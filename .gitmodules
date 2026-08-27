@@ -1,0 +1,6 @@
+[submodule "references/plugins"]
+	path = references/plugins
+	url = https://github.com/cursor/plugins.git
+[submodule "references/skills"]
+	path = references/skills
+	url = https://github.com/mattpocock/skills.git
