@@ -4,3 +4,6 @@
 [submodule "references/skills"]
 	path = references/skills
 	url = https://github.com/mattpocock/skills.git
+[submodule "references/mosk"]
+	path = references/mosk
+	url = https://github.com/rogerznts/mosk.git
