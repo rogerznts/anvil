@@ -7,3 +7,9 @@
 [submodule "references/mosk"]
 	path = references/mosk
 	url = https://github.com/rogerznts/mosk.git
+[submodule "references/hallmark"]
+	path = references/hallmark
+	url = https://github.com/Nutlope/hallmark.git
+[submodule "references/taste"]
+	path = references/taste
+	url = https://github.com/Leonxlnx/taste-skill.git
