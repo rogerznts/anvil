@@ -13,3 +13,6 @@
 [submodule "references/taste"]
 	path = references/taste
 	url = https://github.com/Leonxlnx/taste-skill.git
+[submodule "references/payload-skills"]
+	path = references/payload-skills
+	url = https://github.com/payloadcms/skills.git

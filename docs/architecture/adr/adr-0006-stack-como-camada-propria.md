@@ -32,13 +32,32 @@ carregamento:
 
 ```
 anvil-stack-payload/
-├── RULE.md      SEMPRE (~60 l) — as 3 ciladas + fronteira de edição
+├── RULE.md      SEMPRE (~90 l) — as 3 ciladas + fronteira de edição
 │                + fatos do projeto (adapter, onde ficam collections, teste)
-├── SKILL.md     SOB DEMANDA (409 → ~120 l) — roteador: a tabela de 30 linhas.
-│                Sai Quick Start e Essential Patterns, que duplicam reference/
-├── reference/   SOB DEMANDA — 11 arq, 6.243 l
+├── SKILL.md     SOB DEMANDA — 518 l, VERBATIM do upstream
+├── reference/   SOB DEMANDA — 11 arq
+├── VENDOR.md    proveniência e o que foi modificado
 └── bench/       SÓ O BENCH — INVARIANTS.md, starter/ (23 arq), 3 .sh
 ```
+
+> **Correção aplicada na Fase 2.** A versão original deste ADR mandava enxugar o
+> `SKILL.md` de 409 para ~120 linhas, cortando `Quick Start` e `Essential
+> Patterns` por duplicarem o `reference/`. Isso conflita com o
+> [adr-0001](./adr-0001-skills-vendorizadas-seguem-o-padrao-original.md), e a
+> regra mestra resolve o conflito: **bateu dúvida, o padrão é o da skill
+> original.**
+>
+> A duplicação é escolha deliberada do upstream — `SKILL.md` é a porta de entrada
+> que dá o suficiente para começar sem carregar onze arquivos. Cortar custaria um
+> delta permanente de ~400 linhas, conflito em todo update, e a perda das
+> melhorias upstream justamente nas partes cortadas.
+>
+> O `RULE.md` é **aditivo**: extrai as ciladas sem tocar na fonte. A modificação
+> real ficou em **uma linha** — o `name:` do frontmatter.
+>
+> A skill vem de [`payloadcms/skills`](https://github.com/payloadcms/skills),
+> repositório oficial da Payload. A pendência de origem que este ADR registrava
+> está resolvida: ela é vendorizável, não autoral.
 
 A separação que o mosk não fez: `INV-4` (*zero build local, só Docker*) e `INV-1`
 (*admin sempre pt-BR com menu completo*) **não são fatos do Payload** — são
@@ -74,10 +93,19 @@ carregadas, onde precisam estar.
 armadilha do que é referência exige ler o material inteiro, e errar significa
 uma rule inchada ou uma cilada escondida atrás de carga sob demanda.
 
-**Pendência.** A origem upstream da skill `payload` precisa ser identificada e
-registrada no manifesto. Sem origem rastreável ela é autoral, fica fora do sync
-do [adr-0004](./adr-0004-sync-por-merge-3-way-sem-cache.md), e isso tem que
-estar explícito — não implícito.
+**Pendência resolvida na Fase 2.** A skill vem de
+[`payloadcms/skills`](https://github.com/payloadcms/skills), adicionado como
+submodule `references/payload-skills` e pinado em `832d5bc`. Entra no sync do
+[adr-0004](./adr-0004-sync-por-merge-3-way-sem-cache.md) como qualquer outra
+vendorizada.
+
+A proveniência fica em `VENDOR.md`, no formato que o mosk já usava para o
+hallmark: projeto, autor, licença, pin, caminho de origem, o que foi modificado
+e o que é autoral do anvil. Ele também registra a
+[issue #16909](https://github.com/payloadcms/payload/issues/16909) do upstream —
+`FIELD-TYPE-GUARDS.md` importa os type guards de `payload`, mas eles vêm de
+`payload/shared`. **Não corrigimos aqui:** corrigir criaria divergência num
+arquivo que o upstream vai consertar.
 
 **Verificação.** Num projeto Payload com a rule ativa, pedir uma operação de
 Local API em nome de um usuário e conferir que o `overrideAccess: false` aparece

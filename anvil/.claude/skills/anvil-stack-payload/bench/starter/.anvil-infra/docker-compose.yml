@@ -1,0 +1,50 @@
+# Infra COMPARTILHADA por máquina (ADR-0001, FR-005).
+# Sobe UMA vez; todos os projetos criados pelo modo /anvil-bench reusam.
+# infra.sh copia este arquivo para ~/projects/.anvil-infra/ e sobe com `up -d`.
+#
+# - É esta infra que CRIA a rede `anvil-net` (name: anvil-net).
+# - Postgres e Redis NÃO publicam portas no host: só são acessíveis dentro da
+#   `anvil-net`, pelos containers `app` de cada projeto (por nome de serviço).
+# - Dados persistem em volumes nomeados mesmo derrubando a infra.
+
+name: anvil-infra
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: anvil
+      POSTGRES_PASSWORD: anvil
+      POSTGRES_DB: anvil
+    volumes:
+      - anvil-pgdata:/var/lib/postgresql/data
+    networks:
+      - anvil-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anvil"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - anvil-redisdata:/data
+    networks:
+      - anvil-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  anvil-pgdata:
+  anvil-redisdata:
+
+networks:
+  anvil-net:
+    name: anvil-net
