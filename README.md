@@ -9,10 +9,15 @@ vendoriza com adaptação registrada num manifesto — de forma que continuem
 atualizáveis quando o upstream andar.
 
 ```bash
-npx degit rogerznts/anvil/anvil .
+npx degit rogerznts/anvil/anvil . --force
 claude
 > /anvil-boot
 ```
+
+O `--force` é necessário em projeto que já existe: o degit recusa diretório
+não-vazio. Ele sobrescreve arquivo a arquivo e **não apaga** nada que já estava
+lá — o `README.md` e o código do projeto passam intactos. Em diretório vazio o
+`--force` é dispensável.
 
 ---
 
@@ -45,7 +50,7 @@ Vinte e uma dessas skills têm **uma linha** de delta: o `name:` do frontmatter.
 
 ```mermaid
 flowchart TD
-    A["npx degit rogerznts/anvil/anvil ."] --> B["/anvil-boot"]
+    A["npx degit rogerznts/anvil/anvil . --force"] --> B["/anvil-boot"]
 
     subgraph boot ["Boot — uma vez por projeto"]
         direction TB
@@ -215,7 +220,7 @@ de `resolved` → em andamento; pasta sob `archive/` → arquivado.
 O boot acrescenta ao `.gitignore` do projeto:
 
 ```gitignore
-# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil .`
+# anvil — reinstalável com `npx degit rogerznts/anvil/anvil . --force`
 .claude/skills/
 ```
 

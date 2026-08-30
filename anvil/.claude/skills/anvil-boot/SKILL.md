@@ -178,7 +178,7 @@ Diga ao usuário que a guarda está ativa e o que ela bloqueia.
 Acrescente ao `.gitignore` do projeto, **sem duplicar** se já estiver lá:
 
 ```gitignore
-# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil .`
+# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil . --force`
 .claude/skills/
 ```
 

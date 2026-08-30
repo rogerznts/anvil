@@ -19,14 +19,20 @@ Esta skill escolhe **um**, e só um.
 | Landing ou portfólio, e o projeto já usa um design system (shadcn, Material, Fluent, Carbon, Radix) | **anvil-ui-taste** | roteia para o sistema oficial em vez de inventar CSS. *"Never invent CSS for things that have a package"* |
 | Produto novo · componente isolado · partir de uma referência visual | **anvil-ui-hallmark** | é o único que cobre componente (exige os 8 estados) e o único com o verbo `study`, que extrai o DNA de uma URL ou screenshot |
 
-Empate entre taste e hallmark? Duas perguntas resolvem:
+**Nenhuma linha casou, ou mais de uma casou?** Três perguntas em ordem, e a
+primeira que responder decide:
 
-1. **É dashboard, tabela de dados, formulário multi-etapa ou editor?** O taste
-   declara esses fora de escopo. → hallmark.
-2. **O projeto já tem design system instalado?** Se tem, inventar tokens novos
-   briga com ele. → taste.
+1. **É dashboard, tabela de dados, formulário multi-etapa ou editor de código?**
+   O taste declara esses fora de escopo. → **hallmark**.
+2. **O projeto já tem design system instalado?** Inventar tokens novos brigaria
+   com ele. → **taste**.
+3. **Nenhuma das duas.** → **hallmark**, que tem o escopo mais largo e é o único
+   que cobre componente isolado.
 
-Continua empatado: **hallmark**, que tem o escopo mais largo.
+A terceira existe para a tabela ser **total**: sempre há uma resposta, e ela
+nunca é "os dois". O caso que mais cai aqui é *página nova num projeto que já
+existe mas não tem design system* — não é modernização, não é roteável para um
+sistema oficial, e "produto novo" descreve mal. É hallmark.
 
 ## Por que não os dois
 

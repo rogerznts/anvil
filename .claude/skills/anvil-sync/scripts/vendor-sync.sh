@@ -370,7 +370,7 @@ for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
         t = m.group(1)
         if '://' in t or t.startswith('#') or '{{' in t or '<' in t:
             continue
-        if re.search(r'\.(md|sh|ts|yaml|yml)$', t):
+        if re.search(r'\.(md|sh|ts|css|yaml|yml)$', t):
             out.append(t)
 print('\n'.join(out))
 PYEOF
