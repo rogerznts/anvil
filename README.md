@@ -57,7 +57,7 @@ flowchart TD
         B --> B1["CLAUDE.md<br/>bloco ANVIL:DIRECTIVES"]
         B1 --> B2["varre o projeto"]
         B2 --> B3[".claude/rules/<br/>project.md · anvil.md"]
-        B3 --> B4["anvil-docs scaffold<br/>árvore docs/"]
+        B3 --> B4["anvil-docs scaffold<br/>architecture · discovery<br/>specs · agents"]
         B4 --> B5["anvil-setup<br/>docs/agents/issue-tracker.md"]
         B5 --> B6{"achou<br/>payload.config.ts?"}
         B6 -->|sim| B7["propõe rules/payload.md<br/>e espera aprovação"]
@@ -105,7 +105,7 @@ disco. Depois cada `implement` começa do zero, e **o ticket é o estado**:
 
 | skill | para quê | origem |
 |---|---|---|
-| `anvil-grill` | entrevista que afia o plano e escreve o glossário e os ADRs enquanto decide | mattpocock |
+| `anvil-grill` | entrevista que afia o plano e **escreve enquanto decide**: glossário, ADRs, e o fluxo de usuário em `specs/{id}/ui/` | mattpocock |
 | `anvil-to-spec` | transforma a conversa em spec, sem entrevistar de novo | mattpocock |
 | `anvil-to-tickets` | corta a spec em tickets *tracer bullet*, cada um declarando o que o bloqueia | mattpocock |
 | `anvil-implement` | constrói a partir do ticket; chama `tdd` e `code-review` por dentro | mattpocock |
@@ -128,7 +128,7 @@ disco. Depois cada `implement` começa do zero, e **o ticket é o estado**:
 |---|---|---|
 | `anvil-architect` | esboça tipos, assinaturas e módulos **antes** do código, e fica no loop | pstack |
 | `anvil-arena` | N candidatos em paralelo, um juiz independente, enxerta o melhor de cada | pstack |
-| `anvil-prototype` | protótipo descartável para responder uma pergunta de design | mattpocock |
+| `anvil-prototype` | protótipo descartável para responder uma pergunta de design que só se responde vendo rodar. A decisão volta para o documento; o protótipo morre fora da main | mattpocock |
 | `anvil-wayfinder` | trabalho grande demais para uma sessão: mapa de tickets de decisão | mattpocock |
 | `anvil-principles` | os 21 princípios que `poteto`, `architect` e `arena` citam | pstack |
 | `anvil-poteto` | modo de trabalho: todolist, playbook por formato de tarefa, prosa sem gordura | pstack |

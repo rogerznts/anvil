@@ -1,15 +1,15 @@
 # Índice da documentação
 
-Last updated: 2026-08-28T00:00:00Z
+Last updated: 2026-08-30T00:00:00Z
 
 ## Visão geral
 
-- **[Discovery](./discovery/)** — pesquisa, briefings, brainstorming
-- **[PRD](./prd/)** — requisitos de produto
 - **[Architecture](./architecture/overview.md)** — desenho do sistema + ADRs
-- **[UI](./ui/)** — design system, fluxos, wireframes
-- **[QA](./qa/)** — estratégia de teste e gates
+- **[Discovery](./discovery/)** — pesquisa e notas
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
+
+Os domínios `prd/`, `ui/` e `qa/` são reconhecidos mas não existem aqui: nenhuma
+skill escreve neles, e eles nascem quando houver conteúdo.
 
 ## Specs ativas
 

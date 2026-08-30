@@ -4,7 +4,7 @@ O anvil é um toolkit de skills para Claude Code, distribuído por `npx degit`.
 Sucede o [mosk](https://github.com/rogerznts/mosk), trocando agentes-como-persona
 por um conjunto curado de skills de terceiros.
 
-A tese: **não escrever as skills de trabalho.** Curadoriza 33 skills de quatro
+A tese: **não escrever as skills de trabalho.** Curadoriza 35 skills de cinco
 repositórios upstream, mantidos como submodules em `references/`, e as vendoriza
 com adaptação registrada — ver
 [adr-0001](./adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md).
@@ -14,20 +14,21 @@ com adaptação registrada — ver
 ```
 ┌─ fluxo ──────────────────────────────────────────────────┐
 │  grill → to-spec → to-tickets → implement → code-review  │
-│  mattpocock/skills · 21 skills · 1.196 l                  │
+│  mattpocock/skills · 21 skills                            │
 ├─ ofício ─────────────────────────────────────────────────┤
-│  architect · arena · unslop · how · poteto                │
-│  cursor/plugins (pstack) · 5 skills                       │
+│  architect · arena · unslop · how · poteto · principles   │
+│  cursor/plugins (pstack) · 6 skills                       │
 ├─ interface ──────────────────────────────────────────────┤
 │  anvil-ui (roteador) → hallmark | taste | redesign        │
 │                      + presets brutalist/minimalist/…     │
 │  Nutlope/hallmark + Leonxlnx/taste-skill · 7 skills       │
+│  payloadcms/skills · 1 skill (a stack)                    │
 ├─ stack ──────────────────────────────────────────────────┤
 │  anvil-stack-payload: RULE · reference/ · bench/          │
 │  contrato de 6 capacidades                                │
 └───────────────────────────────────────────────────────────┘
-      apoiadas por 10 skills autorais: docs · setup · boot ·
-      update · bench · ui · tea-*
+      apoiadas por 9 skills autorais: docs · boot · update ·
+      bench · ui · tea-* (4)
 ```
 
 ## O que o anvil impõe, e só isso
@@ -40,14 +41,21 @@ docs/
 ├── index.md                    auto-gerado
 ├── agents/issue-tracker.md     o perfil que as skills de fluxo leem
 ├── architecture/               context.md · context-map.md · adr/
-├── discovery/  prd/  ui/  qa/  project/
-└── specs/
-    ├── {NNN}-{tipo}-{nome}/    ← só a PASTA é do anvil
-    │   ├── spec.md               to-spec, template dele
-    │   ├── issues/NN-slug.md     to-tickets, com Blocked by e Status
-    │   └── map.md                wayfinder, quando usado
-    └── archive/
+├── discovery/                  ●  anvil-research
+├── specs/                      ●
+│   ├── {NNN}-{tipo}-{nome}/       ← só a PASTA é do anvil
+│   │   ├── spec.md                  to-spec, com as User Stories
+│   │   ├── issues/NN-slug.md        to-tickets, com Blocked by e Status
+│   │   ├── ui/                      fluxo desta mudança (anvil-grill)
+│   │   └── map.md                   wayfinder, quando usado
+│   └── archive/
+└── prd/  ui/  qa/  project/    ○  sem escritor; nascem sob demanda
 ```
+
+**●** o `scaffold` cria · **○** reconhecidos pelo `validate.sh`, mas nascem só
+quando houver conteúdo. Cinco dos oito domínios do mosk existiam para agentes que
+morreram com as personas; manter pasta vazia com README prometendo um autor
+inexistente ensina quem lê a ignorar a árvore.
 
 Branch é `{tipo}/{NNN}-{nome}` — string diferente da pasta, de propósito. A
 resolução é por prefixo numérico, nunca por igualdade.
@@ -88,8 +96,8 @@ Os submodules são pinados por commit no manifesto, e o pin **é** a base do mer
 3-way. Não há snapshot a manter — ver
 [adr-0004](./adr/adr-0004-sync-por-merge-3-way-sem-cache.md).
 
-O delta permanente contra o upstream: 14 linhas mais a linha de nome de cada
-skill.
+O delta medido contra o upstream: **171 linhas em 25.064 — 0,68%**. Vinte e uma
+skills ficam com uma linha só, o `name:` do frontmatter.
 
 ## Herança do mosk
 
