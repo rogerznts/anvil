@@ -33,6 +33,16 @@ ser · para onde iria* — sem mover nada:
 - `.scratch/` — sinal de que o perfil de tracker local já esteve em uso
 - `.claude/rules/` e `.claude/skills/` — o que já existe
 
+Rode a checagem de duplicata **antes de propor qualquer coisa**:
+
+```bash
+bash scripts/find-dupes.sh docs
+```
+
+Ela lista conteúdo idêntico, mesmo identificador (`US-014` numa cópia,
+`US-014-exportar-csv` na outra) e mesmo título. Duplicata que já existia entra no
+survey como item a resolver, não como coisa a mover duas vezes.
+
 Classifique cada entrada como **conforme** ou **não-conforme**:
 
 - Conforme: mora sob um domínio canônico (`discovery/`, `prd/`, `architecture/`,
@@ -75,9 +85,9 @@ spec dona é **reportado, não adivinhado** — o usuário decide se cria uma sp
 para ele ou se ele morreu.
 
 **A mesma story costuma existir em dois lugares.** O layout antigo permitia uma
-cópia global em `docs/stories/` e outra local em `docs/specs/{id}/stories/`.
-Antes de mover, **case por identificador** — `US-014` numa, `US-014-exportar-csv`
-na outra é a mesma coisa. Achou par:
+cópia global em `docs/stories/` e outra local em `docs/specs/{id}/stories/`. O
+`find-dupes.sh` do passo 1 já listou esses pares — não confie em reparar sozinho
+enquanto move dezenas de arquivos. Para cada par:
 
 - conteúdo igual → mova **uma** e descarte a outra, dizendo qual descartou
 - conteúdo diferente → a local costuma ser a mais recente. **Mostre as duas e
@@ -110,7 +120,23 @@ uma linha dizendo por que aquele destino.
 
 ## Saída
 
-Ou `docs/` só tem entradas conformes, ou **toda** não-conforme tem destino
-explicitamente aprovado. Reporte o que ficou sem resolver.
+Três condições, e a terceira é a que se esquece:
+
+1. `docs/` só tem entradas conformes, ou **toda** não-conforme tem destino
+   explicitamente aprovado.
+
+2. **Nenhuma duplicata introduzida.** Rode de novo:
+
+   ```bash
+   bash scripts/validate.sh docs-paths
+   bash scripts/find-dupes.sh docs
+   ```
+
+   Os dois precisam sair limpos. Se o `find-dupes` acusar algo que não acusava no
+   passo 1, **foi o adopt que criou** — mover em vez de copiar, fatiar sem apagar
+   a origem, ou tratar as duas cópias da mesma story como coisas diferentes.
+   Resolva antes de declarar pronto.
+
+3. Reporte o que ficou sem resolver, por nome.
 
 Ao final, rode o verbo `index`.

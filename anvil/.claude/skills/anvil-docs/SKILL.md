@@ -141,3 +141,6 @@ fluxo do bench. O contrato está em [STACK-CONTRACT.md](STACK-CONTRACT.md).
   domínios canônicos. Consultivo, não bloqueia.
 - `bash scripts/validate.sh ship-ready` — a spec do branch atual está fechada.
   É o que o hook de merge chama.
+- `bash scripts/find-dupes.sh docs` — conteúdo duplicado: mesmo hash, mesmo
+  identificador de artefato, mesmo título. O `adopt` roda no começo e no fim;
+  vale rodar à mão depois de qualquer movimentação em massa.

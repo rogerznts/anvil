@@ -1,6 +1,7 @@
-# [CLAUDE.md](http://CLAUDE.md)
+## Diretrizes do anvil
 
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with the project-specific instructions below.
+Reduzem os erros que um LLM comete por padrão ao escrever código. Convivem com
+as instruções específicas do projeto, que ficam fora deste bloco.
 
 **Tradeoff:** these guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
