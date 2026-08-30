@@ -34,7 +34,12 @@ python3 -c 'import yaml' 2>/dev/null || die "PyYAML é necessário: pip install 
 
 # --- leitura do manifesto -----------------------------------------------------
 # Emite uma linha por skill, campos separados por \x1f (Unit Separator):
-#   nome  estado  submodule  path  pin  adapt(,)  keep(,)  strip(,)
+#   nome  estado  submodule  path  pin  adapt(,)  keep(,)  strip(,)  extra(,)
+#
+# `extra` traz arquivo que vive FORA do path da skill no mesmo submodule, em
+# pares `origem::destino`. Existe porque uma skill pode depender de material que
+# o upstream guarda na raiz do repositorio — e trazer por `extra` o mantem no
+# merge 3-way, ao contrario de copiar a mao uma vez e esquecer.
 #
 # NAO use tab: tab e whitespace, e `read` com IFS de whitespace COLAPSA
 # delimitadores consecutivos. Um campo vazio no meio — o pin de uma skill
@@ -48,11 +53,19 @@ for s in m.get('skills', []):
     o = src.get(s['source'], {})
     sub = o.get('submodule', '')
     sp = o.get('subpath', '')
-    path = f"{sp}/{s['path']}" if sp else s['path']
-    print('\x1f'.join([
+    # path vazio continua vazio: a skill nao tem arvore propria, so extras.
+    # Concatenar o subpath aqui produziria "pstack/", que NAO e vazio e faria
+    # o tree-walk varrer o plugin inteiro.
+    raw = s.get('path', '')
+    path = (f"{sp}/{raw}" if sp else raw) if raw else ''
+    # extras sao caminhos no submodule: levam o subpath tambem.
+    extra = [(f"{sp}/{e}" if sp and not e.startswith(sp + '/') else e) for e in s.get('extra', [])]
+    # str() em tudo: um pin composto so de digitos e lido como int pelo YAML,
+    # e o join estoura. SHA so-digitos e raro, nao impossivel.
+    print('\x1f'.join(str(x) for x in [
         s['name'], s.get('state', 'planned'), sub, path, s.get('pin', ''),
         ','.join(s.get('adapt', [])), ','.join(s.get('keep', [])),
-        ','.join(s.get('strip', [])),
+        ','.join(s.get('strip', [])), ','.join(extra),
     ]))
 PY
 }
@@ -96,6 +109,9 @@ PY
 
 # Lista os arquivos de um diretório numa árvore git, relativos a esse diretório.
 tree_files() {  # <submodule> <ref> <path>
+    # path vazio: a skill nao tem arvore propria no upstream, so `extra`.
+    # E o caso de material que o upstream publica espalhado e o anvil reune.
+    [ -n "$3" ] || return 0
     git -C "$ROOT/$1" ls-tree -r --name-only "$2" -- "$3" 2>/dev/null \
         | sed "s|^$3/||"
 }
@@ -110,6 +126,39 @@ is_listed() {  # <arquivo> <lista-csv>  — casa exato ou prefixo de diretório
         case "$f" in "$item"/*) return 0 ;; esac
     done
     return 1
+}
+
+# Traz os pares `origem::destino` de `extra`, de uma ref do submodule.
+#
+# Sem <pin>, copia direto (primeira vendorizacao, nao ha "ours").
+# Com <pin>, faz o MESMO merge 3-way dos demais arquivos. Copiar por cima no
+# update apagaria qualquer adaptacao feita no extra — e o link relativo de um
+# arquivo que mudou de lugar e exatamente o tipo de adaptacao que ele precisa.
+copy_extras() {  # <submodule> <ref> <dest-skill> <extra-csv> [<pin>]
+    local sub="$1" ref="$2" dest="$3" list="$4" pin="${5:-}" pair from to n=0
+    local base theirs
+    [ -n "$list" ] || { echo 0; return 0; }
+    IFS=',' read -ra arr <<< "$list"
+    for pair in "${arr[@]}"; do
+        [ -n "$pair" ] || continue
+        from="${pair%%::*}"; to="${pair##*::}"
+        mkdir -p "$dest/$(dirname "$to")"
+        if [ -z "$pin" ] || [ ! -f "$dest/$to" ]; then
+            git -C "$ROOT/$sub" show "$ref:$from" > "$dest/$to" 2>/dev/null && n=$((n + 1))
+            continue
+        fi
+        base="$(mktemp)"; theirs="$(mktemp)"
+        git -C "$ROOT/$sub" show "$pin:$from" > "$base"   2>/dev/null || : > "$base"
+        git -C "$ROOT/$sub" show "$ref:$from" > "$theirs" 2>/dev/null || : > "$theirs"
+        if cmp -s "$base" "$theirs"; then rm -f "$base" "$theirs"; continue; fi
+        if git merge-file -q "$dest/$to" "$base" "$theirs" 2>/dev/null; then
+            n=$((n + 1))
+        else
+            echo "    CONFLITO no extra: $to" >&2
+        fi
+        rm -f "$base" "$theirs"
+    done
+    echo "$n"
 }
 
 # `rename` — a única regra mecânica: o name: do frontmatter casa com o diretório.
@@ -166,11 +215,11 @@ cmd_pull() {
 # --- vendor -------------------------------------------------------------------
 
 cmd_vendor() {
-    local name="${1:-}" row state sub path adapt keep strip head dest f
+    local name="${1:-}" row state sub path adapt keep strip extra head dest f
     [ -n "$name" ] || die "uso: vendor <nome-da-skill>"
     row="$(row_for "$name")"
     [ -n "$row" ] || die "'$name' não está no manifesto"
-    IFS=$'\x1f' read -r _ state sub path _ adapt keep strip <<< "$row"
+    IFS=$'\x1f' read -r _ state sub path _ adapt keep strip extra <<< "$row"
     [ "$state" = "planned" ] || die "'$name' já está vendorizada. Use 'update $name'."
 
     head="$(git -C "$ROOT/$sub" rev-parse HEAD)" || die "submodule $sub ausente"
@@ -187,12 +236,13 @@ cmd_vendor() {
         n=$((n + 1))
     done < <(tree_files "$sub" "$head" "$path")
 
+    local nextra; nextra="$(copy_extras "$sub" "$head" "$dest" "$extra")"
     case ",$adapt," in *,rename,*) apply_rename "$dest" "$name" ;; esac
     set_pin "$name" "$head" || die "falha ao gravar o pin"
 
     echo "vendorizada: $name"
     echo "  origem : $sub/$path @ ${head:0:7}"
-    echo "  copiados: $n arquivo(s); ignorados por strip: $nskip"
+    echo "  copiados: $n arquivo(s); ignorados por strip: $nskip; extras: $nextra"
     [ -n "$keep" ] && echo "  keep   : $keep"
     local j=""
     case ",$adapt," in *,docs-remap,*) j="$j docs-remap" ;; esac
@@ -207,10 +257,10 @@ cmd_vendor() {
 # --- update -------------------------------------------------------------------
 
 update_one() {
-    local name="$1" row state sub path pin adapt keep strip head dest
+    local name="$1" row state sub path pin adapt keep strip extra head dest
     row="$(row_for "$name")"
     [ -n "$row" ] || { echo "  '$name' não está no manifesto"; return 1; }
-    IFS=$'\x1f' read -r _ state sub path pin adapt keep strip <<< "$row"
+    IFS=$'\x1f' read -r _ state sub path pin adapt keep strip extra <<< "$row"
     [ "$state" = "vendored" ] || { echo "  $name: planned, use 'vendor'"; return 0; }
 
     head="$(git -C "$ROOT/$sub" rev-parse HEAD)" || { echo "  $name: submodule ausente"; return 1; }
@@ -265,6 +315,7 @@ update_one() {
     [ "$apagados" -gt 0 ] && { echo "    SUMIRAM upstream (não apagados aqui):"; printf "%b" "$del_list"; }
 
     if [ "$conflitos" -eq 0 ]; then
+        copy_extras "$sub" "$head" "$dest" "$extra" "$pin" >/dev/null
         case ",$adapt," in *,rename,*) apply_rename "$dest" "$name" ;; esac
         set_pin "$name" "$head"
         echo "    pin atualizado para ${head:0:7}"

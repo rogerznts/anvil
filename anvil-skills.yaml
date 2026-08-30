@@ -90,39 +90,63 @@ skills:
               "playbooks/visual-parity.md", "playbooks/worktree-cleanup.md",
               "playbooks/authoring-a-skill.md", "playbooks/shipping.md"] }
 
-  # ---- pstack: principles (o vocabulário que poteto, architect e arena citam) ----
-  - { name: anvil-principle-boundary-discipline,                        source: pstack, path: skills/principle-boundary-discipline, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-build-the-lever,                            source: pstack, path: skills/principle-build-the-lever, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-encode-lessons-in-structure,                source: pstack, path: skills/principle-encode-lessons-in-structure, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-exhaust-the-design-space,                   source: pstack, path: skills/principle-exhaust-the-design-space, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-experience-first,                           source: pstack, path: skills/principle-experience-first, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-fix-root-causes,                            source: pstack, path: skills/principle-fix-root-causes, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-foundational-thinking,                      source: pstack, path: skills/principle-foundational-thinking, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-guard-the-context-window,                   source: pstack, path: skills/principle-guard-the-context-window, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-laziness-protocol,                          source: pstack, path: skills/principle-laziness-protocol, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-make-operations-idempotent,                 source: pstack, path: skills/principle-make-operations-idempotent, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-migrate-callers-then-delete-legacy-apis,    source: pstack, path: skills/principle-migrate-callers-then-delete-legacy-apis, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-minimize-reader-load,                       source: pstack, path: skills/principle-minimize-reader-load, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-model-the-domain,                           source: pstack, path: skills/principle-model-the-domain, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-never-block-on-the-human,                   source: pstack, path: skills/principle-never-block-on-the-human, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-outcome-oriented-execution,                 source: pstack, path: skills/principle-outcome-oriented-execution, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-prove-it-works,                             source: pstack, path: skills/principle-prove-it-works, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-redesign-from-first-principles,             source: pstack, path: skills/principle-redesign-from-first-principles, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-separate-before-serializing-shared-state,   source: pstack, path: skills/principle-separate-before-serializing-shared-state, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-sequence-verifiable-units,                  source: pstack, path: skills/principle-sequence-verifiable-units, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-subtract-before-you-add,                    source: pstack, path: skills/principle-subtract-before-you-add, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-principle-type-system-discipline,                     source: pstack, path: skills/principle-type-system-discipline, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  # ---- pstack: principles ----
+  # As 21 principle-* do upstream vêm como REFERENCES de uma skill só. Elas têm
+  # disable-model-invocation e nunca disparam sozinhas, então 21 lugares no
+  # namespace não se pagam. Três skills as citam — poteto, architect e arena —
+  # logo o lugar compartilhado é uma skill, não a pasta de uma delas.
+  - name: anvil-principles
+    source: pstack
+    pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8
+    state: vendored
+    path: ""                 # sem árvore própria: esta skill é só o índice + extras
+    adapt: []
+    keep: [SKILL.md]
+    extra:
+      - "skills/principle-boundary-discipline/SKILL.md::references/boundary-discipline.md"
+      - "skills/principle-build-the-lever/SKILL.md::references/build-the-lever.md"
+      - "skills/principle-encode-lessons-in-structure/SKILL.md::references/encode-lessons-in-structure.md"
+      - "skills/principle-exhaust-the-design-space/SKILL.md::references/exhaust-the-design-space.md"
+      - "skills/principle-experience-first/SKILL.md::references/experience-first.md"
+      - "skills/principle-fix-root-causes/SKILL.md::references/fix-root-causes.md"
+      - "skills/principle-foundational-thinking/SKILL.md::references/foundational-thinking.md"
+      - "skills/principle-guard-the-context-window/SKILL.md::references/guard-the-context-window.md"
+      - "skills/principle-laziness-protocol/SKILL.md::references/laziness-protocol.md"
+      - "skills/principle-make-operations-idempotent/SKILL.md::references/make-operations-idempotent.md"
+      - "skills/principle-migrate-callers-then-delete-legacy-apis/SKILL.md::references/migrate-callers-then-delete-legacy-apis.md"
+      - "skills/principle-minimize-reader-load/SKILL.md::references/minimize-reader-load.md"
+      - "skills/principle-model-the-domain/SKILL.md::references/model-the-domain.md"
+      - "skills/principle-never-block-on-the-human/SKILL.md::references/never-block-on-the-human.md"
+      - "skills/principle-outcome-oriented-execution/SKILL.md::references/outcome-oriented-execution.md"
+      - "skills/principle-prove-it-works/SKILL.md::references/prove-it-works.md"
+      - "skills/principle-redesign-from-first-principles/SKILL.md::references/redesign-from-first-principles.md"
+      - "skills/principle-separate-before-serializing-shared-state/SKILL.md::references/separate-before-serializing-shared-state.md"
+      - "skills/principle-sequence-verifiable-units/SKILL.md::references/sequence-verifiable-units.md"
+      - "skills/principle-subtract-before-you-add/SKILL.md::references/subtract-before-you-add.md"
+      - "skills/principle-type-system-discipline/SKILL.md::references/type-system-discipline.md"
 
   # ---- UI: métodos ---------------------------------------------------------
-  - { name: anvil-ui-hallmark, source: hallmark, path: skills/hallmark,        state: planned, adapt: [rename] }
-  - { name: anvil-ui-taste,    source: taste,    path: skills/taste-skill,     state: planned, adapt: [rename] }
-  - { name: anvil-ui-redesign, source: taste,    path: skills/redesign-skill,  state: planned, adapt: [rename] }
+  - name: anvil-ui-hallmark
+    source: hallmark
+    path: skills/hallmark
+    pin: 13ac0ec7e148655948100b6396439e481361d690
+    state: vendored
+    adapt: [rename]
+    # Material que o hallmark referencia e que o upstream guarda FORA de
+    # skills/hallmark/. O tokens.css e portante: os valores de eixo por tema,
+    # que a regra de diversificacao le, vivem nos comentarios dele.
+    extra:
+      - "site/css/tokens.css::references/themes.css"
+      - "docs/recipes.md::docs/recipes.md"
+      - "docs/study-examples.md::docs/study-examples.md"
+  - { name: anvil-ui-taste,    source: taste,    path: skills/taste-skill,     pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
+  - { name: anvil-ui-redesign, source: taste,    path: skills/redesign-skill,  pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
 
   # ---- UI: presets ---------------------------------------------------------
-  - { name: anvil-ui-brutalist,  source: taste, path: skills/brutalist-skill,  state: planned, adapt: [rename] }
-  - { name: anvil-ui-minimalist, source: taste, path: skills/minimalist-skill, state: planned, adapt: [rename] }
-  - { name: anvil-ui-soft,       source: taste, path: skills/soft-skill,       state: planned, adapt: [rename] }
-  - { name: anvil-ui-stitch,     source: taste, path: skills/stitch-skill,     state: planned, adapt: [rename] }
+  - { name: anvil-ui-brutalist,  source: taste, path: skills/brutalist-skill,  pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
+  - { name: anvil-ui-minimalist, source: taste, path: skills/minimalist-skill, pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
+  - { name: anvil-ui-soft,       source: taste, path: skills/soft-skill,       pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
+  - { name: anvil-ui-stitch,     source: taste, path: skills/stitch-skill,     pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
 
 # Skills autorais do anvil, fora do sync porque não têm upstream:
 #   anvil-docs · anvil-ui (roteador) · anvil-boot · anvil-update · anvil-bench
