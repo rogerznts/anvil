@@ -82,6 +82,9 @@ veredito em prosa.
 
 ## Migração de projeto criado pelo mosk
 
+<!-- anvil-verify: allow-mosk-ops — esta seção precisa nomear os identificadores
+     antigos; quem migra vai encontrá-los no docker-compose.yml do projeto. -->
+
 Projeto que já roda na infra do mosk usa `mosk-net` e
 `~/projects/.mosk-infra/registry.yaml`. O anvil usa `anvil-net` e
 `~/projects/.anvil-infra/`, com usuário de banco `anvil`.

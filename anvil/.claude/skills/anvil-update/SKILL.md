@@ -43,6 +43,6 @@ lockfile diz a verdade, um prefixo adivinha.
 ## Onde está a implementação de origem
 
 O `reset-install.sh` do mosk é a base: cálculo do conjunto a apagar, lista de
-protegidos e o guard de `--from == --to`. Está em
-`references/mosk/mosk/.claude/mosk/scripts/reset-install.sh` no repositório do
-anvil, e precisa ser portado trocando a detecção por prefixo pelo lockfile.
+protegidos e o guard de `--from == --to`. Ele vive no submodule `references/mosk`
+do repositório do anvil, sob os scripts do toolkit, e precisa ser portado
+trocando a detecção por prefixo pelo lockfile.
