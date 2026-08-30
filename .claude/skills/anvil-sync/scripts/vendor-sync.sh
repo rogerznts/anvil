@@ -302,24 +302,44 @@ cmd_verify() {
         [ "$n" = "$fm" ] || { echo "   FALHA $n: frontmatter diz '$fm'"; falhas=$((falhas+1)); }
     done
 
+    # Extrai links IGNORANDO bloco de codigo cercado: ali o link e EXEMPLO do
+    # que o arquivo do projeto-alvo vai conter, nao um link deste documento.
+    # Tambem ignora URL (contem ://) e caminho com placeholder ({{...}}, <...>).
+    links_of() {
+        python3 - "$1" <<'PYEOF'
+import re, sys
+out, fence = [], False
+for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
+    if line.lstrip().startswith('```'):
+        fence = not fence
+        continue
+    if fence:
+        continue
+    for m in re.finditer(r'\]\(([^)\s]+?)(?:#[^)]*)?\)', line):
+        t = m.group(1)
+        if '://' in t or t.startswith('#') or '{{' in t or '<' in t:
+            continue
+        if re.search(r'\.(md|sh|ts|yaml|yml)$', t):
+            out.append(t)
+print('\n'.join(out))
+PYEOF
+    }
+
     echo "2. links relativos resolvem"
     while IFS= read -r f; do
         d="$(dirname "$f")"
         while IFS= read -r l; do
             [ -n "$l" ] || continue
             [ -e "$d/$l" ] || { echo "   FALHA ${f#"$PAYLOAD"/} -> $l"; falhas=$((falhas+1)); }
-        done < <(grep -ohE '\]\(([^)#][^)]*\.(md|sh|ts|yaml|yml))(#[^)]*)?\)' "$f" 2>/dev/null \
-                 | sed 's/](//;s/)$//;s/#.*//' | grep -v '://')
+        done < <(links_of "$f")
     done < <(find "$PAYLOAD" -name '*.md' -not -path '*/starter/*' -not -path '*/templates/*')
 
     echo "3. nenhum caminho relativo cruza fronteira de skill"
     while IFS= read -r f; do
-        grep -ohE '\]\(\.\./\.\./[^)]*\)' "$f" 2>/dev/null | while IFS= read -r l; do
-            echo "   FALHA ${f#"$PAYLOAD"/} -> $l"
-        done
-    done < <(find "$PAYLOAD" -name '*.md' -not -path '*/starter/*')
-    t="$(find "$PAYLOAD" -name '*.md' -not -path '*/starter/*' -exec grep -ohE '\]\(\.\./\.\./[^)]*\)' {} + 2>/dev/null | wc -l | tr -d ' ')"
-    falhas=$((falhas + t))
+        while IFS= read -r l; do
+            case "$l" in ../../*) echo "   FALHA ${f#"$PAYLOAD"/} -> $l"; falhas=$((falhas+1)) ;; esac
+        done < <(links_of "$f")
+    done < <(find "$PAYLOAD" -name '*.md' -not -path '*/starter/*' -not -path '*/templates/*')
 
     echo "4. denylist de tokens do upstream"
     while IFS= read -r f; do

@@ -50,17 +50,17 @@ skills:
     keep: [RULE.md, VENDOR.md, bench]
 
   # ---- mattpocock: fluxo principal -----------------------------------------
-  - { name: anvil-grill,        source: mattpocock, path: skills/engineering/grill-with-docs,          state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-to-spec,      source: mattpocock, path: skills/engineering/to-spec,                  state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-to-tickets,   source: mattpocock, path: skills/engineering/to-tickets,               state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-implement,    source: mattpocock, path: skills/engineering/implement,                state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-code-review,  source: mattpocock, path: skills/engineering/code-review,              state: planned, adapt: [rename], strip: [agents] }
+  - { name: anvil-grill,        source: mattpocock, path: skills/engineering/grill-with-docs,          pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-to-spec,      source: mattpocock, path: skills/engineering/to-spec,                  pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-to-tickets,   source: mattpocock, path: skills/engineering/to-tickets,               pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-implement,    source: mattpocock, path: skills/engineering/implement,                pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-code-review,  source: mattpocock, path: skills/engineering/code-review,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
 
   # ---- mattpocock: setup e dependências ocultas ----------------------------
-  - { name: anvil-setup,           source: mattpocock, path: skills/engineering/setup-matt-pocock-skills, state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-grilling,        source: mattpocock, path: skills/productivity/grilling,              state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-domain-modeling, source: mattpocock, path: skills/engineering/domain-modeling,        state: planned, adapt: [rename, docs-remap], strip: [agents] }
-  - { name: anvil-codebase-design, source: mattpocock, path: skills/engineering/codebase-design,        state: planned, adapt: [rename], strip: [agents] }
+  - { name: anvil-setup,           source: mattpocock, path: skills/engineering/setup-matt-pocock-skills, pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-grilling,        source: mattpocock, path: skills/productivity/grilling,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-domain-modeling, source: mattpocock, path: skills/engineering/domain-modeling,        pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
+  - { name: anvil-codebase-design, source: mattpocock, path: skills/engineering/codebase-design,        pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
 
   # ---- mattpocock: extras --------------------------------------------------
   - { name: anvil-wayfinder,          source: mattpocock, path: skills/engineering/wayfinder,           state: planned, adapt: [rename], strip: [agents] }
