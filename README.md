@@ -10,6 +10,11 @@ atualizáveis quando o upstream andar.
 
 ```bash
 npx degit rogerznts/anvil/anvil . --force
+```
+
+depois
+
+```bash
 claude
 > /anvil-boot
 ```
@@ -79,15 +84,17 @@ flowchart TD
     H --> I["/anvil-code-review<br/>Standards + Spec"]
     I --> J{"todos os tickets<br/>Status: resolved?"}
     J -->|não| G
-    J -->|sim| K["git merge"]
+    J -->|sim| K["/tea-open-pr<br/>UM PR por spec"]
     K --> L{"hook varre issues/"}
     L -->|"ticket aberto"| M["bloqueia · exit 2"]
-    L -->|"tudo resolved"| N["/anvil-docs archive<br/>promove ADR · move p/ archive/"]
+    L -->|"tudo resolved"| N["PR aberto<br/>corpo lista a spec e os tickets<br/>cada ticket ganha a URL de volta"]
+    N --> O["merge"]
+    O --> P["/anvil-docs archive<br/>promove ADR · move p/ archive/"]
 
     style boot fill:#f8f8f6,stroke:#bbb
     style janela fill:#f8f8f6,stroke:#bbb
     style M fill:#fdecea,stroke:#c33
-    style N fill:#eaf6ec,stroke:#3a3
+    style P fill:#eaf6ec,stroke:#3a3
 ```
 
 O `grill → to-spec → to-tickets` roda numa **janela só**, sem compactar. É o que
@@ -174,7 +181,9 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 | `anvil-docs` | onde o documento mora, como a spec se chama, e o que acontece quando fecha | autoral |
 | `anvil-setup` | escreve o perfil do issue tracker que o fluxo lê | mattpocock |
 | `anvil-wizard` | gera um wizard em bash para o passo que só um humano pode fazer | mattpocock |
-| `tea-commit` · `tea-open-pr` · `tea-open-fast-pr` · `tea-prune-branches` | commit e PR no Gitea | autoral |
+| `tea-commit` | commit em Conventional Commits, sem pular hook | autoral |
+| `tea-open-pr` · `tea-open-fast-pr` | PR no Gitea, **um por spec**: o corpo lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
+| `tea-prune-branches` | remove branch local cujo remoto sumiu | autoral |
 
 ### Stack e bench
 
