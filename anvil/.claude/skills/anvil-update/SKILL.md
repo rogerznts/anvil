@@ -23,9 +23,17 @@ esta instalação possui. É o que substitui a detecção por prefixo do mosk �
 lockfile diz a verdade, um prefixo adivinha, e adivinha errado justamente nas
 skills que não seguem o padrão de nome, como as `tea-*`.
 
-Instalação sem lock — de antes do lockfile, ou de um degit feito à mão — não
-tem nada classificado como nosso. É a leitura segura: nada é apagado, e o
-primeiro update passa a manter o lock a partir dali.
+Instalação sem lock não tem nada classificado como nosso. É a leitura segura —
+nada é apagado — mas também significa que **órfão nenhum é limpo**. Se o preflight
+não achar `.claude/anvil.lock`, **avise antes de seguir**: o reset vai instalar o
+payload novo por cima e deixar no disco tudo que sobrou da versão anterior.
+
+Nesse caso, ou o usuário aceita e o lock passa a existir a partir daqui, ou ele
+escreve o lock com a lista atual antes de rodar, para o update ter o que comparar:
+
+```bash
+ls .claude/skills | sed 's/^/skill: /' > /tmp/lock-atual
+```
 
 ## Fluxo
 

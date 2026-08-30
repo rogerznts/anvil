@@ -1,0 +1,47 @@
+# anvil.lock — o que esta instalacao possui.
+# Derivado do payload. Regenerado por vendor, update e
+# 'vendor-sync.sh lock'. Nao edite a mao.
+skill: anvil-architect
+skill: anvil-arena
+skill: anvil-bench
+skill: anvil-boot
+skill: anvil-code-review
+skill: anvil-codebase-design
+skill: anvil-diagnose
+skill: anvil-docs
+skill: anvil-domain-modeling
+skill: anvil-grill-me
+skill: anvil-grill
+skill: anvil-grilling
+skill: anvil-handoff
+skill: anvil-how
+skill: anvil-implement
+skill: anvil-poteto
+skill: anvil-principles
+skill: anvil-prototype
+skill: anvil-research
+skill: anvil-setup
+skill: anvil-stack-payload
+skill: anvil-tdd
+skill: anvil-teach
+skill: anvil-to-questionnaire
+skill: anvil-to-spec
+skill: anvil-to-tickets
+skill: anvil-ui-brutalist
+skill: anvil-ui-hallmark
+skill: anvil-ui-minimalist
+skill: anvil-ui-redesign
+skill: anvil-ui-soft
+skill: anvil-ui-stitch
+skill: anvil-ui-taste
+skill: anvil-ui
+skill: anvil-unslop
+skill: anvil-update
+skill: anvil-wait-what
+skill: anvil-wayfinder
+skill: anvil-wizard
+skill: anvil-writing-for-agents
+skill: tea-commit
+skill: tea-open-fast-pr
+skill: tea-open-pr
+skill: tea-prune-branches

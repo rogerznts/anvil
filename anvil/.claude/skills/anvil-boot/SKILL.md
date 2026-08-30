@@ -199,7 +199,30 @@ skills, e que o `anvil.lock` diz o que esperar. Se o projeto preferir versionar
 tudo — por CI que não roda instalação, por exemplo — **respeite e não escreva a
 linha**; é decisão do projeto, não do toolkit.
 
-## 10. Índice e relatório
+## 10. Conferir o `anvil.lock`
+
+O payload traz `.claude/anvil.lock` pronto — é dele que o `/anvil-update` calcula
+os órfãos. Confirme que ele existe e bate com o que está instalado:
+
+```bash
+comm -3 <(sed -n 's/^skill: //p' .claude/anvil.lock | sort) \
+        <(ls .claude/skills | sort)
+```
+
+Saída vazia: em dia. Divergência, ou arquivo ausente numa instalação antiga:
+reescreva a partir do disco.
+
+```bash
+{ echo "# anvil.lock — o que esta instalacao possui."
+  echo "# Derivado do payload. Nao edite a mao."
+  ls .claude/skills | sed 's/^/skill: /'
+} > .claude/anvil.lock
+```
+
+**Sem lock, o update não limpa órfão nenhum** — ele não tem como distinguir o que
+o anvil instalou do que você escreveu, e o lado seguro é não apagar nada.
+
+## 11. Índice e relatório
 
 Chame o verbo `index` do `anvil-docs`.
 

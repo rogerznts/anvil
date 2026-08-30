@@ -6,6 +6,7 @@
 #   vendor <nome>       primeira cópia de uma skill planned
 #   update [<nome>]     merge 3-way do upstream sobre a cópia adaptada
 #   verify              checagens de integridade do payload
+#   lock                regenera o anvil.lock a partir do payload
 #
 # A BASE do merge é reconstruída do submodule pelo pin do manifesto:
 #
@@ -239,6 +240,7 @@ cmd_vendor() {
     local nextra; nextra="$(copy_extras "$sub" "$head" "$dest" "$extra")"
     case ",$adapt," in *,rename,*) apply_rename "$dest" "$name" ;; esac
     set_pin "$name" "$head" || die "falha ao gravar o pin"
+    gerar_lock >/dev/null
 
     echo "vendorizada: $name"
     echo "  origem : $sub/$path @ ${head:0:7}"
@@ -318,6 +320,7 @@ update_one() {
         copy_extras "$sub" "$head" "$dest" "$extra" "$pin" >/dev/null
         case ",$adapt," in *,rename,*) apply_rename "$dest" "$name" ;; esac
         set_pin "$name" "$head"
+        gerar_lock >/dev/null
         echo "    pin atualizado para ${head:0:7}"
         local j=""
         case ",$adapt," in *,docs-remap,*) j="$j docs-remap" ;; esac
@@ -336,6 +339,26 @@ cmd_update() {
     while IFS=$'\x1f' read -r name state _ _ _ _ _ _; do
         [ "$state" = "vendored" ] && update_one "$name"
     done < <(manifest_rows)
+}
+
+# --- lock ---------------------------------------------------------------------
+# O anvil.lock diz o que uma instalacao possui, e e dele que o reset-install
+# calcula os orfaos. Numa instalacao NOVA o caminho e `degit` direto, e o
+# reset-install nao roda — entao o lock precisa VIR NO PAYLOAD, ja pronto.
+#
+# Ele e derivado: e a lista de skills do payload. Por isso e regenerado a cada
+# `vendor` e `update`, e o `verify` reprova quando desincroniza — um lock que
+# esqueceu uma skill faz o proximo update trata-la como alheia e nunca
+# substitui-la, em silencio.
+gerar_lock() {
+    local dest="$ROOT/anvil/.claude/anvil.lock" d
+    {
+        echo "# anvil.lock — o que esta instalacao possui."
+        echo "# Derivado do payload. Regenerado por vendor, update e"
+        echo "# 'vendor-sync.sh lock'. Nao edite a mao."
+        for d in "$PAYLOAD"/*/; do [ -d "$d" ] && echo "skill: $(basename "$d")"; done
+    } > "$dest"
+    printf '%s skills no lock\n' "$(grep -c '^skill: ' "$dest")"
 }
 
 # --- verify -------------------------------------------------------------------
@@ -438,6 +461,19 @@ PYEOF
         [ -d "$PAYLOAD/$n" ] || { echo "   FALHA $n: no manifesto como vendored, ausente do payload"; falhas=$((falhas+1)); }
     done < <(manifest_rows)
 
+    echo "7. o anvil.lock bate com o payload"
+    local lock="$ROOT/anvil/.claude/anvil.lock"
+    if [ ! -f "$lock" ]; then
+        echo "   FALHA anvil.lock ausente — rode 'vendor-sync.sh lock'"
+        falhas=$((falhas + 1))
+    else
+        local so_lock so_disco
+        so_lock="$(comm -23 <(sed -n 's/^skill: //p' "$lock" | sort) <(find "$PAYLOAD" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort))"
+        so_disco="$(comm -13 <(sed -n 's/^skill: //p' "$lock" | sort) <(find "$PAYLOAD" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort))"
+        [ -n "$so_lock" ] && { echo "   FALHA no lock e nao no payload: $(echo "$so_lock" | tr '\n' ' ')"; falhas=$((falhas+1)); }
+        [ -n "$so_disco" ] && { echo "   FALHA no payload e nao no lock: $(echo "$so_disco" | tr '\n' ' ')"; falhas=$((falhas+1)); }
+    fi
+
     echo
     if [ "$falhas" -eq 0 ]; then echo "verify: limpo"; return 0; fi
     echo "verify: $falhas falha(s)"; return 1
@@ -455,6 +491,7 @@ case "${1:-status}" in
     vendor) shift; cmd_vendor "$@" ;;
     update) shift; cmd_update "$@" ;;
     verify) cmd_verify ;;
+    lock)   gerar_lock ;;
     -h|--help) usage ;;
     *) echo "subcomando desconhecido: $1" >&2; usage >&2; exit 2 ;;
 esac
