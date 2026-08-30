@@ -27,6 +27,9 @@ sources:
   payloadcms:
     submodule: references/payload-skills
     url: https://github.com/payloadcms/skills.git
+  unlazy:
+    submodule: references/unlazy
+    url: https://github.com/Leonxlnx/unlazy.git
 
 # state: vendored (já no payload, com pin) | planned (ainda não copiada)
 #
@@ -147,6 +150,27 @@ skills:
   - { name: anvil-ui-minimalist, source: taste, path: skills/minimalist-skill, pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
   - { name: anvil-ui-soft,       source: taste, path: skills/soft-skill,       pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
   - { name: anvil-ui-stitch,     source: taste, path: skills/stitch-skill,     pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
+
+  # ---- disciplina de completude --------------------------------------------
+  # A skill mora na RAIZ do repositório upstream, então `path: .` — o `ls-tree`
+  # e o `show <ref>:./<arquivo>` do sync aceitam esse caminho, verificado antes
+  # de registrar aqui.
+  #
+  # `planned` de propósito: o recorte ainda não foi decidido, e enquanto ela não
+  # for vendorizada nada disto é copiado. O `strip` abaixo é a proposta —
+  # infraestrutura do repositório upstream, que não serve dentro de um payload
+  # instalado no projeto de outra pessoa.
+  #
+  # O recorte tem uma amarra: a checagem 2 do `verify` exige que todo link
+  # relativo resolva. README, CHANGELOG e CONTRIBUTING se referenciam entre si,
+  # entao saem juntos ou ficam juntos. E `research/` NAO pode sair — method.md e
+  # token-economy.md apontam para research/validation-protocol.md.
+  - name: anvil-unlazy
+    source: unlazy
+    path: .
+    state: planned
+    adapt: [rename]
+    strip: [tests, .github, .gitignore, README.md, CHANGELOG.md, CONTRIBUTING.md, package.json, agents]
 
 # Skills autorais do anvil, fora do sync porque não têm upstream:
 #   anvil-docs · anvil-ui (roteador) · anvil-boot · anvil-update · anvil-bench

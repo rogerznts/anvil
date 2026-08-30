@@ -16,3 +16,6 @@
 [submodule "references/payload-skills"]
 	path = references/payload-skills
 	url = https://github.com/payloadcms/skills.git
+[submodule "references/unlazy"]
+	path = references/unlazy
+	url = https://github.com/Leonxlnx/unlazy.git
