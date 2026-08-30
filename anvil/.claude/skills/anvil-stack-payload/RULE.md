@@ -87,7 +87,8 @@ contrária:
 
 ## Fatos deste projeto
 
-Preenchidos por `/anvil-boot` na varredura, ou por `/anvil-bench` na criação:
+Preenchidos por `/anvil-boot` na varredura, ou por `/anvil-bench` na criação. O
+valor entra **sem** backtick — o template já os coloca:
 
 - **Adapter de banco:** `{{DB_ADAPTER}}` — mongoose · postgres · sqlite
 - **Onde ficam as collections:** `{{COLLECTIONS_PATH}}`

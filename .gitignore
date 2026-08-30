@@ -1,1 +1,5 @@
 .DS_Store
+
+# workspace/ — projetos descartáveis para testar o toolkit.
+# Fica no disco para você acompanhar, fora do git para não poluir o histórico.
+workspace/

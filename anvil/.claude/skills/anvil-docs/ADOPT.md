@@ -64,9 +64,27 @@ Para cada artefato, decida **lendo**:
 **Monolito só é fatiado se for genuinamente vários documentos grampeados.** Um
 `prd.md` coeso continua sendo um arquivo. Não se fatia por fatiar.
 
+**Nome de arquivo vai em ASCII, sem acento.** Nome de arquivo é código, e a regra
+de idioma vale: `relatórios.md` vira `relatorios.md`. Fatiar um monolito em
+português produz nome acentuado se você derivar do título sem slugificar — e o
+acento quebra em sistema de arquivos que normaliza diferente, além de virar
+`%C3%B3` em qualquer URL.
+
 **`docs/stories/` global** vai para o `issues/` da spec que o possui. Ticket sem
 spec dona é **reportado, não adivinhado** — o usuário decide se cria uma spec
 para ele ou se ele morreu.
+
+**A mesma story costuma existir em dois lugares.** O layout antigo permitia uma
+cópia global em `docs/stories/` e outra local em `docs/specs/{id}/stories/`.
+Antes de mover, **case por identificador** — `US-014` numa, `US-014-exportar-csv`
+na outra é a mesma coisa. Achou par:
+
+- conteúdo igual → mova **uma** e descarte a outra, dizendo qual descartou
+- conteúdo diferente → a local costuma ser a mais recente. **Mostre as duas e
+  pergunte**; não escolha sozinho, e não crie dois tickets para a mesma coisa
+
+Dois tickets para a mesma story é pior que nenhum: o segundo passa na revisão
+como trabalho pendente que já foi feito.
 
 **`CONTEXT.md` na raiz** vai para `docs/architecture/context.md`; `CONTEXT-MAP.md`
 para `docs/architecture/context-map.md`; `docs/adr/` para
