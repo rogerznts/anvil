@@ -120,6 +120,22 @@ Replace `origin` with the actual remote name. Confirm push succeeded before proc
 
 ---
 
+### Step 6.5 — Resolve the spec, if the branch has one
+
+Same resolution as `/tea-open-pr`, **by numeric prefix** — branch is
+`{type}/{NNN}-{name}`, folder is `{NNN}-{type}-{name}`, two different strings:
+
+```bash
+NUM=$(git rev-parse --abbrev-ref HEAD | sed -nE 's|^[a-z]+/([0-9]{3})-.*|\1|p')
+[ -n "$NUM" ] && SPEC_DIR=$(ls -d docs/specs/"$NUM"-*/ 2>/dev/null | head -1)
+grep -l 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # fechados
+grep -L 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # abertos
+```
+
+Branch criado neste fluxo raramente tem spec — o Step 1 pergunta tipo e nome
+livres, sem número. Se tiver, a seção `## Spec` do Step 8 entra; senão, é
+omitida.
+
 ### Step 7 — Read the diff (for PR text)
 
 ```bash
@@ -232,6 +248,21 @@ tea pr create \
 Use `--login <alias>` if you have multiple logins configured.
 
 ---
+
+### Step 11.5 — Link the tickets back to the PR
+
+Só quando houve spec. Para cada ticket que este PR fecha, acrescente uma linha
+logo abaixo de `**Status:**`:
+
+```markdown
+**PR:** https://gitea.exemplo/org/repo/pulls/51
+```
+
+Ticket que já tem `**PR:**` ganha **outra** linha, não substituição — um ticket
+retrabalhado em dois PRs tem duas, e o histórico é o ponto.
+
+Commite antes de devolver a URL, para o link existir no diff do próprio PR. Em
+hotfix, use a URL do **primeiro** PR, o que vai para o branch estável.
 
 ### Step 12 — Return the URL(s)
 

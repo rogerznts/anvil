@@ -42,6 +42,28 @@ Confirm with the user which base branches apply if the repo does not follow the 
 
 ---
 
+### Step 1.5 — Resolve the spec, if the branch has one
+
+A branch with a number carries a spec. Resolve the folder **by numeric prefix**,
+never by string equality — the branch is `{type}/{NNN}-{name}` and the folder is
+`{NNN}-{type}-{name}`, two different strings on purpose:
+
+```bash
+NUM=$(git rev-parse --abbrev-ref HEAD | sed -nE 's|^[a-z]+/([0-9]{3})-.*|\1|p')
+[ -n "$NUM" ] && SPEC_DIR=$(ls -d docs/specs/"$NUM"-*/ 2>/dev/null | head -1)
+```
+
+No number (`chore/`, `docs/`, `ci/`) means no spec, and Steps 3 and 6.5 skip the
+spec parts. Number but no folder: say so — the branch claims a spec that doesn't
+exist.
+
+Read the ticket status:
+
+```bash
+grep -l 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # fechados por este trabalho
+grep -L 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # ainda abertos
+```
+
 ### Step 2 — Read the diff
 
 Run:
@@ -78,7 +100,28 @@ git diff <integration-branch>..<head> --stat
 ## Impact
 
 - <bullet: effect on the user or system>
+
+## Spec
+
+`docs/specs/<spec-dir>/spec.md`
+
+Closes:
+- `issues/01-<slug>.md` — <ticket title>
+- `issues/02-<slug>.md` — <ticket title>
+
+Still open:
+- `issues/03-<slug>.md` — <ticket title>
 ```
+
+The `## Spec` section is **omitted entirely** on a branch without a number.
+
+**Why paths and not `closes #47`:** the tickets are files in the repository, not
+issues on the server, so there is no number to close. The path is the stable
+reference, and it resolves in the diff of this very PR.
+
+**Every ticket still open is a flag to the reviewer.** A PR that leaves tickets
+open is legitimate — a spec can span PRs — but the reviewer needs to know before
+approving, not after.
 
 **Body (Hotfix → integration branch — always use exactly this):**
 
@@ -155,6 +198,26 @@ tea pr create \
 `tea` auto-detects the repo from the git remote. Use `--login <alias>` if you have multiple logins configured.
 
 ---
+
+### Step 6.5 — Link the tickets back to the PR
+
+The PR now points at the tickets. Point the tickets back, so someone reading a
+ticket months later finds where it landed without searching the log.
+
+For each ticket this PR closes, add a line right under `**Status:**`:
+
+```markdown
+**PR:** https://gitea.exemplo/org/repo/pulls/51
+```
+
+Ticket that already has a `**PR:**` line gets **a second one**, not a replacement:
+a ticket reworked across two PRs has two, and the history is the point.
+
+Commit the change to the branch **before** returning the URL, so the link exists
+in the PR's own diff.
+
+On a hotfix, which opens two PRs, use the URL of the **first** — the one to the
+stable branch, where the fix actually lands.
 
 ### Step 7 — Return the URL(s)
 

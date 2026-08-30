@@ -16,6 +16,25 @@ parte do repositório e sobrevivem ao merge.
   padrão, este perfil usa `resolved` para ticket concluído — um ticket está
   desbloqueado quando todos os que ele lista estão `resolved`
 - Comentários e histórico são anexados ao fim do arquivo, sob `## Comments`
+- Ticket que foi para um PR ganha uma linha `PR:` logo abaixo do `Status:`, com
+  a URL. Escrita pelas skills `tea-open-pr` e `tea-open-fast-pr` depois de abrir
+  o PR. Ticket retrabalhado em dois PRs tem **duas** linhas, não uma
+  substituída — o histórico é o ponto
+
+```markdown
+# 03: Aplicar cupom no total do carrinho
+
+**Blocked by:** 01, 02
+**Status:** resolved
+**PR:** https://gitea.exemplo/org/repo/pulls/51
+
+- [ ] Critério de aceite 1
+```
+
+Os tickets são **arquivo**, não issue de servidor, então não existe `#47` para
+fechar. A ligação com o PR é feita nos dois sentidos: o corpo do PR lista os
+caminhos dos tickets que fecha, e cada ticket ganha a URL do PR. Os dois lados
+resolvem no diff do próprio PR.
 
 O **branch** é `{tipo}/{NNN}-{nome}` — string diferente do nome da pasta, de
 propósito. Nunca resolva uma na outra por igualdade; use o prefixo numérico.
