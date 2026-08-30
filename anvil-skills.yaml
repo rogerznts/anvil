@@ -182,7 +182,7 @@ skills:
     state: vendored
     path: ""                 # sem árvore própria: a skill é autoral, só os extras vêm de fora
     adapt: []
-    keep: [SKILL.md, GATE.md, "unlazy/VENDOR.md"]
+    keep: [SKILL.md, GATE.md, CHECKLIST.md, "unlazy/VENDOR.md"]
     extra:
       - "SKILL.md::unlazy/UNLAZY.md"
       - "SECURITY.md::unlazy/SECURITY.md"

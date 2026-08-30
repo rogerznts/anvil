@@ -71,27 +71,24 @@ Se a resposta puder ser lida do código ou do que já existe, leia — não perg
 ### 4. Congelar e testar
 
 Grave o combinado em `briefing.md` e `checklist.yaml` dentro da spec, e atualize
-a rule da stack com os módulos e papéis reais.
+a rule da stack com os módulos e papéis reais. O formato do checklist — mínimo,
+três campos — está em [CHECKLIST.md](CHECKLIST.md).
 
 Derive os testes **do checklist**, simétricos ao que foi acordado: existência de
 módulo, campos, CRUD, papéis, e os asserts de negócio. **Não reescreva os testes
-base do starter.**
+base do starter.** Cada teste derivado termina imprimindo o marcador do seu item
+(`CHECKLIST_C1_OK`), depois do último assert — é ele que o ledger vai exigir, e
+imprimi-lo de dentro é o que impede uma suíte pulada de passar por verde.
 
-Escreva também o **ledger** `gates.md`, na raiz da spec: um gate por item do
-checklist, com o `CHECK:` apontando o teste que você acabou de derivar. O
-critério de pronto que a pessoa deu em português vira aqui a coisa que decide o
-loop sozinho — e ele nasce **antes** da construção, não depois dela. Formato e
-regras de autoria em [unlazy/references/gates.md](unlazy/references/gates.md).
+Escreva também o **ledger** `gates.md`, na raiz da spec: um item do checklist, um
+gate, com o `CHECK:` apontando o teste que você acabou de derivar. O critério de
+pronto que a pessoa deu em português vira aqui a coisa que decide o loop sozinho,
+e nasce **antes** da construção, não depois dela.
 
-Três regras decidem se o gate vale alguma coisa:
-
-- o `CHECK:` roda o teste real e imprime um marcador **só depois** que ele passa.
-  Comando que imprime sucesso por construção certifica qualquer coisa
-- o `EXPECT:` casa esse marcador, nunca um número tirado do briefing — número
-  copiado é a expectativa provando a si mesma
-- item que nenhum teste alcança fica como gate **manual**, sem `CHECK:`, e vai
-  para a entrega como pendência declarada. Não invente comando para fingir
-  cobertura
+A conversão e as três regras que fazem um gate valer alguma coisa — marcador que
+só sai quando tudo passou, nada de número copiado do briefing, item sem teste
+vira gate manual — estão em [CHECKLIST.md](CHECKLIST.md). O formato do arquivo é
+o do upstream, em [unlazy/references/gates.md](unlazy/references/gates.md).
 
 Antes de seguir, rode o linter, que acha o gate incapaz de falhar:
 
