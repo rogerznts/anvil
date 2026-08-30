@@ -57,11 +57,13 @@ No number (`chore/`, `docs/`, `ci/`) means no spec, and Steps 3 and 6.5 skip the
 spec parts. Number but no folder: say so — the branch claims a spec that doesn't
 exist.
 
-Read the ticket status:
+Liste os tickets. Todos devem estar `resolved` — se algum não estiver, a guarda
+de merge vai bloquear o `tea pr create`, e ela está certa: o padrão é **um PR por
+spec**, e uma spec com ticket aberto não terminou.
 
 ```bash
-grep -l 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # fechados por este trabalho
-grep -L 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # ainda abertos
+ls "$SPEC_DIR"issues/*.md
+grep -L 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # se voltar algo, pare aqui
 ```
 
 ### Step 2 — Read the diff
@@ -105,23 +107,26 @@ git diff <integration-branch>..<head> --stat
 
 `docs/specs/<spec-dir>/spec.md`
 
-Closes:
+Tickets:
 - `issues/01-<slug>.md` — <ticket title>
 - `issues/02-<slug>.md` — <ticket title>
-
-Still open:
 - `issues/03-<slug>.md` — <ticket title>
 ```
 
-The `## Spec` section is **omitted entirely** on a branch without a number.
+**Um PR por spec, não por ticket.** Uma spec tem N tickets; abrir um PR para cada
+produziria uma enxurrada de PRs de uma linha, e o revisor perderia a unidade que
+faz sentido revisar — a mudança inteira.
 
-**Why paths and not `closes #47`:** the tickets are files in the repository, not
-issues on the server, so there is no number to close. The path is the stable
-reference, and it resolves in the diff of this very PR.
+Por isso todos os tickets da seção estão fechados: a **guarda de merge** só libera
+`tea pr create` quando `issues/` não tem nenhum `Status:` diferente de `resolved`.
+Se ela bloquear, a spec não terminou — feche o que falta ou reveja o recorte, que
+pode estar grande demais para uma spec só.
 
-**Every ticket still open is a flag to the reviewer.** A PR that leaves tickets
-open is legitimate — a spec can span PRs — but the reviewer needs to know before
-approving, not after.
+A seção `## Spec` é **omitida** num branch sem número.
+
+**Por que caminho e não `closes #47`:** os tickets são arquivo no repositório, não
+issue no servidor, então não há número para fechar. O caminho é a referência
+estável, e resolve no diff deste próprio PR.
 
 **Body (Hotfix → integration branch — always use exactly this):**
 

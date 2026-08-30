@@ -132,9 +132,13 @@ grep -l 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # fechados
 grep -L 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # abertos
 ```
 
-Branch criado neste fluxo raramente tem spec — o Step 1 pergunta tipo e nome
-livres, sem número. Se tiver, a seção `## Spec` do Step 8 entra; senão, é
-omitida.
+Branch criado neste fluxo raramente tem spec: o Step 1 pergunta tipo e nome
+livres, sem número. Quando não há número, a seção `## Spec` do Step 8 e o Step
+11.5 são pulados inteiros.
+
+Quando **há** spec, o padrão é o mesmo do `/tea-open-pr`: **um PR por spec**, com
+todos os tickets fechados. A guarda de merge impõe isso — ela bloqueia o
+`tea pr create` enquanto houver ticket aberto.
 
 ### Step 7 — Read the diff (for PR text)
 
@@ -171,7 +175,26 @@ Alert the user if debug logs (`console.log`, `var_dump`, `dd()`) are present.
 ## Impact
 
 - <bullet: effect on the user or system>
+
+## Spec
+
+`docs/specs/<spec-dir>/spec.md`
+
+Tickets:
+- `issues/01-<slug>.md` — <ticket title>
+- `issues/02-<slug>.md` — <ticket title>
 ```
+
+**Um PR por spec, não por ticket.** Uma spec tem N tickets; abrir um PR para cada
+produziria uma enxurrada de PRs de uma linha, e o revisor perderia a unidade que
+faz sentido revisar.
+
+Todos os tickets da seção estão fechados porque a **guarda de merge** só libera
+`tea pr create` quando `issues/` não tem nenhum `Status:` diferente de `resolved`.
+Se ela bloquear, a spec não terminou.
+
+A seção é **omitida** num branch sem número — o que é o caso comum deste fluxo,
+já que o Step 1 pergunta tipo e nome livres, sem número.
 
 **Body (Hotfix → integration branch — always use exactly this):**
 
