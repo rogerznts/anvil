@@ -12,4 +12,6 @@ Dentro da pasta, o formato é integralmente o das skills originais:
                          com "Blocked by:" e "Status:"
     map.md               /anvil-wayfinder, quando usado
 
-Spec fechada vai para `archive/` via `/anvil-docs archive`.
+Spec fechada vai para `archive/` via `/anvil-docs archive` — **antes de abrir o
+PR**, no mesmo branch, para que o move entre no diff que vai ser revisado. A
+guarda de merge bloqueia o PR enquanto a spec não estiver arquivada.

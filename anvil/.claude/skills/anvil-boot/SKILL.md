@@ -168,9 +168,9 @@ aberta, com o verificador instalado, correto e nunca invocado.
 ```
 
 3. **Confirme que dispara.** Passe um JSON de chamada falsa para o hook: num
-   branch sem número ele sai 0; num branch de spec com ticket aberto sai 2 e diz
-   o que falta. Instalar sem verificar é repetir o erro que o hook existe para
-   evitar.
+   branch sem número ele sai 0; num branch de spec com ticket aberto, ou com a
+   spec ainda fora de `docs/specs/archive/`, sai 2 e diz o que falta. Instalar
+   sem verificar é repetir o erro que o hook existe para evitar.
 
 Diga ao usuário que a guarda está ativa e o que ela bloqueia.
 

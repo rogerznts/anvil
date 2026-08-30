@@ -46,24 +46,36 @@ Confirm with the user which base branches apply if the repo does not follow the 
 
 A branch with a number carries a spec. Resolve the folder **by numeric prefix**,
 never by string equality — the branch is `{type}/{NNN}-{name}` and the folder is
-`{NNN}-{type}-{name}`, two different strings on purpose:
+`{NNN}-{type}-{name}`, two different strings on purpose.
+
+Procure nos **dois** lugares: neste ponto do fluxo a spec já foi arquivada, e é
+`docs/specs/archive/` que tem a pasta.
 
 ```bash
 NUM=$(git rev-parse --abbrev-ref HEAD | sed -nE 's|^[a-z]+/([0-9]{3})-.*|\1|p')
-[ -n "$NUM" ] && SPEC_DIR=$(ls -d docs/specs/"$NUM"-*/ 2>/dev/null | head -1)
+[ -n "$NUM" ] && SPEC_DIR=$(ls -d docs/specs/"$NUM"-*/ docs/specs/archive/"$NUM"-*/ 2>/dev/null | head -1)
 ```
 
 No number (`chore/`, `docs/`, `ci/`) means no spec, and Steps 3 and 6.5 skip the
 spec parts. Number but no folder: say so — the branch claims a spec that doesn't
 exist.
 
+**O `/anvil-docs archive` roda antes deste passo, não depois do merge.** Ele
+promove o ADR e move a spec para `archive/`; as duas coisas são mudança em
+arquivo e precisam de um commit. Depois do merge não sobra branch onde commitar
+— seria um segundo PR só para mover pasta, e no intervalo a spec fica no branch
+padrão sem arquivar, que é exatamente o buraco que a guarda de merge existe para
+fechar. Antes do PR, o move entra no diff que o revisor já vai olhar.
+
 Liste os tickets. Todos devem estar `resolved` — se algum não estiver, a guarda
 de merge vai bloquear o `tea pr create`, e ela está certa: o padrão é **um PR por
-spec**, e uma spec com ticket aberto não terminou.
+spec**, e uma spec com ticket aberto não terminou. Ela bloqueia também quando a
+spec ainda não está sob `archive/`.
 
 ```bash
 ls "$SPEC_DIR"issues/*.md
 grep -L 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # se voltar algo, pare aqui
+bash .claude/skills/anvil-docs/scripts/validate.sh ship-ready   # o que a guarda vai ver
 ```
 
 ### Step 2 — Read the diff
@@ -105,7 +117,7 @@ git diff <integration-branch>..<head> --stat
 
 ## Spec
 
-`docs/specs/<spec-dir>/spec.md`
+`docs/specs/archive/<spec-dir>/spec.md`
 
 Tickets:
 - `issues/01-<slug>.md` — <ticket title>
@@ -127,6 +139,10 @@ A seção `## Spec` é **omitida** num branch sem número.
 **Por que caminho e não `closes #47`:** os tickets são arquivo no repositório, não
 issue no servidor, então não há número para fechar. O caminho é a referência
 estável, e resolve no diff deste próprio PR.
+
+**Use o caminho sob `archive/`**, que é onde a spec está desde o Step 1.5 e onde
+ela vai continuar depois do merge. Citar `docs/specs/<spec-dir>/` deixaria o
+corpo do PR apontando para um lugar que já não existe.
 
 **Body (Hotfix → integration branch — always use exactly this):**
 
@@ -220,6 +236,10 @@ a ticket reworked across two PRs has two, and the history is the point.
 
 Commit the change to the branch **before** returning the URL, so the link exists
 in the PR's own diff.
+
+Os tickets já estão sob `docs/specs/archive/` neste ponto, e escrever neles aqui
+não fere a imutabilidade da spec arquivada: ela começa quando o merge chega ao
+branch padrão. Até lá é tudo o mesmo PR, ainda em revisão.
 
 On a hotfix, which opens two PRs, use the URL of the **first** — the one to the
 stable branch, where the fix actually lands.

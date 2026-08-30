@@ -2,6 +2,24 @@
 
 Promove o que virou canônico e move a spec para `archive/`.
 
+## Quando
+
+Depois do último ticket fechar e **antes de abrir o PR**, no mesmo branch da
+spec:
+
+```
+tickets resolved → /anvil-docs archive → /tea-open-pr → merge
+```
+
+Promover e mover são mudança em arquivo, e mudança em arquivo precisa de um
+commit. Depois do merge não sobra branch onde commitar: seria um segundo PR só
+para mover pasta, e no intervalo a spec fica no branch padrão sem arquivar —
+exatamente o buraco que a guarda de merge existe para fechar. Rodando antes, o
+move e o ADR promovido entram no diff que o revisor já vai olhar.
+
+A guarda impõe a ordem: `validate.sh ship-ready` sai 1 enquanto a spec do branch
+não estiver sob `docs/specs/archive/`, e o hook bloqueia o `tea pr create`.
+
 ## Pré-condição
 
 Todo ticket em `issues/` com `Status: resolved`. Se houver ticket aberto, **pare
@@ -53,8 +71,12 @@ está certo — a maioria dos artefatos de spec é da spec.
 
 `docs/specs/{id}/` → `docs/specs/archive/{id}/`.
 
-Mova, não copie. A spec arquivada é imutável: mudança posterior no assunto abre
-uma spec nova do tipo `extension`, ligada a esta.
+Mova, não copie. A spec arquivada é imutável **a partir do merge**: mudança
+posterior no assunto abre uma spec nova do tipo `extension`, ligada a esta.
+
+Entre o move e o merge ainda é o mesmo PR, e o `/tea-open-pr` escreve mais uma
+vez nos tickets — a linha `**PR:**` com a URL. Isso é o fechamento terminando,
+não uma revisão da spec.
 
 ## 5. Índice e relatório
 

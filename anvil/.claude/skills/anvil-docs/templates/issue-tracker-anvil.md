@@ -67,6 +67,21 @@ puramente linear isso é de cima para baixo.
 Ao concluir um ticket, marque `Status: resolved`. O hook de merge varre
 `issues/` atrás de arquivo sem essa marca e bloqueia o merge enquanto houver.
 
+## Fechar a spec
+
+Quando o último ticket vira `resolved`, a spec ainda não terminou. A ordem, toda
+no mesmo branch:
+
+```
+/anvil-docs archive   promove o que virou canônico, move p/ docs/specs/archive/
+/tea-open-pr          um PR por spec; cada ticket ganha a linha PR: de volta
+merge
+```
+
+O `archive` vem **antes** do PR, não depois do merge: mover a pasta é mudança em
+arquivo e precisa de um commit, e depois do merge não sobra branch onde ele
+caiba. O hook bloqueia o `tea pr create` enquanto a spec não estiver arquivada.
+
 ## Wayfinding operations
 
 Usadas pelo `/anvil-wayfinder`. O **mapa** é um arquivo com um **filho** por

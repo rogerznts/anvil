@@ -84,23 +84,30 @@ flowchart TD
     H --> I["/anvil-code-review<br/>Standards + Spec"]
     I --> J{"todos os tickets<br/>Status: resolved?"}
     J -->|não| G
-    J -->|sim| K["/tea-open-pr<br/>UM PR por spec"]
-    K --> L{"hook varre issues/"}
-    L -->|"ticket aberto"| M["bloqueia · exit 2"]
-    L -->|"tudo resolved"| N["PR aberto<br/>corpo lista a spec e os tickets<br/>cada ticket ganha a URL de volta"]
-    N --> O["merge"]
-    O --> P["/anvil-docs archive<br/>promove ADR · move p/ archive/"]
+    J -->|sim| P["/anvil-docs archive<br/>promove ADR · move p/ archive/"]
+    P --> K["/tea-open-pr<br/>UM PR por spec"]
+    K --> L{"hook: issues/ fechados<br/>e spec arquivada?"}
+    L -->|"ticket aberto ou<br/>spec não arquivada"| M["bloqueia · exit 2"]
+    L -->|sim| N["PR aberto<br/>corpo lista a spec e os tickets<br/>cada ticket ganha a URL de volta"]
+    N --> O["merge<br/>a spec já chega arquivada"]
 
     style boot fill:#f8f8f6,stroke:#bbb
     style janela fill:#f8f8f6,stroke:#bbb
     style M fill:#fdecea,stroke:#c33
     style P fill:#eaf6ec,stroke:#3a3
+    style O fill:#eaf6ec,stroke:#3a3
 ```
 
 O `grill → to-spec → to-tickets` roda numa **janela só**, sem compactar. É o que
 o fluxo do Matt exige, e é o que faz o encadeamento funcionar sem estado em
 disco. Depois cada `implement` começa do zero, e **o ticket é o estado**:
 `Blocked by` carrega a ordem, `Status` carrega o progresso.
+
+**O `archive` vem antes do PR, não depois do merge.** Promover o ADR e mover a
+spec são mudança em arquivo, e depois do merge não sobra branch onde commitar —
+seria um segundo PR só para mover pasta, com a spec parada no branch padrão sem
+arquivar no intervalo. Antes do PR, o move entra no mesmo diff que vai ser
+revisado, e a guarda de merge impõe a ordem.
 
 **Nenhuma skill do fluxo sabe o que é `docs/specs/`.** Todas leem o perfil.
 

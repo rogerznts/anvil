@@ -127,18 +127,22 @@ Same resolution as `/tea-open-pr`, **by numeric prefix** — branch is
 
 ```bash
 NUM=$(git rev-parse --abbrev-ref HEAD | sed -nE 's|^[a-z]+/([0-9]{3})-.*|\1|p')
-[ -n "$NUM" ] && SPEC_DIR=$(ls -d docs/specs/"$NUM"-*/ 2>/dev/null | head -1)
+[ -n "$NUM" ] && SPEC_DIR=$(ls -d docs/specs/"$NUM"-*/ docs/specs/archive/"$NUM"-*/ 2>/dev/null | head -1)
 grep -l 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # fechados
 grep -L 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # abertos
 ```
+
+Os dois globs, porque a spec já arquivada mora em `docs/specs/archive/`.
 
 Branch criado neste fluxo raramente tem spec: o Step 1 pergunta tipo e nome
 livres, sem número. Quando não há número, a seção `## Spec` do Step 8 e o Step
 11.5 são pulados inteiros.
 
 Quando **há** spec, o padrão é o mesmo do `/tea-open-pr`: **um PR por spec**, com
-todos os tickets fechados. A guarda de merge impõe isso — ela bloqueia o
-`tea pr create` enquanto houver ticket aberto.
+todos os tickets fechados e a spec já arquivada. A guarda de merge impõe isso —
+ela bloqueia o `tea pr create` enquanto houver ticket aberto, e também enquanto a
+spec não estiver sob `archive/`. O `/anvil-docs archive` roda **antes** do PR, no
+mesmo branch: depois do merge não sobra branch onde commitar o move.
 
 ### Step 7 — Read the diff (for PR text)
 
