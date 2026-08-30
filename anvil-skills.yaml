@@ -63,18 +63,18 @@ skills:
   - { name: anvil-codebase-design, source: mattpocock, path: skills/engineering/codebase-design,        pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
 
   # ---- mattpocock: extras --------------------------------------------------
-  - { name: anvil-wayfinder,          source: mattpocock, path: skills/engineering/wayfinder,           state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-prototype,          source: mattpocock, path: skills/engineering/prototype,           state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-research,           source: mattpocock, path: skills/engineering/research,            state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-diagnose,           source: mattpocock, path: skills/engineering/diagnosing-bugs,     state: planned, adapt: [rename, docs-remap], strip: [agents] }
-  - { name: anvil-wizard,             source: mattpocock, path: skills/engineering/wizard,              state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-tdd,                source: mattpocock, path: skills/engineering/tdd,                 state: planned, adapt: [rename, docs-remap], strip: [agents] }
-  - { name: anvil-grill-me,           source: mattpocock, path: skills/productivity/grill-me,           state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-handoff,            source: mattpocock, path: skills/productivity/handoff,            state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-teach,              source: mattpocock, path: skills/productivity/teach,              state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-wait-what,          source: mattpocock, path: skills/productivity/wait-what,          state: planned, adapt: [rename, docs-remap], strip: [agents] }
-  - { name: anvil-writing-for-agents, source: mattpocock, path: skills/productivity/writing-for-agents, state: planned, adapt: [rename], strip: [agents] }
-  - { name: anvil-to-questionnaire,   source: mattpocock, path: skills/productivity/to-questionnaire,   state: planned, adapt: [rename], strip: [agents] }
+  - { name: anvil-wayfinder,          source: mattpocock, path: skills/engineering/wayfinder,           pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-prototype,          source: mattpocock, path: skills/engineering/prototype,           pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-research,           source: mattpocock, path: skills/engineering/research,            pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-diagnose,           source: mattpocock, path: skills/engineering/diagnosing-bugs,     pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
+  - { name: anvil-wizard,             source: mattpocock, path: skills/engineering/wizard,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-tdd,                source: mattpocock, path: skills/engineering/tdd,                 pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
+  - { name: anvil-grill-me,           source: mattpocock, path: skills/productivity/grill-me,           pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-handoff,            source: mattpocock, path: skills/productivity/handoff,            pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-teach,              source: mattpocock, path: skills/productivity/teach,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-wait-what,          source: mattpocock, path: skills/productivity/wait-what,          pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
+  - { name: anvil-writing-for-agents, source: mattpocock, path: skills/productivity/writing-for-agents, pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-to-questionnaire,   source: mattpocock, path: skills/productivity/to-questionnaire,   pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
 
   # ---- pstack --------------------------------------------------------------
   - { name: anvil-unslop,    source: pstack, path: skills/unslop,      pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
