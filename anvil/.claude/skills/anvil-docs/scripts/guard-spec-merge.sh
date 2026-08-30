@@ -6,7 +6,13 @@
 # a força de uma prosa e o custo de um programa.
 #
 # Bloqueia (exit 2) a INVOCAÇÃO de merge/PR quando a spec do branch tem ticket
-# sem `Status: resolved`. Cobre GitHub (`gh`), Gitea (`tea`) e `git merge`.
+# sem `Status: resolved`, ou quando ela ainda não foi arquivada. Cobre GitHub
+# (`gh`), Gitea (`tea`) e `git merge`.
+#
+# As duas metades importam. Fechar os tickets e deixar a spec em `docs/specs/`
+# é o caso do mosk de novo, um passo adiante: a spec chega ao branch padrão sem
+# archive, e não sobra branch onde arquivar sem abrir um segundo PR. Por isso o
+# `/anvil-docs archive` roda ANTES do `tea pr create`, no mesmo branch.
 #
 # --- Postura: fail-CLOSED -----------------------------------------------------
 #
@@ -151,11 +157,13 @@ if OUT="$(bash "$VALIDATE" ship-ready 2>&1)"; then
 fi
 
 cat >&2 <<'CABECALHO'
-Bloqueado: a spec deste branch nao esta fechada.
+Bloqueado: a spec deste branch nao esta pronta para o merge.
 CABECALHO
 printf '\n%s\n\n' "$OUT" >&2
 cat >&2 <<'RODAPE'
-Feche os tickets abertos (Status: resolved) e arquive a spec antes de prosseguir.
+A ordem e: todo ticket em Status: resolved, depois /anvil-docs archive, depois o
+PR. O move para archive/ precisa de um commit, e este branch e o ultimo lugar
+onde esse commit cabe.
 Para conferir: bash .claude/skills/anvil-docs/scripts/validate.sh ship-ready
 RODAPE
 exit 2

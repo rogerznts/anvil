@@ -3,7 +3,7 @@
 #
 # Dois subcomandos, ambos com chamador real:
 #
-#   ship-ready   a spec do branch atual está fechada  (chamado pelo hook de merge)
+#   ship-ready   a spec do branch atual está fechada e arquivada  (hook de merge)
 #   docs-paths   as saídas ficam sob os domínios canônicos  (aviso do verbo index)
 #
 # O verificador do mosk tinha oito subcomandos e 600 linhas. Cinco deles
@@ -36,11 +36,16 @@ get_current_branch() {
 # O branch é `{tipo}/{NNN}-{nome}` e a pasta é `{NNN}-{tipo}-{nome}`: strings
 # diferentes de propósito. Comparar por igualdade quebra — é o erro que o
 # ADR-0017 do mosk documentou depois de uma spec ser lida com o número errado.
+#
+# Procura nos DOIS lugares, e `specs/` vem primeiro. O archive roda ANTES do PR,
+# dentro do mesmo branch, então quando o merge chega a spec já está sob
+# `specs/archive/`. Olhando só em `specs/`, o hook bloqueava justamente o fluxo
+# correto — e com a mensagem errada, "não há pasta correspondente".
 resolve_spec_dir() {
     local root="$1" branch="$2" num dir
     num="$(printf '%s' "$branch" | sed -nE 's|^[a-z]+/([0-9]{3})-.*$|\1|p')"
     [ -n "$num" ] || return 1
-    for dir in "$root"/docs/specs/"$num"-*/; do
+    for dir in "$root"/docs/specs/"$num"-*/ "$root"/docs/specs/archive/"$num"-*/; do
         [ -d "$dir" ] || continue
         printf '%s' "${dir%/}"
         return 0
@@ -96,6 +101,24 @@ cmd_ship_ready() {
         return 1
     fi
 
+    # Tickets fechados não bastam. O hook existe porque uma spec do mosk chegou
+    # ao branch padrão sem archive, e até aqui essa metade da garantia era só
+    # prosa no rodapé da mensagem — o script nunca a verificou.
+    #
+    # Verificar é possível porque o archive roda ANTES do PR, no mesmo branch: o
+    # move para archive/ e a promoção do ADR entram no diff que vai ser revisado.
+    # Depois do merge não haveria onde commitar sem abrir um segundo PR.
+    case "$spec_dir" in
+        */docs/specs/archive/*) ;;
+        *)
+            echo "spec $(basename "$spec_dir"): $total de $total tickets resolvidos,"
+            echo "mas a spec ainda não foi arquivada."
+            echo "Rode /anvil-docs archive antes de abrir o PR — a promoção do ADR e"
+            echo "o move para docs/specs/archive/ entram neste mesmo PR."
+            return 1
+            ;;
+    esac
+
     return 0
 }
 
@@ -146,11 +169,12 @@ usage() {
     cat <<'EOF'
 validate.sh <subcomando>
 
-  ship-ready              a spec do branch atual está fechada (default)
+  ship-ready              a spec do branch atual está fechada e arquivada (default)
   docs-paths [--quiet]    as saídas ficam sob os domínios canônicos
 
-ship-ready sai 1 quando há ticket sem `Status: resolved`. É o que o hook de
-merge lê. docs-paths é consultivo e nunca deve bloquear nada.
+ship-ready sai 1 quando há ticket sem `Status: resolved`, ou quando a spec ainda
+não está sob docs/specs/archive/. É o que o hook de merge lê. docs-paths é
+consultivo e nunca deve bloquear nada.
 EOF
 }
 
