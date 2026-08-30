@@ -30,31 +30,54 @@ cima.
 ```
 docs/
 ├── index.md                    gerado pelo verbo `index`
-├── agents/issue-tracker.md     o perfil que as skills de fluxo leem
-├── discovery/                  pesquisa, briefing, brainstorming
-├── prd/                        escopo de produto
-├── architecture/               desenho do sistema
-│   ├── context.md                glossário ubíquo do domínio
-│   ├── context-map.md            só em repositório multi-contexto
-│   └── adr/                      decisões, uma por arquivo
-├── ui/                         design system, fluxos, wireframes
-├── qa/gates/                   só em projeto criado pelo /anvil-bench
-├── project/                    plan.md + update-YYYYMMDD.md
-└── specs/
-    ├── {NNN}-{tipo}-{nome}/
-    │   ├── spec.md               /anvil-to-spec
-    │   ├── issues/NN-slug.md     /anvil-to-tickets, um arquivo por ticket
-    │   ├── map.md                /anvil-wayfinder, quando usado
-    │   ├── prd-delta.md          opcional, quando a spec muda o PRD
-    │   ├── discovery/            opcional, pesquisa da própria spec
-    │   ├── architecture/         opcional, ADRs e modelos da spec
-    │   ├── ui/                   opcional, fluxos e componentes da spec
-    │   └── project/              opcional, acompanhamento da spec
-    └── archive/                  specs concluídas
+├── agents/issue-tracker.md     ●  o perfil que as skills de fluxo leem
+├── architecture/               ●  desenho do sistema
+│   ├── context.md                 glossário ubíquo (anvil-domain-modeling)
+│   ├── context-map.md             só em repositório multi-contexto
+│   └── adr/                       decisões, uma por arquivo
+├── discovery/                  ●  pesquisa e notas (anvil-research)
+├── specs/                      ●
+│   ├── {NNN}-{tipo}-{nome}/
+│   │   ├── spec.md                anvil-to-spec — inclui as User Stories
+│   │   ├── issues/NN-slug.md      anvil-to-tickets, um arquivo por ticket
+│   │   ├── map.md                 anvil-wayfinder, quando usado
+│   │   ├── ui/                    fluxos e comportamento desta mudança
+│   │   ├── architecture/          ADRs e modelos desta mudança
+│   │   └── discovery/             pesquisa desta mudança
+│   └── archive/                   specs concluídas
+│
+├── prd/                        ○  escopo de produto
+├── ui/                         ○  design system e fluxos duráveis
+├── qa/                         ○  estratégia de teste
+└── project/                    ○  plano e atualizações datadas
 ```
+
+**●** o `scaffold` cria · **○** reconhecido, mas **nasce só quando algo for
+escrito ali**
+
+Os quatro com `○` não têm skill que escreva neles. Pasta vazia com README
+prometendo um autor que não existe ensina quem lê a ignorar a árvore inteira —
+então eles não nascem antes de ter conteúdo. Continuam canônicos: o
+`validate.sh docs-paths` não reclama deles quando aparecem.
 
 Duas camadas espelhadas: **base**, que é a verdade do projeto hoje, e
 **por spec**, que é o escopo de uma mudança pendente.
+
+## Quem escreve onde
+
+| domínio | quem |
+|---|---|
+| `architecture/context.md` e `adr/` | `anvil-grill` e `anvil-domain-modeling`, enquanto decidem |
+| `discovery/` | `anvil-research` — ele diz *"salve onde o repositório já guarda essas notas"*, então escreve aqui se a pasta existir |
+| `specs/{id}/spec.md` | `anvil-to-spec`. **Inclui as User Stories** — no anvil a spec é a unidade, e absorve o que num PRD seria épico e story |
+| `specs/{id}/issues/` | `anvil-to-tickets` |
+| `specs/{id}/ui/` | `anvil-grill`. Fluxo de usuário, comportamento de interface e wireframe são decisão que vira artefato — a mesma natureza de um ADR. Quando a pergunta só se responde vendo rodar, o `anvil-prototype` gera as variantes, você escolhe, e **a decisão volta para o documento**; o protótipo em si é descartável e vive fora da main |
+| `agents/issue-tracker.md` | `anvil-setup` |
+| `prd/` · `ui/` · `qa/` · `project/` | **ninguém.** São para o que você escrever à mão |
+
+**Nenhuma skill autora PRD.** O modelo é o das skills de fluxo: a spec é a
+unidade e carrega suas próprias User Stories. Se você quiser uma camada de épico
+atravessando specs, ela é escrita à mão em `prd/` — e aí a pasta nasce.
 
 **A regra de decisão:**
 
@@ -120,8 +143,11 @@ no **destino**.
 
 ## `scaffold`
 
-1. Criar as pastas que faltam. **Nunca sobrescrever** uma que já existe.
-2. Cada pasta de domínio recebe um `README.md` curto dizendo quem escreve ali.
+1. Criar **só os quatro que têm escritor**: `architecture/adr/`, `discovery/`,
+   `specs/archive/` e `agents/`. **Nunca sobrescrever** uma que já existe.
+   `prd/`, `ui/`, `qa/` e `project/` não nascem agora — nascem quando alguém
+   escrever neles.
+2. Cada pasta criada recebe um `README.md` curto dizendo quem escreve ali.
 3. Chamar o `anvil-setup` para escrever `docs/agents/issue-tracker.md` a partir
    do perfil em [templates/issue-tracker-anvil.md](templates/issue-tracker-anvil.md).
    É esse arquivo que faz as skills de fluxo publicarem em `docs/specs/` sem

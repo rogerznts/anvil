@@ -113,6 +113,11 @@ Chame a Skill tool com **anvil-docs**:
 - `docs/` ausente ou só com os README de domínio → verbo `scaffold`
 - `docs/` com conteúdo fora dos domínios canônicos → verbo `adopt`
 
+O `scaffold` cria **quatro** domínios, não oito: `architecture/`, `discovery/`,
+`specs/` e `agents/` — os que têm skill escrevendo neles. `prd/`, `ui/`, `qa/` e
+`project/` continuam canônicos, mas nascem quando alguém escrever ali. Pasta
+vazia prometendo um autor que não existe ensina quem lê a ignorar a árvore.
+
 Nunca presuma que dá para criar por cima. O `adopt` é a operação em que um
 palpite errado sai caro de desfazer, e ele mostra o plano inteiro antes de mover
 qualquer coisa.

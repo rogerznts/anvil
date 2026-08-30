@@ -193,18 +193,28 @@ skills originais.
 ```
 docs/
 ├── index.md                       auto-gerado
-├── agents/issue-tracker.md        o perfil que o fluxo lê
-├── architecture/                  context.md · context-map.md · adr/
-├── discovery/  prd/  ui/  qa/  project/
-└── specs/
-    ├── 012-feature-checkout-coupon/     ← só a PASTA é do anvil
-    │   ├── spec.md                        anvil-to-spec
-    │   ├── issues/01-modelo-de-cupom.md   anvil-to-tickets
-    │   │     **Blocked by:** —
-    │   │     **Status:** resolved
-    │   └── map.md                         anvil-wayfinder, quando usado
-    └── archive/
+├── agents/issue-tracker.md     ●  o perfil que o fluxo lê
+├── architecture/               ●  context.md · adr/
+├── discovery/                  ●  anvil-research
+├── specs/                      ●
+│   ├── 012-feature-checkout-coupon/     ← só a PASTA é do anvil
+│   │   ├── spec.md                        anvil-to-spec, com as User Stories
+│   │   ├── issues/01-modelo-de-cupom.md   anvil-to-tickets
+│   │   │     **Blocked by:** —
+│   │   │     **Status:** resolved
+│   │   ├── ui/                            fluxo e comportamento desta mudança
+│   │   └── map.md                         anvil-wayfinder, quando usado
+│   └── archive/
+│
+└── prd/  ui/  qa/  project/    ○  reconhecidos, nascem quando houver conteúdo
 ```
+
+**●** o `scaffold` cria · **○** nenhuma skill escreve; são para o que você
+escrever à mão
+
+**Não há skill que autore PRD.** A spec é a unidade e carrega suas próprias User
+Stories — o `to-spec` pede uma lista *"extremely extensive"*. Camada de épico
+atravessando specs, se você quiser, é escrita à mão em `prd/`.
 
 O **branch** é `{tipo}/{NNN}-{nome}` — string diferente da pasta, de propósito.
 Resolva sempre pelo prefixo numérico, nunca por igualdade.
