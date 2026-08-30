@@ -78,17 +78,40 @@ skills:
 
   # ---- pstack --------------------------------------------------------------
   - { name: anvil-unslop,    source: pstack, path: skills/unslop,      pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-how,       source: pstack, path: skills/how,         state: planned, adapt: [rename, decursor] }
-  - { name: anvil-architect, source: pstack, path: skills/architect,   state: planned, adapt: [rename, decursor] }
-  - { name: anvil-arena,     source: pstack, path: skills/arena,       state: planned, adapt: [rename, decursor] }
-  - { name: anvil-poteto,    source: pstack, path: skills/poteto-mode, state: planned, adapt: [rename, decursor],
+  - { name: anvil-how,       source: pstack, path: skills/how,         pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename, decursor] }
+  - { name: anvil-architect, source: pstack, path: skills/architect,   pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename, decursor] }
+  - { name: anvil-arena,     source: pstack, path: skills/arena,       pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename, decursor] }
+  - { name: anvil-poteto,    source: pstack, path: skills/poteto-mode, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename, decursor],
       strip: [scripts, references, "playbooks/autonomous-run.md", "playbooks/autopilot-full.md",
               "playbooks/autopilot-stack.md", "playbooks/babysit.md", "playbooks/eval.md",
               "playbooks/hillclimb.md", "playbooks/multi-phase-plan.md", "playbooks/opening-a-pr.md",
               "playbooks/orchestrate.md", "playbooks/perf-issue.md", "playbooks/prototype.md",
               "playbooks/runtime-forensics.md", "playbooks/trace-forensics.md",
               "playbooks/visual-parity.md", "playbooks/worktree-cleanup.md",
-              "playbooks/authoring-a-skill.md"] }
+              "playbooks/authoring-a-skill.md", "playbooks/shipping.md"] }
+
+  # ---- pstack: principles (o vocabulário que poteto, architect e arena citam) ----
+  - { name: anvil-principle-boundary-discipline,                        source: pstack, path: skills/principle-boundary-discipline, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-build-the-lever,                            source: pstack, path: skills/principle-build-the-lever, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-encode-lessons-in-structure,                source: pstack, path: skills/principle-encode-lessons-in-structure, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-exhaust-the-design-space,                   source: pstack, path: skills/principle-exhaust-the-design-space, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-experience-first,                           source: pstack, path: skills/principle-experience-first, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-fix-root-causes,                            source: pstack, path: skills/principle-fix-root-causes, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-foundational-thinking,                      source: pstack, path: skills/principle-foundational-thinking, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-guard-the-context-window,                   source: pstack, path: skills/principle-guard-the-context-window, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-laziness-protocol,                          source: pstack, path: skills/principle-laziness-protocol, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-make-operations-idempotent,                 source: pstack, path: skills/principle-make-operations-idempotent, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-migrate-callers-then-delete-legacy-apis,    source: pstack, path: skills/principle-migrate-callers-then-delete-legacy-apis, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-minimize-reader-load,                       source: pstack, path: skills/principle-minimize-reader-load, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-model-the-domain,                           source: pstack, path: skills/principle-model-the-domain, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-never-block-on-the-human,                   source: pstack, path: skills/principle-never-block-on-the-human, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-outcome-oriented-execution,                 source: pstack, path: skills/principle-outcome-oriented-execution, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-prove-it-works,                             source: pstack, path: skills/principle-prove-it-works, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-redesign-from-first-principles,             source: pstack, path: skills/principle-redesign-from-first-principles, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-separate-before-serializing-shared-state,   source: pstack, path: skills/principle-separate-before-serializing-shared-state, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-sequence-verifiable-units,                  source: pstack, path: skills/principle-sequence-verifiable-units, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-subtract-before-you-add,                    source: pstack, path: skills/principle-subtract-before-you-add, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
+  - { name: anvil-principle-type-system-discipline,                     source: pstack, path: skills/principle-type-system-discipline, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
 
   # ---- UI: métodos ---------------------------------------------------------
   - { name: anvil-ui-hallmark, source: hallmark, path: skills/hallmark,        state: planned, adapt: [rename] }

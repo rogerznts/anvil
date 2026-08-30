@@ -334,10 +334,20 @@ PYEOF
         done < <(links_of "$f")
     done < <(find "$PAYLOAD" -name '*.md' -not -path '*/starter/*' -not -path '*/templates/*')
 
+    # Dependencia entre skills se declara chamando a Skill tool, nunca com
+    # caminho relativo: apos o degit, uma skill pode nao estar instalada, e o
+    # ponteiro morre em silencio. Resolve o link e confere se sai do diretorio
+    # da propria skill — `../` na raiz da skill JA escapa.
     echo "3. nenhum caminho relativo cruza fronteira de skill"
     while IFS= read -r f; do
+        skill_dir="$PAYLOAD/$(printf '%s' "${f#"$PAYLOAD"/}" | cut -d/ -f1)"
+        d="$(dirname "$f")"
         while IFS= read -r l; do
-            case "$l" in ../../*) echo "   FALHA ${f#"$PAYLOAD"/} -> $l"; falhas=$((falhas+1)) ;; esac
+            case "$l" in ../*) ;; *) continue ;; esac
+            abs="$(cd "$d" 2>/dev/null && cd "$(dirname "$l")" 2>/dev/null && pwd)"
+            [ -n "$abs" ] || abs="$d/$l"
+            case "$abs" in "$skill_dir"|"$skill_dir"/*) ;;
+                *) echo "   FALHA ${f#"$PAYLOAD"/} -> $l"; falhas=$((falhas+1)) ;; esac
         done < <(links_of "$f")
     done < <(find "$PAYLOAD" -name '*.md' -not -path '*/starter/*' -not -path '*/templates/*')
 
