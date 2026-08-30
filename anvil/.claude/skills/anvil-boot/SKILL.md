@@ -12,7 +12,45 @@ passo é idempotente e nada é sobrescrito sem aviso.
 árvore vazia de `docs/`. Todo o resto — rules, perfil de tracker, rule de stack,
 hook — é proposto e espera confirmação.
 
-## 1. Diretivas no CLAUDE.md
+## 1. Vindo do mosk?
+
+<!-- anvil-verify: allow-mosk-ops — a seção de migração precisa nomear os
+     caminhos e marcadores do mosk; é o que o boot vai procurar no disco. -->
+
+Se o projeto tem `.claude/mosk/` ou `.claude/agents/mosk-*.md`, ele roda o
+antecessor. **Mostre o plano de migração e espere aprovação antes de apagar
+qualquer coisa.**
+
+Sai, porque não existe mais equivalente e ficar no disco só faz o agente
+encontrar e tentar usar:
+
+| O quê | Por quê |
+|---|---|
+| `.claude/agents/` | as doze personas. O anvil não tem agentes |
+| `.claude/mosk/` | o core: tasks, templates, checklists, scripts, schemas |
+| `.claude/skills/mosk-*` | os wrappers de agente e as skills soltas |
+| `.claude/hooks/guard-spec-merge.sh` | é substituído pela versão do `anvil-docs` |
+
+Fica, sem ser tocado:
+
+| O quê | Por quê |
+|---|---|
+| `.claude/rules/` | é do projeto, não do toolkit. Só o `project.md` é revisado no passo 4, porque cita caminhos do mosk |
+| `docs/` | é o trabalho. Vai para o verbo `adopt` no passo 5 |
+| `.claude/settings.json` | pode ter hook do projeto. O passo 8 **mescla**, não sobrescreve |
+
+As `tea-*` existem nos dois e são substituídas pelas do anvil, que já não
+mencionam o mosk.
+
+**No `CLAUDE.md`**, o bloco entre `<!-- MOSK:DIRECTIVES:START -->` e `END` vira o
+bloco `ANVIL:DIRECTIVES` do passo 2. Substitua o bloco inteiro; não deixe os dois
+convivendo, porque as regras de idioma deles são diferentes — o mosk mandava
+escrever artefato em inglês, o anvil manda em pt-BR.
+
+Diga quantos arquivos serão removidos, listando os diretórios, e **espere o
+"pode ir"**.
+
+## 2. Diretivas no CLAUDE.md
 
 O conteúdo de [claude_boot.md](claude_boot.md) entra como **bloco delimitado**,
 para poder ser atualizado depois sem estragar o que o projeto já tinha:
@@ -34,7 +72,7 @@ para poder ser atualizado depois sem estragar o que o projeto já tinha:
 
 Só siga adiante depois de confirmar que o bloco está lá e delimitado.
 
-## 2. Varrer o projeto
+## 3. Varrer o projeto
 
 Escopo: se o usuário tem uma mudança em vista, varra em volta dela. Senão, mapeie
 o projeto inteiro em profundidade representativa.
@@ -48,7 +86,7 @@ O que você quer capturar: stack, entrypoints, camadas, comandos, integrações,
 convenções, testes, dívida técnica e as pegadinhas operacionais. **Com caminho
 verificado** — caminho citado de memória e errado é pior que ausente.
 
-## 3. Rules
+## 4. Rules
 
 `.claude/rules/` é do projeto: o `/anvil-update` **nunca** toca nele. Markdown
 puro, sem frontmatter.
@@ -68,7 +106,7 @@ código que a justifica, e **espere aprovação**: `coding-standards.md`,
 Rule sem evidência não se sugere. Uma lista de seis sugestões genéricas ensina o
 usuário a aprovar sem ler.
 
-## 4. Documentação
+## 5. Documentação
 
 Chame a Skill tool com **anvil-docs**:
 
@@ -79,7 +117,7 @@ Nunca presuma que dá para criar por cima. O `adopt` é a operação em que um
 palpite errado sai caro de desfazer, e ele mostra o plano inteiro antes de mover
 qualquer coisa.
 
-## 5. Issue tracker
+## 6. Issue tracker
 
 Chame a Skill tool com **anvil-setup**. Ele escreve `docs/agents/issue-tracker.md`
 a partir do perfil que o `anvil-docs` fornece.
@@ -89,7 +127,7 @@ a partir do perfil que o `anvil-docs` fornece.
 `docs/specs/` sem conhecer esse caminho por dentro — eles leem o perfil. Sem ele,
 publicam no lugar errado e não reclamam.
 
-## 6. Stack
+## 7. Stack
 
 Se a varredura encontrou uma stack conhecida — hoje, um `payload.config.ts` —
 **proponha** a rule dela com uma linha de justificativa, e espere aprovação:
@@ -102,7 +140,7 @@ A rule sai da skill `anvil-stack-payload`, arquivo `RULE.md`, com os `{{...}}`
 preenchidos pelo que a varredura achou. **Sem** as invariantes do bench — aquelas
 são decisão de produto do `/anvil-bench` e não valem para projeto comum.
 
-## 7. Guarda de merge
+## 8. Guarda de merge
 
 Uma verificação que ninguém chama tem a força de uma prosa e o custo de um
 programa. O mosk pagou por isso: uma spec dele chegou ao branch padrão ainda
@@ -131,7 +169,32 @@ aberta, com o verificador instalado, correto e nunca invocado.
 
 Diga ao usuário que a guarda está ativa e o que ela bloqueia.
 
-## 8. Índice e relatório
+## 9. Ignorar o toolkit no git
+
+`.claude/skills/` é conteúdo do toolkit, reinstalável por `npx degit`. Versionar
+2 MB de skill de terceiro no repositório do projeto engorda o histórico, e todo
+`/anvil-update` viraria um diff gigante que ninguém revisa.
+
+Acrescente ao `.gitignore` do projeto, **sem duplicar** se já estiver lá:
+
+```gitignore
+# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil .`
+.claude/skills/
+```
+
+O que **fica versionado**, porque é do projeto e não se reinstala:
+
+- `.claude/rules/` — o contexto que o boot levantou deste projeto
+- `.claude/anvil.lock` — diz qual versão instalar num clone novo
+- `.claude/settings.json` — a configuração, incluindo o hook
+- `docs/` — o trabalho
+
+Avise que quem clonar o repositório precisa rodar o degit uma vez para ter as
+skills, e que o `anvil.lock` diz o que esperar. Se o projeto preferir versionar
+tudo — por CI que não roda instalação, por exemplo — **respeite e não escreva a
+linha**; é decisão do projeto, não do toolkit.
+
+## 10. Índice e relatório
 
 Chame o verbo `index` do `anvil-docs`.
 
