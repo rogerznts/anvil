@@ -79,6 +79,11 @@ Duas exceções com fundamento: o `/anvil-bench`, headless, grava `gate.yaml`
 porque um loop precisa de parada mecânica; e o hook de merge, que varre
 `issues/` atrás de ticket aberto.
 
+O mesmo bench é o único lugar com **ledger de gates** (`gates.md`, do unlazy
+adotado sob `anvil-bench/unlazy/`). Ele não contradiz a regra de estado lido: o
+ledger é declaração, e o que decide o veredito é a **reexecução** dos comandos
+pelo supervisor — nunca a leitura da marca que o agente deixou nele.
+
 ## Idioma
 
 Fronteira única, na rule sempre carregada (`claude_boot.md`, injetada no

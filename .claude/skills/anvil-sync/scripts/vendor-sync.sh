@@ -225,7 +225,17 @@ cmd_vendor() {
 
     head="$(git -C "$ROOT/$sub" rev-parse HEAD)" || die "submodule $sub ausente"
     dest="$PAYLOAD/$name"
-    [ -e "$dest" ] && die "$dest já existe"
+
+    # Destino existente passa SO quando tudo que ja esta la e `keep`. E o caso
+    # de adotar material upstream DENTRO de uma skill autoral: o anvil-bench tem
+    # SKILL.md e GATE.md nossos, e o unlazy entra embaixo de unlazy/. Qualquer
+    # arquivo fora do keep significa sobrescrever trabalho, e a recusa continua.
+    if [ -e "$dest" ]; then
+        while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            is_listed "$f" "$keep" || die "$dest ja existe e contem '$f', que nao esta no keep"
+        done < <(cd "$dest" && find . -type f | sed 's|^\./||')
+    fi
 
     mkdir -p "$dest"
     local n=0 nskip=0

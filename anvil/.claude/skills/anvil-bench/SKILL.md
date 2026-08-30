@@ -77,6 +77,31 @@ Derive os testes **do checklist**, simétricos ao que foi acordado: existência 
 módulo, campos, CRUD, papéis, e os asserts de negócio. **Não reescreva os testes
 base do starter.**
 
+Escreva também o **ledger** `gates.md`, na raiz da spec: um gate por item do
+checklist, com o `CHECK:` apontando o teste que você acabou de derivar. O
+critério de pronto que a pessoa deu em português vira aqui a coisa que decide o
+loop sozinho — e ele nasce **antes** da construção, não depois dela. Formato e
+regras de autoria em [unlazy/references/gates.md](unlazy/references/gates.md).
+
+Três regras decidem se o gate vale alguma coisa:
+
+- o `CHECK:` roda o teste real e imprime um marcador **só depois** que ele passa.
+  Comando que imprime sucesso por construção certifica qualquer coisa
+- o `EXPECT:` casa esse marcador, nunca um número tirado do briefing — número
+  copiado é a expectativa provando a si mesma
+- item que nenhum teste alcança fica como gate **manual**, sem `CHECK:`, e vai
+  para a entrega como pendência declarada. Não invente comando para fingir
+  cobertura
+
+Antes de seguir, rode o linter, que acha o gate incapaz de falhar:
+
+```
+docker compose exec -T app node \
+  .claude/skills/anvil-bench/unlazy/scripts/gate-lint.mjs docs/specs/<id>/gates.md
+```
+
+Nada disto aparece para quem pediu a ferramenta (INV-6).
+
 ### 5. Construir
 
 ```
@@ -90,7 +115,8 @@ a **audiência**: quem está do outro lado não tem como responder "os testes de
 integração falharam, quer que eu ajuste o mock?".
 
 A condição de parada é mecânica e está em [GATE.md](GATE.md). Teto de **três**
-tentativas por ticket; esgotado, para e reporta.
+tentativas por ticket; esgotado, para e reporta. O `gate` do diagrama reexecuta o
+ledger da fase 4 — ele não lê o que o agente disse ter feito.
 
 Uma linha visível de progresso por fase. Detalhe vai para `build-log.md`, e toda
 decisão que você tomou sozinha vai para `decisions-log.md` — é o que permite

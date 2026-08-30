@@ -151,27 +151,65 @@ skills:
   - { name: anvil-ui-soft,       source: taste, path: skills/soft-skill,       pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
   - { name: anvil-ui-stitch,     source: taste, path: skills/stitch-skill,     pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
 
-  # ---- disciplina de completude --------------------------------------------
-  # A skill mora na RAIZ do repositório upstream, então `path: .` — o `ls-tree`
-  # e o `show <ref>:./<arquivo>` do sync aceitam esse caminho, verificado antes
-  # de registrar aqui.
+  # ---- unlazy: material do bench, não uma skill ----------------------------
+  # O unlazy vira `extra` DENTRO do anvil-bench, e não uma skill própria. Duas
+  # razões, nesta ordem:
   #
-  # `planned` de propósito: o recorte ainda não foi decidido, e enquanto ela não
-  # for vendorizada nada disto é copiado. O `strip` abaixo é a proposta —
-  # infraestrutura do repositório upstream, que não serve dentro de um payload
-  # instalado no projeto de outra pessoa.
+  # 1. A description dele dispara por linguagem natural em "long or multi-part
+  #    task", que é a descrição do /anvil-implement. Como skill, ele se
+  #    auto-invocaria no fluxo do mattpocock — e o catálogo não me dá regra para
+  #    desligar isso: `rename` cobre só o `name:`, e a description fica verbatim.
+  # 2. O uso é exclusivo do bench, que é quem tem loop headless e precisa de
+  #    condição de parada mecânica.
   #
-  # O recorte tem uma amarra: a checagem 2 do `verify` exige que todo link
-  # relativo resolva. README, CHANGELOG e CONTRIBUTING se referenciam entre si,
-  # entao saem juntos ou ficam juntos. E `research/` NAO pode sair — method.md e
-  # token-economy.md apontam para research/validation-protocol.md.
-  - name: anvil-unlazy
+  # O SKILL.md vira UNLAZY.md na cópia, pelo mesmo motivo que as 21 principle-*
+  # viram references/: um SKILL.md aninhado não deve existir no payload.
+  #
+  # A árvore é preservada tal como no upstream para que todo link relativo
+  # continue resolvendo dentro de anvil-bench/unlazy/ — é o que as checagens 2 e
+  # 3 do verify exigem. Por isso vem inteira, inclusive a metade de orquestração
+  # que o bench não usa: deixá-la fora exigiria editar o UNLAZY.md, e editar não
+  # é uma das quatro regras do catálogo.
+  #
+  # FORA, deliberadamente: tests, .github, .gitignore, README, CHANGELOG,
+  # CONTRIBUTING, package.json e agents/ (infraestrutura de repositório), mais
+  # scripts/install-hooks.mjs e scripts/stop-hook.mjs — o Stop hook solta depois
+  # de 6 bloqueios sem progresso e o bench para no teto de 3 tentativas: duas
+  # condições de parada rivais na mesma sessão. O motivo está no VENDOR.md.
+  - name: anvil-bench
     source: unlazy
-    path: .
-    state: planned
-    adapt: [rename]
-    strip: [tests, .github, .gitignore, README.md, CHANGELOG.md, CONTRIBUTING.md, package.json, agents]
+    pin: 473d4b80421c36d733042434cd4b938f81a19ef1
+    state: vendored
+    path: ""                 # sem árvore própria: a skill é autoral, só os extras vêm de fora
+    adapt: []
+    keep: [SKILL.md, GATE.md, "unlazy/VENDOR.md"]
+    extra:
+      - "SKILL.md::unlazy/UNLAZY.md"
+      - "SECURITY.md::unlazy/SECURITY.md"
+      - "LICENSE::unlazy/LICENSE"
+      - "references/gates.md::unlazy/references/gates.md"
+      - "references/method.md::unlazy/references/method.md"
+      - "references/orchestration.md::unlazy/references/orchestration.md"
+      - "references/dispatch.md::unlazy/references/dispatch.md"
+      - "references/parallel.md::unlazy/references/parallel.md"
+      - "references/token-economy.md::unlazy/references/token-economy.md"
+      - "research/validation-protocol.md::unlazy/research/validation-protocol.md"
+      - "templates/gates-leaf.md::unlazy/templates/gates-leaf.md"
+      - "templates/gates-node.md::unlazy/templates/gates-node.md"
+      - "templates/PLAN.md::unlazy/templates/PLAN.md"
+      - "scripts/gate-check.mjs::unlazy/scripts/gate-check.mjs"
+      - "scripts/gate-lint.mjs::unlazy/scripts/gate-lint.mjs"
+      - "scripts/dispatch-check.mjs::unlazy/scripts/dispatch-check.mjs"
+      - "scripts/lib/gates.mjs::unlazy/scripts/lib/gates.mjs"
+      - "scripts/lib/dispatch.mjs::unlazy/scripts/lib/dispatch.mjs"
+      - "scripts/lib/process-tree.mjs::unlazy/scripts/lib/process-tree.mjs"
+      - "scripts/lib/check-supervisor.mjs::unlazy/scripts/lib/check-supervisor.mjs"
+      - "scripts/lib/regex-worker.mjs::unlazy/scripts/lib/regex-worker.mjs"
 
 # Skills autorais do anvil, fora do sync porque não têm upstream:
-#   anvil-docs · anvil-ui (roteador) · anvil-boot · anvil-update · anvil-bench
+#   anvil-docs · anvil-ui (roteador) · anvil-boot · anvil-update
 #   tea-commit · tea-open-pr · tea-open-fast-pr · tea-prune-branches
+#
+# O anvil-bench é autoral E tem entrada no sync: o SKILL.md e o GATE.md são
+# nossos (protegidos por `keep`), e o material do unlazy embaixo de unlazy/ vem
+# do upstream pelo merge 3-way como qualquer outra cópia.

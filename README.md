@@ -46,6 +46,7 @@ O resultado, medido:
 | **linhas nossas que diferem do upstream** | **171 — 0,68%** |
 | arquivos deixados de fora (`strip`) | 40 |
 | arquivos que o anvil adicionou | 3 |
+| material vendorizado fora de skill (`unlazy`, dentro do bench) | 21 arquivos · 3.772 linhas |
 
 Vinte e uma dessas skills têm **uma linha** de delta: o `name:` do frontmatter.
 
@@ -197,7 +198,19 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 | skill | para quê | origem |
 |---|---|---|
 | `anvil-stack-payload` | o ofício do Payload em 11 arquivos, mais a `RULE.md` com as três ciladas | payloadcms |
-| `anvil-bench` | leva quem não programa de uma necessidade até a ferramenta rodando | autoral |
+| `anvil-bench` | leva quem não programa de uma necessidade até a ferramenta rodando | autoral + `unlazy` |
+
+O bench é autoral, mas carrega material de terceiro embaixo de `unlazy/`: o
+[unlazy](https://github.com/Leonxlnx/unlazy) (MIT), que transforma o critério de
+pronto acordado na entrevista num **ledger de gates executável**. O loop do bench
+é headless, então o veredito não pode ser leitura de auto-relato — ele é a
+reexecução do ledger pelo supervisor, com `gate-check --reverify`.
+
+Ele entra como material, não como skill, porque a `description` do upstream
+dispara em *"long or multi-part task"* e se auto-invocaria dentro do
+`/anvil-implement`. O que ficou de fora, e por quê, está em
+`anvil-bench/unlazy/VENDOR.md` — inclusive o Stop hook, que competiria com o teto
+de três tentativas do próprio bench.
 
 ---
 
