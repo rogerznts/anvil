@@ -18,8 +18,8 @@
 # existe, porque submodule é clone completo — a base é recuperável de graça.
 #
 # O script faz o que é MECÂNICO: mover bytes, rodar merge-file, aplicar o
-# `rename`. As regras de julgamento (`docs-remap`, `decursor`) ele apenas
-# SINALIZA; quem aplica é a skill anvil-sync, que sabe ler o que mudou.
+# `rename` e o `invocable`. As regras de julgamento (`docs-remap`, `decursor`)
+# ele apenas SINALIZA; quem aplica é a skill anvil-sync, que sabe ler o que mudou.
 
 set -uo pipefail
 
@@ -169,6 +169,16 @@ apply_rename() {  # <dir-da-skill> <nome>
     sed -i.bak "1,10s|^name: .*|name: $name|" "$sk" && rm -f "$sk.bak"
 }
 
+# `invocable` — mecânica: tira a trava `disable-model-invocation` do frontmatter,
+# para um orquestrador conseguir despachar a skill pela Skill tool. Reaplicada
+# depois de todo merge, como o rename: um conflito no frontmatter resolvido a
+# favor do upstream traria a trava de volta em silêncio.
+apply_invocable() {  # <dir-da-skill>
+    local sk="$1/SKILL.md"
+    [ -f "$sk" ] || return 0
+    sed -i.bak '1,10{/^disable-model-invocation: *true *$/d;}' "$sk" && rm -f "$sk.bak"
+}
+
 # --- status -------------------------------------------------------------------
 
 cmd_status() {
@@ -249,6 +259,7 @@ cmd_vendor() {
 
     local nextra; nextra="$(copy_extras "$sub" "$head" "$dest" "$extra")"
     case ",$adapt," in *,rename,*) apply_rename "$dest" "$name" ;; esac
+    case ",$adapt," in *,invocable,*) apply_invocable "$dest" ;; esac
     set_pin "$name" "$head" || die "falha ao gravar o pin"
     gerar_lock >/dev/null
 
@@ -329,6 +340,7 @@ update_one() {
     if [ "$conflitos" -eq 0 ]; then
         copy_extras "$sub" "$head" "$dest" "$extra" "$pin" >/dev/null
         case ",$adapt," in *,rename,*) apply_rename "$dest" "$name" ;; esac
+        case ",$adapt," in *,invocable,*) apply_invocable "$dest" ;; esac
         set_pin "$name" "$head"
         gerar_lock >/dev/null
         echo "    pin atualizado para ${head:0:7}"
@@ -483,6 +495,15 @@ PYEOF
         [ -n "$so_lock" ] && { echo "   FALHA no lock e nao no payload: $(echo "$so_lock" | tr '\n' ' ')"; falhas=$((falhas+1)); }
         [ -n "$so_disco" ] && { echo "   FALHA no payload e nao no lock: $(echo "$so_disco" | tr '\n' ' ')"; falhas=$((falhas+1)); }
     fi
+
+    echo "8. skill marcada invocable não tem a trava de invocação"
+    while IFS=$'\x1f' read -r n state _ _ _ a _ _ _; do
+        [ "$state" = "vendored" ] || continue
+        case ",$a," in *,invocable,*) ;; *) continue ;; esac
+        [ -f "$PAYLOAD/$n/SKILL.md" ] || continue
+        sed -n '1,10p' "$PAYLOAD/$n/SKILL.md" | grep -qE '^disable-model-invocation: *true' &&
+            { echo "   FALHA $n: invocable no manifesto, mas o frontmatter ainda trava"; falhas=$((falhas+1)); }
+    done < <(manifest_rows)
 
     echo
     if [ "$falhas" -eq 0 ]; then echo "verify: limpo"; return 0; fi

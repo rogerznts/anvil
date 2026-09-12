@@ -321,8 +321,8 @@ theirs = git -C <submodule> show <HEAD>:<path>/<arquivo>
 ours   = anvil/.claude/skills/<nome>/<arquivo>
 ```
 
-O catálogo de adaptações é **fechado**: `rename`, `docs-remap`, `decursor`,
-`keep`/`strip`/`extra`. Se uma mudança não cabe em nenhuma, ela não deveria estar
+O catálogo de adaptações é **fechado**: `rename`, `invocable`, `docs-remap`,
+`decursor`, `keep`/`strip`/`extra`. Se uma mudança não cabe em nenhuma, ela não deveria estar
 sendo feita. E há uma lista do que **nunca** é adaptação: traduzir, enxugar,
 uniformizar vocabulário entre skills, corrigir erro do upstream.
 

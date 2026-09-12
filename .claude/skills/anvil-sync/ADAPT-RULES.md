@@ -9,6 +9,7 @@ O catálogo é fechado de propósito. Regra nova exige entrada aqui e um motivo.
 | id | natureza | quem aplica |
 |---|---|---|
 | `rename` | mecânica | o script |
+| `invocable` | mecânica | o script |
 | `docs-remap` | julgamento | você, lendo o arquivo |
 | `decursor` | julgamento | você, lendo o arquivo |
 | `keep` / `strip` | declarativa | o script, pelo manifesto |
@@ -37,6 +38,34 @@ Cross-referências entre skills adotadas também mudam, porque o nome mudou:
 
 O script aplica o `name:`. As cross-referências você confere — elas variam de
 forma demais para automatizar com segurança.
+
+---
+
+## `invocable` — mecânica
+
+Tira `disable-model-invocation: true` do frontmatter. Só isso.
+
+```diff
+ name: anvil-to-spec
+ description: "..."
+-disable-model-invocation: true
+```
+
+**Por que existe.** Com a trava, só o usuário dispara a skill digitando o
+comando — a Skill tool recusa qualquer modelo, inclusive um subagente. É uma
+decisão deliberada do upstream, e ela serve a quem trabalha sozinho. Ela impede
+a orquestração: um agente coordenador não consegue despachar `grill`,
+`to-spec`, `to-tickets` ou `implement`, e o fluxo inteiro volta para as mãos do
+usuário. Contornar por skill-wrapper não funciona — a recusa manda
+explicitamente não replicar a skill por outro caminho.
+
+**Aplique só no que um agente precisa despachar.** A trava é também uma proteção
+contra auto-invocação: sem ela, o modelo pode disparar a skill sozinho no meio de
+uma conversa. As skills que ninguém orquestra continuam travadas.
+
+**Mecânica, e reaplicada a cada merge**, como o `rename`: um conflito no
+frontmatter resolvido a favor do upstream traria a trava de volta em silêncio. O
+`verify` reprova skill marcada `invocable` que ainda trave.
 
 ---
 
@@ -82,7 +111,9 @@ Só para skills do `pstack`, que são escritas para o Cursor.
 | slugs `gpt-5.6-sol-max`, `grok-4.6-fast-xhigh`, `claude-fable-5-thinking-max` | variantes Claude |
 | skill de outro plugin (`cursor-team-kit`) | remover a referência, ou apontar para a equivalente do anvil |
 
-`disable-model-invocation: true` **é suportado** pelo Claude Code. Não mexa.
+`disable-model-invocation: true` **é suportado** pelo Claude Code, e o
+`decursor` não o descarta. Quem o tira é a regra `invocable`, e só nas skills
+que o anvil precisa despachar por agente.
 
 **A armadilha do `arena`.** Ele pressupõe candidatos de famílias de modelo
 diferentes. O Claude Code só endereça modelos Claude, então a premissa degrada
