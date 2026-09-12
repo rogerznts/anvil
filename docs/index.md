@@ -1,15 +1,12 @@
 # Índice da documentação
 
-Last updated: 2026-08-30T00:00:00Z
+Last updated: 2026-09-12T17:24:04Z
 
 ## Visão geral
 
-- **[Architecture](./architecture/overview.md)** — desenho do sistema + ADRs
-- **[Discovery](./discovery/)** — pesquisa e notas
+- **[Discovery](./discovery/)** — pesquisa, briefings, brainstorming
+- **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
-
-Os domínios `prd/`, `ui/` e `qa/` são reconhecidos mas não existem aqui: nenhuma
-skill escreve neles, e eles nascem quando houver conteúdo.
 
 ## Specs ativas
 
@@ -20,6 +17,14 @@ Nenhuma.
 Nenhuma.
 
 ## Conteúdo por domínio
+
+### Agents
+
+- [issue-tracker.md](./agents/issue-tracker.md) — o perfil que as skills de
+  fluxo leem: specs e tickets versionados em `docs/specs/{NNN}-{tipo}-{nome}/`,
+  com `Blocked by` e `Status`.
+- [domain.md](./agents/domain.md) — o que ler antes de explorar, e o vocabulário
+  do glossário. Single-context, sob `docs/architecture/`.
 
 ### Architecture
 
@@ -41,8 +46,8 @@ Nenhuma.
 
 ### Project
 
-- [plan.md](./project/plan.md) — o roster de 43 skills, as sete fases, a
-  verificação e o corte do core do mosk.
+- [plan.md](./project/plan.md) — o roster de skills, as fases, a verificação e o
+  corte do core do mosk.
 
 <!-- custom -->
 <!-- /custom -->

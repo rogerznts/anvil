@@ -1,3 +1,4 @@
+<!-- ANVIL:DIRECTIVES:START -->
 ## Diretrizes do anvil
 
 Reduzem os erros que um LLM comete por padrão ao escrever código. Convivem com
@@ -104,3 +105,15 @@ que ele quer dizer na **primeira menção**:
 > exige isso
 
 Sem a glosa, quem lê é obrigado a abrir a spec para saber se aquilo importa.
+<!-- ANVIL:DIRECTIVES:END -->
+
+## Agent skills
+
+### Issue tracker
+
+Specs e tickets versionados em `docs/specs/{NNN}-{tipo}-{nome}/`. Veja
+`docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context, sob `docs/architecture/`. Veja `docs/agents/domain.md`.

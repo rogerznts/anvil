@@ -3,3 +3,13 @@
 # workspace/ — projetos descartáveis para testar o toolkit.
 # Fica no disco para você acompanhar, fora do git para não poluir o histórico.
 workspace/
+
+# .maestri/ — estado local da equipe multiagente (roles, sessões).
+# Pertence à máquina, não ao toolkit.
+.maestri/
+
+# .claude/skills/ — symlinks para anvil/, o payload. Reconstruíveis com
+# `bash .claude/skills/anvil-sync/scripts/dev-link.sh`.
+# A anvil-sync é exceção: é do repositório e não vai no degit.
+.claude/skills/*
+!.claude/skills/anvil-sync/
