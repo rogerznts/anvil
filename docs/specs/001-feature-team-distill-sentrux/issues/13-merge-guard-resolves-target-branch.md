@@ -52,3 +52,29 @@ Ficam como ideia, fora da spec: merge por SHA ou alvo que ainda não resolve (fa
 registrar a limitação no cabeçalho, isto sim entra), `gh pr merge <branch>` a partir da `main` (fluxo
 de PR), `git ls-tree` sem `-z` com nome não-ASCII, e os smells de regex repetida.
 Aguardando o gate do Tester antes de devolver ao Dev.
+
+**Leader, 2026-09-13 — gate Tester: REPROVADO pelo caso 2** (opção global antes do subcomando). Da
+`main`, `git -C . merge {spec}` e `git -c k=v merge {spec}` passam e mesclam de verdade. Confirmou também
+o B1 do Review. O ticket fechou 28 contornos que já existiam e criou 5 falsos positivos.
+
+**Lista única de correções deste ticket** (Review + Tester):
+
+1. **B1** — o branch atual também é lido do commit (HEAD), não do disco.
+2. **Opção global do git** antes do subcomando (`-C <dir>`, `-c k=v`, `--no-pager` e afins) não impede
+   reconhecer o `merge`.
+3. **Falsos positivos novos**: `git` só conta em posição de comando (início de comando simples, depois de
+   `&&`, `;`, `|`, newline, prefixo de env ou `command`) — `echo git merge x` é menção; newline encerra
+   a coleta de alvos; delimitadores de heredoc entre aspas (`<<'EOF'`, `<<"EOF"`) e com pipe depois
+   (`<<EOF | tee f`) são reconhecidos.
+4. O perfil do tracker (template do `anvil-docs` e o deste repo) diz que o merge também bloqueia com a
+   spec fora de `archive/`, não só o `tea pr create`.
+5. O rodapé do hook e a mensagem do `validate.sh` não falam em PR quando o merge é local.
+6. A rule ressalva que o `anvil-bench` carrega material do `unlazy`, que vem de upstream.
+7. O cabeçalho do hook registra o que a guarda **não** pega: `bash -c`/`sh -c`/`eval`/backticks/`xargs`,
+   merge por SHA ou alvo que não resolve, `git pull . {spec}`, `git rebase {spec}` na `main`, `reset --hard`.
+
+Ficam como ideia, fora da spec: fechar os contornos do item 7; `gh pr merge {branch}` a partir da
+`main`; hook que libera quando o `validate.sh` não existe num clone novo sem `dev-link`; `ls-tree -z`.
+
+Reteste: `workspace/11-merge-target-tester/adv.sh` e `repro-git-C.sh` do Tester, o `run.sh` do Dev, e
+os cenários do Review (archive não commitado disparado do branch da spec → rc=2).
