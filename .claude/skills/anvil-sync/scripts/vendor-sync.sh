@@ -513,9 +513,10 @@ PYEOF
     # com o valor de cada `chave: valor` que tem `: ` ou caractere especial posto
     # entre aspas, e com tab de inicio de linha virando espacos; se ainda falha, nao
     # ha trava. O valor trava se for booleano true, ou string ou numero que, em
-    # minusculas e sem espaco nas pontas, e 1, true, yes ou on. O PyYAML nao aceita o
-    # tab entre a chave e o valor, que o parser do Claude Code aceita, e o tab vira
-    # espaco antes.
+    # minusculas e sem espaco nas pontas, e 1, true, yes ou on. O PyYAML recusa o que
+    # o parser do Claude Code aceita — tab fora da indentacao e caractere nao
+    # imprimivel para o YAML (controle, DEL, C1 fora o U+0085, U+FFFE, U+FFFF) —, e
+    # isso vira espaco antes; senao a trava de um frontmatter assim some.
     tem_trava() {  # <SKILL.md>
         python3 - "$1" <<'PYEOF'
 import re, sys, yaml
@@ -525,7 +526,8 @@ if t.startswith('\ufeff'):
 m = re.match(r'---\s*\n(.*?)---\s*\n?', t, re.S)
 if not m:
     sys.exit(1)
-fm = re.sub(r'^([^\s#][^:\n]*):\t[ \t]*', r'\1: ', m.group(1), flags=re.M)
+fm = re.sub('[^\t\n\r\x20-\x7e\x85\xa0-\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]', ' ', m.group(1))
+fm = re.sub(r'^(\t*)(.*)$', lambda x: x.group(1) + x.group(2).replace('\t', ' '), fm, flags=re.M)
 
 def entre_aspas(texto):
     linhas = []
