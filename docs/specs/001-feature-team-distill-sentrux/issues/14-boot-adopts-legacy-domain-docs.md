@@ -4,14 +4,14 @@
 
 **Blocked by:** 04
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] O passo 5 do boot trata como gatilho do `adopt` a presença de `CONTEXT.md` ou `CONTEXT-MAP.md` na raiz, ou de ADRs em `docs/adr/`, mesmo com `docs/` ausente ou só com README de domínio.
-- [ ] O `adopt` mostra o plano inteiro antes de mover qualquer coisa, como já faz para esses caminhos, e nada é movido sem aprovação.
-- [ ] Projeto sem nenhum desses arquivos continua indo para o `scaffold`.
-- [ ] Depois do boot, o glossário e os ADRs estão no layout do anvil e o perfil de domínio aponta para eles; nenhuma rule do projeto continua citando o caminho antigo sem aviso.
-- [ ] Ponto B, com `claude -p` isolado do `CLAUDE.md` e das rules do repo pai: um projeto com `CONTEXT.md` na raiz recebe o plano do `adopt` e só move com aprovação; um projeto limpo segue pelo `scaffold`.
-- [ ] O `verify` sai limpo.
+- [x] O passo 5 do boot trata como gatilho do `adopt` a presença de `CONTEXT.md` ou `CONTEXT-MAP.md` na raiz, ou de ADRs em `docs/adr/`, mesmo com `docs/` ausente ou só com README de domínio.
+- [x] O `adopt` mostra o plano inteiro antes de mover qualquer coisa, como já faz para esses caminhos, e nada é movido sem aprovação.
+- [x] Projeto sem nenhum desses arquivos continua indo para o `scaffold`.
+- [x] Depois do boot, o glossário e os ADRs estão no layout do anvil e o perfil de domínio aponta para eles; nenhuma rule do projeto continua citando o caminho antigo sem aviso.
+- [x] Ponto B, com `claude -p` isolado do `CLAUDE.md` e das rules do repo pai: um projeto com `CONTEXT.md` na raiz recebe o plano do `adopt` e só move com aprovação; um projeto limpo segue pelo `scaffold`.
+- [x] O `verify` sai limpo.
 
 ## Comments
 
@@ -60,3 +60,12 @@ a mesma do `validate.sh docs-paths` — o boot rodado de novo num projeto que j�
 **Leader, 2026-09-13 — checagem do Review sobre o ajuste: APROVADO.** F1 (pré-condição antes do passo 1, valendo
 com o verbo explícito), F2 (gatilho definido uma vez e citado nos três lugares, sem texto antigo sobrando) e F4
 resolvidos. Falta o gate do Tester na versão final.
+
+**Leader, 2026-09-13 — resolvido.** Gate do Tester, isolado, na versão final: APROVADO nos cinco casos —
+`CONTEXT-MAP.md` na raiz (adopt, plano, parada, movimentação aprovada), `CONTEXT.md` pelo boot até a aprovação
+(rule do usuário trocada com aprovação), `/anvil-docs scaffold` explícito com legado (para antes de criar
+qualquer coisa), projeto que já segue o anvil (scaffold sem sobrescrever nada) e projeto limpo. Com o gate e a
+checagem do Review, os gates passaram sobre `14ff955`.
+
+Evidência acrescentada à ideia **F5**: na execução com `CONTEXT-MAP.md`, os links relativos foram corrigidos por
+iniciativa do modelo — o `ADOPT.md` não manda, então uma execução pior deixa o mapa com links quebrados.
