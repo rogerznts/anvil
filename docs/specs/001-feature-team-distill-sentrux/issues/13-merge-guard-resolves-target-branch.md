@@ -141,3 +141,9 @@ positivos no formato de merge dos agentes). Exceção aceita no corpus: um falso
 em variável e outro nome de spec no mesmo comando — custo direto de mandar alvo em variável para a lista larga;
 no uso real só acrescenta o branch atual. Ficam como ideia: `echo a\ #` e `echo \;#` antes de um merge.
 Reteste limitado: Review (casos do N1) e Tester (`repro-reteste.sh`, `adv.sh`).
+
+**Leader, 2026-09-13 — reteste final do Review: APROVADO.** N1 resolvido (`git -C $(pwd) merge {spec}`, que
+mesclava de verdade, bloqueia; conteúdo de `$(...)` conferido à parte); F2, alvo em variável, N2, N4, F3 e a
+aritmética resolvidos; sem regressão no B1, nas opções globais nem nas menções; suítes do Dev e do Tester
+limpas em bash 5 e 3.2. Ideia acrescentada: `echo $((1))#; git merge {spec}` (o `#` colado a `))` lido como
+comentário — mesma classe de `echo a\ #`). Falta o reteste final do Tester.
