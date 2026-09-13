@@ -18,7 +18,8 @@
 # As duas metades importam. Fechar os tickets e deixar a spec em `docs/specs/`
 # é o caso do mosk de novo, um passo adiante: a spec chega ao branch padrão sem
 # archive, e não sobra branch onde arquivar sem abrir um segundo PR. Por isso o
-# `/anvil-docs archive` roda ANTES do `tea pr create`, no mesmo branch.
+# `/anvil-docs archive` roda ANTES do merge ou do `tea pr create`, no mesmo
+# branch, e é commitado: a spec é lida do commit de cada branch, não do disco.
 #
 # --- Postura: fail-CLOSED -----------------------------------------------------
 #
@@ -32,15 +33,35 @@
 #
 #   1. Se o comando não menciona nenhum dos verbos, ignora. Substring, barato.
 #   2. Se menciona, a resposta padrão é VERIFICAR. Só ignora quando conseguir
-#      PROVAR que toda ocorrência é menção — texto dentro de string ou corpo de
-#      heredoc — e nunca tokens adjacentes de comando.
-#   3. Qualquer coisa que impeça a prova (sem python3, parse falhando) resulta em
-#      VERIFICAR, não em ignorar. E, sem prova de quais branches o merge nomeia,
-#      confere todo nome no comando com cara de branch de spec.
+#      PROVAR que toda ocorrência é menção — texto dentro de string, corpo de
+#      heredoc, comentário ou argumento de outro comando (`echo git merge`).
+#   3. Qualquer coisa que impeça a prova (sem python3, parse falhando, heredoc
+#      sem fim) resulta em VERIFICAR, não em ignorar. E, sem prova de quais
+#      branches o merge nomeia, confere todo nome no comando com cara de branch
+#      de spec.
 #
-# O custo é falso positivo: escrever *sobre* `gh pr merge` num branch de spec
-# aberta dispara a verificação. É barato — a mensagem diz o que falta — e é o
+# O custo é falso positivo: o que não se prova menção — `sudo echo git merge`,
+# uma aspa sem par — é conferido. É barato — a mensagem diz o que falta — e é o
 # lado certo para errar num controle.
+#
+# --- O que a guarda NÃO pega --------------------------------------------------
+#
+# Fail-closed vale para o parse, não para tudo o que o shell e o git fazem.
+# Passam sem conferência, e ficam aqui para ninguém supor o contrário:
+#
+#   - comando dentro de comando: `bash -c`, `sh -c`, `eval`, backticks,
+#     `"$(git merge ...)"` entre aspas e texto entregue a um shell pelo pipe ou
+#     por heredoc (`echo git merge x | sh`, `bash <<EOF`). O comando ali é
+#     texto, e texto é menção;
+#   - branch que não está na linha: `xargs git merge` é conferido, mas o branch
+#     chega pelo stdin;
+#   - aspa `$'...'`, que o parse não entende: a aspa escapada dentro dela
+#     desalinha as outras;
+#   - merge por SHA, ou por alvo que não resolve para um branch de spec: sem
+#     nome de branch não há número, e sem número não há spec;
+#   - outro verbo que traz o branch da spec para a `main`: `git pull . {spec}`,
+#     `git rebase {spec}` e `git reset --hard {spec}` — e o merge por alias do
+#     git, que tem outro nome.
 
 set -u
 INPUT="$(cat)"
@@ -48,7 +69,9 @@ INPUT="$(cat)"
 # --- 1. filtro barato ---------------------------------------------------------
 # `|| exit 0` seria fail-open: grep ausente devolve 127, indistinguível de "não
 # encontrou" (1). Só o 1 significa ausência; qualquer outro código verifica.
-printf '%s' "$INPUT" | grep -qE '(gh|tea)[^"]{0,4}(pr|pull)|git[^"]{0,4}merge'
+# Entre `git` e `merge` não há limite: `git -C <caminho> merge` põe ali um
+# caminho de qualquer tamanho.
+printf '%s' "$INPUT" | grep -qE '(gh|tea)[^"]{0,4}(pr|pull)|git.*merge'
 GREP_RC=$?
 if [ "$GREP_RC" -eq 1 ]; then
     [ "${GUARD_DECIDE_ONLY:-0}" = "1" ] && echo "ignora"
@@ -83,31 +106,76 @@ except Exception:
 if not cmd:
     print("ignora"); sys.exit(0)
 
-# Remove o CORPO de cada heredoc — ali é dado, não comando. Cortar no primeiro
-# `<<` seria errado: ele aparece dentro de string e no operador aritmético.
-# Aqui o delimitador é capturado e o corte vai do fim da linha até quem fecha.
-def strip_heredocs(text):
-    linhas = text.split("\n")
-    saida, i = [], 0
-    while i < len(linhas):
-        linha = linhas[i]
-        m = re.search(r"<<[-~]?\s*([\"\x27]?)([A-Za-z_][A-Za-z0-9_]*)\1\s*$", linha)
-        if m:
-            saida.append(linha[:m.start()])
-            delim = m.group(2)
-            i += 1
-            while i < len(linhas) and linhas[i].strip() != delim:
+# Uma passada que conhece aspas tira o que o shell não executa e o shlex não sabe
+# ver: comentário, corpo de heredoc e continuação de linha. O comentário do
+# shlex começa em qualquer `#` e engole o newline, e `echo a#b; git merge x`
+# virava comentário inteiro.
+#
+# Heredoc só conta fora de aspas, e o corpo vai da linha seguinte até a do
+# delimitador. O resto da linha do `<<` fica: `<<\x27EOF\x27 > f` e `<<EOF | tee f`
+# são as formas comuns, e procurar o delimitador só no fim da linha as perdia.
+# Heredoc sem fim não prova nada.
+#
+# `(` e `$(` abrem um nível novo, sem aspa: o `-m "$(cat <<\x27EOF\x27 ...)"` de
+# todo commit tem o heredoc dentro das aspas duplas, e uma aspa no corpo dele não
+# pode fechar a de fora.
+APOSTROFO, ASPAS = "\x27", "\""
+HEREDOC = re.compile(r"<<(-?)[ \t]*((?:[^\s;&|<>()\x27\"\\]|\x27[^\x27\n]*\x27|\"[^\"\n]*\"|\\.)+)")
+
+def limpa(text):
+    out, pendentes, pilha, i, n = [], [], [""], 0, len(text)
+    while i < n:
+        c, aspa = text[i], pilha[-1]
+        m = None if aspa or c != "<" else HEREDOC.match(text, i)
+        if aspa == APOSTROFO:
+            pilha[-1] = "" if c == APOSTROFO else aspa
+            out.append(c); i += 1
+        elif c == "\\":
+            if not text.startswith("\\\n", i):
+                out.append(text[i:i + 2])
+            i += 2
+        elif text.startswith("$(", i) or (c == "(" and not aspa):
+            pilha.append("")
+            k = 2 if c == "$" else 1
+            out.append(text[i:i + k]); i += k
+        elif aspa == ASPAS:
+            pilha[-1] = "" if c == ASPAS else aspa
+            out.append(c); i += 1
+        elif c == ")" and len(pilha) > 1:
+            pilha.pop()
+            out.append(c); i += 1
+        elif c in (APOSTROFO, ASPAS):
+            pilha[-1] = c; out.append(c); i += 1
+        elif c == "#" and (not out or out[-1][-1] in " \t\n;&|()"):
+            while i < n and text[i] != "\n":
                 i += 1
-            i += 1
-            continue
-        saida.append(linha)
-        i += 1
-    return "\n".join(saida)
+        elif text.startswith("<<<", i):
+            out.append("<<<"); i += 3
+        elif m:
+            pendentes.append((m.group(1), re.sub(r"[\x27\"\\]", "", m.group(2))))
+            out.append(m.group(0)); i = m.end()
+        elif c == "\n" and pendentes:
+            out.append(c); i += 1
+            for tabs, delim in pendentes:
+                while True:
+                    fim = text.find("\n", i)
+                    linha = text[i:] if fim < 0 else text[i:fim]
+                    if (linha.lstrip("\t") if tabs else linha) == delim:
+                        i = n if fim < 0 else fim + 1
+                        break
+                    if fim < 0:
+                        raise ValueError("heredoc sem fim")
+                    i = fim + 1
+            pendentes = []
+        else:
+            out.append(c); i += 1
+    return "".join(out)
 
-cmd = strip_heredocs(cmd)
-
+# O newline vira pontuação, e não espaço: ele separa comandos como o `;`.
 try:
-    lexer = shlex.shlex(cmd, posix=True, punctuation_chars=True)
+    lexer = shlex.shlex(limpa(cmd), posix=True, punctuation_chars=";&|()<>\n")
+    lexer.whitespace = " \t\r"
+    lexer.commenters = ""
     lexer.whitespace_split = True
     tokens = list(lexer)
 except Exception:
@@ -126,25 +194,61 @@ FERRAMENTAS = {"gh", "tea"}
 SUB_PR = {"pr", "pulls", "pull"}
 ACOES = {"create", "c", "merge", "m"}
 
-# Operador de shell (`&&`, `;`, `|`) encerra o comando: dali em diante os tokens
-# são de outro. Opção (`--no-ff`, `-m`) não é branch — `-` sozinho é, o anterior;
-# o valor dela entra na lista, e o validate descarta o que não é branch de spec.
-PONTUACAO = set("();<>|&")
+# O comando simples vai do começo, ou de `;`, `&&`, `|`, `(`, newline, até o
+# próximo desses, e a cabeça dele é o primeiro token depois do prefixo de env.
+# Cabeça `git`, `gh` ou `tea` é conferida pelo subcomando. Qualquer outra pode
+# executar o resto — `command`, `sudo`, `timeout 60`, `if`, `{` —, e aí vale
+# qualquer `git` do comando simples. Só a cabeça que nunca executa os argumentos
+# prova menção: em `echo git merge x`, o `git` é texto. Lista curta de
+# propósito: cabeça fora dela é conferida.
+PONTUACAO = set(";&|()<>\n")
+SEPARA = set(";&|()\n")
+MENCAO = {"echo", "printf", "grep", "egrep", "fgrep", "rg"}
+ENV = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=")
+# Opção global do git que leva o valor no token seguinte: `git -C . merge x` é
+# um merge, e o subcomando é o primeiro token depois das opções.
+GIT_VALOR = {"-C", "-c", "--git-dir", "--work-tree", "--namespace",
+             "--super-prefix", "--config-env", "--attr-source"}
 
+def pontuacao(tok):
+    return tok != "" and set(tok) <= PONTUACAO
+
+comandos, atual = [], []
+for tok in tokens:
+    if pontuacao(tok) and set(tok) & SEPARA:
+        comandos.append(atual); atual = []
+    else:
+        atual.append(tok)
+comandos.append(atual)
+
+# Redirecionamento (`>`, `2>&1`) encerra os alvos. Opção (`--no-ff`, `-m`) não é
+# branch — `-` sozinho é, o anterior; o valor dela entra na lista, e o validate
+# descarta o que não é branch de spec.
 verifica, alvos = False, []
-for i, tok in enumerate(tokens):
-    base = nome(tok)
-    if base == "git" and tokens[i + 1 : i + 2] == ["merge"]:
-        verifica = True
-        for arg in tokens[i + 2 :]:
-            if arg and set(arg) <= PONTUACAO:
-                break
-            if arg == "-" or not arg.startswith("-"):
-                alvos.append(arg)
-    if base in FERRAMENTAS:
-        resto = tokens[i + 1 : i + 3]
-        if len(resto) == 2 and resto[0] in SUB_PR and resto[1] in ACOES:
-            verifica = True
+for palavras in comandos:
+    j = 0
+    while j < len(palavras) and ENV.match(palavras[j]):
+        j += 1
+    if j == len(palavras) or nome(palavras[j]) in MENCAO:
+        continue
+    cabeca = nome(palavras[j])
+    for k in ([j] if cabeca in FERRAMENTAS | {"git"} else range(j, len(palavras))):
+        base = nome(palavras[k])
+        if base == "git":
+            s = k + 1
+            while s < len(palavras) and palavras[s].startswith("-"):
+                s += 2 if palavras[s] in GIT_VALOR else 1
+            if palavras[s : s + 1] == ["merge"]:
+                verifica = True
+                for arg in palavras[s + 1 :]:
+                    if pontuacao(arg):
+                        break
+                    if arg == "-" or not arg.startswith("-"):
+                        alvos.append(arg)
+        if base in FERRAMENTAS:
+            resto = palavras[k + 1 : k + 3]
+            if len(resto) == 2 and resto[0] in SUB_PR and resto[1] in ACOES:
+                verifica = True
 
 # `alvos` na segunda linha é a prova de que a lista saiu do parse. Sem ela, vale
 # a lista larga montada pelo shell.
@@ -199,9 +303,9 @@ merge.
 CABECALHO
 printf '\n%s\n\n' "$OUT" >&2
 cat >&2 <<'RODAPE'
-A ordem e: todo ticket em Status: resolved, depois /anvil-docs archive, depois o
-PR. O move para archive/ precisa de um commit, e o branch da spec e o ultimo
-lugar onde esse commit cabe.
+A ordem e: todo ticket em Status: resolved, depois /anvil-docs archive, os dois
+commitados no branch da spec, depois o merge ou o PR. A guarda le a spec do
+commit de cada branch, nao do disco: o que nao foi commitado nao conta.
 Para conferir: bash .claude/skills/anvil-docs/scripts/validate.sh ship-ready [branch...]
 RODAPE
 exit 2
