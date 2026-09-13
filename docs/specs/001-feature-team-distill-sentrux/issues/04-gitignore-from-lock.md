@@ -91,3 +91,21 @@ Observações do Tester sem bloqueio: lock com espaço depois do nome (só edita
 aceito, `--from` sem valor sem mensagem (anterior ao ticket).
 
 Pendentes para fechar: reteste do Review sobre `5dd8a52..496b155` e ponto B do boot isolado (R1, R2, S1).
+
+**Leader, 2026-09-13 — reteste do Review sobre `5dd8a52..496b155`: APROVADO.** S1, S2, (a), P2, S3, R1,
+R2 e o critério de CRLF resolvidos; os desvios aceitos se sustentam.
+
+**Última rodada deste ticket**, só texto dos `SKILL.md` do boot e do update, sem mudar o script:
+
+- **N1** — com skill do lock faltando no disco, o passo 9 só aponta como candidatas as skills fora do
+  lock, e o passo 10 não repete a pergunta: a skill do usuário que já estava no lock volta para ele.
+  A pergunta tem de cobrir também as skills que o lock lista.
+- **N2** — a busca do boot normaliza o fim de linha como o script (espaço, tab e `\r`).
+- **N3** — a troca da linha antiga pelos marcadores mantém o fim de linha do arquivo.
+- **N4** — a pergunta é "quais skills não vieram do anvil", não "quais o usuário escreveu".
+- **N5** — `MINHAS` vira `USER_SKILLS`: identificador em texto de skill segue a regra do inglês.
+- **Receita do update para instalação sem lock** (`ls .claude/skills` para `/tmp`) põe a skill do
+  usuário no lock, a mesma falha do S2: passa a excluí-las.
+
+Fica fora: **N6** (ramos sem saída e linha em branco sobrando — cosmético ou anterior ao ticket).
+Depois desta rodada, achado não bloqueante vira ideia registrada, não reabertura.
