@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-12T17:24:04Z
+Last updated: 2026-09-13T01:20:05Z
 
 ## Visão geral
 
@@ -10,7 +10,9 @@ Last updated: 2026-09-12T17:24:04Z
 
 ## Specs ativas
 
-Nenhuma.
+| Spec | Branch | Estado | Tickets |
+|---|---|---|---|
+| [001 — Equipe, destilação e sentrux](./specs/001-feature-team-distill-sentrux/spec.md) | `feature/001-team-distill-sentrux` | em andamento | 0/12 |
 
 ## Specs arquivadas
 
@@ -28,6 +30,8 @@ Nenhuma.
 
 ### Architecture
 
+- [context.md](./architecture/context.md) — o glossário: curadoria, referências e
+  equipe, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
   impõe, como o estado é lido do disco, e a herança do mosk.
 - **ADRs**
@@ -43,6 +47,8 @@ Nenhuma.
     — a camada de UI tem roteador: hallmark e taste são métodos rivais
   - [adr-0006](./architecture/adr/adr-0006-stack-como-camada-propria.md)
     — stack é camada própria, com contrato de seis capacidades
+  - [adr-0007](./architecture/adr/adr-0007-equipe-por-papel-sobre-agent-teams.md)
+    — equipe por papel, coordenada por agent teams; complementa o adr-0003
 
 ### Project
 
