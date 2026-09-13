@@ -24,3 +24,10 @@
 
 **Leader, 2026-09-13 — U3:** `anvil-wayfinder`, `anvil-handoff` e `anvil-to-questionnaire` continuam
 travadas (o usuário destravou só as sete que a equipe despacha). Vale a saída do desenho.
+
+**Leader, 2026-09-13 — RV-F1 decidido** (Architect, a partir de proposta do Dev; `team-shape.md` §5 em `0ca933b`): o
+Tester, com ou sem gate, escreve **fora de qualquer checkout**, num diretório nomeado pelo Leader, com `Commit: não`; o
+Dev é o único escritor do checkout. O repro chega ao Dev por `SendMessage`, com caminho e comando; teste de regressão
+quem escreve e commita é o Dev; o Leader anota o caminho do repro no ticket e o repassa ao gate do Tester. Vale também
+com worktrees. Motivo: dois escritores disputam o índice, e arquivo não rastreado do Tester entraria no commit do Dev.
+`SKILL.md` e `anvil-team-tester.md` ficam com o Dev.
