@@ -556,10 +556,25 @@ Gate não entra nesta regra: rodada de gate já é sempre `Agent` novo.
 Para o Dev pedir um repro ao Tester sem passar pelo Leader, o Tester precisa estar
 vivo. Quando o ticket tem comportamento a reproduzir ou pede harness antes da
 solução, o Leader despacha `tester-{NN}` junto com `dev-{NN}`, com delegação
-**sem** `gate`: preparar repro e harness numa região própria, responder o autor, e
-voltar `PRONTO`. Cada um aparece na linha `Equipe` do outro. O gate do Tester é
-outra chamada, depois da entrega do Dev, com o mesmo name e `· gate`, e só depois
-que a delegação sem gate voltou.
+**sem** `gate`: preparar repro e harness, responder o autor, e voltar `PRONTO`.
+Cada um aparece na linha `Equipe` do outro. O gate do Tester é outra chamada, depois
+da entrega do Dev, com o mesmo name e `· gate`, e só depois que a delegação sem gate
+voltou.
+
+**O Tester escreve fora do checkout.** A Política de escrita dele, com ou sem gate,
+nomeia um diretório fora de qualquer checkout, dado pelo Leader, e diz
+`Commit: não`. O Dev é o único escritor do checkout. Dois motivos: dois escritores
+no mesmo checkout disputam o índice, e arquivo não rastreado do Tester entraria no
+commit do Dev, porque `anvil-implement` e `tea-commit` stageiam o que estiver
+pendente.
+
+- O repro chega ao Dev por `SendMessage`, com caminho e comando.
+- Se o repro virar teste de regressão, quem o escreve e commita é o Dev, na região
+  dele.
+- O Leader anota o caminho do repro no comentário do ticket e o repassa no Contexto
+  da delegação de gate do Tester.
+- Com worktrees (seção 11), a regra continua a mesma: o Tester não escreve em
+  worktree nenhum.
 
 Quando o Tester não foi despachado, o Dev que precisa dele devolve `BLOQUEADO`, e o
 Leader decide.
