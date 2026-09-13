@@ -17,9 +17,10 @@
 #
 # As duas metades importam. Fechar os tickets e deixar a spec em `docs/specs/`
 # é o caso do mosk de novo, um passo adiante: a spec chega ao branch padrão sem
-# archive, e não sobra branch onde arquivar sem abrir um segundo PR. Por isso o
-# `/anvil-docs archive` roda ANTES do merge ou do `tea pr create`, no mesmo
-# branch, e é commitado: a spec é lida do commit de cada branch, não do disco.
+# archive, e arquivar depois já não cabe no branch da spec — vira commit direto
+# no branch padrão, ou um segundo PR. Por isso o `/anvil-docs archive` roda ANTES
+# do merge ou do PR, no mesmo branch, e é commitado: a spec é lida do commit de
+# cada branch, não do disco.
 #
 # --- Postura: fail-CLOSED -----------------------------------------------------
 #
@@ -37,8 +38,8 @@
 #      heredoc, comentário ou argumento de outro comando (`echo git merge`).
 #   3. Qualquer coisa que impeça a prova (sem python3, parse falhando, heredoc
 #      sem fim) resulta em VERIFICAR, não em ignorar. E, sem prova de quais
-#      branches o merge nomeia, confere todo nome no comando com cara de branch
-#      de spec.
+#      branches o merge nomeia — alvo com `$` ou crase também não é prova —,
+#      confere todo nome no comando com cara de branch de spec.
 #
 # O custo é falso positivo: o que não se prova menção — `sudo echo git merge`,
 # uma aspa sem par — é conferido. É barato — a mensagem diz o que falta — e é o
@@ -54,7 +55,10 @@
 #     por heredoc (`echo git merge x | sh`, `bash <<EOF`). O comando ali é
 #     texto, e texto é menção;
 #   - branch que não está na linha: `xargs git merge` é conferido, mas o branch
-#     chega pelo stdin;
+#     chega pelo stdin; `git merge "$B"` confere os nomes do comando, mas o `B`
+#     definido numa chamada anterior não está nele;
+#   - verbo ofuscado: `git mer''ge`, `git m\erge`, `g"i"t merge`. O filtro de
+#     substring não vê `merge` ali, e o shell junta as partes na execução;
 #   - aspa `$'...'`, que o parse não entende: a aspa escapada dentro dela
 #     desalinha as outras;
 #   - merge por SHA, ou por alvo que não resolve para um branch de spec: sem
@@ -119,33 +123,56 @@ if not cmd:
 # `(` e `$(` abrem um nível novo, sem aspa: o `-m "$(cat <<\x27EOF\x27 ...)"` de
 # todo commit tem o heredoc dentro das aspas duplas, e uma aspa no corpo dele não
 # pode fechar a de fora.
+#
+# O `$(` fora de aspas é parte da palavra, e não separa comando: em `git -C
+# $(pwd) merge x`, separar no `(` deixava `merge x` sem `git`. A palavra fica
+# com `$_` no lugar, e o conteúdo vai para o fim do texto como comando à parte —
+# `echo $(git merge x)` continua conferido. `$((` e `((` são aritmética: `<<` ali
+# é deslocamento, não heredoc.
 APOSTROFO, ASPAS = "\x27", "\""
 HEREDOC = re.compile(r"<<(-?)[ \t]*((?:[^\s;&|<>()\x27\"\\]|\x27[^\x27\n]*\x27|\"[^\"\n]*\"|\\.)+)")
 
 def limpa(text):
-    out, pendentes, pilha, i, n = [], [], [""], 0, len(text)
+    # Cada nível é [aspa, saída, tipo]. Só o `$(` sem aspas tem saída própria.
+    raiz, extraidos, pendentes, i, n = [], [], [], 0, len(text)
+    pilha = [["", raiz, ""]]
     while i < n:
-        c, aspa = text[i], pilha[-1]
-        m = None if aspa or c != "<" else HEREDOC.match(text, i)
+        c, aspa, out = text[i], pilha[-1][0], pilha[-1][1]
+        m = None
+        if c == "<" and not aspa and all(t != "$((" for _, _, t in pilha):
+            m = HEREDOC.match(text, i)
         if aspa == APOSTROFO:
-            pilha[-1] = "" if c == APOSTROFO else aspa
+            pilha[-1][0] = "" if c == APOSTROFO else aspa
             out.append(c); i += 1
         elif c == "\\":
             if not text.startswith("\\\n", i):
                 out.append(text[i:i + 2])
             i += 2
+        elif text.startswith("$((", i) or (text.startswith("((", i) and not aspa):
+            pilha.append(["", out, "$(("])
+            k = 3 if c == "$" else 2
+            out.append(text[i:i + k]); i += k
+        elif text.startswith("$(", i) and not aspa:
+            pilha.append(["", [], "$_"])
+            i += 2
         elif text.startswith("$(", i) or (c == "(" and not aspa):
-            pilha.append("")
+            pilha.append(["", out, "("])
             k = 2 if c == "$" else 1
             out.append(text[i:i + k]); i += k
         elif aspa == ASPAS:
-            pilha[-1] = "" if c == ASPAS else aspa
+            pilha[-1][0] = "" if c == ASPAS else aspa
             out.append(c); i += 1
         elif c == ")" and len(pilha) > 1:
-            pilha.pop()
-            out.append(c); i += 1
+            _, dentro, tipo = pilha.pop()
+            if tipo == "$_":
+                extraidos.append("".join(dentro))
+                pilha[-1][1].append("$_"); i += 1
+            elif tipo == "$((" and text.startswith("))", i):
+                out.append("))"); i += 2
+            else:
+                out.append(c); i += 1
         elif c in (APOSTROFO, ASPAS):
-            pilha[-1] = c; out.append(c); i += 1
+            pilha[-1][0] = c; out.append(c); i += 1
         elif c == "#" and (not out or out[-1][-1] in " \t\n;&|()"):
             while i < n and text[i] != "\n":
                 i += 1
@@ -156,20 +183,30 @@ def limpa(text):
             out.append(m.group(0)); i = m.end()
         elif c == "\n" and pendentes:
             out.append(c); i += 1
+            # Dentro de `$(`, o bash aceita o `)` colado no delimitador: `EOF)"`.
+            colado = False
             for tabs, delim in pendentes:
-                while True:
+                while not colado:
                     fim = text.find("\n", i)
                     linha = text[i:] if fim < 0 else text[i:fim]
-                    if (linha.lstrip("\t") if tabs else linha) == delim:
+                    recuo = len(linha) - len(linha.lstrip("\t")) if tabs else 0
+                    if linha[recuo:] == delim:
                         i = n if fim < 0 else fim + 1
                         break
-                    if fim < 0:
+                    if len(pilha) > 1 and linha[recuo:].startswith(delim + ")"):
+                        i += recuo + len(delim); colado = True
+                    elif fim < 0:
                         raise ValueError("heredoc sem fim")
-                    i = fim + 1
+                    else:
+                        i = fim + 1
             pendentes = []
         else:
             out.append(c); i += 1
-    return "".join(out)
+    while len(pilha) > 1:
+        _, dentro, tipo = pilha.pop()
+        if tipo == "$_":
+            extraidos.append("".join(dentro))
+    return "\n".join(["".join(raiz)] + extraidos)
 
 # O newline vira pontuação, e não espaço: ele separa comandos como o `;`.
 try:
@@ -195,7 +232,8 @@ SUB_PR = {"pr", "pulls", "pull"}
 ACOES = {"create", "c", "merge", "m"}
 
 # O comando simples vai do começo, ou de `;`, `&&`, `|`, `(`, newline, até o
-# próximo desses, e a cabeça dele é o primeiro token depois do prefixo de env.
+# próximo desses, e a cabeça dele é o primeiro token depois do prefixo de env e
+# dos redirecionamentos.
 # Cabeça `git`, `gh` ou `tea` é conferida pelo subcomando. Qualquer outra pode
 # executar o resto — `command`, `sudo`, `timeout 60`, `if`, `{` —, e aí vale
 # qualquer `git` do comando simples. Só a cabeça que nunca executa os argumentos
@@ -213,38 +251,61 @@ GIT_VALOR = {"-C", "-c", "--git-dir", "--work-tree", "--namespace",
 def pontuacao(tok):
     return tok != "" and set(tok) <= PONTUACAO
 
+# `>&` e `&>` têm `&`, mas redirecionam: separar ali partia `git merge 2>&1 x`
+# em dois comandos e fazia `>&2` virar a cabeça de `>&2 echo git merge x`.
+# Conjunto fechado: `&&>`, colado, continua separando.
+REDIRECAO = {"<", ">", ">>", "<>", "<&", ">&", "&>", "&>>", ">|", "<<", "<<<"}
+
+def redireciona(tok):
+    return tok in REDIRECAO
+
 comandos, atual = [], []
 for tok in tokens:
-    if pontuacao(tok) and set(tok) & SEPARA:
+    if pontuacao(tok) and set(tok) & SEPARA and not redireciona(tok):
         comandos.append(atual); atual = []
     else:
         atual.append(tok)
 comandos.append(atual)
 
-# Redirecionamento (`>`, `2>&1`) encerra os alvos. Opção (`--no-ff`, `-m`) não é
-# branch — `-` sozinho é, o anterior; o valor dela entra na lista, e o validate
-# descarta o que não é branch de spec.
-verifica, alvos = False, []
+# Opção (`--no-ff`, `-m`) não é branch — `-` sozinho é, o anterior; o valor dela
+# entra na lista, e o validate descarta o que não é branch de spec.
+#
+# Redirecionamento não encerra a coleta: ele e o destino dele saem, e o que vem
+# depois continua alvo — `git merge 2>&1 x` mescla o `x`. O `2` de `2>&1` entra
+# na lista, e o validate o descarta.
+#
+# A lista só prova quais branches o merge nomeia quando cada alvo é literal. Alvo
+# com `$` ou crase — `"$B"`, `$(...)` — só se sabe na execução: sem prova, vale a
+# lista larga.
+verifica, alvos, incerto = False, [], False
 for palavras in comandos:
     j = 0
-    while j < len(palavras) and ENV.match(palavras[j]):
-        j += 1
-    if j == len(palavras) or nome(palavras[j]) in MENCAO:
+    while j < len(palavras):
+        if ENV.match(palavras[j]):
+            j += 1
+        elif redireciona(palavras[j]):
+            j += 2
+        else:
+            break
+    if j >= len(palavras) or nome(palavras[j]) in MENCAO:
         continue
     cabeca = nome(palavras[j])
     for k in ([j] if cabeca in FERRAMENTAS | {"git"} else range(j, len(palavras))):
         base = nome(palavras[k])
-        if base == "git":
+        # `$(which git) merge x`: palavra que só se resolve na execução pode ser o git.
+        if base == "git" or "$" in palavras[k]:
             s = k + 1
             while s < len(palavras) and palavras[s].startswith("-"):
                 s += 2 if palavras[s] in GIT_VALOR else 1
             if palavras[s : s + 1] == ["merge"]:
                 verifica = True
-                for arg in palavras[s + 1 :]:
-                    if pontuacao(arg):
-                        break
-                    if arg == "-" or not arg.startswith("-"):
+                args = iter(palavras[s + 1 :])
+                for arg in args:
+                    if redireciona(arg):
+                        next(args, None)
+                    elif arg == "-" or not arg.startswith("-"):
                         alvos.append(arg)
+                        incerto = incerto or "$" in arg or "`" in arg
         if base in FERRAMENTAS:
             resto = palavras[k + 1 : k + 3]
             if len(resto) == 2 and resto[0] in SUB_PR and resto[1] in ACOES:
@@ -252,8 +313,10 @@ for palavras in comandos:
 
 # `alvos` na segunda linha é a prova de que a lista saiu do parse. Sem ela, vale
 # a lista larga montada pelo shell.
-if verifica:
+if verifica and not incerto:
     print("verifica"); print("alvos"); print("\n".join(alvos))
+elif verifica:
+    print("verifica")
 else:
     print("ignora")
 ' 2>/dev/null)"
