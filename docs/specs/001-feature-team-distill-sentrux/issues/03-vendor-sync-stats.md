@@ -79,3 +79,10 @@ saída decide. Observações que ficam como ideia: symlink dentro de skill ignor
 no repo real passa).
 
 Correção vai ao Dev como parte da mesma rodada de ajuste (o gate do Tester não tinha voltado quando ela abriu).
+
+**Leader, 2026-09-13 — correção do F1 do Tester** em `c388679`: onde o código de saída decide a existência no pin
+(`cmd_stats` no `extra` e no payload, e `copy_extras`), `git show` vira `git cat-file blob`, que sai 128 com nome de
+glob inexistente. Os fallbacks `|| : > base` do `update` ficam: com glob inexistente o `show` já dava a mesma base
+vazia. Na cópia `workspace/19-stats-glob/`: `[slug].md` e `a*b?.md` passam a SEM-PAR 1 com totais iguais; `bench` fora
+do `keep` dá sem par 27, com os três arquivos de glob; `copy_extras` com origem de glob inexistente conta 0 (antes 2).
+`stats` do payload real idêntico ao publicado em 3.2 e 5.2; `verify` limpo. Reteste do Tester despachado.
