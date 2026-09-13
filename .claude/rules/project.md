@@ -19,7 +19,8 @@ Confundir as duas coisas é o erro caro daqui.
 | `.claude/skills/anvil-*` | **symlinks** para `anvil/.claude/skills/*`. Editar a skill instalada **é** editar o payload |
 | `.claude/skills/anvil-sync/` | a ferramenta de manutenção. É do repositório e **não vai no degit** |
 | `anvil-skills.yaml` | o manifesto de curadoria. Também não vai no degit |
-| `references/` | submodules upstream. **O pin é a base do merge 3-way** |
+| `references/` — upstream vendorizado | submodule com pin, listado em `sources:` no manifesto. De onde vêm as skills vendorizadas. **O pin é a base do merge 3-way** |
+| `references/` — sistema de referência | sistema de terceiro estudado para portar algo, fora do manifesto. Entra passageiro, fora do git por `.git/info/exclude`, ou versionado como submodule, com pin. **Não é base de merge**: o `mosk` está aqui |
 | `docs/` | a documentação do próprio anvil |
 | `workspace/` | projetos descartáveis para exercitar o toolkit. Fora do git |
 
@@ -71,9 +72,18 @@ vivem em `workspace/01-…08-`, fora do git de propósito.
 
 ## Fluxo git
 
-Commit direto na `main`. Sem branch por spec e sem PR: este repositório é o
-payload do toolkit, não um projeto que o toolkit governa.
+Trabalho com spec vai num branch `{tipo}/{NNN}-{nome}`. Fecha com
+`/anvil-docs archive` no próprio branch e `git merge` local na `main`, sem PR.
+Trabalho sem spec vai direto na `main`.
 
-A guarda de merge fica instalada, mas em `main` ela sai 0 na primeira
-verificação — branch sem o prefixo `{tipo}/{NNN}-` não tem spec. Ela só passa a
-valer se algum dia existir um branch de spec aqui.
+A guarda de merge vale para o branch de spec: bloqueia com ticket sem
+`Status: resolved` ou com a spec fora de `docs/specs/archive/`. Ela olha o branch
+**atual** na hora do comando, então o merge se dispara do branch da spec, num
+comando só:
+
+```bash
+git switch main && git merge {tipo}/{NNN}-{nome}
+```
+
+Rodado já na `main`, o merge passa sem que a guarda olhe a spec. E ela é um hook
+do Claude Code: só vê comando do agente, não o que se digita no terminal.
