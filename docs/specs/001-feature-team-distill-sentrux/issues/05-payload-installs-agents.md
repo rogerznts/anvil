@@ -84,3 +84,13 @@ com link por referência). Cenário do 05 com 117 checagens limpo em bash 5 e 3.
 Pedido antes dos gates: o "Contrato" do topo do `SKILL.md` do update ressalva o homônimo fora do lock.
 Reteste: Review sobre o ajuste; Tester ajusta as duas checagens do R1 no `adv.sh` para conferir o destaque
 e atualiza o clone (o dele está no `vendor-sync` antigo).
+
+**Leader, 2026-09-13 — reteste do Review sobre `2ebd015..cb956b9`: APROVADO.** F1, F2, F3, F7, check (c) e o
+contrato resolvidos; o risco do lock escrito pelo leitor antigo (agentes do anvil destacados como colisão)
+se sustenta como aviso raro e do lado seguro.
+
+Ficam como ideia, sem nova rodada: **N1** o contrato promete o destaque sem dizer que ele exige lock; **N2**
+orientar o aviso de colisão (comparar com a cópia do `$TMP`; se o arquivo for do usuário, parar e renomear);
+**N3** o check (c) reprova prosa como `[nota]: veja isto`; **N4** referência indentada 4 espaços passa;
+Standards: `{ [ -f ] || [ -L ]; }` repetido três vezes, identificador `alvos` num heredoc Python, "e"/"é"
+num comentário. Falta o reteste do Tester (ajuste das duas checagens do R1 para o destaque).
