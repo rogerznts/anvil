@@ -4,15 +4,15 @@
 
 **Blocked by:** 09
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Com URL, o distill pergunta a forma de entrada, sugerindo passageiro.
-- [ ] Passageiro: clone raso, com uma linha de exclusão local do git para a pasta; o gitignore do projeto não muda; a Origem registra o commit.
-- [ ] Versionado: submodule; a mudança fica para o usuário commitar; a Origem registra o pin.
-- [ ] Pasta já presente: sem pergunta e sem atualizar.
-- [ ] Repositório privado usa a credencial que o git já tiver; o distill nunca pede credencial.
-- [ ] A invariante de escrita do `DISTILL.md` passa a autorizar criar a pasta do sistema em `references/` (hoje só autoriza escrever em `docs/`).
-- [ ] Ponto B: uma URL passageira some do `git status`; uma URL versionada aparece como submodule; uma pasta existente não é atualizada.
+- [x] Com URL, o distill pergunta a forma de entrada, sugerindo passageiro.
+- [x] Passageiro: clone raso, com uma linha de exclusão local do git para a pasta; o gitignore do projeto não muda; a Origem registra o commit.
+- [x] Versionado: submodule; a mudança fica para o usuário commitar; a Origem registra o pin.
+- [x] Pasta já presente: sem pergunta e sem atualizar.
+- [x] Repositório privado usa a credencial que o git já tiver; o distill nunca pede credencial.
+- [x] A invariante de escrita do `DISTILL.md` passa a autorizar criar a pasta do sistema em `references/` (hoje só autoriza escrever em `docs/`).
+- [x] Ponto B: uma URL passageira some do `git status`; uma URL versionada aparece como submodule; uma pasta existente não é atualizada.
 
 ## Comments
 
@@ -68,3 +68,20 @@ interativo; GCM gráfico e ssh-askpass; RV-1 (exclude sem `\n`); fork com nome d
 
 Rodada única de ajuste (depois da do 07): RV-1, RV-4, RV-2, RV-3, RV-5, RV-7 do Review; T-1; e a funcionalidade dita em
 linguagem natural junto da URL passa ao despacho.
+
+**Leader, 2026-09-13 — resolvido.** Rodada de ajuste em `3188097`, conferida pelo Leader. **RV-1** a exclusão usa a
+forma do Review (cria `info/`, garante quebra de linha, idempotente): em zsh 5.9 e `/bin/bash` 3.2, exclude normal, sem
+`\n`, sem `.git/info/` e vazio dão uma linha e preservam a regra anterior; o bloco antigo, de controle, grudou
+`*.log/references/up/`. **RV-4** `{sistema}` é o último segmento não vazio (run com barra final clonou em
+`references/p-retry`). **RV-2** a invariante fala a quem escreve um arquivo e diz que a pasta vem pronta. **RV-3** o
+que cada forma grava fica nos comentários do bloco; os proibidos, só no `DISTILL.md`. **RV-5** a Origem filtra a
+entrada 160000 da própria pasta (cópia versionada com gitlink aninhado não dá falso positivo). **RV-7 e linguagem
+natural** a funcionalidade vem do pedido, não só dos args (com args só com a URL, destino `distill-node-retry-retry.md`).
+**T-1** na falha, o bloco remove `references/` só se o fluxo a criou (sem prévio some; com conteúdo ou vazio prévio
+fica), nas duas formas. Run isolado com o texto final (linguagem natural, barra final, passageiro): disparou, bloco
+literal, uma linha no exclude, `git status` só com o documento, Origem = `ls-remote`, 74 ponteiros limpos. US$ 1,64.
+
+Desvios aceitos: T-1 estendido ao versionado; um `.git/modules/references/` vazio pode ficar dentro do `.git` depois
+de um `submodule add` que falha. Ficam como ideia: RV-6 (description sem URL — o disparo por linguagem natural com URL
+funcionou nos runs); comparar `remote get-url origin` com a URL quando a pasta existe; endurecer GCM e ssh. Não
+testados: AskUserQuestion e a permissão do clone no interativo.
