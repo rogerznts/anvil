@@ -92,3 +92,24 @@ repetido não se registra. **F3** entra no S5 do Review: os checks 8 e 14 reconh
 (`true`/`yes`/`1`, maiúsculas, aspas, comentário, tab, BOM). **F5** o agente do Tester nomeia que nada escreve no `.git`
 do checkout (sem `git worktree add`). Ficam como ideia: **F4** (exceto o que o F3 cobre), CRLF no check 1. Reteste do
 Tester: caso 1 com F2, e o ataque ao check (e)/trava.
+
+**Leader, 2026-09-13 — rodada de ajuste** em `7f43a23`, `24af185`, `e09539d`, `0619011`, `1ed719e`, `7d87cff` e
+`2840c70`; desenho pelo Architect em `08429ec`, `2133935`, `6f961a7` e `162754f`. **F1** o Dev sai logo que a chamada
+`Agent` do Tester devolve o lançamento, sem esperar o PRONTO; o repro não é colado na delegação do Dev e chega por
+`SendMessage`. **F2** no protocolo: mensagem final sem palavra do protocolo não é entrega (o Leader pede o retorno);
+retorno repetido sem trabalho novo não se registra; papel não encerra à espera de lateral. **F5** o Tester não escreve
+no `.git` do checkout. **P3** template da Política de escrita com a forma do Tester. **P4** check 14 pega `/anvil-…`.
+**S5 + F3** checks 8 e 14 usam uma função só, `tem_trava`, portada da leitura do Claude Code 2.1.270 (booleano; texto
+`1`/`true`/`yes`/`on` sem caixa; BOM; segunda tentativa de parse). **P5, S3, S4** fonte única. Fixtures do check (e) e
+da trava 52/52 em 5.2 e 3.2 (contra o script anterior, 12 falhas); `15-team` 21/21; `verify` limpo; linha-ponteiro
+com o mesmo hash nos sete. Ponto B do par, um run isolado (US$ 2,02), sem o prompt pedir lateral: Tester às 22:33:50,
+Dev às 22:34:02, antes de qualquer notificação; o Dev pediu o repro por `SendMessage`, seguiu em TDD e recebeu a
+resposta no meio do trabalho; zero `sleep`; todo fim de turno com palavra do protocolo.
+
+Desvios aceitos: **D-a** o Dev aponta para a própria Política de escrita, não para o arquivo do Tester (quebraria em
+worktree); **D-b** `on` e a segunda tentativa de parse vêm da leitura do binário, sem `claude -p`; **D-c** o Leader pede o
+retorno quando a mensagem final vem sem palavra; **D-d** CRLF sem fixture (ideia). Riscos registrados: a linha Equipe
+nomeia o diretório do Tester, e o Dev achou o harness no disco antes da mensagem (mantido: o Dev pediu por
+`SendMessage`, e o caminho é útil); PyYAML (YAML 1.1) pode divergir do Bun.YAML em `0b1`, `1e0`, `0o1`; o
+`apply_invocable` só apaga `true`, e uma trava `yes` de upstream faz o check 8 reprovar alto; três leitores de
+frontmatter no `vendor-sync`. Reteste do Tester e revisão do diff da rodada pelo Review despachados.
