@@ -147,7 +147,9 @@ copy_extras() {  # <submodule> <ref> <dest-skill> <extra-csv> [<pin>]
         from="${pair%%::*}"; to="${pair##*::}"
         mkdir -p "$dest/$(dirname "$to")"
         if [ -z "$pin" ] || [ ! -f "$dest/$to" ]; then
-            git -C "$ROOT/$sub" show "$ref:$from" > "$dest/$to" 2>/dev/null && n=$((n + 1))
+            # cat-file, e nao show: com `[`, `*` ou `?` no nome, o show trata o caminho
+            # como pathspec e sai 0 com saida vazia quando o arquivo nao existe
+            git -C "$ROOT/$sub" cat-file blob "$ref:$from" > "$dest/$to" 2>/dev/null && n=$((n + 1))
             continue
         fi
         base="$(mktemp)"; theirs="$(mktemp)"
@@ -694,7 +696,8 @@ cmd_stats() {
                 from="${pair%%::*}"; to="${pair##*::}"
                 dests="$dests,$to"
                 is_listed "$to" "$keep" && continue
-                if [ -f "$dest/$to" ] && git -C "$ROOT/$sub" show "$pin:$from" > "$base" 2>/dev/null; then
+                # cat-file, e nao show: ver copy_extras
+                if [ -f "$dest/$to" ] && git -C "$ROOT/$sub" cat-file blob "$pin:$from" > "$base" 2>/dev/null; then
                     e=$((e + 1)); el=$((el + $(nlines "$dest/$to"))); en=$((en + $(nossas "$base" "$dest/$to")))
                 else
                     sp=$((sp + 1)); sem_par="$sem_par$name/$to, extra sem origem no pin ou sem destino"$'\n'
@@ -707,7 +710,7 @@ cmd_stats() {
         while IFS= read -r f; do
             if is_listed "$f" "$keep"; then k=$((k + 1)); kl=$((kl + $(nlines "$dest/$f"))); continue; fi
             is_listed "$f" "$dests" && continue
-            if [ -n "$path" ] && git -C "$ROOT/$sub" show "$pin:$path/$f" > "$base" 2>/dev/null; then
+            if [ -n "$path" ] && git -C "$ROOT/$sub" cat-file blob "$pin:$path/$f" > "$base" 2>/dev/null; then
                 is_listed "$f" "$strip" && continue
                 arq=$((arq + 1)); lin=$((lin + $(nlines "$dest/$f"))); nos=$((nos + $(nossas "$base" "$dest/$f")))
             else
