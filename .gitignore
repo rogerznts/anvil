@@ -13,3 +13,6 @@ workspace/
 # A anvil-sync é exceção: é do repositório e não vai no degit.
 .claude/skills/*
 !.claude/skills/anvil-sync/
+
+# .claude/agents/ — symlinks para os agentes do payload, pelo mesmo dev-link.
+.claude/agents/*

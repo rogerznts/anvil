@@ -10,7 +10,7 @@
 # Isto nao e o caminho de um projeto. La e o degit. Isto existe porque este
 # repositorio E a fonte.
 #
-#   dev-link.sh [--dry-run]     liga o roster de fluxo
+#   dev-link.sh [--dry-run]     liga o roster de fluxo e os agentes
 #   dev-link.sh --all           liga o payload inteiro
 #   dev-link.sh --unlink        remove os symlinks, e somente eles
 #
@@ -21,6 +21,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
 PAYLOAD="$ROOT/anvil/.claude/skills"
 DEST="$ROOT/.claude/skills"
+AGENTS="$ROOT/anvil/.claude/agents"
+DEST_AGENTS="$ROOT/.claude/agents"
 
 [ -d "$PAYLOAD" ] || { echo "erro: payload nao encontrado em $PAYLOAD" >&2; exit 2; }
 
@@ -76,14 +78,14 @@ done
 conta() { printf '%s' "$1" | grep -c . || true; }
 
 # --- unlink -------------------------------------------------------------------
-# Remove symlink nosso, nunca diretorio real: skill escrita a mao dentro de
-# .claude/skills/ nao e nossa para apagar.
+# Remove symlink nosso, nunca diretorio ou arquivo real: skill ou agente escrito a
+# mao dentro de .claude/ nao e nosso para apagar.
 if [ "$MODO" = "unlink" ]; then
     n=0
-    for l in "$DEST"/*; do
+    for l in "$DEST"/* "$DEST_AGENTS"/*; do
         [ -L "$l" ] || continue
-        case "$(readlink "$l")" in *anvil/.claude/skills/*) ;; *) continue ;; esac
-        [ "$DRY" -eq 1 ] && echo "removeria $(basename "$l")" || rm -f "$l"
+        case "$(readlink "$l")" in *anvil/.claude/skills/*|*anvil/.claude/agents/*) ;; *) continue ;; esac
+        if [ "$DRY" -eq 1 ]; then echo "removeria $(basename "$l")"; else rm -f "$l"; fi
         n=$((n + 1))
     done
     echo "$n symlink(s) $([ "$DRY" -eq 1 ] && echo "a remover" || echo "removido(s)")."
@@ -114,10 +116,35 @@ for s in $conjunto; do
     ligados=$((ligados + 1))
 done
 
+# --- agentes -------------------------------------------------------------------
+# Todos, no roster e no --all. O roster poupa a atencao que as descriptions das
+# skills disputam; os agentes do payload so recebem trabalho da skill que os
+# despacha, e ela os procura em .claude/agents/.
+ag_ligados=0; ag_total=0; ag_pulados=""
+for f in "$AGENTS"/*.md; do
+    [ -f "$f" ] || continue
+    a="$(basename "$f")"; ag_total=$((ag_total + 1))
+    alvo="$DEST_AGENTS/$a"
+    if [ -e "$alvo" ] && [ ! -L "$alvo" ]; then
+        ag_pulados="$ag_pulados$a"$'\n'   # arquivo real: nao e nosso para sobrescrever
+        continue
+    fi
+    if [ "$DRY" -eq 1 ]; then
+        echo "ligaria .claude/agents/$a"
+    else
+        mkdir -p "$DEST_AGENTS"
+        rm -f "$alvo"
+        ln -s "../../anvil/.claude/agents/$a" "$alvo"
+    fi
+    ag_ligados=$((ag_ligados + 1))
+done
+
 echo
 echo "$ligados de $(conta "$disponiveis") skills do payload $([ "$DRY" -eq 1 ] && echo "seriam ligadas" || echo "ligadas")."
+echo "$ag_ligados de $ag_total agentes do payload $([ "$DRY" -eq 1 ] && echo "seriam ligados" || echo "ligados")."
 [ -n "$ausentes" ] && { echo "NO ROSTER MAS FORA DO PAYLOAD — revise a lista:"; printf '%s' "$ausentes" | sed 's/^/  /'; }
 [ -n "$pulados"  ] && { echo "pulados, porque sao diretorio real e nao symlink:"; printf '%s' "$pulados" | sed 's/^/  /'; }
+[ -n "$ag_pulados" ] && { echo "agentes pulados, porque sao arquivo real e nao symlink:"; printf '%s' "$ag_pulados" | sed 's/^/  /'; }
 
 # --- aviso: referencia para fora do roster ------------------------------------
 # Nao religa nada. Existe para a lista nao apodrecer em silencio: uma skill
@@ -137,4 +164,4 @@ done
 [ -n "$penduradas" ] && { echo; echo "referencias para fora do roster (nao religadas):"; printf '%s' "$penduradas" | sed 's/^/  /'; }
 
 echo
-echo "as skills so aparecem na PROXIMA sessao do Claude Code."
+echo "as skills e os agentes so aparecem na PROXIMA sessao do Claude Code."
