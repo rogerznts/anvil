@@ -77,3 +77,10 @@ avisa e espera, e a sobrescrita continua depois da aprovação. O contrato do up
 nomeando e espera; pular a colisão deixaria o agente do payload sem instalar, em silêncio. As duas
 checagens do R1 no `adv.sh` do Tester passam a conferir o destaque — quem ajusta é o Tester, no reteste,
 porque a suíte é do gate.
+
+**Leader, 2026-09-13 — ajuste entregue** em `5ba3220` (F1), `c92c122` (F2), `be68ac3` (F3), `5439732` (F7:
+destaque "substituídos fora do lock, possível colisão" no dry-run e nomeado no passo 4) e `07d0cfb` (check c
+com link por referência). Cenário do 05 com 117 checagens limpo em bash 5 e 3.2; suítes do 04 limpas.
+Pedido antes dos gates: o "Contrato" do topo do `SKILL.md` do update ressalva o homônimo fora do lock.
+Reteste: Review sobre o ajuste; Tester ajusta as duas checagens do R1 no `adv.sh` para conferir o destaque
+e atualiza o clone (o dele está no `vendor-sync` antigo).
