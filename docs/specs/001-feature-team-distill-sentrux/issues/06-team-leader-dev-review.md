@@ -46,3 +46,19 @@ partir de medições do ponto B do Dev):
 2. **Subagente de skill em background** perdia o resultado. A linha do protocolo vira exceção explícita à regra
    "o protocolo de uma skill vence este": dentro da equipe, foreground mesmo quando a skill manda background; as
    chamadas da mesma mensagem continuam em paralelo.
+
+**Leader, 2026-09-13 — entrega do Dev** em `aeb1f53..249ae8e` (skill `anvil-team`, `PROTOCOL.md`, agentes
+`anvil-team-dev` e `anvil-team-review`, checks d e f, roster, lock). Ponto B com o fluxo inteiro: frontier, Dev,
+Review reprovando duas rodadas com registro literal no ticket, autor retomado. Medições: **M4** permissão pedida
+por papel aparece na sessão do Leader (interativo) ou é negada com registro (`-p`); **M6** reuso de `name` sem
+erro; **M7** `Grep` e `Glob` não existem na 2.1.270 — ficam na allowlist, porque existem em outras versões.
+
+Desvios aceitos: exceção de foreground e regra de `name` inalcançável (desenho `9ad85de`); "um escritor por vez"
+provisório até o 08; Mission Control fora do `SKILL.md` até o 08; `model` omitido até a lista `team`; sem o jargão
+"Ponto B" no payload; aviso do `dev-link` pula nome de agente do payload.
+
+Ajustes antes dos gates: os exemplos da skill deixam de citar a spec 001 deste repositório e passam ao exemplo
+genérico da documentação; `anvil-diagnose` e demais skills citadas pelos papéis entram no roster do `dev-link`.
+Riscos registrados: `ListAgents` do Leader enxerga sessões de toda a máquina (a regra filtra, mas nomes podem
+colidir); no interativo o resultado do papel chega duplicado (retorno e `SendMessage`); eixos do
+`anvil-code-review` em paralelo não re-medidos depois do texto novo.
