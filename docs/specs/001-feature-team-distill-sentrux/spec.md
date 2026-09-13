@@ -304,7 +304,9 @@ payload e contra um projeto descartável.
 - **`anvil-distill`:** destila um sistema local, uma URL passageira (fora do
   status do git, com o commit na Origem) e uma URL versionada (submodule, com o
   pin). O documento tem as seis seções; cada ponteiro abre e contém o trecho
-  citado; nada fora de `docs/` e da pasta criada em `references/` é alterado. Em
+  citado; nada fora de `docs/` e da pasta criada em `references/` é alterado,
+  além da linha de exclusão local do git (passageiro) e do `.gitmodules`
+  (versionado), que a entrada por URL pede. Em
   branch com número, cai na spec; sem número, na base.
 - **`anvil-team`:** sem a variável, para e mostra a configuração. Com ela, despacha
   um papel, uma mensagem entre papéis chega, o julgamento do Review chega ao Leader
