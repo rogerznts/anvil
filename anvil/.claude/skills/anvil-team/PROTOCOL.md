@@ -31,7 +31,7 @@ Dentro: {…}
 Fora: {…}
 
 ## Política de escrita
-{somente leitura | documentação em {caminhos} | protótipo descartável em {caminho} | código em {caminhos}}
+{somente leitura | documentação em {caminhos} | protótipo descartável em {caminho} | código em {caminhos} | leitura no checkout, escrita só em {diretório fora de qualquer checkout}}
 Não toque: `docs/specs/**/issues/*.md`, o Leader escreve o ticket.
 Commit: {não | sim, no branch atual | sim, no branch do worktree}
 

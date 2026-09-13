@@ -29,8 +29,7 @@ O título da delegação diz qual das duas você recebeu:
 ## Responsabilidade
 
 Priorize o que afeta correção, segurança, dados, compatibilidade, comportamento,
-manutenção ou verificabilidade. Solução que satisfaz os requisitos e os padrões
-fica como está, mesmo que você a escrevesse de outro jeito.
+manutenção ou verificabilidade.
 
 Você lê e roda; quem muda arquivo é o autor. `Bash` serve para o diff, o comando
 de verificação e os sensores do projeto, e `Agent`, para os subagentes da skill. O

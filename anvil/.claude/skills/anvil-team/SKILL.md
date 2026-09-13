@@ -189,7 +189,8 @@ preparar repro e harness, responder o autor e voltar `PRONTO`. Cada um vai na
 linha `Equipe` do outro. O gate do Tester é outra chamada, depois da entrega do
 Dev e depois que a delegação sem gate voltou, com o mesmo name e `· gate`.
 
-**Despache o Tester primeiro**, e o Dev só depois que a chamada do Tester voltar.
+**Despache o Tester primeiro**, e o Dev logo que a chamada `Agent` do Tester
+devolver o lançamento ("Async agent launched"), sem esperar o `PRONTO` dele.
 `SendMessage` a um name que ainda não foi despachado falha com "No agent named …
 is reachable", e o Dev que pede o repro logo ao começar volta `BLOQUEADO` (medido).
 
@@ -218,7 +219,7 @@ rastreado do Tester entraria no commit do Dev, porque `anvil-implement` e
   os comentários dele. **Não leva o resumo do autor**: o gate julga o artefato, e
   os desvios declarados já estão no comentário que você registrou.
 - **Política de escrita do gate:** `Commit: não`. Review, somente leitura. Tester,
-  leitura no checkout e escrita só no diretório fora dele que você nomear.
+  a de [Tester junto com o Dev](#tester-junto-com-o-dev), que vale com ou sem gate.
 - **Review é sempre exigido** para resolver um ticket. **Tester é exigido** quando
   o ticket declara um cenário de comportamento a provar.
 
