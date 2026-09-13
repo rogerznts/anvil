@@ -71,3 +71,9 @@ markdown por referência (`[p]: PROTOCOL.md`) passa a reprovar no check (c).
 Ficam como ideia, além das do Review: `<a href>` relativo, `.claude/../` que resolve fora, cerca
 indentada 5 espaços e bloco de 4 espaços conferidos, span com `$VAR` ou `:linha`, `mailto:` tratado
 como relativo, agente do usuário chamado `mosk-*` apagado pela migração (o boot mostra o plano antes).
+
+**Leader, 2026-09-13 — F7/R1, pergunta do Dev:** a colisão é destacada no dry-run e nomeada no passo que
+avisa e espera, e a sobrescrita continua depois da aprovação. O contrato do update já é dry-run, aviso
+nomeando e espera; pular a colisão deixaria o agente do payload sem instalar, em silêncio. As duas
+checagens do R1 no `adv.sh` do Tester passam a conferir o destaque — quem ajusta é o Tester, no reteste,
+porque a suíte é do gate.
