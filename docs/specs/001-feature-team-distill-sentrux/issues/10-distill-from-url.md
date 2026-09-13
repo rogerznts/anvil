@@ -50,3 +50,21 @@ segmento vazio, a pasta vira `references/`, que existe, e o fluxo destila `refer
 vazio". **RV-5** `ls-files --stage` numa cópia versionada lista todos os arquivos da pasta; filtrar pela entrada
 160000. **RV-6** a description não cita URL; o disparo por linguagem natural com URL não foi testado. **RV-7** "as
 direções que vieram com a URL" não diz que viram a funcionalidade no despacho.
+
+**Leader, 2026-09-13 — gate Tester, rodada 1: APROVADO.** Isolado, payload de `4d44e64`, projeto Go, `GIT_TRACE2`
+gravando todo processo git (subagente inclusive), repositórios diferentes dos do Dev; 11 sessões, US$ 5,83.
+Passageiro (`vercel/ms`): pergunta sem git de rede antes da resposta, clone raso, uma linha no exclude, `.gitignore`
+igual, Origem = `ls-remote`. Versionado (URL com `.git`): submodule sem commit, Origem com o pin do índice. Pasta
+presente atrás do remoto: sem pergunta, sem fetch/pull/checkout no trace, HEAD, refs e mtimes do `.git` iguais; a
+segunda execução mantém uma linha no exclude. Credencial: https e ssh inexistentes param sem prompt; repositório
+**privado com credencial salva** (osxkeychain) clona e destila. Quebra: barra final não reproduziu o RV-4 neste run
+(pasta certa); URL `/tree/main/src` normalizada para o repositório e a funcionalidade recortada em `src/`; branch com
+número sem pasta parou antes de clonar. Linguagem natural com URL dispara a skill, mas a funcionalidade pedida ("o
+retry") caiu dos args e a destilação cobriu o sistema inteiro. Regressão do 09: submodule commitado com checkout
+divergente registra pin e checkout. Achado **T-1** (baixo): clone que falha deixa `references/` vazio quando a pasta
+não existia. Observação: `GIT_TERMINAL_PROMPT=0` não cobre o prompt de host key do ssh, mas a ferramenta Bash não tem
+terminal de controle e o ssh falha em vez de travar. Não testados: AskUserQuestion e permissão do clone no
+interativo; GCM gráfico e ssh-askpass; RV-1 (exclude sem `\n`); fork com nome de pasta existente.
+
+Rodada única de ajuste (depois da do 07): RV-1, RV-4, RV-2, RV-3, RV-5, RV-7 do Review; T-1; e a funcionalidade dita em
+linguagem natural junto da URL passa ao despacho.
