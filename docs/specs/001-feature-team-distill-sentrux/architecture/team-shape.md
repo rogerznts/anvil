@@ -187,7 +187,7 @@ que cobrar."
 | A delegação | template literal dos sete campos ([5](#5-delegação)); todo contexto chega nela; `mission-control.md` é do Leader e não se lê; name fora da linha `Equipe` não se inventa |
 | O retorno | a última mensagem é o retorno e chega a quem despachou; primeira linha fixa; seções; severidade de finding ([6](#6-retorno-e-gates)) |
 | Gates | Tester e Review são gate só quando a delegação diz `gate`; o veredito existe só no retorno; conversa lateral esclarece finding e não muda veredito; o autor discorda na seção Divergências do próprio retorno, e a discordância não elimina o gate; **papel nunca despacha agente `anvil-team-*`**, só os subagentes que as próprias skills abrem |
-| Skills | carregar a skill real pela Skill tool e seguir o `SKILL.md`, sem simular; skills primárias não são whitelist; o protocolo de uma skill vence este; skill ausente ou travada → `BLOQUEADO`, nunca instalar |
+| Skills | carregar a skill real pela Skill tool e seguir o `SKILL.md`, sem simular; skills primárias não são whitelist; subagente que a skill abre vai com `run_in_background: false`, **mesmo quando a skill manda background**, e várias chamadas na mesma mensagem continuam em paralelo (medido no Ponto B do 06: resultado de subagente em background não chega a papel que encerrou o turno); fora essa exceção, o protocolo de uma skill vence este; skill ausente ou travada → `BLOQUEADO`, nunca instalar |
 | Fontes de verdade | a ordem da referência, com `.claude/rules/` no item de regras locais e "memória de sessões anteriores, quando houver" no último; memória é histórico, não estado; o Mission Control não é fonte |
 | Comunicação | `SendMessage` aos names da linha `Equipe`; `SendMessage` é ferramenta diferida dentro do agente, e se carrega com `ToolSearch` `select:SendMessage` antes do primeiro envio (medido, M3); texto comum de um agente não chega a outro; não simular a opinião de um colega que está na Equipe; o que nasceu em conversa lateral e importa (finding, repro, divergência, acordo) vai na seção Laterais do retorno; erro de entrega não se repete, vira `BLOQUEADO` |
 | Ownership de escrita | um escritor por região; a Política de escrita é a fronteira; `Status:` e `## Comments` de ticket são do Leader; sobreposição descoberta no meio → parar e devolver `BLOQUEADO`, e quem escolhe a saída é o Leader; em worktree, conferir que `HEAD` contém o sha da Base antes de escrever, e não conter é `BLOQUEADO` |
@@ -534,6 +534,22 @@ precisam de endereços diferentes, e reusar um name substitui o agente anterior.
 
 A retomada do autor depende de o resultado de um turno retomado voltar ao Leader.
 Medido (M2): volta.
+
+**Name inalcançável.** Numa sessão do Leader retomada em processo novo
+(`claude --resume`, ou cada turno de `claude -p`), `SendMessage` ao name falha com
+"No agent named … is reachable" (medido no Ponto B do 06). Regra, em SKILL §
+Despacho, só para autor:
+
+1. `ListAgents`, e procurar a linha com o name exato **entre os subagentes que esta
+   sessão despachou**. Sessão de outra máquina, sessão local alheia (peer) ou sessão
+   na nuvem não conta, mesmo com o mesmo name: mandar a delegação para ela é
+   entregar trabalho da equipe a quem não é da equipe.
+2. Uma linha só → `SendMessage` pelo agentId dela. O contexto volta intacto
+   (medido).
+3. Nenhuma, ou mais de uma → `Agent` novo com o mesmo name, e o Contexto apontando o
+   ticket e os comentários. O papel relê em vez de lembrar.
+
+Gate não entra nesta regra: rodada de gate já é sempre `Agent` novo.
 
 ### Tester junto com o Dev
 
