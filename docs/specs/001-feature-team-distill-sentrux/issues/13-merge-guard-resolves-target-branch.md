@@ -78,3 +78,16 @@ Ficam como ideia, fora da spec: fechar os contornos do item 7; `gh pr merge {bra
 
 Reteste: `workspace/11-merge-target-tester/adv.sh` e `repro-git-C.sh` do Tester, o `run.sh` do Dev, e
 os cenários do Review (archive não commitado disparado do branch da spec → rc=2).
+
+**Leader, 2026-09-13 — correções entregues** em `f454be1..f1a12f4` (os 7 itens). Suíte adversarial do Tester:
+14 contornos e 8 falsos positivos → 10 e 2; os 10 são exatamente os do item 7, e os 2 já existiam
+(`git merge main` e `git merge --abort` disparados do branch da spec). `run.sh` com 100 checagens limpo em
+bash 5 e 3.2; cópia instalada igual ao payload; verify limpo.
+
+Desvios aceitos: **D1** a posição de comando foi implementada ao contrário — `git` fora da cabeça só é
+menção quando a cabeça nunca executa os argumentos (`echo`, `printf`, `grep`, `rg` e afins), o que mantém
+`sudo`, `timeout`, `if`, `{ }` e `nohup` verificados; **D2** a pré-passada trata também comentário,
+continuação de linha e `$(`, fechando dois contornos antigos; **D3** `ARCHIVE.md` e `SKILL.md` do
+`anvil-docs` dizem que a spec é lida do commit; **D4** texto neutro "merge ou PR". Efeito aceito do B1: no
+branch de uma spec cuja pasta ainda não foi commitada, `git merge main` bloqueia até o commit.
+Reteste despachado: Review e Tester.
