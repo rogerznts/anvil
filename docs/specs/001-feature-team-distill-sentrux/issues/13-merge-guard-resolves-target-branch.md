@@ -16,6 +16,7 @@
 - [ ] A rule do projeto diz que o passo de PR do perfil do tracker (`/tea-open-pr`) não se aplica neste repositório, onde a spec fecha com merge local.
 - [ ] O critério de bloqueio da guarda não é repetido na rule: ela aponta o perfil do tracker.
 - [ ] Na rule, `mosk` ganha glosa na primeira menção, o `unlazy` deixa de ser descrito como origem de skill, e o parágrafo de abertura para de tratar todo `references/` como upstream.
+- [ ] `git cherry-pick` continua fora da guarda: é como a equipe integra worktrees com a spec aberta.
 - [ ] O `verify` sai limpo.
 
 ## Comments

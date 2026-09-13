@@ -12,6 +12,26 @@
 - [ ] A delegação tem os sete campos: objetivo, contexto, skills, escopo, política de escrita, critério de pronto e retorno.
 - [ ] `anvil-team-dev` e `anvil-team-review` existem no payload, com descriptions que dizem que só são despachados pela `anvil-team` e que não atraem delegação automática.
 - [ ] O Review declara allowlist com leitura, `Bash`, `Agent` e `Skill`, sem `Edit` e `Write`.
+- [ ] A implementação segue o desenho em `architecture/team-shape.md` (`384fc45`), seção 12, parte do 06.
+- [ ] O Review declara também `SendMessage` e `ToolSearch` na allowlist, e continua sem `Edit` e `Write`.
+- [ ] A `anvil-team` tem trava de invocação: só o usuário a abre.
+- [ ] O `verify` reprova agente de equipe que não cita o protocolo, e token do Maestri (`@team-protocol`, `@anvil-skills`, `@mission-control`, `@anvil-install`, `No connection to note`) em skill ou agente do payload.
 - [ ] A frontier sai dos tickets, e os findings do Review ficam nos comentários do ticket.
 - [ ] Ponto B: sem a variável, a skill para; com ela, um ticket vai do Dev ao Review e o julgamento chega ao Leader; um "revisa esse diff" fora da skill não cai em papel nenhum; o Review não consegue editar.
 - [ ] O `verify` sai limpo, incluindo a checagem de caminhos citados por agentes.
+
+## Comments
+
+**Leader, 2026-09-13 — decisões sobre as perguntas do desenho** (o desenho em `architecture/team-shape.md` (`384fc45`)):
+
+- **U1** o Review ganha `SendMessage` e `ToolSearch`: a allowlist existe para impedir edição, e
+  mensagem não edita; a conversa lateral é decisão do ADR-0007.
+- **U2** "o Review não edita" = sem `Edit` e `Write`; `Bash` e `Agent` ficam declarados (Q19).
+- **U6** a volta PO → Leader → usuário → Leader → PO no grill é aceita: é o fluxo da configuração de origem.
+- **U7** a trava de invocação na `anvil-team` fica: o usuário disse que a equipe só existe quando ele a chama.
+
+Medições já feitas no teste de sondagem (Claude Code 2.1.270): **M1** o resultado de um agente com nome
+chega à sessão principal; **M2** o de um agente retomado por `SendMessage` também; **M3** `SendMessage`
+é diferida dentro do agente e precisa de `ToolSearch`. Ficam para o ponto B deste ticket: **M4**
+permissão pedida por papel em background, **M6** reuso de `name`, **M7** nomes das ferramentas de
+leitura na allowlist.

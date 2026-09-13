@@ -253,8 +253,10 @@ spec com merge local.
   recebem o contexto na delegação.
 - **Delegação** com os sete campos: objetivo, contexto, skills, escopo, política de
   escrita, critério de pronto e retorno.
-- **Ferramentas.** Só o Review declara allowlist: leitura, `Bash`, `Agent` e
-  `Skill`, sem `Edit` e `Write`. Os demais papéis herdam tudo.
+- **Ferramentas.** Só o Review declara allowlist: leitura, `Bash`, `Agent`, `Skill`,
+  `SendMessage` e `ToolSearch`, sem `Edit` e `Write`. Os demais papéis herdam tudo.
+- **Trava de invocação na `anvil-team`**: só o usuário abre a equipe.
+- **Forma detalhada** em `architecture/team-shape.md`, dentro da pasta desta spec.
 - **Modelo.** Nenhum agente fixa modelo. A rule do anvil ganha a lista `team`, de
   papel para modelo, que o Leader passa na chamada. Sem esse suporte, o papel usa o
   modelo da sessão.
