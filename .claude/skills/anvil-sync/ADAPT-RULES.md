@@ -72,8 +72,11 @@ frontmatter resolvido a favor do upstream traria a trava de volta em silêncio. 
 
 ## `docs-remap` — julgamento
 
-Só para caminho de saída **dentro de `docs/`**, e só quando o modelo de pastas do
-anvil difere do que a skill assume.
+Só para os caminhos da tabela — glossário, mapa de contextos e ADRs —, que no
+anvil moram **dentro de `docs/`**, e só quando o modelo de pastas do anvil difere
+do que a skill assume. Vale para o caminho que a skill escreve e para o que ela
+lê, manda ler ou descreve ao usuário: skill que procura `CONTEXT.md` na raiz não
+acha o glossário do anvil, mesmo sem escrever nada.
 
 | Upstream | Anvil |
 |---|---|
@@ -94,7 +97,9 @@ Exemplos do que **não** se remapeia:
 - O temp do SO no `handoff` — não é caminho em `docs/`, é decisão de desenho do
   autor (*"not the current workspace"*). Fora do escopo da exceção.
 
-Hoje só `anvil-domain-modeling` precisa de verdade: 14 linhas.
+Quem declara a regra está no manifesto. Hoje são cinco: o `anvil-domain-modeling`,
+que escreve esses arquivos, e o `anvil-setup`, o `anvil-diagnose`, o `anvil-tdd` e o
+`anvil-wait-what`, que os leem ou apontam para eles.
 
 ---
 
