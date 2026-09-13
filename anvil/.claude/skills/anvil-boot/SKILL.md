@@ -237,15 +237,24 @@ O bloco sai do lock que o passo 9 conferiu. Veja o que o script vai escrever:
 bash .claude/skills/anvil-update/scripts/reset-install.sh --gitignore-only --dry-run --to .
 ```
 
-**Primeiro, a linha antiga.** Um boot anterior ignorava `.claude/skills/` inteiro,
+**Antes de tudo, alguma dessas é do usuário?** O passo 9 não pega a skill do
+usuário que já está dentro do lock — um boot antigo reescrevia o lock do disco com
+ela junto. Mostre as skills que o bloco vai ignorar e **pergunte se alguma o
+usuário escreveu**; se o passo 9 acabou de reescrever o lock com essa pergunta,
+não repita. Se alguma for, ela sai do lock pela reescrita do passo 9, com
+`MINHAS` levando todas as skills do usuário — essa e as que já estavam fora do
+lock. **Nunca edite o lock à mão.** Rode o dry-run de novo: o bloco sai sem ela.
+
+**Depois, a linha antiga.** Um boot anterior ignorava `.claude/skills/` inteiro,
 com um comentário exato em cima — em duas versões, com e sem o `--force`. Procure
-pelas duas:
+pelas duas, e pelo início do bloco. O `tr` tira o `\r` de um `.gitignore` com
+CRLF, que o `grep -x` não casaria:
 
 ```bash
-grep -nxF -A1 \
+tr -d '\r' < .gitignore | grep -nxF -A1 \
   -e '# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil . --force`' \
   -e '# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil .`' \
-  .gitignore
+  -e '# ANVIL:INSTALLED:START'
 ```
 
 - **Achou um dos comentários, e a linha seguinte é `.claude/skills/`** → foi o
@@ -253,20 +262,20 @@ grep -nxF -A1 \
   dry-run) e **espere aprovação**. Ela vale para a troca e para o bloco juntos:
   não pergunte do bloco de novo, porque um "não" ali deixaria um par de
   marcadores vazio. Aprovado:
-  - o `.gitignore` **não tem** `# ANVIL:INSTALLED:START` → troque as duas linhas
+  - a busca **não achou** `# ANVIL:INSTALLED:START` → troque as duas linhas
     por `# ANVIL:INSTALLED:START` e `# ANVIL:INSTALLED:END`; o script preenche o
     bloco no lugar;
-  - o `.gitignore` **já tem** o bloco — um boot anterior o escreveu, com a troca
+  - a busca **achou** o início do bloco — um boot anterior o escreveu, com a troca
     recusada → **só apague as duas linhas**. Trocá-las por marcadores daria um
     segundo par, e o script para com erro.
 
   Recusado → as duas linhas ficam. Avise que elas continuam ignorando todo o
   `.claude/skills/`, a skill do usuário inclusive, e pergunte do bloco à parte.
-- **Não achou** → não toque em linha nenhuma que ignore `.claude/skills/`, mesmo
-  parecida. Foi o usuário que escreveu. Avise que ela continua ignorando as
-  skills que ele escrever ali, e pergunte do bloco.
+- **Não achou nenhum dos comentários** → não toque em linha nenhuma que ignore
+  `.claude/skills/`, mesmo parecida. Foi o usuário que escreveu. Avise que ela
+  continua ignorando as skills que ele escrever ali, e pergunte do bloco.
 
-**Depois, o bloco.** Com a aprovação, grave:
+**Por fim, o bloco.** Com a aprovação, grave:
 
 ```bash
 bash .claude/skills/anvil-update/scripts/reset-install.sh --gitignore-only --to .
