@@ -42,3 +42,20 @@ Decisões: link de âncora (`](#…)`) continua reprovando no check (c) — isen
 que precise (ideia registrada); "preservados sempre" continua sendo o grupo fixo; (c) vale no arquivo
 inteiro; a adaptação da suíte do 04 ao `USER_SKILLS` é aceita. Gates despachados: Review e Tester
 (ponto A e ponto B da migração do mosk, isolado).
+
+**Leader, 2026-09-13 — gate Review: APROVADO, sem bloqueante.** Critérios 1–17 atendidos, com fixtures de
+agente (o payload ainda não tem agentes). Entram num ajuste antes de fechar:
+
+- **F1** — a troca da linha antiga no passo 10 do boot grava o `.gitignore` mesmo se o `awk` falhar (duas
+  linhas independentes): encadear com `&&`, como o script já faz.
+- **F2** — o `SKILL.md` do update manda commitar o lock e, adiante, diz "nunca commite sozinho": pedir ao
+  usuário que commite.
+- **F3** — agente órfão que é symlink pendurado some do relatório e fica no disco: os testes de existência
+  de agente aceitam symlink.
+- **F7** — agente do usuário com o nome de um agente do payload, fora do lock, é sobrescrito sem aviso
+  explícito (user story 13): o relatório destaca substituído que não estava no lock como possível colisão.
+
+Ficam como ideia: **F4** falsos negativos raros do check (b) (linha com crases inline tratada como cerca,
+span em duas linhas); **F5** duplicação do formato do lock entre boot, update e scripts; **F6** alinhar
+skills em `grep -qxF`; **F8** symlink velho no `dev-link`; **F9** detalhes do awk e do temporário;
+**F10** `name:` com comentário. Aguardando o gate do Tester.
