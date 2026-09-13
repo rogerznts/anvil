@@ -82,3 +82,12 @@ com CRLF; **R2** um projeto bootado com o passo antigo pode já ter skill do usu
 antes de gravar o bloco, o boot confirma com o usuário se alguma skill listada é dele.
 Ficam como estão: **R3** fim de linha pela primeira linha em arquivo misto; **R4** intervalo fixo do
 `--help`, que já existia.
+
+**Leader, 2026-09-13 — R1 e R2 em `496b155`; reteste do Tester, ponto A: APROVADO.** Suítes `run.sh`,
+`adv.sh` (com aval do c3f e o novo c3g) e `adv2.sh` sem falha; `adv2.sh` contra o script de
+`5dd8a52` dá 34 falhas, então a suíte distingue as versões. Desvio aceito em R1: o START entra na
+mesma busca que ignora `\r`, para a pergunta "o bloco já existe?" também valer em CRLF.
+Observações do Tester sem bloqueio: lock com espaço depois do nome (só editado à mão), `--from ""`
+aceito, `--from` sem valor sem mensagem (anterior ao ticket).
+
+Pendentes para fechar: reteste do Review sobre `5dd8a52..496b155` e ponto B do boot isolado (R1, R2, S1).
