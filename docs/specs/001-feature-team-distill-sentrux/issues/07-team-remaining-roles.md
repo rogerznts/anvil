@@ -12,11 +12,11 @@
 - [ ] A implementação segue o desenho em `architecture/team-shape.md` (`384fc45`), seção 12, parte do 07.
 - [ ] O `verify` reprova agente que cita skill inexistente no payload ou skill com trava de invocação.
 - [ ] O PO não cita `anvil-to-questionnaire`; o Leader sugere `/anvil-wayfinder` e `/anvil-handoff` ao usuário em vez de despachá-las.
-- [ ] F1 do gate do 06: o Tester despachado junto com o Dev deixa de contradizer "um escritor por vez neste checkout" — exceção explícita com commit coordenado, ou o Tester escreve fora do checkout.
-- [ ] F2 do gate do 06: a regra de divergência e os campos do finding ficam num lugar só (protocolo), sem cópia nos papéis.
-- [ ] F3 do gate do 06: o papel Review (e o Tester) contempla a delegação sem gate prevista no protocolo.
-- [ ] F1 do gate do 06: a linha-ponteiro dos sete agentes manda ler o protocolo INTEIRO antes de agir; um fluxo de reteste mostra o Dev lendo o arquivo todo e carregando a skill delegada pela Skill tool.
-- [ ] R1 do gate do 06: com os sete papéis existindo, um ticket chega a `resolved` pela equipe com os gates de Review e Tester.
+- [ ] RV-F1 (gate Review do 06): o Tester despachado junto com o Dev deixa de contradizer "um escritor por vez neste checkout" — exceção explícita com commit coordenado, ou o Tester escreve fora do checkout.
+- [ ] RV-F2 (gate Review do 06): a regra de divergência e os campos do finding ficam num lugar só (protocolo), sem cópia nos papéis.
+- [ ] RV-F3 (gate Review do 06): o papel Review (e o Tester) contempla a delegação sem gate prevista no protocolo.
+- [ ] TS-F1 (gate Tester do 06): a linha-ponteiro dos sete agentes manda ler o protocolo INTEIRO antes de agir; um fluxo de reteste mostra o Dev lendo o arquivo todo e carregando a skill delegada pela Skill tool.
+- [ ] TS-R1 (gate Tester do 06): com os sete papéis existindo, um ticket chega a `resolved` pela equipe com os gates de Review e Tester.
 - [ ] O README e o overview dizem que o anvil distribui agentes e a skill de equipe, apontando o ADR-0007.
 - [ ] Ponto B: uma mensagem do Dev chega ao Tester sem passar pelo Leader; o julgamento do Tester chega ao Leader; cada um dos cinco papéis é despachado ao menos uma vez.
 

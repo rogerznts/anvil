@@ -11,4 +11,5 @@
 - [ ] Versionado: submodule; a mudança fica para o usuário commitar; a Origem registra o pin.
 - [ ] Pasta já presente: sem pergunta e sem atualizar.
 - [ ] Repositório privado usa a credencial que o git já tiver; o distill nunca pede credencial.
+- [ ] A invariante de escrita do `DISTILL.md` passa a autorizar criar a pasta do sistema em `references/` (hoje só autoriza escrever em `docs/`).
 - [ ] Ponto B: uma URL passageira some do `git status`; uma URL versionada aparece como submodule; uma pasta existente não é atualizada.
