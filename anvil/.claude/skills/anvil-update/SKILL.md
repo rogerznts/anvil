@@ -12,7 +12,9 @@ Reinstala o payload do anvil e reporta o que mudou.
 **Isto é um reset, não uma sobrescrita.** As skills e os agentes que o anvil
 instalou são apagados e reinstalados. Ficam intactos: `.claude/rules/`,
 `.claude/settings.json`, `docs/`, `CLAUDE.md`, e **qualquer skill ou agente que
-você tenha escrito**.
+você tenha escrito**. A ressalva é a skill ou o agente seu, fora do lock, com o
+mesmo nome de um do payload: é sobrescrito, depois do destaque de colisão no
+dry-run e do aviso do passo 4.
 
 **Por que reset e não `degit --force`:** o `--force` sobrescreve arquivo a
 arquivo e **nunca apaga**. Uma skill que deixou de existir upstream ficaria no
