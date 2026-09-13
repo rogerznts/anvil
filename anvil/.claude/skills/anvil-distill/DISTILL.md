@@ -10,7 +10,7 @@ A destilação escreve em dois lugares:
 
 - **o documento**, dentro de `docs/`, criando a pasta `discovery/` se ela faltar;
 - **a pasta do sistema em `references/`**, quando ele vem de uma URL que ainda não
-  tem pasta — com a linha em `.git/info/exclude`, se passageiro, ou o
+  tem pasta — com a linha de exclusão local do git, se passageiro, ou o
   `.gitmodules` e o pin no índice, se versionado. Quem baixa é a sessão principal,
   antes do despacho: você recebe a pasta pronta e não baixa nada.
 

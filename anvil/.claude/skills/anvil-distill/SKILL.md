@@ -56,13 +56,15 @@ usuário se substitui ou se a funcionalidade ganha outro nome.
 
 ## 3. Despacho
 
-Com URL e pasta nova, baixe antes, na forma que o usuário escolheu:
+Com URL e pasta nova, baixe antes, na forma que o usuário escolheu, com um
+comando só, da raiz do projeto. São as escritas fora de `docs/` que a invariante
+do [DISTILL.md](DISTILL.md) autoriza:
 
 ```bash
-# passageiro: clone raso e uma linha de exclusão local; o .gitignore não muda
-GIT_TERMINAL_PROMPT=0 git clone --depth 1 <url> references/{sistema}
-exclude="$(git rev-parse --git-path info/exclude)"
-grep -qxF '/references/{sistema}/' "$exclude" || echo '/references/{sistema}/' >> "$exclude"
+# passageiro: clone raso e uma linha de exclusão local, só se o clone deu certo
+GIT_TERMINAL_PROMPT=0 git clone --depth 1 <url> references/{sistema} &&
+  exclude="$(git rev-parse --git-path info/exclude)" &&
+  { grep -qxF '/references/{sistema}/' "$exclude" || echo '/references/{sistema}/' >> "$exclude"; }
 
 # versionado: submodule; o .gitmodules e o pin ficam para o usuário commitar
 GIT_TERMINAL_PROMPT=0 git submodule add <url> references/{sistema}
