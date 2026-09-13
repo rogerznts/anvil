@@ -137,10 +137,10 @@ a cada versão.
 | `subagent_type` | `anvil-team-{papel}` | sempre |
 | `name` | `{papel}-{NN}` no trabalho de um ticket; `{papel}` fora de ticket (discovery do PO, design antes dos tickets) | sempre. Sem `name` o agente não entra no time, e ninguém fala com ele |
 | `description` | `{papel} · ticket {NN}[ · rodada {n}]` | sempre |
+| `model` | o valor do papel na lista `team` | só quando o papel tem valor válido. Ver [Modelo por papel](#modelo-por-papel) |
+| `isolation` | `"worktree"` | só com dois escritores ao mesmo tempo, os dois isolados. Nunca num gate nem no Tester. Ver [Paralelismo e integração](#paralelismo-e-integração) |
 | `run_in_background` | `true` | sempre. A chamada devolve o lançamento na hora, não o retorno do papel. Você segue disponível para o usuário, e dois papéis vivos ao mesmo tempo é o que torna a conversa lateral possível |
 | `prompt` | a delegação do [protocolo](PROTOCOL.md#a-delegação), com os sete campos | sempre |
-
-`model` fica omitido, e vale o modelo da sessão.
 
 `{papel}-{NN}`, e não um name fixo por papel: dois Devs em tickets diferentes
 precisam de endereços diferentes, e reusar um name substitui o agente anterior.
@@ -149,12 +149,50 @@ precisam de endereços diferentes, e reusar um name substitui o agente anterior.
 escolha do papel". Skill com trava de invocação não se delega; o papel a
 recusaria.
 
-**Um escritor ativo por vez neste checkout.** Leitura se despacha em paralelo à
-vontade. O Tester não conta como escritor: ele escreve fora do checkout (ver
-[Tester junto com o Dev](#tester-junto-com-o-dev)).
+**Escrita.** Leitura se despacha em paralelo à vontade. Um escritor por checkout:
+dois escritores ao mesmo tempo só em worktrees, por [Paralelismo e
+integração](#paralelismo-e-integração). O Tester não conta como escritor: ele
+escreve fora de qualquer checkout (ver [Tester junto com o
+Dev](#tester-junto-com-o-dev)).
 
 **Agente ausente.** Se o despacho falhar com erro de tipo de agente, um
 `anvil-team-*` não está instalado: pare e sugira `/anvil-update` ao usuário.
+
+### Modelo por papel
+
+Antes do primeiro despacho da sessão, leia a lista `team` em
+`.claude/rules/anvil.md`, na seção "Modelos por papel":
+
+```markdown
+- `team`:
+  - `po`:
+  - `dev`: `sonnet`
+```
+
+A chave é o papel, o sufixo do agente: `po`, `architect`, `analyst`, `designer`,
+`dev`, `tester`, `review`. O valor vai no `model` da chamada, e só vale `opus`,
+`fable`, `sonnet` ou `haiku`.
+
+| Na lista | `model` na chamada | Aviso |
+|---|---|---|
+| papel com valor válido | o valor | não |
+| papel sem valor | omitido: vale o modelo da sessão | não. É o que o `anvil-boot` escreve |
+| papel sem linha, ou a lista inteira ausente | omitido | sim |
+| valor fora dos quatro | omitido | sim |
+| chave que não é papel | nenhum papel muda | sim |
+
+O aviso é um só por sessão, no primeiro despacho, com todos os problemas da lista:
+
+```text
+A lista `team` de .claude/rules/anvil.md {não existe | não tem `tester` | dá `gpt` a `dev` | tem `devs`, que não é papel}.
+Esses papéis usam o modelo da sessão.
+
+Para escolher, em "Modelos por papel" de .claude/rules/anvil.md:
+- `team`:
+  - `dev`: `sonnet`
+```
+
+Se a chamada `Agent` recusar `model`, despache sem ele: vale o modelo da sessão.
 
 ### Despachar ou retomar
 
@@ -181,6 +219,17 @@ falha com "No agent named … is reachable". Então:
 
 Gate não entra nesta regra: rodada de gate já é `Agent` novo.
 
+**Autor que trabalhou em worktree.** Correção depois da integração não vai por
+`SendMessage` ao autor: o cwd dele é um worktree removido, ou prestes a ser, e o
+branch dele não tem os commits do outro escritor. Vai a `Agent` novo com o mesmo
+name, com o Contexto apontando o ticket e os comentários, sobre o branch da spec já
+integrado.
+
+- Um corretor só: sem worktree.
+- Dois ao mesmo tempo são dois escritores de novo: [Paralelismo e
+  integração](#paralelismo-e-integração) recomeça do passo 0, com a Base no `HEAD`
+  integrado.
+
 ### Tester junto com o Dev
 
 Quando o ticket tem comportamento a reproduzir ou pede harness antes da solução,
@@ -195,9 +244,9 @@ devolver o lançamento ("Async agent launched"), sem esperar o `PRONTO` dele.
 `SendMessage` a um name que ainda não foi despachado falha com "No agent named …
 is reachable", e o Dev que pede o repro logo ao começar volta `BLOQUEADO` (medido).
 
-**O Tester escreve fora do checkout**, com ou sem gate. A Política de escrita dele
-nomeia um diretório fora de qualquer checkout, escolhido por você, e diz
-`Commit: não`. Dois escritores no mesmo checkout disputam o índice, e arquivo não
+**O Tester escreve fora de qualquer checkout**, com ou sem gate, e nunca num
+worktree. A Política de escrita dele nomeia um diretório fora de qualquer
+checkout, escolhido por você, e diz `Commit: não`. Dois escritores no mesmo checkout disputam o índice, e arquivo não
 rastreado do Tester entraria no commit do Dev, porque `anvil-implement` e
 `tea-commit` stageiam o que estiver pendente.
 
@@ -208,6 +257,78 @@ rastreado do Tester entraria no commit do Dev, porque `anvil-implement` e
   dele.
 - Anote o caminho do repro no comentário do ticket e repasse-o no Contexto da
   delegação de gate do Tester.
+
+## Paralelismo e integração
+
+Leitura se paraleliza à vontade. Dois escritores ao mesmo tempo, só com as três
+pré-condições:
+
+- nenhum bloqueio entre os tickets;
+- regiões de escrita declaradas e disjuntas;
+- a integração decidida antes do despacho: a desta seção.
+
+Faltando uma, execute em sequência ou dê a região a um escritor só. Com dois
+escritores, **os dois** vão em worktree. O Tester continua fora de qualquer
+checkout e não recebe worktree; gate também não.
+
+Mecânica medida no Claude Code 2.1.270: o worktree de `isolation: "worktree"` parte
+do `HEAD` do checkout principal, **sem o que não foi commitado**, em
+`.claude/worktrees/agent-{id}`, no branch `worktree-agent-{id}`, e sobrevive ao
+agente quando tem commit. A Skill tool do papel enxerga as skills instaladas, mas
+lá não existe `.claude/skills/`: por isso a linha `Protocolo:` absoluta.
+
+0. **Exclusão local.** Antes do primeiro worktree, ponha `/.claude/worktrees/` na
+   exclusão local do git, sem tocar o `.gitignore` do projeto:
+
+   ```bash
+   f="$(git rev-parse --git-path info/exclude)"
+   grep -qxF '/.claude/worktrees/' "$f" 2>/dev/null || printf '/.claude/worktrees/\n' >> "$f"
+   ```
+
+   Sem ela, `.claude/worktrees/` aparece no status do checkout principal, e um
+   `git add -A` de `anvil-implement` ou `tea-commit` num Dev sem worktree, como o do
+   passo 6, stagearia os worktrees como repositório embutido.
+1. **Commit do pendente.** Commite por caminho explícito os tickets e o
+   `mission-control.md` pendentes: o que não foi commitado não chega ao worktree. A
+   Base é o branch da spec em `git rev-parse HEAD` depois desse commit.
+2. **Despacho no mesmo turno.** As duas chamadas `Agent` na mesma mensagem, ambas
+   com `isolation: "worktree"`. O checkout principal fica com você, que escreve os
+   tickets.
+3. **Delegação.** Cada uma leva, no Contexto, `Base: {branch} em {sha}` e
+   `Protocolo: {caminho absoluto do PROTOCOL.md}`; em Fora, no Escopo, a região do
+   outro escritor; na Política de escrita, `Commit: sim, no branch do worktree`.
+4. **Conferência de base.** É do papel: antes de escrever, ele confere que o `HEAD`
+   do worktree contém o sha da Base e, se não contém, volta `BLOQUEADO` sem escrever.
+5. **Integração, um de cada vez.** Quando os dois voltarem, registre as entregas e,
+   no branch da spec, para cada worktree que `git worktree list` mostrar:
+
+   ```bash
+   git cherry-pick {sha da Base}..worktree-agent-{id}
+   ```
+
+   Nunca `git merge`: a guarda de merge o bloqueia no branch de uma spec com ticket
+   aberto.
+6. **Conflito:** `git cherry-pick --abort`, e despache um Dev **sem** worktree com o
+   conflito como Objetivo.
+7. **Verificação, depois gates.** Integrados os dois, rode o comando de verificação
+   do projeto, o de `.claude/rules/`. Só então despache os gates, com o Contexto no
+   intervalo integrado `{sha da Base}..{HEAD}` e os commits de cada ticket dentro
+   dele.
+8. **Remoção.** Para cada worktree, só quando `git cherry {branch da spec}
+   worktree-agent-{id}` não listar nenhuma linha com `+`:
+
+   ```bash
+   git worktree remove .claude/worktrees/agent-{id}
+   git branch -D worktree-agent-{id}
+   ```
+
+   O `-D` é preciso, porque commit trazido por `cherry-pick` não conta como merge.
+   Sem `--force`: se o `worktree remove` recusar por mudança não commitada, pare e
+   pergunte ao usuário. Sobrou `+`, porque o conflito do passo 6 foi resolvido num
+   commit diferente: o worktree fica, e você pergunta ao usuário antes de remover.
+
+Finding de gate sobre trabalho integrado não volta ao worktree: ver [Autor que
+trabalhou em worktree](#despachar-ou-retomar).
 
 ## Gates
 
@@ -297,6 +418,34 @@ artefato.
 {NN}`, por caminho explícito, e só sem escritor ativo neste checkout, porque dois
 `git commit` no mesmo checkout disputam o índice.
 
+## Mission Control
+
+O seu bloco de notas numa feature grande, em
+`docs/specs/{NNN}-{tipo}-{nome}/mission-control.md`. Crie-o copiando
+[templates/mission-control.md](templates/mission-control.md) na primeira destas:
+
+- o usuário pede;
+- dois papéis vão escrever em paralelo, antes do passo 0 de [Paralelismo e
+  integração](#paralelismo-e-integração);
+- a sessão vai acabar com ticket da spec aberto e decisão, bloqueio ou gate
+  pendente;
+- os tickets da spec não cabem numa sessão: ele nasce ao abrir a spec, sem esperar
+  a sessão acabar.
+
+Fora delas, não crie. As regras:
+
+- **Nunca fase, estado ou frontier.** O estado de cada ticket está no `Status:`
+  dele, os gates nos comentários, e a frontier se calcula relendo os tickets.
+- **Ponteiro em vez de cópia:** spec, ticket, comentário, commit.
+- **Em divergência com um ticket, vale o ticket**, e você corrige a nota.
+- **Papel não lê.** O que um papel precisar daqui vai copiado para o Contexto da
+  delegação; o arquivo não aparece em delegação nenhuma.
+- **Nenhuma skill ou hook o lê.** Numa sessão nova, onde o trabalho parou sai dos
+  tickets.
+
+Ele se commita junto com os tickets, pela mesma regra. No `archive`, fica congelado
+dentro da spec.
+
 ## Perguntas ao usuário
 
 - **Retorno `PERGUNTA`:** decida se a decisão é mesmo do usuário. Se é, pergunte
@@ -320,5 +469,6 @@ Antes de declarar o trabalho concluído:
 
 Responda ao usuário em CONCLUÍDO, PENDENTE, BLOQUEADO, RISCO e PRÓXIMO PASSO.
 
-Sessão acabando com trabalho aberto: sugira ao usuário `/anvil-handoff`, que tem
-trava de invocação.
+Sessão acabando com trabalho aberto: atualize o [Mission
+Control](#mission-control), ou crie-o, e sugira ao usuário `/anvil-handoff`, que
+tem trava de invocação.
