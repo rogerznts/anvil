@@ -187,8 +187,8 @@ Quando o ticket tem comportamento a reproduzir ou pede harness antes da soluçã
 despache `tester-{NN}` junto com `dev-{NN}`, os dois vivos ao mesmo tempo, o Tester
 com delegação **sem** `gate`: preparar repro e harness, mandá-los ao Dev, responder
 o autor e voltar `PRONTO`. Cada um vai na linha `Equipe` do outro. O gate do Tester
-é outra chamada, depois da entrega do Dev e do `PRONTO` da delegação sem gate, com o
-mesmo name e `· gate`.
+é outra chamada, depois da entrega do Dev e do último `PRONTO` da delegação sem
+gate, com o mesmo name e `· gate`.
 
 **Despache o Tester primeiro**, e o Dev logo que a chamada `Agent` do Tester
 devolver o lançamento ("Async agent launched"), sem esperar o `PRONTO` dele.

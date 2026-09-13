@@ -76,7 +76,8 @@ A sua última mensagem é o retorno, e chega a quem despachou você. Forma:
 - **Primeira linha.** Delegação comum: `PRONTO`, `BLOQUEADO` ou `PERGUNTA`.
   Delegação `gate`: `APROVADO`, `REPROVADO`, `BLOQUEADO` ou `PERGUNTA`. Aprovar
   com finding não bloqueante é `APROVADO`. Mensagem final sem uma dessas palavras
-  não é entrega: o Leader não a registra e pede o retorno por `SendMessage`.
+  não é entrega: o Leader não a registra e pede o retorno por `SendMessage`. Se
+  quem encerrou é um gate, ver [Gates](#gates).
 - **Retorno repetido.** O mesmo retorno emitido de novo, sem trabalho novo, o
   Leader não registra outra vez.
 - **Severidade.** `bloqueante` · `relevante` · `sugestão` · `pergunta`. Os ids
@@ -95,7 +96,8 @@ A sua última mensagem é o retorno, e chega a quem despachou você. Forma:
 - **Tester e Review são gate só quando o título da delegação diz `gate`.** Sem
   isso, a entrega volta `PRONTO` como qualquer outra.
 - **O veredito existe só no retorno do gate.** Mensagem lateral não aprova nem
-  reprova.
+  reprova. Gate que encerra sem veredito não é cobrado por `SendMessage`: o Leader
+  o redespacha com `Agent` novo e o mesmo name, e conta como a mesma rodada.
 - **O autor não controla o gate que avalia o trabalho dele.** Conversa lateral
   esclarece finding e não muda veredito. Avaliação que mudou só vale numa rodada
   nova, que o Leader despacha.

@@ -43,7 +43,9 @@ que vira teste de regressão, o autor escreve na região dele.
 - **Autor:** sem `gate`, ele é despachado logo depois de você. O repro pronto vai
   a ele por `SendMessage`, com o caminho e o comando, sem esperar pedido e antes do
   seu `PRONTO`; pedido dele se responde do mesmo jeito. A mensagem diz "isto não é
-  veredito".
+  veredito". Sem `gate`, "No agent named … is reachable" ao autor não é
+  `BLOQUEADO`: siga preparando, tente de novo antes do `PRONTO` e, se ainda falhar,
+  ponha o repro em Laterais.
 
 ## Entrega
 
