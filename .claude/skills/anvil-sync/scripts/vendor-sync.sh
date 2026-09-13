@@ -26,6 +26,7 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
 MANIFEST="$ROOT/anvil-skills.yaml"
 PAYLOAD="$ROOT/anvil/.claude/skills"
+AGENTS="$ROOT/anvil/.claude/agents"
 
 die() { printf 'erro: %s\n' "$*" >&2; exit 1; }
 
@@ -370,19 +371,20 @@ cmd_update() {
 # calcula os orfaos. Numa instalacao NOVA o caminho e `degit` direto, e o
 # reset-install nao roda — entao o lock precisa VIR NO PAYLOAD, ja pronto.
 #
-# Ele e derivado: e a lista de skills do payload. Por isso e regenerado a cada
-# `vendor` e `update`, e o `verify` reprova quando desincroniza — um lock que
-# esqueceu uma skill faz o proximo update trata-la como alheia e nunca
-# substitui-la, em silencio.
+# Ele e derivado: e a lista de skills e de agentes do payload. Por isso e
+# regenerado a cada `vendor` e `update`, e o `verify` reprova quando desincroniza
+# — um lock que esqueceu uma skill ou um agente faz o proximo update trata-lo
+# como alheio e nunca substitui-lo, em silencio.
 gerar_lock() {
-    local dest="$ROOT/anvil/.claude/anvil.lock" d
+    local dest="$ROOT/anvil/.claude/anvil.lock" d f
     {
         echo "# anvil.lock — o que esta instalacao possui."
         echo "# Derivado do payload. Regenerado por vendor, update e"
         echo "# 'vendor-sync.sh lock'. Nao edite a mao."
         for d in "$PAYLOAD"/*/; do [ -d "$d" ] && echo "skill: $(basename "$d")"; done
+        for f in "$AGENTS"/*.md; do [ -f "$f" ] && echo "agent: $(basename "$f" .md)"; done
     } > "$dest"
-    printf '%s skills no lock\n' "$(grep -c '^skill: ' "$dest")"
+    printf '%s skills e %s agentes no lock\n' "$(grep -c '^skill: ' "$dest")" "$(grep -c '^agent: ' "$dest")"
 }
 
 # --- verify -------------------------------------------------------------------
@@ -485,6 +487,11 @@ PYEOF
         [ -d "$PAYLOAD/$n" ] || { echo "   FALHA $n: no manifesto como vendored, ausente do payload"; falhas=$((falhas+1)); }
     done < <(manifest_rows)
 
+    agentes_do_payload() {
+        local f
+        for f in "$AGENTS"/*.md; do [ -f "$f" ] && basename "$f" .md; done | sort
+    }
+
     echo "7. o anvil.lock bate com o payload"
     local lock="$ROOT/anvil/.claude/anvil.lock"
     if [ ! -f "$lock" ]; then
@@ -496,6 +503,10 @@ PYEOF
         so_disco="$(comm -13 <(sed -n 's/^skill: //p' "$lock" | sort) <(find "$PAYLOAD" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort))"
         [ -n "$so_lock" ] && { echo "   FALHA no lock e nao no payload: $(echo "$so_lock" | tr '\n' ' ')"; falhas=$((falhas+1)); }
         [ -n "$so_disco" ] && { echo "   FALHA no payload e nao no lock: $(echo "$so_disco" | tr '\n' ' ')"; falhas=$((falhas+1)); }
+        so_lock="$(comm -23 <(sed -n 's/^agent: //p' "$lock" | sort) <(agentes_do_payload))"
+        so_disco="$(comm -13 <(sed -n 's/^agent: //p' "$lock" | sort) <(agentes_do_payload))"
+        [ -n "$so_lock" ] && { echo "   FALHA agente no lock e nao no payload: $(echo "$so_lock" | tr '\n' ' ')"; falhas=$((falhas+1)); }
+        [ -n "$so_disco" ] && { echo "   FALHA agente no payload e nao no lock: $(echo "$so_disco" | tr '\n' ' ')"; falhas=$((falhas+1)); }
     fi
 
     echo "8. skill marcada invocable não tem a trava de invocação"
@@ -506,6 +517,67 @@ PYEOF
         sed -n '1,10p' "$PAYLOAD/$n/SKILL.md" | grep -qE '^disable-model-invocation: *true' &&
             { echo "   FALHA $n: invocable no manifesto, mas o frontmatter ainda trava"; falhas=$((falhas+1)); }
     done < <(manifest_rows)
+
+    # Contrato de citacao com a equipe (spec 001, team-shape.md, secao 3). Num agente,
+    # caminho do payload se cita so em crase e relativo a raiz de instalacao, porque
+    # o modelo resolve caminho a partir do cwd, a raiz do projeto, e nao do arquivo
+    # do agente. Link relativo resolveria para o verify e nao para o modelo:
+    # pareceria checado e quebraria em uso. Por isso o span e conferido contra
+    # anvil/, a raiz do payload, e o link e falha em qualquer lugar do arquivo.
+    echo "9. name: do agente bate com o nome do arquivo"
+    for f in "$AGENTS"/*.md; do
+        [ -f "$f" ] || continue
+        n="$(basename "$f" .md)"
+        fm="$(awk '{ sub(/\r$/, "") } NR == 1 { if ($0 != "---") exit; next } $0 == "---" { exit }
+                   sub(/^name: */, "") { print; exit }' "$f" | tr -d "\"'")"
+        [ "$n" = "$fm" ] || { echo "   FALHA agents/$n.md: frontmatter diz '$fm'"; falhas=$((falhas+1)); }
+    done
+
+    # Span em crase, CommonMark de uma linha: abre e fecha com a mesma quantidade de
+    # crases. Fica de fora o que e padrao e nao caminho (`*`, `{`, `<`) e o que esta
+    # em bloco cercado, que e exemplo.
+    spans_of() {
+        python3 - "$1" <<'PYEOF'
+import re, sys
+fence = False
+for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
+    if line.lstrip().startswith('```'):
+        fence = not fence
+        continue
+    if fence:
+        continue
+    for m in re.finditer(r'(?<!`)(`+)(?!`)(.+?)(?<!`)\1(?!`)', line):
+        t = m.group(2)
+        if len(t) > 1 and t[0] == ' ' and t[-1] == ' ':
+            t = t[1:-1]
+        if t.startswith('.claude/') and not re.search(r'[*{<]', t):
+            print(t)
+PYEOF
+    }
+
+    echo "10. caminho .claude/ citado por agente existe no payload"
+    for f in "$AGENTS"/*.md; do
+        [ -f "$f" ] || continue
+        while IFS= read -r t; do
+            [ -n "$t" ] || continue
+            [ -e "$ROOT/anvil/$t" ] || { echo "   FALHA agents/$(basename "$f") -> $t"; falhas=$((falhas+1)); }
+        done < <(spans_of "$f")
+    done
+
+    echo "11. nenhum link markdown relativo em agente"
+    for f in "$AGENTS"/*.md; do
+        [ -f "$f" ] || continue
+        while IFS= read -r t; do
+            echo "   FALHA agents/$(basename "$f"): link relativo $t"; falhas=$((falhas+1))
+        done < <(python3 - "$f" <<'PYEOF'
+import re, sys
+for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
+    for m in re.finditer(r'\]\(([^)]*)\)', line):
+        if '://' not in m.group(1):
+            print(m.group(1))
+PYEOF
+)
+    done
 
     echo
     if [ "$falhas" -eq 0 ]; then echo "verify: limpo"; return 0; fi
