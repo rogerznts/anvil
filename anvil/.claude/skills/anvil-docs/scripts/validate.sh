@@ -59,26 +59,19 @@ resolve_spec_dir() {
     return 1
 }
 
-# A spec do branch atual é lida do disco, como sempre foi. A de um branch mesclado
-# é lida do commit dele: o disco é o do branch atual, e na `main` a pasta da spec
-# nem existe. Sem ref, disco; com ref, commit.
+# A spec é lida do commit, nunca do disco — a do branch atual inclusive, pelo
+# HEAD. O merge e o PR levam o commit: archive e resolved feitos e não commitados
+# passavam lidos do disco, e a `main` recebia a spec aberta. E a de um branch
+# mesclado nem está no disco: na `main` a pasta da spec não existe.
 list_entries() {
-    local root="$1" ref="$2" path="$3" kind="$4" e
-    if [ -z "$ref" ]; then
-        for e in "$root/$path"/*; do
-            if [ "$kind" = d ]; then [ -d "$e" ] || continue; else [ -f "$e" ] || continue; fi
-            printf '%s\n' "${e##*/}"
-        done
-    else
-        [ "$kind" = d ] && kind=tree || kind=blob
-        git -C "$root" ls-tree "$ref" "$path/" 2>/dev/null |
-            awk -F'\t' -v kind="$kind" '{ split($1, m, " "); if (m[2] == kind) { n = split($2, p, "/"); print p[n] } }'
-    fi
+    local root="$1" ref="$2" path="$3" kind="$4"
+    [ "$kind" = d ] && kind=tree || kind=blob
+    git -C "$root" ls-tree "$ref" "$path/" 2>/dev/null |
+        awk -F'\t' -v kind="$kind" '{ split($1, m, " "); if (m[2] == kind) { n = split($2, p, "/"); print p[n] } }'
 }
 
 read_entry() {
-    local root="$1" ref="$2" path="$3"
-    if [ -z "$ref" ]; then cat "$root/$path"; else git -C "$root" show "$ref:$path"; fi
+    git -C "$1" show "$2:$3"
 }
 
 # --- ship-ready ---------------------------------------------------------------
@@ -92,13 +85,14 @@ cmd_ship_ready() {
     root="$(get_repo_root)" || { echo "não é um repositório git."; return 0; }
     branch="$(get_current_branch)" || { echo "branch não resolvido."; return 0; }
 
-    check_spec "$root" "" "$branch" || rc=1
+    check_spec "$root" HEAD "$branch" || rc=1
     for ref in "$@"; do
         # A spec sai do nome do branch, não do jeito de escrevê-lo: `-` e `@{-1}`
         # são o branch anterior, e é o nome resolvido que tem o número.
         [ "$ref" = "-" ] && ref="@{-1}"
         name="$(git -C "$root" rev-parse --symbolic-full-name "$ref" 2>/dev/null)"
         name="${name:-$ref}"; name="${name#refs/heads/}"
+        # O branch atual já foi conferido, e pelo mesmo commit.
         [ "$name" = "$branch" ] && continue
         check_spec "$root" "$ref" "$name" || rc=1
     done
@@ -113,14 +107,15 @@ check_spec() {
         return 0
     fi
 
-    # Ref que não resolve não mescla nada: o próprio `git merge` falha.
-    if [ -n "$ref" ] && ! git -C "$root" rev-parse -q --verify "$ref^{commit}" >/dev/null; then
+    # Ref que não resolve não mescla nada: o próprio `git merge` falha. Nem o HEAD
+    # de um repositório sem commit.
+    if ! git -C "$root" rev-parse -q --verify "$ref^{commit}" >/dev/null; then
         return 0
     fi
 
     if ! spec_dir="$(resolve_spec_dir "$root" "$ref" "$branch")"; then
         echo "branch '$branch' tem número de spec, mas não há pasta correspondente"
-        echo "em docs/specs/. Crie a spec ou renomeie o branch."
+        echo "em docs/specs/ no commit dele. Crie e commite a spec, ou renomeie o branch."
         return 1
     fi
 
@@ -167,9 +162,9 @@ EOF
         docs/specs/archive/*) ;;
         *)
             echo "spec $(basename "$spec_dir"): $total de $total tickets resolvidos,"
-            echo "mas a spec ainda não foi arquivada."
-            echo "Rode /anvil-docs archive antes de abrir o PR — a promoção do ADR e"
-            echo "o move para docs/specs/archive/ entram neste mesmo PR."
+            echo "mas a spec ainda não foi arquivada no commit de '$branch'."
+            echo "Rode /anvil-docs archive e commite no branch da spec antes do merge ou"
+            echo "do PR — a promoção do ADR e o move para docs/specs/archive/ vão junto."
             return 1
             ;;
     esac
@@ -229,7 +224,8 @@ validate.sh <subcomando>
   docs-paths [--quiet]    as saídas ficam sob os domínios canônicos
 
 ship-ready sai 1 quando há ticket sem `Status: resolved`, ou quando a spec ainda
-não está sob docs/specs/archive/. É o que o hook de merge lê. docs-paths é
+não está sob docs/specs/archive/. Lê o commit de cada branch, o atual pelo HEAD:
+o que não foi commitado não conta. É o que o hook de merge lê. docs-paths é
 consultivo e nunca deve bloquear nada.
 EOF
 }
