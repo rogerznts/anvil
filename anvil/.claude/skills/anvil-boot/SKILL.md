@@ -111,8 +111,27 @@ usuário a aprovar sem ler.
 
 Chame a Skill tool com **anvil-docs**:
 
-- `docs/` ausente ou só com os README de domínio → verbo `scaffold`
+- `docs/` ausente ou só com os README de domínio → verbo `scaffold`, **salvo**
+  se houver `CONTEXT.md` ou `CONTEXT-MAP.md` na raiz, ou ADR em `docs/adr/` →
+  verbo `adopt`
 - `docs/` com conteúdo fora dos domínios canônicos → verbo `adopt`
+
+Confira no disco antes de escolher; qualquer linha na saída leva ao `adopt`. Sem
+glob: no zsh, um `docs/adr/*` que não casa aborta o comando inteiro e esconde o
+`CONTEXT.md`.
+
+```bash
+ls -d CONTEXT.md CONTEXT-MAP.md 2>/dev/null; find docs/adr -type f 2>/dev/null
+```
+
+São o glossário e os ADRs do layout antigo. O `scaffold` só olha dentro de `docs/`,
+e o perfil de domínio que o passo 6 grava os procura no layout do anvil: sem o
+`adopt`, eles ficam esquecidos, e o perfil manda seguir em silêncio. O `adopt` já
+sabe para onde cada um vai.
+
+As rules do passo 4 foram escritas antes da mudança. Se o `adopt` moveu algum
+desses arquivos, as que citam o caminho antigo entram na lista de referências que
+ele avisa: proponha trocar pelo caminho novo e espere aprovação.
 
 O `scaffold` cria **quatro** domínios, não oito: `architecture/`, `discovery/`,
 `specs/` e `agents/` — os que têm skill escrevendo neles. `prd/`, `ui/`, `qa/` e
