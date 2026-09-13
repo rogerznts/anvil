@@ -16,7 +16,7 @@ cobra.
 
 ```text
 /anvil-team          a spec sai do prefixo numérico do branch atual
-/anvil-team 001      a spec 001, de qualquer branch
+/anvil-team 012      a spec 012, de qualquer branch
 ```
 
 ## Pré-condição
@@ -80,13 +80,15 @@ comentários para saber onde parou.
 Com a frontier calculada, fale com o usuário antes do primeiro despacho:
 
 ```text
-Spec 001, Equipe, destilação e sentrux
+Spec 012, cupom no checkout
 
 Frontier, relida dos tickets agora:
-  06  anvil-team: Leader, Dev e Review de ponta a ponta   (05 resolved)
-  13  guarda de merge resolve o branch alvo               (01 resolved)
+  02  validar o código do cupom              (01 resolved)
+  04  mostrar o desconto no resumo do pedido (01 resolved)
 
-Proposta: dev-06 primeiro, Review sobre a entrega, depois o 13. Sigo?
+Fora: 03 aplicar cupom no total do carrinho, bloqueado pelo 02.
+
+Proposta: dev-02 primeiro, Review sobre a entrega, depois o 04. Sigo?
 ```
 
 ## Papéis e roteamento
@@ -203,32 +205,32 @@ mesmo name e `· gate`.
 - **Review é sempre exigido** para resolver um ticket. **Tester é exigido** quando
   o ticket declara um cenário de comportamento a provar.
 
-Delegação de referência, depois que `dev-06` voltou `PRONTO` com
+Delegação de referência, depois que `dev-03` voltou `PRONTO` com
 `{base}..{head}` e a entrega foi registrada:
 
 ```js
 Agent({
   subagent_type: "anvil-team-review",
-  name: "review-06",
-  description: "review · ticket 06 · rodada 1",
+  name: "review-03",
+  description: "review · ticket 03 · rodada 1",
   run_in_background: true,
-  prompt: `# Delegação · review · spec 001 · ticket 06 · gate
+  prompt: `# Delegação · review · spec 012 · ticket 03 · gate
 
 ## Objetivo
-Um veredito sobre a mudança do ticket 06 contra a spec e os padrões do repositório.
+Um veredito sobre a mudança do ticket 03 contra a spec e os padrões do repositório.
 
 ## Contexto
-- Spec: \`docs/specs/001-feature-team-distill-sentrux/spec.md\`
-- Ticket: \`docs/specs/001-feature-team-distill-sentrux/issues/06-team-leader-dev-review.md\`, com os comentários
-- Base: \`feature/001-team-distill-sentrux\`; mudança em \`{base}..{head}\`
+- Spec: \`docs/specs/012-feature-checkout-coupon/spec.md\`
+- Ticket: \`docs/specs/012-feature-checkout-coupon/issues/03-apply-coupon-to-cart-total.md\`, com os comentários
+- Base: \`feature/012-checkout-coupon\`; mudança em \`{base}..{head}\`
 - Padrões: \`CLAUDE.md\` e \`.claude/rules/\`
-- Equipe: \`dev-06\` (dev, autor)
+- Equipe: \`dev-03\` (dev, autor)
 
 ## Skills
 \`anvil-code-review\`, ponto fixo \`{base}\`.
 
 ## Escopo
-Dentro: o diff \`{base}..{head}\` e os critérios de aceite do ticket 06.
+Dentro: o diff \`{base}..{head}\` e os critérios de aceite do ticket 03.
 Fora: critério que só uma sessão nova prova fica como "não verificável".
 
 ## Política de escrita
@@ -237,7 +239,7 @@ Commit: não.
 
 ## Critério de pronto
 - [ ] Os eixos Standards e Spec rodaram sobre o intervalo inteiro.
-- [ ] Cada critério de aceite do ticket 06 está como atendido, não atendido ou não verificável, com evidência.
+- [ ] Cada critério de aceite do ticket 03 está como atendido, não atendido ou não verificável, com evidência.
 
 ## Retorno
 Primeira linha: APROVADO ou REPROVADO.
@@ -255,10 +257,10 @@ roda. A cada retorno de entrega ou de gate, nesta ordem:
 
 ```markdown
 **Review, 2026-09-14, gate Review, rodada 1: REPROVADO.**
-- Critério 5 (descriptions não atraem delegação): não atendido, ver S1.
-- **S1 (bloqueante)** `anvil/.claude/agents/anvil-team-review.md:3`: a description diz "revisão de mudança". Num pedido "revisa esse diff", o agente é escolhido. Correção: tirar a tarefa da description.
+- Critério 2 (cupom expirado não desconta): não atendido, ver S1.
+- **S1 (bloqueante)** `src/checkout/coupon.ts:42`: a validade compara a data local. Um cupom que expira hoje ainda desconta até a meia-noite do servidor. Correção: comparar em UTC.
 
-**Leader, 2026-09-14, decisão sobre a rodada 1 do Review.** S1 volta ao `dev-06` neste
+**Leader, 2026-09-14, decisão sobre a rodada 1 do Review.** S1 volta ao `dev-03` neste
 ticket. Próximo: rodada 2 do Review sobre a correção.
 ```
 
