@@ -97,8 +97,33 @@ puro, sem frontmatter.
   que o agente deve seguir neste projeto.
 - **`anvil.md`** — sempre. A configuração resolvida: idioma de comunicação
   (default pt-BR), comando de teste, e a lista de modelos por papel que o
-  `anvil-arena`, o `anvil-how` e o `anvil-architect` leem.
+  `anvil-arena`, o `anvil-how`, o `anvil-architect` e o `anvil-team` leem.
 - **`frontend.md`** — só se houver código de frontend.
+
+A seção de modelos do `anvil.md`:
+
+```markdown
+## Modelos por papel
+
+Lidos por `anvil-arena`, `anvil-how`, `anvil-architect` e `anvil-team`.
+
+- `runners`: `opus`, `fable`, `sonnet`
+- `how-critics`: `opus`, `fable`, `sonnet`
+- `cross-judge`: `opus`, `fable`, `sonnet`
+- `team`:
+  - `po`:
+  - `architect`:
+  - `analyst`:
+  - `designer`:
+  - `dev`:
+  - `tester`:
+  - `review`:
+```
+
+A lista `team` sai com os sete papéis sem modelo, e cada um herda o da sessão.
+Quem configura é o usuário, com um de `opus`, `fable`, `sonnet` ou `haiku`:
+`` - `dev`: `opus` ``. Num `anvil.md` que já existe sem a lista, proponha
+acrescentá-la; valor já configurado não se troca.
 
 Depois, **sugira** rules adicionais, cada uma com uma linha de evidência do
 código que a justifica, e **espere aprovação**: `coding-standards.md`,
