@@ -24,3 +24,20 @@
 sessão" (as palavras do usuário: guia para grandes features de muitos tickets); lista `team` escrita sem
 modelo, reversível; visibilidade das skills no worktree vira critério, porque sem ela um Dev isolado não
 roda `anvil-implement`.
+
+**Leader, 2026-09-13 — fase 1 do Dev** em `4b0a6cc` (o 07 está em gate nos mesmos arquivos, então a entrega foi
+dividida): `anvil-team/templates/mission-control.md` literal do desenho §9 (aviso de que não é fonte de estado, sete
+seções, gates em lista cronológica); `anvil-boot` escreve a lista `team` com os sete papéis sem modelo, a frase "Lidos
+por" ganha a `anvil-team`, e um `anvil.md` existente sem a lista recebe proposta de acréscimo sem trocar valor;
+`.claude/rules/anvil.md` deste repositório igual. `verify` limpo; nenhum agente com `model` ou `isolation`. Boot num
+projeto descartável escreveu a lista vazia (US$ 0,34). **M5 medida** (US$ 0,36): o worktree de `isolation: "worktree"`
+parte do HEAD do checkout principal, sem as mudanças não commitadas, em `.claude/worktrees/agent-<id>` com branch
+`worktree-agent-<id>`; **a Skill tool enxerga as skills instaladas** (carregadas do checkout principal), então o
+`.worktreeinclude` não é preciso; no worktree não existe `.claude/skills/`, e a linha `Protocolo:` absoluta continua
+necessária; worktree com commit sobrevive ao agente e `git cherry` lista o commit.
+
+Decisão do Leader sobre o risco levantado na M5 — `?? .claude/worktrees/` aparece no status do checkout principal, e um
+`git add -A` (de `anvil-implement` ou `tea-commit` num Dev sem worktree, como o do conflito no passo 6) stagearia os
+worktrees como repositório embutido: antes de abrir worktrees, o Leader acrescenta `/.claude/worktrees/` à exclusão
+local do git, idempotente, sem tocar o `.gitignore` do projeto. Entra em SKILL § Paralelismo na fase 2 e no desenho §11
+(Architect). A fase 2 espera o 07 resolver.
