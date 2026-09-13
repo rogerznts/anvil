@@ -322,7 +322,7 @@ inexistente". Para os dois lados fecharem, o check lê a forma acima:
 | b | todo span em crase que começa com `.claude/` e não tem `*`, `{` nem `<`, fora de bloco cercado, existe em `anvil/{span}` | 05 |
 | c | link markdown relativo (`](…)` sem `://`) num arquivo de agente é falha | 05 |
 | d | todo `anvil-team-*.md` cita `` `.claude/skills/anvil-team/PROTOCOL.md` `` | 06 |
-| e | todo span em crase `anvil-[a-z0-9-]+` num agente nomeia um diretório de skill ou um arquivo de agente do payload, e a skill não tem trava | 07 |
+| e | todo span em crase `/?anvil-[a-z0-9-]+` num agente, com a barra do comando tirada antes da conferência, nomeia um diretório de skill ou um arquivo de agente do payload, e a skill não tem trava. Trava é a linha `disable-model-invocation: true` dentro do frontmatter, aceitando espaço sobrando ou comentário YAML depois do `true`; fora do frontmatter não conta, e com aspas não é reconhecida. É a mesma leitura do check 8 | 07 |
 | f | tokens do Maestri (`@team-protocol`, `@anvil-skills`, `@mission-control`, `@anvil-install`, `No connection to note`) não aparecem em skill nem agente do payload | 06 |
 
 O check (e) é a user story 53, que pede que toda skill citada pelos papéis exista;
