@@ -1,6 +1,7 @@
 # A destilação
 
-Você recebeu o sistema de referência, a funcionalidade e o caminho do documento.
+Você recebeu o sistema de referência, a funcionalidade — sem ela, a destilação
+cobre o sistema inteiro — e o caminho do documento.
 Leia o código, escreva o documento e devolva o caminho e três linhas.
 
 ## Invariante: política de escrita
@@ -9,8 +10,9 @@ A destilação escreve **um arquivo**: o documento, dentro de `docs/`, criando a
 pasta `discovery/` se ela faltar. O sistema de referência e o código do projeto
 são **somente leitura** — nenhum arquivo editado, criado, movido ou apagado neles,
 e nenhum comando que os altere: `git pull`, `checkout`, instalador de dependência,
-build ou formatter. Comando git de leitura — `log`, `show`, `rev-parse`,
-`ls-tree`, `status` — é livre.
+build, formatter, nem executar o sistema de referência ou os testes do projeto, que
+deixam cache como `.pytest_cache` e `.unlazy/`. Comando git de leitura — `log`,
+`show`, `rev-parse`, `ls-tree`, `status` — é livre.
 
 ## A stack do projeto
 

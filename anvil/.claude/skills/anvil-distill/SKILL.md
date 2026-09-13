@@ -25,18 +25,21 @@ o caminho e o resumo.
 
 ## 2. Destino
 
-O destino sai do branch atual, pelo prefixo numérico, como o perfil do tracker
-(`docs/agents/issue-tracker.md`) e a guarda de merge resolvem a spec:
+Com `docs/specs/`, a pasta da spec sai do prefixo numérico do branch, como manda o
+perfil do tracker (`docs/agents/issue-tracker.md`). A destilação procura também em
+`archive/` e lê do disco, porque a spec pode ainda não estar commitada:
 
 ```bash
-git rev-parse --abbrev-ref HEAD                          # {tipo}/{NNN}-{nome}?
-ls -d docs/specs/{NNN}-*/ docs/specs/archive/{NNN}-*/   # a primeira que existir
+git rev-parse --abbrev-ref HEAD
+find docs/specs -maxdepth 2 -type d -name '{NNN}-*'   # ativa ou em archive/
 ```
 
-- **Branch `{tipo}/{NNN}-{nome}`**: destino `<pasta da spec>/discovery/`. A pasta é
-  lida do disco, porque a spec pode ainda não estar commitada. Número sem pasta
-  correspondente: pare e diga ao usuário.
-- **Qualquer outro branch**, `main` e HEAD destacado inclusive: `docs/discovery/`.
+- **A pasta existe**: destino `<pasta da spec>/discovery/`.
+- **Branch com número e `docs/specs/` sem a pasta** — o `find` volta vazio: pare e
+  diga ao usuário.
+- **Branch sem número**, `main` e HEAD destacado inclusive, **ou projeto sem
+  `docs/specs/`** — tracker GitHub ou GitLab, e o `find` falha com `No such file
+  or directory`: `docs/discovery/`.
 
 O arquivo é `distill-{sistema}.md` ou `distill-{sistema}-{funcionalidade}.md`,
 em kebab-case, com `{sistema}` o nome da pasta. Se ele já existe, pergunte ao
@@ -46,7 +49,10 @@ usuário se substitui ou se a funcionalidade ganha outro nome.
 
 Despache um subagente `general-purpose` em background com o caminho absoluto do
 `DISTILL.md`, a instrução de lê-lo inteiro e executá-lo, e o sistema, a
-funcionalidade e o caminho do documento resolvidos acima.
+funcionalidade e o caminho do documento resolvidos acima. O prompt leva só isso.
+A stack do projeto fica fora dele e fora do que você diz ao usuário: você não a
+lê, nem a repassa da rule que tem no contexto — quem a lê, do código, é o
+subagente.
 
 Siga com o usuário enquanto ele trabalha. Quando voltar, mostre o caminho e o
 resumo de três linhas que ele devolveu.
