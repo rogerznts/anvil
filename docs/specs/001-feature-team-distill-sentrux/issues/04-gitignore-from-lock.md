@@ -49,3 +49,19 @@ migrar é mudança à parte), **P3**, **P5** e **P6** (smells sem efeito no comp
 Correção da justificativa do desvio 3, pelo Review: quem apaga a skill do usuário é o lock que
 a inclui, e isso já existia; o que o bloco acrescenta é passar a ignorá-la, quebrando a user
 story 1. É esse o motivo de o passo 10 estar neste ticket.
+
+**Leader, 2026-09-12 — gate Tester: REPROVADO pelo caso adversarial 3.** Os 6 critérios passam,
+e o ponto B boot-com foi reproduzido de forma independente. A falha:
+
+- `.gitignore` com CRLF (checkout com `core.autocrlf=true`) ou marcador com espaço no fim: o
+  update diz "sem bloco, fica intocado" e o bloco apodrece; o `--gitignore-only` acrescenta
+  um segundo bloco. Lock com CRLF gera caminho com `\r`, que o git não ignora.
+- Causa: `tem_bloco`, a guarda de marcadores e o awk comparam a linha exata.
+- Repro: `workspace/09-gitignore-tester/repro-crlf.sh`.
+
+**Decisão:** entra nas correções deste ticket, junto com S1, S2, (a), P2 e S3. Critério
+acrescentado: marcadores reconhecidos com CR e espaço no fim; lock lido sem `\r`; o arquivo
+preserva o fim de linha que já tinha.
+
+**Reteste:** `run.sh` do Dev, `adv.sh` e `repro-crlf.sh` do Tester, e o Review conferindo S1 e
+S2 no diff novo.
