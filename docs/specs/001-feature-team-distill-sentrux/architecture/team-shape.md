@@ -227,8 +227,8 @@ delegação que você recebeu e o retorno que você deve.
 | `anvil-team-analyst` | `anvil-how`, `anvil-research`, `anvil-diagnose`, `anvil-prototype` | Responsabilidade · Método · Relações · Entrega |
 | `anvil-team-designer` | `anvil-ui`, `anvil-prototype` | Responsabilidade · Grounding · Implementação · Relações · Entrega |
 | `anvil-team-dev` | `anvil-implement`, `anvil-tdd`, `anvil-diagnose` | Antes de implementar · Implementação · Relações · Entrega |
-| `anvil-team-tester` | `anvil-tdd`, `anvil-diagnose` | Responsabilidade · Findings · Relações · Entrega |
-| `anvil-team-review` | `anvil-code-review`, com o ponto fixo que o Contexto der | Responsabilidade · Findings · Relações · Entrega |
+| `anvil-team-tester` | `anvil-tdd`, `anvil-diagnose` | Responsabilidade · Onde você escreve · Relações · Entrega |
+| `anvil-team-review` | `anvil-code-review`, com o ponto fixo que o Contexto der | Responsabilidade · Relações · Entrega |
 
 Quatro linhas específicas que o Dev não deve perder:
 
@@ -418,10 +418,10 @@ mecânica do Maestri vira a do Claude Code.
 | dev › Relações | muda, divide | dev § Relações · PROT § Gates | com quem conversar fica; "discordância não elimina o gate" vale para todo autor |
 | tester › Skills primárias | muda | tester | `anvil-test` → `anvil-tdd`, `anvil-debug` → `anvil-diagnose` |
 | tester › Independência | sai | PROT § Gates | igual à do Review |
-| tester › Findings | muda | tester § Findings | os campos do finding comportamental ficam; a severidade vai para PROT § O retorno |
+| tester › Findings | sai | PROT § O retorno | os campos do finding comportamental e a severidade ficam num lugar só, junto dos do Review (RV-F2 do gate do 06) |
 | review › Skills primárias | muda | review | `anvil-review` → `anvil-code-review` |
 | review › Independência | sai | PROT § Gates | igual à do Tester |
-| review › Findings | muda | review § Findings | os campos ficam; a escala vai para PROT § O retorno |
+| review › Findings | sai | PROT § O retorno | campos e escala num lugar só, com os do Tester (RV-F2) |
 | tester, review › Entrega | muda | {papel} § Entrega | veredito na primeira linha; aderência por critério de aceite no Registro |
 
 ### `control/mission-control.md`
@@ -561,6 +561,11 @@ Cada um aparece na linha `Equipe` do outro. O gate do Tester é outra chamada, d
 da entrega do Dev, com o mesmo name e `· gate`, e só depois que a delegação sem gate
 voltou.
 
+**O Tester sai primeiro**, e o Dev só depois que a chamada do Tester voltar. Um name
+que ainda não foi despachado não recebe mensagem ("No agent named … is reachable"),
+e o Dev que pede o repro logo ao começar volta `BLOQUEADO`. Medido no Ponto B do 07,
+com 11 s entre os dois despachos.
+
 **O Tester escreve fora do checkout.** A Política de escrita dele, com ou sem gate,
 nomeia um diretório fora de qualquer checkout, dado pelo Leader, e diz
 `Commit: não`. O Dev é o único escritor do checkout. Dois motivos: dois escritores
@@ -604,8 +609,9 @@ Leader decide.
 - **Severidade.** `bloqueante` · `relevante` · `sugestão` · `pergunta`. Os ids são
   os que a skill produzir; sem ids, `F1`, `F2`…
 - **Finding.** Localização (`arquivo:linha`, ou passos mínimos de repro para o
-  Tester), condição, impacto, correção esperada. Os campos do finding comportamental
-  (esperado, observado, ambiente, determinismo) ficam no arquivo do Tester.
+  Tester), condição, impacto, correção esperada. Finding de comportamento traz
+  também esperado, observado, ambiente e determinismo. Tudo isso mora aqui, em PROT
+  § O retorno, e nem Tester nem Review têm seção Findings (RV-F2 do gate do 06).
 - **Seções.** Só as que têm conteúdo, nesta ordem. Laterais diz com quem o papel
   falou, sobre o quê, e o que ficou acertado ou em aberto.
 
