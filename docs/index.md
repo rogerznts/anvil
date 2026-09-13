@@ -12,7 +12,7 @@ Last updated: 2026-09-13T01:20:05Z
 
 | Spec | Branch | Estado | Tickets |
 |---|---|---|---|
-| [001 — Equipe, destilação e sentrux](./specs/001-feature-team-distill-sentrux/spec.md) | `feature/001-team-distill-sentrux` | em andamento | 1/14 |
+| [001 — Equipe, destilação e sentrux](./specs/001-feature-team-distill-sentrux/spec.md) | `feature/001-team-distill-sentrux` | em andamento | 2/14 |
 
 ## Specs arquivadas
 
