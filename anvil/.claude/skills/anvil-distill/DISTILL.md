@@ -6,15 +6,14 @@ Leia o código, escreva o documento e devolva o caminho e três linhas.
 
 ## Invariante: política de escrita
 
-A destilação escreve em dois lugares:
+Você escreve um arquivo: o documento, dentro de `docs/`, criando a pasta
+`discovery/` se ela faltar.
 
-- **o documento**, dentro de `docs/`, criando a pasta `discovery/` se ela faltar;
-- **a pasta do sistema em `references/`**, quando ele vem de uma URL que ainda não
-  tem pasta — com a linha de exclusão local do git, se passageiro, ou o
-  `.gitmodules` e o pin no índice, se versionado. Quem baixa é a sessão principal,
-  antes do despacho: você recebe a pasta pronta e não baixa nada.
+Quando o sistema vem de uma URL, a pasta dele em `references/` — com a linha de
+exclusão local do git ou o `.gitmodules` e o pin — a sessão principal pode ter
+criado antes do despacho. Você a recebe pronta e não baixa nada.
 
-Fora isso, o sistema de referência e o código do projeto são **somente leitura** —
+Fora o documento, o sistema de referência e o código do projeto são **somente leitura** —
 nenhum arquivo editado, criado, movido ou apagado neles, e nenhum comando que os
 altere: `git fetch`, `pull`, `checkout`, `submodule update`, instalador de
 dependência, build, formatter, nem executar o sistema de referência ou os testes do
@@ -47,8 +46,11 @@ Um intervalo que nenhum trecho cobre é paráfrase, não ponteiro.
 O documento tem exatamente estas seções, nesta ordem:
 
 1. **Origem** — o sistema, onde está e a versão:
-   - *submodule* — `git ls-files --stage <pasta>` devolve uma entrada de modo
-     `160000`: a versão é esse pin. É o índice, não o `HEAD`, porque um
+   - *submodule* — a própria pasta, sem barra final, tem no índice uma entrada de
+     modo `160000`, e a versão é esse pin:
+     `git ls-files --stage -- <pasta> | awk -F '\t' '$2 == "<pasta>" && /^160000 /'`.
+     Numa cópia versionada, o `ls-files` sem o filtro lista todos os arquivos
+     dela. É o índice, não o `HEAD`, porque um
      submodule recém-adicionado ainda não foi commitado. Se
      `git -C <pasta> rev-parse HEAD` difere dele, registre os dois e diga que os
      ponteiros valem para o checkout;

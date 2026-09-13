@@ -20,14 +20,17 @@ de uma URL, despacha, e devolve ao usuário o caminho e o resumo.
   - *Caminho local* — por padrão uma pasta em `references/`, usada como está. Se
     a pasta não existe, pare e diga ao usuário.
   - *URL* — a pasta é `references/{sistema}`, com `{sistema}` o último segmento
-    da URL sem `.git`. Se ela já existe, é o caminho local: sem pergunta e sem
-    atualizar — nada de `fetch`, `pull` ou `submodule update`. Se não existe,
-    pergunte ao usuário como o sistema entra, sugerindo passageiro: *passageiro*,
-    clone raso fora do git do projeto, ou *versionado*, submodule com pin. A
-    pergunta é sua, aqui: o subagente em background não fala com o usuário. O
-    download é no despacho.
-- **A funcionalidade** — ou as direções que vieram com a URL —, opcional. Sem
-  ela, a destilação cobre o sistema inteiro.
+    não vazio da URL, sem `.git`: `…/node-retry/` e `…/node-retry.git` dão
+    `node-retry`. Se ela já existe, é o caminho local: sem pergunta e sem
+    atualizar. Se não existe, pergunte ao usuário se o sistema entra *passageiro*
+    ou *versionado*, as duas formas do Despacho, sugerindo passageiro. A pergunta
+    é sua, aqui: o subagente em background não fala com o usuário. O download é no
+    despacho.
+- **A funcionalidade**, opcional: o que o usuário quer do sistema, dito no pedido
+  e não só nos args da skill. Em "porta o retry de <url> para o meu projeto" ela é
+  "o retry", mesmo com os args trazendo só a URL. As direções que vieram com a URL
+  são a funcionalidade, e vão no despacho. Sem ela, a destilação cobre o sistema
+  inteiro.
   Quando o sistema é grande demais para um documento, proponha ao usuário o
   recorte em funcionalidades antes de despachar: uma destilação por
   funcionalidade.
@@ -61,18 +64,27 @@ comando só, da raiz do projeto. São as escritas fora de `docs/` que a invarian
 do [DISTILL.md](DISTILL.md) autoriza:
 
 ```bash
-# passageiro: clone raso e uma linha de exclusão local, só se o clone deu certo
-GIT_TERMINAL_PROMPT=0 git clone --depth 1 <url> references/{sistema} &&
+# passageiro: clone raso e, só se ele deu certo, uma linha de exclusão local
+novo=; [ -d references ] || novo=1
+if GIT_TERMINAL_PROMPT=0 git clone --depth 1 <url> references/{sistema}; then
   exclude="$(git rev-parse --git-path info/exclude)" &&
-  { grep -qxF '/references/{sistema}/' "$exclude" || echo '/references/{sistema}/' >> "$exclude"; }
+    mkdir -p "$(dirname "$exclude")" &&
+    { grep -qxF '/references/{sistema}/' "$exclude" 2>/dev/null ||
+      { [ -n "$(tail -c 1 "$exclude" 2>/dev/null)" ] && echo; echo '/references/{sistema}/'; } >> "$exclude"; }
+else
+  [ -z "$novo" ] || rmdir references; false
+fi
 
 # versionado: submodule; o .gitmodules e o pin ficam para o usuário commitar
-GIT_TERMINAL_PROMPT=0 git submodule add <url> references/{sistema}
+novo=; [ -d references ] || novo=1
+GIT_TERMINAL_PROMPT=0 git submodule add <url> references/{sistema} ||
+  { [ -z "$novo" ] || rmdir references; false; }
 ```
 
 A credencial é a que o git já tiver, e `GIT_TERMINAL_PROMPT=0` impede que ele a
 peça. Se o download falha, mostre a mensagem do git e pare: não peça credencial
-nem tente outra URL.
+nem tente outra URL. O git não deixa a pasta do sistema, mas deixa
+`references/` vazia quando ela não existia; o `rmdir` do bloco a remove.
 
 Despache um subagente `general-purpose` em background com o caminho absoluto do
 `DISTILL.md`, a instrução de lê-lo inteiro e executá-lo, e o sistema, a
