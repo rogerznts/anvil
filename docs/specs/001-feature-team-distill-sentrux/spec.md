@@ -1,4 +1,4 @@
-# 001 — Equipe, destilação e sentrux
+# 001 — Equipe e destilação
 
 **Status:** ready-for-agent
 
@@ -20,10 +20,6 @@ skills que o usuário escreve nesse diretório somem do git. O perfil de domíni
 escrito pelo `anvil-setup` manda ler um glossário e ADRs em caminhos que o anvil
 não usa. O manifesto não registra uma adaptação que existe de fato, então o
 próximo update não vai avisar quando o upstream mexer nessas linhas.
-
-As decisões de arquitetura ficam em prosa. Um ADR que decide uma fronteira entre
-camadas não quebra nada quando alguém a atravessa, e nada acusa quando uma sessão
-de implementação degrada a estrutura do código.
 
 E o mantenedor não consegue refazer a métrica que o README exibe, nem trabalhar
 neste repositório pelo fluxo que o anvil publica.
@@ -48,10 +44,6 @@ anvil instalou — skills e agentes —, gerado a partir do lock. Skill e agente
 usuário ficam versionados. O update instala e remove agentes como já faz com
 skills. O perfil de domínio aponta para onde o anvil guarda glossário e ADRs, e o
 manifesto registra o que foi adaptado.
-
-**Arquitetura que se verifica.** A skill opcional `anvil-sentrux` instala o sensor
-sentrux com aprovação, propõe regras de camada e fronteira a partir dos ADRs e
-oferece uma comparação estrutural antes e depois de uma sessão de implementação.
 
 **Um repositório que segue o próprio fluxo.** A métrica do README passa a ter
 comando e definição, e as rules deste repositório descrevem o fluxo por branch de
@@ -121,18 +113,10 @@ spec com merge local.
 52. Como papel, quero despachar as skills do fluxo e as que abrem subagentes, para usar a capacidade certa dentro da minha tarefa.
 53. Como mantenedor, quero que toda skill citada pelos papéis exista no payload, para que nenhum papel seja roteado para o vazio.
 
-### Sentrux
+### Sentrux — descartado
 
-54. Como usuário, quero que o anvil confira se o sentrux está instalado e em qual versão, para saber se posso usá-lo.
-55. Como usuário, quero ver o comando de instalação com a versão fixada e aprovar antes, para controlar o que entra na minha máquina.
-56. Como usuário, quero instalar o sentrux sem `sudo`, para não dar privilégio de administrador a um instalador de terceiro.
-57. Como usuário, quero ser avisado de que o upstream não publica checksum, para decidir com a informação completa.
-58. Como usuário, quero escolher registrar o servidor MCP no projeto ou só para mim, com o projeto sugerido, sabendo que quem clonar sem o binário verá o servidor falhar.
-59. Como usuário, quero que as camadas e fronteiras decididas nos ADRs virem regras que o sentrux verifica, com o motivo apontando o ADR, para que uma decisão de arquitetura quebre algo quando violada.
-60. Como usuário, quero aprovar a proposta de regras antes de ela ser escrita, para que nada entre no projeto sem eu ver.
-61. Como usuário, quero salvar uma linha de base antes de uma sessão de implementação e comparar depois, para ver se aquela sessão piorou a estrutura.
-62. Como Review, quero consultar o sentrux pela linha de comando, para ter evidência estrutural sem ferramenta extra liberada.
-63. Como usuário, quero que nada no fluxo dependa do sentrux, para usá-lo só quando eu quiser.
+As user stories 54 a 63 saíram com a `anvil-sentrux` (ver Out of Scope). A numeração das outras fica como estava,
+porque tickets e comentários citam as histórias pelo número.
 
 ### Este repositório
 
@@ -267,24 +251,9 @@ spec com merge local.
   `anvil-diagnose`, `anvil-test` → `anvil-tdd`, `anvil-review` →
   `anvil-code-review`.
 
-### `anvil-sentrux`
+### `anvil-sentrux` — descartada
 
-- **Skill autoral**, opcional e fora do fluxo. A skill `scan` do upstream não é
-  adotada: ela é a lista de ferramentas que o MCP já expõe, e contradiz o README do
-  projeto. O motivo fica registrado no manifesto.
-- **Detecção** do binário e da versão instalada.
-- **Instalação** com aprovação e versão fixada, sem `sudo`: pelo tap do Homebrew no
-  macOS; no Linux, o binário da release no diretório de binários do usuário, sem o
-  instalador oficial. A skill avisa que o upstream não publica checksum e registra
-  a versão instalada.
-- **MCP.** Oferece registrar no projeto, sugerido, ou só para o usuário. Ao sugerir
-  o projeto, avisa que quem clonar sem o binário verá o servidor falhar.
-- **Regras.** Propõe o arquivo de regras do sentrux com camadas e fronteiras
-  extraídas dos ADRs, cada uma com o motivo apontando o ADR. Escreve só com
-  aprovação.
-- **Gate.** Oferece salvar a linha de base antes de uma sessão de implementação e
-  comparar depois. Nada no fluxo o chama.
-- **Review** usa o sentrux pela linha de comando; a allowlist dele não muda.
+Ver Out of Scope. Os fatos levantados ficam em `discovery/sentrux-facts.md`, como registro do motivo.
 
 ### Este repositório
 
@@ -341,9 +310,6 @@ payload e contra um projeto descartável.
   um papel, uma mensagem entre papéis chega, o julgamento do Review chega ao Leader
   e fica o comentário no ticket. Um "revisa esse diff" fora da skill não cai em
   papel nenhum. O Review não consegue editar.
-- **`anvil-sentrux`:** sem o binário, mostra o comando com a versão fixada e
-  espera. Com o binário, detecta a versão. Um ADR com fronteira gera a proposta de
-  regra com o motivo apontando para ele. O gate salva e compara.
 
 ### Ponta a ponta
 
@@ -362,7 +328,11 @@ com ticket aberto ou spec fora de `archive/`, e libera depois do archive.
 - **Codex** como executor de papel.
 - **Modo degradado** da equipe sem *agent teams*, e o boot ligar o recurso.
 - **Verificador de ponteiros** que reabre cada `caminho:linha` de uma destilação.
-- **Sentrux como insumo do distill**, com `scan` ou `dsm` alimentando o mapa.
+- **`anvil-sentrux`** e o sensor sentrux: descartados depois do levantamento em
+  `discovery/sentrux-facts.md`. Qualquer invocação, até `--version`, baixa gramáticas
+  sem conferir checksum e as carrega como código nativo; a telemetria diária vem ligada
+  por padrão; o binário publicado é compilado de um repositório privado. Os tickets 11 e
+  12 saíram da spec (o histórico fica no git). Sai junto o sentrux como insumo do distill.
 - **Runner automatizado** para os cenários de `workspace/`.
 - **Mover uma destilação** da base para a spec depois que a spec nasce.
 - **A regra `invocable`** e a remoção da trava das sete skills que a equipe
@@ -375,9 +345,9 @@ com ticket aberto ou spec fora de `archive/`, e libera depois do archive.
   subagente consegue despachar outro, o que não está documentado; agentes trocam
   mensagem direta com *agent teams* ligado, um recurso experimental; modelo e
   isolamento podem ser passados por chamada.
-- **Riscos.** *Agent teams* é experimental e pode mudar. O sentrux não recebe merge
-  desde março de 2026 e tem aberto um bug que inventa ciclos que não existem.
-  Nenhum dos binários instalados pelo anvil publica checksum.
+- **Riscos.** *Agent teams* é experimental e pode mudar.
+- **O nome da pasta e do branch** continua `team-distill-sentrux`: é o identificador
+  reservado da spec e não muda com o escopo.
 - **Acoplamentos.** A equipe depende de o lock e o `reset-install` saberem instalar
   agentes, e do bloco de gitignore cobri-los. O distill pode ser despachado pelo
   Analyst, mas não depende da equipe.
