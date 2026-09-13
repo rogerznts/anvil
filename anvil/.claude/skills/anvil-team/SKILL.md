@@ -61,7 +61,8 @@ Não há modo degradado, e o `settings.json` é do usuário: você não o escrev
 Para cada `docs/specs/{NNN}-*/issues/*.md`, leia a linha `Status:` e a linha
 `Blocked by:`.
 
-- **Resolvido** é `Status: resolved`.
+- **Resolvido** é `Status: resolved`, com ou sem negrito (`**Status:** resolved`),
+  a mesma regra do `validate.sh` da `anvil-docs`.
 - **Bloqueadores** são os números de dois dígitos da linha `Blocked by:`. Linha
   sem número ("Nenhum — pode começar agora.", "None") não tem bloqueador. Número
   sem arquivo correspondente conta como bloqueando, e você avisa o usuário.
@@ -200,7 +201,7 @@ mesmo name e `· gate`.
   os desvios declarados já estão no comentário que você registrou.
 - **Política de escrita do gate:** somente leitura, `Commit: não`.
 - **Review é sempre exigido** para resolver um ticket. **Tester é exigido** quando
-  o ticket declara cenário de comportamento (Ponto B).
+  o ticket declara um cenário de comportamento a provar.
 
 Delegação de referência, depois que `dev-06` voltou `PRONTO` com
 `{base}..{head}` e a entrega foi registrada:
@@ -228,7 +229,7 @@ Um veredito sobre a mudança do ticket 06 contra a spec e os padrões do reposit
 
 ## Escopo
 Dentro: o diff \`{base}..{head}\` e os critérios de aceite do ticket 06.
-Fora: critério que só um Ponto B em sessão nova prova fica como "não verificável".
+Fora: critério que só uma sessão nova prova fica como "não verificável".
 
 ## Política de escrita
 Somente leitura.
