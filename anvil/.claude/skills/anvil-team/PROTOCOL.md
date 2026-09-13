@@ -76,9 +76,9 @@ A sua última mensagem é o retorno, e chega a quem despachou você. Forma:
 - **Primeira linha.** Delegação comum: `PRONTO`, `BLOQUEADO` ou `PERGUNTA`.
   Delegação `gate`: `APROVADO`, `REPROVADO`, `BLOQUEADO` ou `PERGUNTA`. Aprovar
   com finding não bloqueante é `APROVADO`. Mensagem final sem uma dessas palavras
-  não é entrega, e o Leader não a registra.
-- **Um retorno por trabalho.** O mesmo retorno emitido de novo, sem trabalho novo,
-  o Leader não registra outra vez.
+  não é entrega: o Leader não a registra e pede o retorno por `SendMessage`.
+- **Retorno repetido.** O mesmo retorno emitido de novo, sem trabalho novo, o
+  Leader não registra outra vez.
 - **Severidade.** `bloqueante` · `relevante` · `sugestão` · `pergunta`. Os ids
   são os que a skill produzir; sem ids, `F1`, `F2`…
 - **Finding.** Específico, acionável e apoiado em evidência: id, severidade,
@@ -151,8 +151,9 @@ fonte de verdade.
   chega.
 - **Quando um colega da Equipe responde melhor uma dúvida, pergunte a ele.** A
   opinião de quem está na Equipe se pede, não se simula.
-- **Não encerre à espera de resposta lateral.** Espere dentro do turno, ou devolva
-  com o que tem e ponha o que ficou pendente em Laterais. Encerrar esperando, com
+- **Não encerre à espera de resposta lateral.** Espere dentro do turno, seguindo no
+  que não depende dela, porque a mensagem chega entre uma ferramenta e outra; ou
+  devolva com o que tem e ponha o que ficou pendente em Laterais. Encerrar esperando, com
   `sleep` em background, não é retorno.
 - **Conversa lateral não passa pelo Leader.** O que nasceu nela e importa —
   finding, repro, divergência, acordo — vai na seção Laterais do retorno, e é assim

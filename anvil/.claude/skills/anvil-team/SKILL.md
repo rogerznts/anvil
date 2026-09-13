@@ -137,7 +137,7 @@ a cada versão.
 | `subagent_type` | `anvil-team-{papel}` | sempre |
 | `name` | `{papel}-{NN}` no trabalho de um ticket; `{papel}` fora de ticket (discovery do PO, design antes dos tickets) | sempre. Sem `name` o agente não entra no time, e ninguém fala com ele |
 | `description` | `{papel} · ticket {NN}[ · rodada {n}]` | sempre |
-| `run_in_background` | `true` | sempre. Você segue disponível para o usuário, e dois papéis vivos ao mesmo tempo é o que torna a conversa lateral possível |
+| `run_in_background` | `true` | sempre. A chamada devolve o lançamento na hora, não o retorno do papel. Você segue disponível para o usuário, e dois papéis vivos ao mesmo tempo é o que torna a conversa lateral possível |
 | `prompt` | a delegação do [protocolo](PROTOCOL.md#a-delegação), com os sete campos | sempre |
 
 `model` fica omitido, e vale o modelo da sessão.
@@ -187,8 +187,8 @@ Quando o ticket tem comportamento a reproduzir ou pede harness antes da soluçã
 despache `tester-{NN}` junto com `dev-{NN}`, os dois vivos ao mesmo tempo, o Tester
 com delegação **sem** `gate`: preparar repro e harness, mandá-los ao Dev, responder
 o autor e voltar `PRONTO`. Cada um vai na linha `Equipe` do outro. O gate do Tester
-é outra chamada, depois da entrega do Dev e depois que a delegação sem gate voltou,
-com o mesmo name e `· gate`.
+é outra chamada, depois da entrega do Dev e do `PRONTO` da delegação sem gate, com o
+mesmo name e `· gate`.
 
 **Despache o Tester primeiro**, e o Dev logo que a chamada `Agent` do Tester
 devolver o lançamento ("Async agent launched"), sem esperar o `PRONTO` dele.

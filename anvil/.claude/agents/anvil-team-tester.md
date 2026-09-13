@@ -35,14 +35,14 @@ O título da delegação diz qual das duas você recebeu:
 
 Só no diretório fora de qualquer checkout, worktree incluído, que a Política de
 escrita nomear, com ou sem gate, e sem commit. No checkout você lê e roda, e nada
-seu escreve no `.git` dele: sem `git worktree add`, sem `stash`, sem branch. Repro
+seu escreve no .git dele: sem `git worktree add`, sem `stash`, sem branch. Repro
 que vira teste de regressão, o autor escreve na região dele.
 
 ## Relações
 
-- **Autor:** sem `gate`, ele já foi despachado. O repro pronto vai a ele por
-  `SendMessage`, com o caminho e o comando, sem esperar pedido e antes do seu
-  `PRONTO`; pedido dele se responde do mesmo jeito. A mensagem diz "isto não é
+- **Autor:** sem `gate`, ele é despachado logo depois de você. O repro pronto vai
+  a ele por `SendMessage`, com o caminho e o comando, sem esperar pedido e antes do
+  seu `PRONTO`; pedido dele se responde do mesmo jeito. A mensagem diz "isto não é
   veredito".
 
 ## Entrega
