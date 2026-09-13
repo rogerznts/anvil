@@ -156,8 +156,8 @@ disable-model-invocation: true
 ---
 ```
 
-A trava de invocação é decisão deste desenho, não do ADR (ver
-[Contradições](#contradições-encontradas), item 7). Todo papel herda a Skill tool;
+A trava de invocação nasceu neste desenho, e o Leader a confirmou (U7). Todo
+papel herda a Skill tool;
 sem a trava, um papel poderia carregar a `anvil-team` e virar um segundo Leader, e
 o modelo poderia abrir a equipe sozinho no meio de uma conversa. A user story 51,
 que pede que um pedido comum não caia na equipe, fica garantida dos dois lados: a
@@ -189,7 +189,7 @@ que cobrar."
 | Gates | Tester e Review são gate só quando a delegação diz `gate`; o veredito existe só no retorno; conversa lateral esclarece finding e não muda veredito; o autor discorda na seção Divergências do próprio retorno, e a discordância não elimina o gate; **papel nunca despacha agente `anvil-team-*`**, só os subagentes que as próprias skills abrem |
 | Skills | carregar a skill real pela Skill tool e seguir o `SKILL.md`, sem simular; skills primárias não são whitelist; o protocolo de uma skill vence este; skill ausente ou travada → `BLOQUEADO`, nunca instalar |
 | Fontes de verdade | a ordem da referência, com `.claude/rules/` no item de regras locais e "memória de sessões anteriores, quando houver" no último; memória é histórico, não estado; o Mission Control não é fonte |
-| Comunicação | `SendMessage` aos names da linha `Equipe`; texto comum de um agente não chega a outro; não simular a opinião de um colega que está na Equipe; o que nasceu em conversa lateral e importa (finding, repro, divergência, acordo) vai na seção Laterais do retorno; erro de entrega não se repete, vira `BLOQUEADO` |
+| Comunicação | `SendMessage` aos names da linha `Equipe`; `SendMessage` é ferramenta diferida dentro do agente, e se carrega com `ToolSearch` `select:SendMessage` antes do primeiro envio (medido, M3); texto comum de um agente não chega a outro; não simular a opinião de um colega que está na Equipe; o que nasceu em conversa lateral e importa (finding, repro, divergência, acordo) vai na seção Laterais do retorno; erro de entrega não se repete, vira `BLOQUEADO` |
 | Ownership de escrita | um escritor por região; a Política de escrita é a fronteira; `Status:` e `## Comments` de ticket são do Leader; sobreposição descoberta no meio → parar e devolver `BLOQUEADO`, e quem escolhe a saída é o Leader; em worktree, conferir que `HEAD` contém o sha da Base antes de escrever, e não conter é `BLOQUEADO` |
 | Verificação | "done" não é evidência; formas de prova da referência; provar que funciona sempre que der |
 | Divergências | evidência, não hierarquia; os quatro passos da referência; o quinto é a seção Divergências do retorno |
@@ -230,7 +230,7 @@ delegação que você recebeu e o retorno que você deve.
 | `anvil-team-tester` | `anvil-tdd`, `anvil-diagnose` | Responsabilidade · Findings · Relações · Entrega |
 | `anvil-team-review` | `anvil-code-review`, com o ponto fixo que o Contexto der | Responsabilidade · Findings · Relações · Entrega |
 
-Três linhas específicas que o Dev não deve perder:
+Quatro linhas específicas que o Dev não deve perder:
 
 - **Dev, Implementação:** "A revisão que o `anvil-implement` roda no fim é
   verificação sua. Não é o gate."
@@ -239,6 +239,9 @@ Três linhas específicas que o Dev não deve perder:
   com o Designer para UI; regra de produto ambígua → `PERGUNTA`.
 - **Tester, Relações:** pedido de repro do autor se responde por `SendMessage` a
   ele. "Isto não é veredito" vai escrito na resposta.
+- **Review, Relações:** o autor pode pedir esclarecimento de um finding, e o
+  Review responde por `SendMessage`. O veredito só muda numa rodada nova do
+  Leader.
 
 Nenhum agente declara `model`, `isolation`, `background`, `skills`,
 `permissionMode`, `memory` ou `maxTurns`. O que varia por despacho vai na chamada.
@@ -275,15 +278,18 @@ description: "Só despachado pela skill anvil-team, dentro de uma equipe que o u
 ---
 name: anvil-team-review
 description: "Só despachado pela skill anvil-team, dentro de uma equipe que o usuário abriu. Não delegue a este agente por conta própria: sem a delegação da anvil-team ele não tem o que fazer. Papel: review."
-tools: Read, Grep, Glob, Bash, Agent, Skill
+tools: Read, Grep, Glob, Bash, Agent, Skill, SendMessage, ToolSearch
 ---
 ```
 
-A allowlist é a decisão fechada, sem acréscimo. `Agent` está nela porque o
-`anvil-code-review` abre dois subagentes; `Bash`, porque o Review roda `git diff`,
-o comando de verificação e o sentrux. **Confira os nomes das ferramentas de
-leitura na versão instalada**: nome que não existe não dá acesso a nada, e o
-Review ficaria sem ler. A falta de `SendMessage` é a contradição 1.
+A allowlist existe para impedir edição, e continua sem `Edit` e `Write`. `Agent`
+está nela porque o `anvil-code-review` abre dois subagentes; `Bash`, porque o
+Review roda `git diff`, o comando de verificação e o sentrux. `SendMessage` e
+`ToolSearch` entraram pela decisão U1: mensagem não edita, a conversa lateral é do
+ADR-0007, e `SendMessage` é diferida dentro do agente (M3), então sem `ToolSearch`
+ela não carrega. **Confira os nomes das ferramentas de leitura na versão
+instalada** (M7, Ponto B do 06): nome que não existe não dá acesso a nada, e o
+Review ficaria sem ler.
 
 ## 3. Como o agente chega ao protocolo
 
@@ -315,9 +321,9 @@ inexistente". Para os dois lados fecharem, o check lê a forma acima:
 | a | `name:` do frontmatter de `anvil/.claude/agents/X.md` é `X` | 05 |
 | b | todo span em crase que começa com `.claude/` e não tem `*`, `{` nem `<`, fora de bloco cercado, existe em `anvil/{span}` | 05 |
 | c | link markdown relativo (`](…)` sem `://`) num arquivo de agente é falha | 05 |
-| d | todo `anvil-team-*.md` cita `` `.claude/skills/anvil-team/PROTOCOL.md` `` | 06, recomendado |
-| e | todo span em crase `anvil-[a-z0-9-]+` num agente nomeia um diretório de skill ou um arquivo de agente do payload, e a skill não tem trava | 07, recomendado |
-| f | tokens do Maestri (`@team-protocol`, `@anvil-skills`, `@mission-control`, `@anvil-install`, `No connection to note`) não aparecem em skill nem agente do payload | 06, recomendado |
+| d | todo `anvil-team-*.md` cita `` `.claude/skills/anvil-team/PROTOCOL.md` `` | 06 |
+| e | todo span em crase `anvil-[a-z0-9-]+` num agente nomeia um diretório de skill ou um arquivo de agente do payload, e a skill não tem trava | 07 |
+| f | tokens do Maestri (`@team-protocol`, `@anvil-skills`, `@mission-control`, `@anvil-install`, `No connection to note`) não aparecem em skill nem agente do payload | 06 |
 
 O check (e) é a user story 53, que pede que toda skill citada pelos papéis exista;
 ele pega `anvil-debug` escrito de volta e pega skill travada antes do Ponto B. O
@@ -325,8 +331,8 @@ ele pega `anvil-debug` escrito de volta e pega skill travada antes do Ponto B. O
 port. Nenhum deles briga com o check 3 atual, que só olha links dentro de
 `anvil/.claude/skills`.
 
-**Se o Dev do ticket 05 já tiver escolhido outra forma**, o contrato é esta seção
-contra o que ele fez. O Leader precisa cruzar os dois antes do 06 começar.
+O Leader cruzou este contrato com os tickets (M8): cada check virou critério do
+ticket indicado na tabela.
 
 ## 4. Partição do protocolo
 
@@ -526,9 +532,8 @@ precisam de endereços diferentes, e reusar um name substitui o agente anterior.
   resultado de uma chamada `Agent` do Leader, que é o caminho medido. A rodada não
   herda a conversa lateral da anterior.
 
-A retomada do autor depende de o resultado de um turno retomado voltar ao Leader,
-o que não está medido (pergunta M2). Se não voltar, o Leader despacha o autor de
-novo com o mesmo name e o Contexto apontando o comentário; o protocolo não muda.
+A retomada do autor depende de o resultado de um turno retomado voltar ao Leader.
+Medido (M2): volta.
 
 ### Tester junto com o Dev
 
@@ -581,8 +586,9 @@ Quatro invariantes, cada um num lugar só. O Dev não aparece em nenhum.
    despachar o próprio revisor é proibido, e o retorno de um revisor despachado pelo
    Dev iria ao Dev.
 2. **Cada rodada de gate é uma chamada `Agent` do Leader** (SKILL § Gates), e o
-   veredito é a primeira linha do resultado. É o caminho medido pelo ADR:
-   subagente despachado pela sessão principal devolve a ela.
+   veredito é a primeira linha do resultado. É o caminho medido: agente despachado
+   com `name` devolve o resultado à sessão principal, que o recebe como
+   notificação de idle com o campo `result` (M1).
 3. **Conversa lateral não muda veredito** (PROT § Gates). O Dev pode discutir um
    finding com o Tester; se a avaliação mudar, só uma rodada nova do Leader a
    registra. A discordância do Dev vai na seção Divergências do retorno **dele**, que
@@ -778,7 +784,11 @@ de `templates/mission-control.md`, quando uma destas acontecer:
 - dois papéis vão escrever em paralelo;
 - a sessão vai acabar com ticket da spec aberto e decisão, bloqueio ou gate
   pendente;
+- os tickets da spec não cabem numa sessão;
 - o usuário pede.
+
+O terceiro gatilho é da decisão U4: numa feature de muitos tickets, o Leader cria o
+Mission Control ao abrir a spec, sem esperar a sessão acabar.
 
 Sem `promote:` no front-matter: no `archive`, ele congela dentro da spec arquivada.
 
@@ -836,25 +846,29 @@ ticket, com data, e não uma coluna que alguém atualizaria como estado.
 Em `.claude/rules/anvil.md`, na seção que já tem `runners`, `how-critics` e
 `cross-judge`, e no mesmo estilo de bullet:
 
+Pela decisão U5, o `anvil-boot` escreve a lista com os sete papéis **sem modelo**, e
+a rule deste repositório fica igual:
+
 ```markdown
 - `team`:
-  - `po`: `opus`
-  - `architect`: `opus`
-  - `analyst`: `sonnet`
-  - `designer`: `opus`
-  - `dev`: `opus`
-  - `tester`: `sonnet`
-  - `review`: `fable`
+  - `po`:
+  - `architect`:
+  - `analyst`:
+  - `designer`:
+  - `dev`:
+  - `tester`:
+  - `review`:
 ```
 
-Os valores acima são exemplo; os deste repositório são do usuário (pergunta U5).
+Configurado, um papel fica assim: `` - `dev`: `opus` ``.
 
 - Chave é o sufixo do agente: `po`, `architect`, `analyst`, `designer`, `dev`,
   `tester`, `review`.
 - Valor é um de `opus`, `fable`, `sonnet`, `haiku`, o enum do parâmetro `model`.
-- Papel sem linha, ou a lista ausente: o Leader omite `model`, e vale o modelo da
-  sessão. Na primeira vez que isso acontece na sessão, avisa o usuário uma vez e diz
-  onde configurar.
+- Papel sem valor: o Leader omite `model`, e vale o modelo da sessão. É o padrão
+  escrito pelo boot, então não gera aviso.
+- Papel sem linha, ou a lista inteira ausente (projeto bootado antes da lista): o
+  Leader omite `model` e avisa o usuário uma vez por sessão, dizendo onde configurar.
 - Chave desconhecida ou valor fora do enum: avisa uma vez e omite.
 - A frase "Lidos por `anvil-arena`, `anvil-how` e `anvil-architect`" ganha a
   `anvil-team`, aqui e no texto do `anvil-boot` que descreve o `anvil.md`.
@@ -886,31 +900,37 @@ Com dois escritores:
 8. Remove cada worktree e o branch dele só depois de `git cherry {branch-da-spec}
    {branch-do-worktree}` não listar nenhum commit com `+`.
 
+`git cherry-pick` fora da guarda de merge é critério do ticket 13. Se a Skill tool
+enxerga as skills instaladas de dentro do worktree é medição do Ponto B do 08 (M5);
+se não enxergar, a solução entra no 08, e o passo 3 ganha o que ela exigir.
+
 ## 12. O que cabe em cada ticket
 
 | Ticket | Entrega deste desenho |
 |---|---|
-| 06 | `SKILL.md` com todas as seções menos Mission Control, lista `team` e integração de worktree; `PROTOCOL.md` **completo**, inclusive a linha de worktree, para o 07 não precisar editá-lo; `anvil-team-dev.md` e `anvil-team-review.md`; checks (d) e (f) |
+| 06 | `SKILL.md` com trava de invocação e todas as seções menos Mission Control, lista `team` e integração de worktree; `PROTOCOL.md` **completo**, inclusive a linha de worktree, para o 07 não precisar editá-lo; `anvil-team-dev.md` e `anvil-team-review.md`, este com `SendMessage` e `ToolSearch` na allowlist; checks (d) e (f); medições M4, M6 e M7 no Ponto B |
 | 07 | os outros cinco agentes; check (e); o Tester despachado junto com o Dev e a conversa lateral, provados no Ponto B |
-| 08 | `templates/mission-control.md` e SKILL § Mission Control; leitura da lista `team` em SKILL § Despacho, a lista na rule deste repositório e a menção no `anvil-boot`; SKILL § Paralelismo e integração |
+| 08 | `templates/mission-control.md` e SKILL § Mission Control com os quatro gatilhos; leitura da lista `team` em SKILL § Despacho; o `anvil-boot` escrevendo a lista com os sete papéis sem modelo, e a rule deste repositório igual; SKILL § Paralelismo e integração; medição M5 no Ponto B |
+| 13 | `git cherry-pick` continua fora da guarda de merge |
 
 Os checks (a), (b) e (c) são do 05.
 
 ## Contradições encontradas
 
-1. **A allowlist do Review não tem `SendMessage`.** A decisão fechada diz "leitura,
-   `Bash`, `Agent`, `Skill`". A mesma lista de decisões põe os papéis em conversa
-   direta, e a referência (`agents/review.md`) prevê o Dev esclarecendo finding com
-   o Review. Sem `SendMessage`, o Review lê mensagens e não responde. **O desenho
-   implementa a decisão como está**: o Review responde só pelo retorno, e o Dev que
-   discorda escreve em Divergências. Se o usuário acrescentar `SendMessage`, é uma
-   linha no frontmatter, e talvez `ToolSearch` junto, se a ferramenta for diferida
-   dentro do agente (pergunta M3).
+Cada item diz como ficou depois das decisões do Leader (`3d38ec0`).
+
+1. **A allowlist do Review não tinha `SendMessage`.** A decisão fechada dizia
+   "leitura, `Bash`, `Agent`, `Skill`". A mesma lista de decisões põe os papéis em
+   conversa direta, e a referência (`agents/review.md`) prevê o Dev esclarecendo
+   finding com o Review. Sem `SendMessage`, o Review lê mensagens e não responde.
+   **Decidido (U1):** o Review ganha `SendMessage` e `ToolSearch`, e continua sem
+   `Edit` e `Write`. A spec foi atualizada.
 2. **"O Review não consegue editar" vale só para as ferramentas de edição.** `Bash`
    escreve arquivo, e `Agent` deixa o Review despachar um `general-purpose` com
-   `Edit`. A allowlist fechada precisa de `Bash` (sentrux, verify) e de `Agent`
-   (`anvil-code-review`). O Ponto B do ticket 06 mede pela ferramenta `Edit`; o resto
-   é o protocolo, por disciplina.
+   `Edit`. A allowlist precisa de `Bash` (sentrux, verify) e de `Agent`
+   (`anvil-code-review`). **Decidido (U2):** "não edita" quer dizer sem `Edit` e
+   `Write`; `Bash` e `Agent` ficam declarados. O Ponto B do 06 mede pela ferramenta
+   `Edit`, e o resto é o protocolo.
 3. **O Mission Control de referência tem mais estado do que as duas peças citadas.**
    Além da coluna Estado da frontier e do Estado global, a tabela Gates tem coluna
    Estado (`PENDENTE`), o `team-protocol.md` diz que o Mission Control "representa o
@@ -919,27 +939,30 @@ Os checks (a), (b) e (c) são do 05.
 4. **Skills citadas pela referência têm trava de invocação.** `anvil-to-questionnaire`
    (secundária do PO), `anvil-wayfinder` (roteamento do Leader) e `anvil-handoff` (o
    "handoff" do protocolo). A user story 53 pede que nenhum papel seja roteado para o
-   vazio; a spec deixa as skills travadas fora do escopo. Saída do desenho, sem tirar
-   trava nenhuma: o PO perde `anvil-to-questionnaire`, e o Leader sugere
+   vazio; a spec deixa as skills travadas fora do escopo. **Decidido (U3):** as três
+   continuam travadas. O PO perde `anvil-to-questionnaire`, e o Leader sugere
    `/anvil-wayfinder` e `/anvil-handoff` ao usuário.
 5. **Worktree sem `.claude/skills/`.** O ticket 06 pede que os agentes leiam o
    protocolo antes de agir, e o ticket 04 fez as skills instaladas serem ignoradas
-   pelo git. Num worktree, o caminho do protocolo não existe. Saída: caminho absoluto
-   na linha `Protocolo:` do Contexto. Se a Skill tool também não enxergar as skills
-   de dentro do worktree, um Dev isolado não roda `anvil-implement`, e o ticket 08
-   não fecha como está (pergunta M5).
+   pelo git. Num worktree, o caminho do protocolo não existe. Saída adotada: caminho
+   absoluto na linha `Protocolo:` do Contexto. Se a Skill tool também não enxergar as
+   skills de dentro do worktree, um Dev isolado não roda `anvil-implement`.
+   **Em aberto, com dono:** a medição é critério do Ponto B do 08 (M5), e a solução,
+   se precisar, entra no 08.
 6. **O port também tira `ai-memory`, que não é do Maestri.** A spec manda tirar
    visibilidade de notas, erro de conexão e bootstrap. `ai-memory` é um MCP do
    ambiente de quem configurou a equipe, e o payload vai para projetos que não o têm;
    citá-lo manda o papel chamar ferramenta inexistente. Virou "memória de sessões
-   anteriores, quando houver". É desvio deliberado do port literal.
-7. **Trava de invocação na `anvil-team` é decisão nova.** Não contradiz o ADR nem a
-   spec, mas nenhum dos dois a pede. Motivo na [seção 1](#skillmd-o-leader). Reverter
-   é uma linha.
+   anteriores, quando houver". É desvio deliberado do port literal, e o Leader não o
+   contestou.
+7. **Trava de invocação na `anvil-team` era decisão nova.** Nem o ADR nem a spec a
+   pediam. Motivo na [seção 1](#skillmd-o-leader). **Decidido (U7):** fica, e a spec a
+   registra.
 8. **A guarda de merge bloqueia a integração por `git merge`.** Não contradiz o
    ticket 08, que não diz o comando, mas amarra o ticket 13 (a guarda passa a olhar
    também o branch nomeado no merge): se a guarda um dia casar `cherry-pick`, a
-   integração de worktree quebra.
+   integração de worktree quebra. **Decidido:** `cherry-pick` fora da guarda é
+   critério do 13.
 
 ## Tradeoffs aceitos
 
@@ -953,7 +976,7 @@ Os checks (a), (b) e (c) são do 05.
   independência sem ancoragem na rodada anterior e do veredito sempre no caminho
   medido.
 - Aceito `run_in_background: true` sempre, com o risco de permissão em background
-  (pergunta M4), em troca de o Leader continuar disponível e de dois papéis estarem
+  (M4, Ponto B do 06), em troca de o Leader continuar disponível e de dois papéis estarem
   vivos ao mesmo tempo.
 - Aceito `cherry-pick` e histórico linear em troca de não abrir exceção na guarda de
   merge.
@@ -983,7 +1006,8 @@ Os checks (a), (b) e (c) são do 05.
   cópias divergentes em worktree, e o Review escrevendo por `Bash` esvazia a
   allowlist.
 - **Rodada de gate por `SendMessage` ao mesmo agente.** Mantém contexto; ancora o gate
-  na rodada anterior e depende de um caminho de retorno não medido.
+  na rodada anterior e na conversa lateral com o autor. O caminho de retorno funciona
+  (M2); o motivo que sobra é a independência.
 - **`DISPATCH.md` separado para a mecânica medida.** Um arquivo a mais com um leitor e
   a mesma ocasião do `SKILL.md`; ficou como nota de versão dentro de SKILL § Despacho.
 - **Names fixos por papel** (`dev`, `review`). Endereço estático, mas dois Devs em
@@ -1019,7 +1043,8 @@ enxuto. A minha leitura e a do juiz coincidiram na base.
 **Rejeitados.**
 
 - Do candidato de `opus`: `SendMessage` e `ToolSearch` aplicados na allowlist do
-  Review. Ficou como contradição 1, porque reabre decisão fechada. Também o aviso a
+  Review. Ficou como contradição 1, porque reabria decisão fechada; depois a decisão
+  U1 os adotou. Também o aviso a
   `to: "main"` para laterais: a ferramenta o documenta só para subagente em background,
   e não está medido em agent teams. Laterais vão no retorno.
 - Do candidato de `fable`: `DISPATCH.md`; gate do Tester por `SendMessage`; retorno do
@@ -1036,39 +1061,46 @@ catálogo e install fora.
 
 ## Perguntas abertas
 
-### Para medir (Dev, no Ponto B, antes de dar o desenho por certo)
+Estado depois das decisões e medições do Leader (`3d38ec0`). As medições foram
+feitas num teste de sondagem no Claude Code 2.1.270, com agent teams ligado.
 
-- **M1.** O resultado final de um agente despachado **com `name`**, dentro de agent
-  teams, chega à sessão principal como o de um subagente comum? É a base dos gates.
-  Primeira coisa do Ponto B do 06.
-- **M2.** O resultado de um agente retomado por `SendMessage` do Leader volta ao
-  Leader? O laço de correção do autor depende disso; os gates não. Sem isso, o
-  Leader redespacha o autor com o mesmo name.
-- **M3.** `SendMessage` é ferramenta diferida dentro de um agente? Se for, quem a
-  tiver na allowlist precisa de `ToolSearch` junto.
-- **M4.** Um papel em background que precisa de permissão não pré-aprovada recebe o
-  pedido na sessão do Leader, ou a chamada é negada em silêncio?
-- **M5.** Num worktree de `isolation: "worktree"`: de que commit ele parte, e a Skill
-  tool enxerga as skills instaladas? Se não enxergar, o caminho candidato é o
-  `.worktreeinclude`, e isso volta ao Architect antes do 08.
-- **M6.** Reusar um `name` com `Agent` substitui o agente anterior sem erro?
-- **M7.** Os nomes das ferramentas de leitura do `tools:` do Review existem na versão
-  instalada.
-- **M8.** O contrato de citação da seção 3 bate com o que o Dev do ticket 05 está
-  implementando. É cruzamento para o Leader fazer antes do 06.
+### Medições
 
-### Para o usuário
+- **M1. Medido: sim.** Agente despachado com `name`, dentro de agent teams, devolve o
+  resultado à sessão principal, como notificação de idle com o campo `result`. É a
+  base dos gates.
+- **M2. Medido: sim.** Agente retomado por `SendMessage` devolve o novo resultado à
+  sessão principal. O laço de correção do autor por retomada vale como desenhado.
+- **M3. Medido: sim.** `SendMessage` é diferida dentro do agente, e carrega com
+  `ToolSearch` `select:SendMessage`. Por isso o Review tem as duas na allowlist, e o
+  PROT § Comunicação manda carregar antes do primeiro envio.
+- **M4. Aberta, Ponto B do 06.** Um papel em background que precisa de permissão não
+  pré-aprovada recebe o pedido na sessão do Leader, ou a chamada é negada em
+  silêncio?
+- **M5. Aberta, critério do 08.** Num worktree de `isolation: "worktree"`: de que
+  commit ele parte, e a Skill tool enxerga as skills instaladas? Se não enxergar, o
+  caminho candidato é o `.worktreeinclude`, e a solução entra no 08.
+- **M6. Aberta, Ponto B do 06.** Reusar um `name` com `Agent` substitui o agente
+  anterior sem erro?
+- **M7. Aberta, Ponto B do 06.** Os nomes das ferramentas de leitura do `tools:` do
+  Review existem na versão instalada.
+- **M8. Feito.** O contrato de citação da seção 3 virou critério: (a), (b) e (c) no
+  05, (d) e (f) no 06, (e) no 07.
 
-- **U1.** O Review ganha `SendMessage` (e `ToolSearch`, se M3 pedir), ou fica mudo na
-  conversa lateral e fala só pelo retorno? Reabre a allowlist fechada.
-- **U2.** "O Review não consegue editar" significa "não tem as ferramentas de edição",
-  que é o que a allowlist entrega, ou pede mais?
+### Decisões do usuário
+
+- **U1.** O Review ganha `SendMessage` e `ToolSearch`, e continua sem `Edit` e
+  `Write`. A allowlist existe para impedir edição; mensagem não edita.
+- **U2.** "O Review não edita" quer dizer sem `Edit` e `Write`. `Bash` e `Agent` ficam
+  declarados.
 - **U3.** `anvil-wayfinder`, `anvil-handoff` e `anvil-to-questionnaire` continuam
-  travadas, com o Leader sugerindo o comando ao usuário, ou ganham `invocable`?
-- **U4.** O critério de feature grande (dois escritores em paralelo, sessão acabando
-  com trabalho pendente, ou pedido) é o certo?
-- **U5.** Que modelo cada papel usa na lista `team` deste repositório, e o
-  `anvil-boot` escreve a lista por padrão ou só a menciona?
-- **U6.** Cada pergunta do grill dá a volta PO → Leader → usuário → Leader → PO. Num
-  grill de trinta perguntas, isso é aceitável?
-- **U7.** A trava de invocação na `anvil-team` fica?
+  travadas. O PO fica sem `anvil-to-questionnaire`, e o Leader sugere
+  `/anvil-wayfinder` e `/anvil-handoff` ao usuário.
+- **U4.** O Mission Control nasce a pedido, com dois escritores em paralelo, com
+  sessão acabando com trabalho pendente, ou quando os tickets da spec não cabem numa
+  sessão.
+- **U5.** O `anvil-boot` escreve a lista `team` com os sete papéis sem modelo, e cada
+  um herda o da sessão. A rule deste repositório fica igual.
+- **U6.** A volta PO → Leader → usuário → Leader → PO a cada pergunta do grill é
+  aceita: é o fluxo da configuração de origem.
+- **U7.** A trava de invocação na `anvil-team` fica.
