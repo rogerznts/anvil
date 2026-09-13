@@ -39,3 +39,17 @@ remedido: keep 35 arquivos · 7.866 linhas, sem par 0; demais totais iguais) e `
 "Comandos" da `anvil-sync`). `verify` limpo em 3.2 e 5; `status` e `update anvil-to-spec` em dia. Ressalva do Dev: com
 o HEAD do submodule igual ao pin, o `update` não percorre arquivos, então o caminho do `keep` num merge real não foi
 exercitado; o efeito prático do `keep` é o `vendor` e a classificação no `stats`. Gates despachados: Review e Tester.
+
+**Leader, 2026-09-13 — gate Review, rodada 1: APROVADO, sem bloqueante.** Critérios atendidos sobre `df59c26`; todos
+os números da tabela do README conferidos contra o `stats` em `/bin/bash`; determinismo por `cmp` em 3.2 e 5.2; o
+`keep` do `new-spec.sh` é adaptação legítima (o arquivo nasceu no anvil, e o pin só tem `SKILL.md` e
+`agents/openai.yaml`); usage `3,8p` → `3,10p` corrige omissão antiga do `lock`. Achados: **F1** o laço do payload no
+`cmd_stats` não consulta `strip` — arquivo em `strip` presente no payload e no pin contaria como pareado e inflaria as
+linhas (0 casos hoje; o `verify` não barra cópia à mão); **F2** README diz "35 skills de cinco repositórios" e a
+tabela diz 36 (ambos certos, leitura confusa); **F3** "dezessete skills com uma linha de delta" inclui
+`anvil-stack-payload`, que tem 29 arquivos `keep` — a linha única vale só para os pareados. Standards: **S1**
+identificadores em pt-BR (`nossas`, `sem_par`…) seguem o estilo existente do script (`gerar_lock`, `falhas`); **S2**
+contadores de uma a três letras; **S3** leitura de `extra` repete `copy_extras`; **S4** `arr` não é local; **S5**
+binário alterado mede 0 sem aviso; **S6** vírgula em nome de arquivo quebra as listas. Lacuna da spec: o
+`docs/architecture/overview.md` repete a métrica velha (171 em 25.064, 0,68%, vinte e uma; linha 104) e nenhum
+ticket a cobre — a spec diz "README e overview … a métrica ganha comando e data".
