@@ -34,3 +34,18 @@ com `CONTEXT.md` na raiz segue pelo `adopt` com plano e parada; pelo boot, proje
 e projeto limpo para o `scaffold`. Desvio aceito: duas células da tabela de verbos do `anvil-docs` deixam de
 contradizer a regra. O diagrama do README que mostra o boot chamando o `scaffold` direto vai para o ticket 03.
 Gates: Review agora; Tester depois do reteste do 05.
+
+**Leader, 2026-09-13 — gate Review: APROVADO, sem bloqueante.** Seis critérios atendidos; a ampliação para o
+`anvil-docs` e o desvio da tabela se sustentam. Ajuste antes do Tester, só texto:
+
+- **F1** — a parada do `scaffold` vem depois dos passos 1–4; com `/anvil-docs scaffold` explícito num projeto
+  antigo, a árvore é criada antes de a parada ser lida. Vira pré-condição, antes do passo 1.
+- **F2** — a condição sobre `docs/` está redigida de três jeitos (tabela, regra, parada). Uma redação só.
+- **F4** — o boot ainda diz que "vai para o verbo `adopt` no passo 5" e repete "quatro domínios" e "Nunca
+  presuma", que agora são do `anvil-docs`; "escritas antes da mudança" nomeia a movimentação do `adopt`.
+
+Ficam como ideia: **F3** usuário que recusa a movimentação fica com o perfil apontando para o layout do anvil
+(avisar na recusa); **F5** description do `anvil-docs` e título do `ADOPT.md` falam de `docs/` existente, e o
+`ADOPT.md` não trata os links relativos de um `CONTEXT-MAP.md` movido; **F6** `src/*/docs/adr/` chamado de
+layout antigo no `ADOPT.md` e válido no `anvil-setup`. O Tester julga depois do ajuste, cobrindo
+`CONTEXT-MAP.md` e o turno de aprovação na versão final.
