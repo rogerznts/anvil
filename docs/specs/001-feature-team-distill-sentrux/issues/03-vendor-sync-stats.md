@@ -4,15 +4,15 @@
 
 **Blocked by:** Nenhum — pode começar agora.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] *Linha nossa* é a linha presente no payload e ausente da versão do pin, contada só em arquivos que existem dos dois lados; `keep` e `extra` contam à parte, e `strip` não conta. A definição está escrita no script.
-- [ ] Duas execuções seguidas dão o mesmo resultado.
-- [ ] Uma skill cujo único delta é o `rename` mede exatamente uma linha nossa.
-- [ ] O README troca os números antigos pelos medidos, com o comando e a data.
-- [ ] A lista do catálogo de adaptações no README inclui `invocable` e `tracker-profile`, na mesma ordem do `ADAPT-RULES.md`.
-- [ ] O diagrama do fluxo no README mostra o boot chamando o `anvil-docs` sem verbo, que escolhe entre `scaffold` e `adopt` (ticket 14).
-- [ ] Ponto A: as três verificações acima rodam contra o payload real.
+- [x] *Linha nossa* é a linha presente no payload e ausente da versão do pin, contada só em arquivos que existem dos dois lados; `keep` e `extra` contam à parte, e `strip` não conta. A definição está escrita no script.
+- [x] Duas execuções seguidas dão o mesmo resultado.
+- [x] Uma skill cujo único delta é o `rename` mede exatamente uma linha nossa.
+- [x] O README troca os números antigos pelos medidos, com o comando e a data.
+- [x] A lista do catálogo de adaptações no README inclui `invocable` e `tracker-profile`, na mesma ordem do `ADAPT-RULES.md`.
+- [x] O diagrama do fluxo no README mostra o boot chamando o `anvil-docs` sem verbo, que escolhe entre `scaffold` e `adopt` (ticket 14).
+- [x] Ponto A: as três verificações acima rodam contra o payload real.
 
 ## Comments
 
@@ -86,3 +86,17 @@ glob inexistente. Os fallbacks `|| : > base` do `update` ficam: com glob inexist
 vazia. Na cópia `workspace/19-stats-glob/`: `[slug].md` e `a*b?.md` passam a SEM-PAR 1 com totais iguais; `bench` fora
 do `keep` dá sem par 27, com os três arquivos de glob; `copy_extras` com origem de glob inexistente conta 0 (antes 2).
 `stats` do payload real idêntico ao publicado em 3.2 e 5.2; `verify` limpo. Reteste do Tester despachado.
+
+**Leader, 2026-09-13 — resolvido.** Gate Tester, rodada 2: APROVADO, numa cópia nova em `df88bbd`. F1 corrigido:
+`[slug].md` e `a*b?.md` vão para sem par com totais iguais; `bench` fora do `keep` põe os três arquivos de glob em sem
+par (27). Regressão: os 26 casos da rodada 1 idênticos por `cmp`, exceto os três de glob. `copy_extras` pelos fluxos
+reais do `anvil-ui-hallmark`: `vendor` com os três extras reais igual ao blob do pin; origens de glob inexistentes
+deixam de contar (5 → 3); origem de glob existente continua copiada e pareada; `update` com destino ausente copia e
+com destino presente mescla. `stats` idêntico ao publicado em 3.2 e 5.2, também depois de o HEAD andar para
+`a085581`; `verify` limpo. Com o gate do Review, os gates passaram sobre `c388679`.
+
+Ficam como ideia: origem de `extra` inexistente ainda deixa o destino como arquivo vazio (o redirect cria antes do
+`cat-file`; anterior ao 03, o `stats` o põe em sem par); symlink dentro de skill ignorado em silêncio; a frase curta do
+README é menos precisa que o "lado > do diff"; comentários do `c388679` sem acento, diferente do resto do script.
+Riscos: SIGTRAP do `verify` em `/bin/bash` 3.2 na cópia do Tester (anterior ao 03); medir no repo real enquanto outro
+papel edita o `vendor-sync.sh` pode abortar a execução.
