@@ -507,12 +507,20 @@ PYEOF
         [ -n "$so_disco" ] && { echo "   FALHA agente no payload e nao no lock: $(echo "$so_disco" | tr '\n' ' ')"; falhas=$((falhas+1)); }
     fi
 
+    # A trava de invocacao, numa forma so para os checks 8 e 14: a linha dentro do
+    # frontmatter, com espaco sobrando ou comentario YAML depois do true. Fora do
+    # frontmatter e texto. Com aspas nao e reconhecida.
+    tem_trava() {  # <SKILL.md>
+        awk '{ sub(/[ \t\r]+$/, "") } NR == 1 { if ($0 != "---") exit; next } $0 == "---" { exit }
+             /^disable-model-invocation: *true([ \t]+#.*)?$/ { found = 1; exit } END { exit !found }' "$1"
+    }
+
     echo "8. skill marcada invocable não tem a trava de invocação"
     while IFS=$'\x1f' read -r n state _ _ _ a _ _ _; do
         [ "$state" = "vendored" ] || continue
         case ",$a," in *,invocable,*) ;; *) continue ;; esac
         [ -f "$PAYLOAD/$n/SKILL.md" ] || continue
-        sed -n '1,10p' "$PAYLOAD/$n/SKILL.md" | grep -qE '^disable-model-invocation: *true' &&
+        tem_trava "$PAYLOAD/$n/SKILL.md" &&
             { echo "   FALHA $n: invocable no manifesto, mas o frontmatter ainda trava"; falhas=$((falhas+1)); }
     done < <(manifest_rows)
 
@@ -617,7 +625,8 @@ PYEOF
     # existe no payload (o `anvil-debug` da configuracao de origem) ou skill com trava
     # de invocacao, que a Skill tool recusa, roteiam o papel para o vazio. Nome de
     # agente do payload passa: e endereco, nao skill. Mesma forma de citar do check
-    # 10: span em crase, fora de bloco cercado.
+    # 10: span em crase, fora de bloco cercado; com ou sem a barra do comando
+    # (`/anvil-wayfinder`).
     echo "14. skill citada por agente existe no payload e não tem trava"
     for f in "$AGENTS"/*.md; do
         [ -f "$f" ] || continue
@@ -626,11 +635,10 @@ PYEOF
             [ -f "$AGENTS/$t.md" ] && continue
             if [ ! -f "$PAYLOAD/$t/SKILL.md" ]; then
                 echo "   FALHA agents/$(basename "$f"): $t nao existe no payload"; falhas=$((falhas+1))
-            elif awk '{ sub(/[ \t\r]+$/, "") } NR == 1 { if ($0 != "---") exit; next } $0 == "---" { exit }
-                      /^disable-model-invocation: *true$/ { found = 1; exit } END { exit !found }' "$PAYLOAD/$t/SKILL.md"; then
+            elif tem_trava "$PAYLOAD/$t/SKILL.md"; then
                 echo "   FALHA agents/$(basename "$f"): $t tem trava de invocacao"; falhas=$((falhas+1))
             fi
-        done < <(spans_of "$f" 'anvil-[a-z0-9-]+' | sort -u)
+        done < <(spans_of "$f" '/?anvil-[a-z0-9-]+' | sed 's|^/||' | sort -u)
     done
 
     echo
