@@ -101,8 +101,11 @@ Os submodules são pinados por commit no manifesto, e o pin **é** a base do mer
 3-way. Não há snapshot a manter — ver
 [adr-0004](./adr/adr-0004-sync-por-merge-3-way-sem-cache.md).
 
-O delta medido contra o upstream: **171 linhas em 25.064 — 0,68%**. Vinte e uma
-skills ficam com uma linha só, o `name:` do frontmatter.
+O delta medido contra o upstream, em 2026-09-13 com
+`bash .claude/skills/anvil-sync/scripts/vendor-sync.sh stats`: **202 linhas nossas
+em 21.887 — 0,92%**, contadas só nos arquivos que existem no pin e no payload;
+`keep` e `extra` ficam à parte. Em dezessete skills, os arquivos pareados ficam
+com uma linha só, o `name:` do frontmatter.
 
 ## Herança do mosk
 
