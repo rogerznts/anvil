@@ -299,7 +299,7 @@ O boot detecta e **propõe** a migração, esperando aprovação antes de apagar
 
 | Sai | Fica |
 |---|---|
-| `.claude/agents/` — as doze personas | `.claude/rules/` — é do projeto |
+| `.claude/agents/mosk-*.md` — as doze personas | `.claude/rules/` — é do projeto |
 | `.claude/mosk/` — 252 arquivos de core | `docs/` — vai para o verbo `adopt` |
 | `.claude/skills/mosk-*` | `.claude/settings.json` — o hook é **mesclado** |
 

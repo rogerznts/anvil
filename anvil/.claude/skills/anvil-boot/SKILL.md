@@ -26,7 +26,7 @@ encontrar e tentar usar:
 
 | O quê | Por quê |
 |---|---|
-| `.claude/agents/` | as doze personas. O anvil não tem agentes |
+| `.claude/agents/mosk-*.md` | as doze personas. Só elas: o diretório fica |
 | `.claude/mosk/` | o core: tasks, templates, checklists, scripts, schemas |
 | `.claude/skills/mosk-*` | os wrappers de agente e as skills soltas |
 | `.claude/hooks/guard-spec-merge.sh` | é substituído pela versão do `anvil-docs` |
@@ -35,6 +35,7 @@ Fica, sem ser tocado:
 
 | O quê | Por quê |
 |---|---|
+| `.claude/agents/`, fora as personas | os agentes do anvil e os que o projeto escreveu |
 | `.claude/rules/` | é do projeto, não do toolkit. Só o `project.md` é revisado no passo 4, porque cita caminhos do mosk |
 | `docs/` | é o trabalho. Vai para o verbo `adopt` no passo 5 |
 | `.claude/settings.json` | pode ter hook do projeto. O passo 8 **mescla**, não sobrescreve |
@@ -177,33 +178,44 @@ Diga ao usuário que a guarda está ativa e o que ela bloqueia.
 ## 9. Conferir o `anvil.lock`
 
 O payload traz `.claude/anvil.lock` pronto. É dele que o `/anvil-update` calcula
-os órfãos e que o passo 10 gera o bloco do `.gitignore`, por isso vem antes.
-Confira se alguma skill do lock falta no disco:
+os órfãos e que o passo 10 gera o bloco do `.gitignore`, por isso vem antes. O
+lock tem uma linha `skill:` por skill e uma `agent:` por agente. Confira se algum
+item do lock falta no disco:
 
 ```bash
 comm -23 <(sed -n 's/^skill: *//p' .claude/anvil.lock | tr -d '\r' | sort) \
          <(ls .claude/skills | sort)
+comm -23 <(sed -n 's/^agent: *//p' .claude/anvil.lock | tr -d '\r' | sed 's/$/.md/' | sort) \
+         <(ls .claude/agents 2>/dev/null | sort)
 ```
 
 - **Saída vazia** → em dia.
-- **Saiu nome** — o lock dá como instalada uma skill que não está no disco — ou
-  **não há o arquivo**, numa instalação antiga → divergência: reescreva o lock a
-  partir do disco.
+- **Saiu nome** — o lock dá como instalada uma skill ou um agente (`nome.md`) que
+  não está no disco — ou **não há o arquivo**, numa instalação antiga →
+  divergência: reescreva o lock a partir do disco.
 
-**Skill no disco fora do lock não é divergência.** Costuma ser a que o usuário
-escreveu, e não entra no lock: skill no lock é tratada como do anvil — o update a
-apaga como órfã, e o bloco do `.gitignore` a ignora.
+**Skill ou agente no disco fora do lock não é divergência.** Costuma ser o que o
+usuário escreveu, e não entra no lock: o que está no lock é tratado como do anvil
+— o update o apaga como órfão, e o bloco do `.gitignore` o ignora.
 
-Por isso, antes de reescrever, mostre as skills de `.claude/skills/` e **pergunte
-quais o usuário escreveu** — as que estão fora do lock atual são as candidatas.
-Elas entram em `MINHAS` e ficam fora:
+Por isso, antes de reescrever, mostre **todas** as skills de `.claude/skills/` e
+todos os agentes de `.claude/agents/`, inclusive os que o lock lista, e **pergunte
+quais não vieram do anvil**. Os que estão fora do lock atual são os candidatos
+mais prováveis, mas não os únicos: um boot antigo reescrevia o lock a partir do
+disco, e pode ter posto ali uma skill do usuário. Nada do usuário volta ao lock
+sem ter sido perguntado. Os que não vieram do anvil entram em `USER_SKILLS` e
+`USER_AGENTS` e ficam fora:
 
 ```bash
-MINHAS="minha-skill outra-skill"   # as que o usuário escreveu; vazio se nenhuma
+USER_SKILLS="minha-skill outra-skill"   # skills que não vieram do anvil; vazio se nenhuma
+USER_AGENTS="meu-agente"                # agentes que não vieram do anvil, sem o .md; vazio se nenhum
 { echo "# anvil.lock — o que esta instalacao possui."
   echo "# Derivado do payload. Nao edite a mao."
   ls .claude/skills | while read -r s; do
-    case " $MINHAS " in *" $s "*) ;; *) echo "skill: $s" ;; esac
+    case " $USER_SKILLS " in *" $s "*) ;; *) echo "skill: $s" ;; esac
+  done
+  ls .claude/agents 2>/dev/null | sed -n 's/\.md$//p' | while read -r a; do
+    case " $USER_AGENTS " in *" $a "*) ;; *) echo "agent: $a" ;; esac
   done
 } > .claude/anvil.lock
 ```
@@ -213,14 +225,14 @@ o anvil instalou do que você escreveu, e o lado seguro é não apagar nada.
 
 ## 10. Ignorar o toolkit no git
 
-As skills que o anvil instalou são conteúdo do toolkit, reinstalável por
-`npx degit`. Versionar 2 MB de skill de terceiro no repositório do projeto engorda
+As skills e os agentes que o anvil instalou são conteúdo do toolkit,
+reinstalável por `npx degit`. Versionar 2 MB de skill de terceiro no repositório do projeto engorda
 o histórico, e todo `/anvil-update` viraria um diff gigante que ninguém revisa.
 
-Mas `.claude/skills/` não é só do anvil: a skill que o usuário escreve ali é do
-projeto e continua versionada. Por isso o `.gitignore` ganha um bloco com **uma
-linha por skill do `.claude/anvil.lock`**, nunca por prefixo — as `tea-*` não
-seguem o padrão de nome:
+Mas `.claude/skills/` e `.claude/agents/` não são só do anvil: a skill ou o agente
+que o usuário escreve ali é do projeto e continua versionado. Por isso o
+`.gitignore` ganha um bloco com **uma linha por skill e por agente do
+`.claude/anvil.lock`**, nunca por prefixo — as `tea-*` não seguem o padrão de nome:
 
 ```gitignore
 # ANVIL:INSTALLED:START
@@ -228,6 +240,7 @@ seguem o padrão de nome:
 .claude/skills/anvil-architect/
 …
 .claude/skills/tea-commit/
+.claude/agents/{agente}.md
 # ANVIL:INSTALLED:END
 ```
 
@@ -237,21 +250,23 @@ O bloco sai do lock que o passo 9 conferiu. Veja o que o script vai escrever:
 bash .claude/skills/anvil-update/scripts/reset-install.sh --gitignore-only --dry-run --to .
 ```
 
-**Antes de tudo, alguma dessas é do usuário?** O passo 9 não pega a skill do
-usuário que já está dentro do lock — um boot antigo reescrevia o lock do disco com
-ela junto. Mostre as skills que o bloco vai ignorar e **pergunte se alguma o
-usuário escreveu**; se o passo 9 acabou de reescrever o lock com essa pergunta,
-não repita. Se alguma for, ela sai do lock pela reescrita do passo 9, com
-`MINHAS` levando todas as skills do usuário — essa e as que já estavam fora do
-lock. **Nunca edite o lock à mão.** Rode o dry-run de novo: o bloco sai sem ela.
+**Antes de tudo, alguma dessas não veio do anvil?** Com o lock em dia, o passo 9
+não pega a skill do usuário que já está dentro dele — um boot antigo reescrevia o
+lock do disco com ela junto. Mostre as skills e os agentes que o bloco vai ignorar
+e **pergunte se algum não veio do anvil**; se o passo 9 acabou de reescrever o lock
+com essa pergunta, não repita. Se algum não veio, ele sai do lock pela reescrita
+do passo 9, com `USER_SKILLS` e `USER_AGENTS` levando tudo que não veio do anvil —
+esse e os que já estavam fora do lock. **Nunca edite o lock à mão.** Rode o dry-run
+de novo: o bloco sai sem ele.
 
 **Depois, a linha antiga.** Um boot anterior ignorava `.claude/skills/` inteiro,
 com um comentário exato em cima — em duas versões, com e sem o `--force`. Procure
-pelas duas, e pelo início do bloco. O `tr` tira o `\r` de um `.gitignore` com
-CRLF, que o `grep -x` não casaria:
+pelas duas, e pelo início do bloco. O `awk` tira do fim de cada linha o espaço, o
+tab e o `\r` de um `.gitignore` com CRLF, como o script faz, porque o `grep -x`
+não casaria com eles:
 
 ```bash
-tr -d '\r' < .gitignore | grep -nxF -A1 \
+awk '{ sub(/[ \t\r]+$/, "") } 1' .gitignore | grep -nxF -A1 \
   -e '# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil . --force`' \
   -e '# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil .`' \
   -e '# ANVIL:INSTALLED:START'
@@ -268,6 +283,20 @@ tr -d '\r' < .gitignore | grep -nxF -A1 \
   - a busca **achou** o início do bloco — um boot anterior o escreveu, com a troca
     recusada → **só apague as duas linhas**. Trocá-las por marcadores daria um
     segundo par, e o script para com erro.
+
+  Faça a troca com o comando, não com edição à mão: cada linha mantém o fim de
+  linha que tinha, `\r` inclusive, e o `.gitignore` mantém as permissões.
+
+  ```bash
+  LINE=2        # o número do comentário, que a busca mostrou antes do ":"
+  HAS_BLOCK=0   # 1 se a busca achou # ANVIL:INSTALLED:START; senão, 0
+  awk -v n="$LINE" -v has="$HAS_BLOCK" '
+      { cr = sub(/\r$/, "") ? "\r" : "" }
+      NR == n     { if (!has) print "# ANVIL:INSTALLED:START" cr; next }
+      NR == n + 1 { if (!has) print "# ANVIL:INSTALLED:END" cr; next }
+      { print $0 cr }' .gitignore > .gitignore.anvil
+  cat .gitignore.anvil > .gitignore && rm .gitignore.anvil
+  ```
 
   Recusado → as duas linhas ficam. Avise que elas continuam ignorando todo o
   `.claude/skills/`, a skill do usuário inclusive, e pergunte do bloco à parte.
