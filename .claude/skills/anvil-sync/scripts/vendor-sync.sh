@@ -487,11 +487,6 @@ PYEOF
         [ -d "$PAYLOAD/$n" ] || { echo "   FALHA $n: no manifesto como vendored, ausente do payload"; falhas=$((falhas+1)); }
     done < <(manifest_rows)
 
-    agentes_do_payload() {
-        local f
-        for f in "$AGENTS"/*.md; do [ -f "$f" ] && basename "$f" .md; done | sort
-    }
-
     echo "7. o anvil.lock bate com o payload"
     local lock="$ROOT/anvil/.claude/anvil.lock"
     if [ ! -f "$lock" ]; then
@@ -503,8 +498,8 @@ PYEOF
         so_disco="$(comm -13 <(sed -n 's/^skill: //p' "$lock" | sort) <(find "$PAYLOAD" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort))"
         [ -n "$so_lock" ] && { echo "   FALHA no lock e nao no payload: $(echo "$so_lock" | tr '\n' ' ')"; falhas=$((falhas+1)); }
         [ -n "$so_disco" ] && { echo "   FALHA no payload e nao no lock: $(echo "$so_disco" | tr '\n' ' ')"; falhas=$((falhas+1)); }
-        so_lock="$(comm -23 <(sed -n 's/^agent: //p' "$lock" | sort) <(agentes_do_payload))"
-        so_disco="$(comm -13 <(sed -n 's/^agent: //p' "$lock" | sort) <(agentes_do_payload))"
+        so_lock="$(comm -23 <(sed -n 's/^agent: //p' "$lock" | sort) <(find "$AGENTS" -maxdepth 1 -type f -name '*.md' -exec basename {} .md \; 2>/dev/null | sort))"
+        so_disco="$(comm -13 <(sed -n 's/^agent: //p' "$lock" | sort) <(find "$AGENTS" -maxdepth 1 -type f -name '*.md' -exec basename {} .md \; 2>/dev/null | sort))"
         [ -n "$so_lock" ] && { echo "   FALHA agente no lock e nao no payload: $(echo "$so_lock" | tr '\n' ' ')"; falhas=$((falhas+1)); }
         [ -n "$so_disco" ] && { echo "   FALHA agente no payload e nao no lock: $(echo "$so_disco" | tr '\n' ' ')"; falhas=$((falhas+1)); }
     fi
@@ -518,33 +513,41 @@ PYEOF
             { echo "   FALHA $n: invocable no manifesto, mas o frontmatter ainda trava"; falhas=$((falhas+1)); }
     done < <(manifest_rows)
 
+    # O Claude Code acha o agente pelo name:, e o lock e o bloco o acham pelo nome
+    # do arquivo. Os dois tem de ser o mesmo.
+    echo "9. name: do agente bate com o nome do arquivo"
+    for f in "$AGENTS"/*.md; do
+        [ -f "$f" ] || continue
+        n="$(basename "$f" .md)"
+        fm="$(awk '{ sub(/[ \t\r]+$/, "") } NR == 1 { if ($0 != "---") exit; next } $0 == "---" { exit }
+                   sub(/^name: */, "") { print; exit }' "$f" | tr -d "\"'")"
+        [ "$n" = "$fm" ] || { echo "   FALHA agents/$n.md: frontmatter diz '$fm'"; falhas=$((falhas+1)); }
+    done
+
     # Contrato de citacao com a equipe (spec 001, team-shape.md, secao 3). Num agente,
     # caminho do payload se cita so em crase e relativo a raiz de instalacao, porque
     # o modelo resolve caminho a partir do cwd, a raiz do projeto, e nao do arquivo
     # do agente. Link relativo resolveria para o verify e nao para o modelo:
     # pareceria checado e quebraria em uso. Por isso o span e conferido contra
     # anvil/, a raiz do payload, e o link e falha em qualquer lugar do arquivo.
-    echo "9. name: do agente bate com o nome do arquivo"
-    for f in "$AGENTS"/*.md; do
-        [ -f "$f" ] || continue
-        n="$(basename "$f" .md)"
-        fm="$(awk '{ sub(/\r$/, "") } NR == 1 { if ($0 != "---") exit; next } $0 == "---" { exit }
-                   sub(/^name: */, "") { print; exit }' "$f" | tr -d "\"'")"
-        [ "$n" = "$fm" ] || { echo "   FALHA agents/$n.md: frontmatter diz '$fm'"; falhas=$((falhas+1)); }
-    done
-
-    # Span em crase, CommonMark de uma linha: abre e fecha com a mesma quantidade de
-    # crases. Fica de fora o que e padrao e nao caminho (`*`, `{`, `<`) e o que esta
-    # em bloco cercado, que e exemplo.
+    #
+    # Span em crase de uma linha, como no CommonMark: abre e fecha com a mesma
+    # quantidade de crases. Fica de fora o que e padrao e nao caminho (`*`, `{`, `<`)
+    # e o que esta em bloco cercado, que e exemplo. A cerca e de crase ou de til, e
+    # so fecha com a mesma marca e pelo menos o mesmo comprimento: uma cerca de
+    # quatro crases pode mostrar uma de tres por dentro.
     spans_of() {
         python3 - "$1" <<'PYEOF'
 import re, sys
-fence = False
+fence = None
 for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
-    if line.lstrip().startswith('```'):
-        fence = not fence
-        continue
+    m = re.match(r' {0,3}(`{3,}|~{3,})', line)
     if fence:
+        if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and not line[m.end():].strip():
+            fence = None
+        continue
+    if m:
+        fence = m.group(1)
         continue
     for m in re.finditer(r'(?<!`)(`+)(?!`)(.+?)(?<!`)\1(?!`)', line):
         t = m.group(2)
