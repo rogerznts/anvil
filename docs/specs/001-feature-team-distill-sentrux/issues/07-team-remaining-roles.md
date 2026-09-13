@@ -31,3 +31,24 @@ Dev é o único escritor do checkout. O repro chega ao Dev por `SendMessage`, co
 quem escreve e commita é o Dev; o Leader anota o caminho do repro no ticket e o repassa ao gate do Tester. Vale também
 com worktrees. Motivo: dois escritores disputam o índice, e arquivo não rastreado do Tester entraria no commit do Dev.
 `SKILL.md` e `anvil-team-tester.md` ficam com o Dev.
+
+**Leader, 2026-09-13 — entrega do Dev** em `1911994` (check e, "14." no `verify`), `8e54737` (os cinco agentes; Dev,
+Review, `PROTOCOL.md`, `SKILL.md` e lock), `4999f32` (`anvil-principles` e `anvil-prototype` no roster do `dev-link`),
+`a085581` (README e overview), `cf464ec` (autorrevisão) e `1465105` (Tester despachado antes do Dev). Desenho
+atualizado pelo Architect em `8180c4a`. Ponto A: fixtures do check (e) 16/16 em bash 5.2 e 3.2 — reprova skill
+inexistente, crase dupla, skill travada, a própria `anvil-team`, trava com espaço, agente fora da equipe; não reprova
+skill livre, nome de agente, bloco cercado, nome sem crase, placeholder, trava fora do frontmatter; 8 falhas antes do
+check; `workspace/15-team/run.sh` sem regressão. Ponto B isolado, uma sessão em três turnos (US$ 6,50): os sete agent
+types no init; Dev → Tester por `SendMessage` sem o Leader (a primeira tentativa voltou "not reachable", a segunda
+entregou), repro com caminho e comando, Dev viu falhar antes de corrigir; Tester escreveu só fora do checkout; o
+julgamento do Tester chegou ao Leader; o ticket 01 do projeto de teste chegou a `resolved` com os dois gates;
+tester, po, analyst, architect e designer despachados; todo despacho leu o protocolo com `cat` inteiro e carregou a
+skill pela Skill tool.
+
+Desvios aceitos: **D1** campos do finding de comportamento no `PROTOCOL.md`, sem seção Findings em Tester e Review
+(RV-F2; o 07 editou o protocolo, contra o §12 original); **D2** Tester despachado antes do Dev, pela corrida medida
+(ambos em `8180c4a`); **D3** `anvil-ui` fora do roster do `dev-link`, porque este repositório não tem UI; **D4** check
+(e) vale para todo agente do payload; **D5** turnos 1 e 2 com a linha-ponteiro anterior a `cf464ec` (o "inteiro, sem
+head" já estava); **D6** linha de agente no bloco do `.gitignore` do README, atrasada do 05. Riscos registrados:
+"Tester primeiro" medido uma vez; o check (e) só reconhece a trava sem aspas, como o check 8; `SendMessage` tardia
+retomou o Tester depois do PRONTO. Gates despachados: Review e Tester.
