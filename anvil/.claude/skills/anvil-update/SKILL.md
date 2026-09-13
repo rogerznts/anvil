@@ -88,6 +88,12 @@ A saída classifica em quatro grupos: *substituídos* · *órfãos, serão remov
 
 Skill aparece pelo nome, agente pelo caminho (`.claude/agents/{nome}.md`).
 
+Com lock, o substituído que o lock não lista sai de novo logo abaixo, como
+*possível colisão com arquivo do usuário*: pode ser uma skill ou um agente que o
+usuário escreveu com o nome de um do payload. Ele será sobrescrito e passa a
+constar do lock. Sem lock tudo está fora dele, não há como distinguir, e o
+destaque não aparece.
+
 Por último vem o bloco `ANVIL:INSTALLED` do `.gitignore`, regenerado a partir do
 lock novo: uma linha por skill e por agente instalado, então um órfão removido sai
 dele junto.
@@ -97,7 +103,8 @@ não ganha um — quem o cria é o `/anvil-boot`.
 ### 4. Avisar e esperar
 
 Diga numa frase o que será apagado e o que será preservado, **nomeando os
-órfãos**. Não continue com um "talvez".
+órfãos** e as **possíveis colisões**, que serão sobrescritas. Não continue com um
+"talvez".
 
 ### 5. Executar
 

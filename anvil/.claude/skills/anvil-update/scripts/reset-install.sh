@@ -183,6 +183,15 @@ for f in "$AGENTS"/*.md; do
     alheios_ag="$alheios_ag$a"$'\n'
 done
 
+# Substituido que o lock nao lista pode ser do usuario com o nome de um do payload:
+# sera sobrescrito, e o relatorio o destaca para o aviso nomea-lo. Sem lock nao ha
+# como distinguir, e nada e destacado.
+colisoes=""; colisoes_ag=""
+if [ -f "$LOCK" ]; then
+    for s in $substituidos;    do printf '%s\n' "$possui"    | grep -qxF "$s" || colisoes="$colisoes$s"$'\n'; done
+    for a in $substituidos_ag; do printf '%s\n' "$possui_ag" | grep -qxF "$a" || colisoes_ag="$colisoes_ag$a"$'\n'; done
+fi
+
 conta() { printf '%s' "$1" | grep -c . || true; }
 # Skill sai pelo nome, agente pelo caminho: as duas listas dividem o mesmo grupo.
 lista() {
@@ -195,6 +204,10 @@ echo "reset-install: $FROM_ABS -> $TO_ABS"
 [ "$DRY" -eq 1 ] && echo "(dry-run: nada foi alterado)"
 echo
 echo "substituídos ($(conta "$substituidos$substituidos_ag")):"; lista "$substituidos" "$substituidos_ag"
+if [ -n "$colisoes$colisoes_ag" ]; then
+    echo "ATENÇÃO, substituídos fora do lock, possível colisão com arquivo do usuário ($(conta "$colisoes$colisoes_ag")):"
+    lista "$colisoes" "$colisoes_ag"
+fi
 echo "órfãos, serão REMOVIDOS ($(conta "$orfaos$orfaos_ag")):"; lista "$orfaos" "$orfaos_ag"
 echo "não são do anvil, ficam intocados ($(conta "$alheios$alheios_ag")):"; lista "$alheios" "$alheios_ag"
 echo "preservados sempre:"
