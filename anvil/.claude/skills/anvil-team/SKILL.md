@@ -162,6 +162,21 @@ vontade.
 - **Gate:** sempre `Agent` novo com o mesmo name, rodada `n+1`. Ver
   [Gates](#gates).
 
+**Name inalcançável.** Numa sessão sua retomada em processo novo (`claude
+--resume`, ou cada turno de `claude -p`), a `SendMessage` ao name de um autor
+falha com "No agent named … is reachable". Então:
+
+1. Rode `ListAgents` e procure o name exato **entre os subagentes que esta sessão
+   despachou**. Sessão de outra máquina, sessão local alheia ou sessão na nuvem não
+   conta, mesmo com o mesmo name: mandar a delegação para ela é entregar trabalho
+   da Equipe a quem não é da Equipe.
+2. Uma linha só: `SendMessage` pelo agentId dela, que retoma com o contexto
+   intacto.
+3. Nenhuma, ou mais de uma: `Agent` novo com o mesmo name, com o Contexto apontando
+   o ticket e os comentários. O papel relê em vez de lembrar.
+
+Gate não entra nesta regra: rodada de gate já é `Agent` novo.
+
 ### Tester junto com o Dev
 
 Quando o ticket tem comportamento a reproduzir ou pede harness antes da solução,
