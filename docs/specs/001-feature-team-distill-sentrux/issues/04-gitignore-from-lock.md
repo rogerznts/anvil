@@ -4,14 +4,14 @@
 
 **Blocked by:** Nenhum — pode começar agora.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Uma função única gera o bloco a partir do lock, e o update a chama depois de gravar o lock.
-- [ ] O modo `--gitignore-only` reescreve só o bloco a partir do lock existente, e é o que o boot usa.
-- [ ] Rodar duas vezes não muda nada, e uma skill órfã removida sai do bloco.
-- [ ] O boot troca a linha antiga só quando acha o comentário exato que ele mesmo escreveu, mostrando o antes e o depois e esperando aprovação.
-- [ ] Uma linha parecida sem esse comentário fica intocada.
-- [ ] Pontos A e B: `reset-install --dry-run` e boot num projeto descartável com skill do usuário, `tea-*`, e a linha antiga com e sem o comentário.
+- [x] Uma função única gera o bloco a partir do lock, e o update a chama depois de gravar o lock.
+- [x] O modo `--gitignore-only` reescreve só o bloco a partir do lock existente, e é o que o boot usa.
+- [x] Rodar duas vezes não muda nada, e uma skill órfã removida sai do bloco.
+- [x] O boot troca a linha antiga só quando acha o comentário exato que ele mesmo escreveu, mostrando o antes e o depois e esperando aprovação.
+- [x] Uma linha parecida sem esse comentário fica intocada.
+- [x] Pontos A e B: `reset-install --dry-run` e boot num projeto descartável com skill do usuário, `tea-*`, e a linha antiga com e sem o comentário.
 
 ## Comments
 
@@ -109,3 +109,13 @@ R2 e o critério de CRLF resolvidos; os desvios aceitos se sustentam.
 
 Fica fora: **N6** (ramos sem saída e linha em branco sobrando — cosmético ou anterior ao ticket).
 Depois desta rodada, achado não bloqueante vira ideia registrada, não reabertura.
+
+**Leader, 2026-09-13 — resolvido.** Ponto B do Tester, isolado do `CLAUDE.md` e das rules do repo pai:
+APROVADO — R1 (troca em `.gitignore` CRLF, todas as linhas mantêm CR), R2 (skill do usuário que estava
+no lock sai dele pela reescrita do passo 9, sem edição à mão) e S1 (recusa no primeiro boot, aprovação
+no segundo, um par só, script nunca com rc=2). Com o reteste do Review e o ponto A do Tester, os gates
+passaram sobre `496b155`.
+
+A "última rodada" registrada acima **não acontece neste ticket**: N1, N2, N3, N4, N5 e a receita do
+update para instalação sem lock foram para o ticket 05, que estende o lock e o bloco aos agentes nos
+mesmos passos do boot. Os arquivos deste ticket deixam de estar congelados.
