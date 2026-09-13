@@ -42,7 +42,7 @@ O resultado, medido em 2026-09-13 com
 
 | | |
 |---|---|
-| skills `vendored` no manifesto | 36 — 34 com árvore no upstream; `anvil-principles` e `anvil-bench` são só `keep` e `extra` |
+| skills `vendored` no manifesto | 36 entradas: as 35 skills curadas e o `anvil-bench`, autoral, que traz o `unlazy`. 34 têm árvore no upstream; `anvil-principles` e `anvil-bench` são só `keep` e `extra` |
 | linhas dos arquivos que existem no pin e no payload | 21.887 |
 | **linhas nossas que diferem do upstream** | **202 — 0,92%** |
 | arquivos deixados de fora (`strip`) | 59 |
@@ -53,7 +53,9 @@ O resultado, medido em 2026-09-13 com
 *Linha nossa* é a que está no payload e não está na versão do pin. A definição
 inteira, com o que conta à parte, está no próprio script.
 
-Dezessete dessas skills têm **uma linha** de delta: o `name:` do frontmatter.
+Em dezessete dessas skills, os arquivos pareados têm **uma linha** de delta: o
+`name:` do frontmatter. O que conta à parte fica fora dessa linha — o
+`anvil-stack-payload` está entre as dezessete e carrega 29 arquivos `keep`.
 
 ---
 
