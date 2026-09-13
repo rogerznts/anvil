@@ -37,18 +37,23 @@ Isso é possível porque as skills do Matt Pocock não têm caminho fixo: elas l
 documental do anvil é um perfil de tracker** — ao lado de github, gitlab e local
 — e não um alvo de reescrita.
 
-O resultado, medido:
+O resultado, medido em 2026-09-13 com
+`bash .claude/skills/anvil-sync/scripts/vendor-sync.sh stats`:
 
 | | |
 |---|---|
-| skills vendorizadas | 35 |
-| linhas totais | 25.064 |
-| **linhas nossas que diferem do upstream** | **171 — 0,68%** |
-| arquivos deixados de fora (`strip`) | 40 |
-| arquivos que o anvil adicionou | 3 |
-| material vendorizado fora de skill (`unlazy`, dentro do bench) | 21 arquivos · 3.772 linhas |
+| skills `vendored` no manifesto | 36 — 34 com árvore no upstream; `anvil-principles` e `anvil-bench` são só `keep` e `extra` |
+| linhas dos arquivos que existem no pin e no payload | 21.887 |
+| **linhas nossas que diferem do upstream** | **202 — 0,92%** |
+| arquivos deixados de fora (`strip`) | 59 |
+| arquivos do anvil dentro de skill vendorizada (`keep`) | 34 arquivos · 7.720 linhas |
+| material trazido de fora da árvore da skill (`extra`, inclui o `unlazy` do bench) | 45 arquivos · 5.771 linhas · 4 nossas |
+| arquivo sem par, fora da conta | 1 — `anvil-to-spec/scripts/new-spec.sh` |
 
-Vinte e uma dessas skills têm **uma linha** de delta: o `name:` do frontmatter.
+*Linha nossa* é a que está no payload e não está na versão do pin. A definição
+inteira, com o que conta à parte, está no próprio script.
+
+Dezessete dessas skills têm **uma linha** de delta: o `name:` do frontmatter.
 
 ---
 
@@ -63,7 +68,7 @@ flowchart TD
         B --> B1["CLAUDE.md<br/>bloco ANVIL:DIRECTIVES"]
         B1 --> B2["varre o projeto"]
         B2 --> B3[".claude/rules/<br/>project.md · anvil.md"]
-        B3 --> B4["anvil-docs scaffold<br/>architecture · discovery<br/>specs · agents"]
+        B3 --> B4["anvil-docs, sem verbo<br/>escolhe scaffold ou adopt<br/>architecture · discovery<br/>specs · agents"]
         B4 --> B5["anvil-setup<br/>docs/agents/issue-tracker.md"]
         B5 --> B6{"achou<br/>payload.config.ts?"}
         B6 -->|sim| B7["propõe rules/payload.md<br/>e espera aprovação"]
@@ -326,6 +331,7 @@ bash $S pull            # atualiza os submodules
 bash $S vendor <nome>   # primeira cópia de uma skill
 bash $S update [<nome>] # merge 3-way; sem argumento, todas
 bash $S verify          # integridade do payload
+bash $S stats           # a métrica do topo deste README
 ```
 
 **O pin do submodule é a base do merge.** Nenhum snapshot é guardado:
@@ -337,7 +343,7 @@ ours   = anvil/.claude/skills/<nome>/<arquivo>
 ```
 
 O catálogo de adaptações é **fechado**: `rename`, `invocable`, `docs-remap`,
-`decursor`, `keep`/`strip`/`extra`. Se uma mudança não cabe em nenhuma, ela não deveria estar
+`decursor`, `tracker-profile`, `keep`/`strip`/`extra`. Se uma mudança não cabe em nenhuma, ela não deveria estar
 sendo feita. E há uma lista do que **nunca** é adaptação: traduzir, enxugar,
 uniformizar vocabulário entre skills, corrigir erro do upstream.
 
