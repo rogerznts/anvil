@@ -33,3 +33,9 @@ reconcilia.
 Ajuste antes dos gates: `anvil-to-spec/scripts/new-spec.sh` é arquivo do anvil dentro de skill vendorizada e não
 está no `keep` — o `stats` o mostra sem par, e o `update` não tem ordem de preservá-lo; entra `keep`. O bloco
 "Comandos" da `anvil-sync/SKILL.md` passa a listar `lock` e `stats`.
+
+**Leader, 2026-09-13 — ajuste pré-gate** em `9c2f44e` (`keep: [scripts/new-spec.sh]` no `anvil-to-spec`; README
+remedido: keep 35 arquivos · 7.866 linhas, sem par 0; demais totais iguais) e `df59c26` (`lock` e `stats` no bloco
+"Comandos" da `anvil-sync`). `verify` limpo em 3.2 e 5; `status` e `update anvil-to-spec` em dia. Ressalva do Dev: com
+o HEAD do submodule igual ao pin, o `update` não percorre arquivos, então o caminho do `keep` num merge real não foi
+exercitado; o efeito prático do `keep` é o `vendor` e a classificação no `stats`. Gates despachados: Review e Tester.
