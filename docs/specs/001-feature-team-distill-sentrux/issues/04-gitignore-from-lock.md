@@ -65,3 +65,20 @@ preserva o fim de linha que já tinha.
 
 **Reteste:** `run.sh` do Dev, `adv.sh` e `repro-crlf.sh` do Tester, e o Review conferindo S1 e
 S2 no diff novo.
+
+**Leader, 2026-09-13 — correções entregues em `837b7ca` (script) e `7135c05` (boot).**
+
+Nota de numeração: os passos do boot trocaram de ordem nas correções — agora o **9 é o lock** e o
+**10 é o gitignore**. Nos comentários acima, escritos antes, "passo 9" é o gitignore (S1) e "passo 10"
+é o lock (S2).
+
+Desvios aceitos: (1) marcador `END ` com espaço fecha o par, como decidido para CR e espaço no fim;
+(2) o lock é lido sem `\r` também no cálculo do que o anvil possui; (3) com skill faltando no disco o
+lock é reescrito do disco com a exclusão das skills do usuário, e a sugestão de `/anvil-boot` fica só
+no `SKILL.md` do update, com a ressalva do opt-out.
+
+Entram neste ticket, antes dos gates: **R1** a busca da linha antiga no boot casa em `.gitignore`
+com CRLF; **R2** um projeto bootado com o passo antigo pode já ter skill do usuário dentro do lock —
+antes de gravar o bloco, o boot confirma com o usuário se alguma skill listada é dele.
+Ficam como estão: **R3** fim de linha pela primeira linha em arquivo misto; **R4** intervalo fixo do
+`--help`, que já existia.
