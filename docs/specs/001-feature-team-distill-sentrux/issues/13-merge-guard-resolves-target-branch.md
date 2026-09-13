@@ -4,20 +4,20 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] A guarda identifica a spec pelo branch nomeado no `git merge`, além do branch atual, e opções do comando (`--no-ff`, `-m`, etc.) não atrapalham a identificação.
-- [ ] Merge de branch sem número continua liberado, como hoje.
-- [ ] Quando o branch atual e o branch mesclado são specs diferentes, as duas são conferidas.
-- [ ] As fixtures de decisão (menção dentro de string ignora; invocação verifica) continuam passando.
-- [ ] A cópia do hook instalada neste repositório fica igual à do payload.
-- [ ] A rule do projeto deixa de descrever o contorno "disparar do branch da spec".
-- [ ] Ponto A: num projeto descartável com spec de ticket aberto, `git merge` do branch da spec rodado na `main` sai 2, e do próprio branch da spec também; com tickets resolvidos e spec arquivada, os dois saem 0.
-- [ ] A rule do projeto diz que o passo de PR do perfil do tracker (`/tea-open-pr`) não se aplica neste repositório, onde a spec fecha com merge local.
-- [ ] O critério de bloqueio da guarda não é repetido na rule: ela aponta o perfil do tracker.
-- [ ] Na rule, `mosk` ganha glosa na primeira menção, o `unlazy` deixa de ser descrito como origem de skill, e o parágrafo de abertura para de tratar todo `references/` como upstream.
-- [ ] `git cherry-pick` continua fora da guarda: é como a equipe integra worktrees com a spec aberta.
-- [ ] O `verify` sai limpo.
+- [x] A guarda identifica a spec pelo branch nomeado no `git merge`, além do branch atual, e opções do comando (`--no-ff`, `-m`, etc.) não atrapalham a identificação.
+- [x] Merge de branch sem número continua liberado, como hoje.
+- [x] Quando o branch atual e o branch mesclado são specs diferentes, as duas são conferidas.
+- [x] As fixtures de decisão (menção dentro de string ignora; invocação verifica) continuam passando.
+- [x] A cópia do hook instalada neste repositório fica igual à do payload.
+- [x] A rule do projeto deixa de descrever o contorno "disparar do branch da spec".
+- [x] Ponto A: num projeto descartável com spec de ticket aberto, `git merge` do branch da spec rodado na `main` sai 2, e do próprio branch da spec também; com tickets resolvidos e spec arquivada, os dois saem 0.
+- [x] A rule do projeto diz que o passo de PR do perfil do tracker (`/tea-open-pr`) não se aplica neste repositório, onde a spec fecha com merge local.
+- [x] O critério de bloqueio da guarda não é repetido na rule: ela aponta o perfil do tracker.
+- [x] Na rule, `mosk` ganha glosa na primeira menção, o `unlazy` deixa de ser descrito como origem de skill, e o parágrafo de abertura para de tratar todo `references/` como upstream.
+- [x] `git cherry-pick` continua fora da guarda: é como a equipe integra worktrees com a spec aberta.
+- [x] O `verify` sai limpo.
 
 ## Comments
 
@@ -147,3 +147,11 @@ mesclava de verdade, bloqueia; conteúdo de `$(...)` conferido à parte); F2, al
 aritmética resolvidos; sem regressão no B1, nas opções globais nem nas menções; suítes do Dev e do Tester
 limpas em bash 5 e 3.2. Ideia acrescentada: `echo $((1))#; git merge {spec}` (o `#` colado a `))` lido como
 comentário — mesma classe de `echo a\ #`). Falta o reteste final do Tester.
+
+**Leader, 2026-09-13 — resolvido.** Reteste final do Tester: APROVADO — `repro-reteste.sh` 13/13 em bash 5 e 3.2,
+suíte adversarial estável nos 10 contornos do item 7 e nos 2 falsos positivos antigos, commits no formato dos
+agentes sem falso positivo novo (159 comandos com heredoc no corpus real e 28 sintéticos hostis), nenhum comando
+passando de bloqueado para liberado. Com o reteste final do Review, os gates passaram sobre `33644a2`.
+
+Nota para o fechamento desta spec: enquanto o 13 não estiver na `main`, a guarda que roda num comando disparado
+já na `main` é a antiga. O merge final da 001 sai num comando só, disparado do branch da spec.
