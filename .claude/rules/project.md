@@ -58,8 +58,8 @@ O julgamento está em `.claude/skills/anvil-sync/SKILL.md`, o catálogo em
 nada disso aqui — são a fonte, isto é o ponteiro.
 
 Skill autoral — `anvil-boot`, `anvil-update`, `anvil-docs`, `anvil-ui`,
-`anvil-team`, `anvil-bench` e as `tea-*` — não tem upstream, e se edita direto no
-payload. Os agentes `anvil-team-*` também são autorais. A ressalva é o
+`anvil-team`, `anvil-distill`, `anvil-bench` e as `tea-*` — não tem upstream, e se
+edita direto no payload. Os agentes `anvil-team-*` também são autorais. A ressalva é o
 `anvil-bench`: o que está em `anvil-bench/unlazy/` é material do
 `unlazy`, que vem de upstream com pin e registro no manifesto, e segue a regra de
 skill vendorizada.

@@ -133,6 +133,7 @@ revisado, e a guarda de merge impõe a ordem.
 |---|---|---|
 | `anvil-how` | *"como X funciona?"* — passeio pelo código, camadas, onde uma coisa deveria morar | pstack |
 | `anvil-research` | investiga contra fonte primária e devolve um documento com citação por afirmação | mattpocock |
+| `anvil-distill` | destila uma funcionalidade de um sistema de referência em `references/`: ponteiros `caminho:linha`, tradução para a stack do projeto e o que não portar | autoral |
 | `anvil-diagnose` | bug difícil: constrói o loop de feedback antes de levantar hipótese | mattpocock |
 | `anvil-domain-modeling` | constrói o glossário e os ADRs; a linguagem ubíqua do projeto | mattpocock |
 | `anvil-codebase-design` | vocabulário de módulo profundo, seam, interface, alavanca | mattpocock |
