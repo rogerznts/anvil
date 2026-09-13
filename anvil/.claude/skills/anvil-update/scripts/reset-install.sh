@@ -167,14 +167,16 @@ if [ -d "$SKILLS" ]; then
     done
 fi
 
+# Symlink conta como agente no disco, mesmo pendurado: o [ -f ] segue o link, e um
+# orfao pendurado ficaria no disco sem aparecer em grupo nenhum.
 substituidos_ag=""; orfaos_ag=""; alheios_ag=""
-for a in $novo_ag;   do [ -f "$AGENTS/$a.md" ] && substituidos_ag="$substituidos_ag$a"$'\n'; done
+for a in $novo_ag;   do { [ -f "$AGENTS/$a.md" ] || [ -L "$AGENTS/$a.md" ]; } && substituidos_ag="$substituidos_ag$a"$'\n'; done
 for a in $possui_ag; do
     printf '%s\n' "$novo_ag" | grep -qxF "$a" && continue
-    [ -f "$AGENTS/$a.md" ] && orfaos_ag="$orfaos_ag$a"$'\n'
+    { [ -f "$AGENTS/$a.md" ] || [ -L "$AGENTS/$a.md" ]; } && orfaos_ag="$orfaos_ag$a"$'\n'
 done
 for f in "$AGENTS"/*.md; do
-    [ -f "$f" ] || continue
+    [ -f "$f" ] || [ -L "$f" ] || continue
     a="$(basename "$f" .md)"
     printf '%s\n' "$novo_ag"   | grep -qxF "$a" && continue
     printf '%s\n' "$possui_ag" | grep -qxF "$a" && continue
