@@ -139,6 +139,7 @@ spec com merge local.
 64. Como mantenedor, quero que a rule do projeto descreva o fluxo por branch de spec com merge local, para que agentes não mandem trabalho de spec direto na `main`.
 65. Como mantenedor, quero que a rule distinga upstream vendorizado de sistema de referência, para que ninguém trate uma pasta passageira como base de merge.
 66. Como mantenedor, quero que o README e o overview parem de dizer que o anvil não tem agentes, para que a documentação conte o que o payload distribui.
+67. Como mantenedor que fecha uma spec com merge local, quero que a guarda bloqueie o `git merge` do branch da spec disparado de qualquer lugar, inclusive da `main`, para que a garantia não dependa de eu lembrar de onde rodar o comando.
 
 ## Implementation Decisions
 
@@ -175,6 +176,9 @@ spec com merge local.
 - **`dev-link`.** Liga também os agentes do payload neste repositório.
 - **Migração do mosk no boot.** Remove só as personas do mosk dentro de
   `.claude/agents/`, não o diretório.
+- **Guarda de merge.** Identifica a spec também pelo branch nomeado no `git merge`,
+  não só pelo branch atual. Achado durante a implementação: rodado na `main`, o merge
+  local passava com ticket aberto.
 
 ### `anvil-distill`
 
@@ -305,6 +309,8 @@ payload e contra um projeto descartável.
   inclusive as `tea-*`. O modo `--gitignore-only` reescreve só o bloco, e rodar
   duas vezes não muda nada.
 - A linha do `anvil-setup` no manifesto tem `docs-remap`, e o `verify` sai limpo.
+- A guarda bloqueia o `git merge` de uma spec aberta disparado do branch da spec e da
+  `main`, e libera os dois depois do archive.
 
 ### Ponto B — skills num projeto descartável
 
