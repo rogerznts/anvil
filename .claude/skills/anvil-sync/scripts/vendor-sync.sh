@@ -507,12 +507,39 @@ PYEOF
         [ -n "$so_disco" ] && { echo "   FALHA agente no payload e nao no lock: $(echo "$so_disco" | tr '\n' ' ')"; falhas=$((falhas+1)); }
     fi
 
-    # A trava de invocacao, numa forma so para os checks 8 e 14: a linha dentro do
-    # frontmatter, com espaco sobrando ou comentario YAML depois do true. Fora do
-    # frontmatter e texto. Com aspas nao e reconhecida.
+    # A trava de invocacao, numa forma so para os checks 8 e 14: a leitura do Claude
+    # Code 2.1.270, tirada do binario. Sem BOM, o frontmatter e o que casa com
+    # /^---\s*\n([\s\S]*?)---\s*\n?/, lido como YAML; se nao parseia, tenta de novo
+    # com tab de inicio de linha virando espacos, e se ainda falha nao ha trava. O
+    # valor trava se for booleano true, ou string ou numero que, em minusculas e sem
+    # espaco nas pontas, e 1, true, yes ou on. O PyYAML nao aceita o tab entre a
+    # chave e o valor, que o parser do Claude Code aceita, e o tab vira espaco antes.
     tem_trava() {  # <SKILL.md>
-        awk '{ sub(/[ \t\r]+$/, "") } NR == 1 { if ($0 != "---") exit; next } $0 == "---" { exit }
-             /^disable-model-invocation: *true([ \t]+#.*)?$/ { found = 1; exit } END { exit !found }' "$1"
+        python3 - "$1" <<'PYEOF'
+import re, sys, yaml
+t = open(sys.argv[1], encoding='utf-8', errors='replace').read()
+if t.startswith('\ufeff'):
+    t = t[1:]
+m = re.match(r'---\s*\n(.*?)---\s*\n?', t, re.S)
+if not m:
+    sys.exit(1)
+fm = re.sub(r'^([^\s#][^:\n]*):\t[ \t]*', r'\1: ', m.group(1), flags=re.M)
+v = None
+for texto in (fm, re.sub(r'^\t+', lambda x: '  ' * len(x.group()), fm, flags=re.M)):
+    try:
+        d = yaml.safe_load(texto)
+    except yaml.YAMLError:
+        continue
+    v = d.get('disable-model-invocation') if isinstance(d, dict) else None
+    break
+if isinstance(v, bool):
+    sys.exit(0 if v else 1)
+if isinstance(v, float) and v.is_integer():
+    v = int(v)  # String(1.0) no JavaScript e "1"
+if isinstance(v, (str, int, float)) and str(v).strip().lower() in ('1', 'true', 'yes', 'on'):
+    sys.exit(0)
+sys.exit(1)
+PYEOF
     }
 
     echo "8. skill marcada invocable não tem a trava de invocação"
