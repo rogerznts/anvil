@@ -27,3 +27,10 @@ ainda cai no `scaffold` e ignora o glossário. A exceção vai para o `anvil-doc
 Ficam como ideia: `ARCHITECTURE.md`/`ROADMAP.md` soltos na raiz e `src/*/docs/adr/` como gatilho (o ticket
 nomeia três caminhos). Aceito: a cláusula de `docs/adr/` é redundante com "conteúdo fora dos domínios", mas o
 ticket a nomeia. `CONTEXT-MAP.md` sem execução própria vai para o gate do Tester.
+
+**Leader, 2026-09-13 — ampliação entregue** em `3a66f54` (`anvil-docs`: regra "sem verbo explícito" e parada
+do `scaffold`) e `30549ae` (boot delega a escolha). Prova isolada: `/anvil-docs` digitado direto num projeto
+com `CONTEXT.md` na raiz segue pelo `adopt` com plano e parada; pelo boot, projeto antigo vai para o `adopt`
+e projeto limpo para o `scaffold`. Desvio aceito: duas células da tabela de verbos do `anvil-docs` deixam de
+contradizer a regra. O diagrama do README que mostra o boot chamando o `scaffold` direto vai para o ticket 03.
+Gates: Review agora; Tester depois do reteste do 05.

@@ -11,4 +11,5 @@
 - [ ] Uma skill cujo único delta é o `rename` mede exatamente uma linha nossa.
 - [ ] O README troca os números antigos pelos medidos, com o comando e a data.
 - [ ] A lista do catálogo de adaptações no README inclui `invocable` e `tracker-profile`, na mesma ordem do `ADAPT-RULES.md`.
+- [ ] O diagrama do fluxo no README mostra o boot chamando o `anvil-docs` sem verbo, que escolhe entre `scaffold` e `adopt` (ticket 14).
 - [ ] Ponto A: as três verificações acima rodam contra o payload real.
