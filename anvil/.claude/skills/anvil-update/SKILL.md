@@ -9,9 +9,10 @@ Reinstala o payload do anvil e reporta o que mudou.
 
 ## O contrato
 
-**Isto é um reset, não uma sobrescrita.** As skills que o anvil instalou são
-apagadas e reinstaladas. Ficam intactos: `.claude/rules/`, `.claude/settings.json`,
-`docs/`, `CLAUDE.md`, e **qualquer skill que você tenha escrito**.
+**Isto é um reset, não uma sobrescrita.** As skills e os agentes que o anvil
+instalou são apagados e reinstalados. Ficam intactos: `.claude/rules/`,
+`.claude/settings.json`, `docs/`, `CLAUDE.md`, e **qualquer skill ou agente que
+você tenha escrito**.
 
 **Por que reset e não `degit --force`:** o `--force` sobrescreve arquivo a
 arquivo e **nunca apaga**. Uma skill que deixou de existir upstream ficaria no
@@ -19,9 +20,10 @@ disco para sempre, e os agentes continuariam encontrando e tentando usar.
 Atualizar sem reset acumula o entulho de todas as versões anteriores.
 
 **Como os órfãos são calculados:** pelo `.claude/anvil.lock`, que lista o que
-esta instalação possui. É o que substitui a detecção por prefixo do mosk — um
-lockfile diz a verdade, um prefixo adivinha, e adivinha errado justamente nas
-skills que não seguem o padrão de nome, como as `tea-*`.
+esta instalação possui, com uma linha `skill:` por skill e uma `agent:` por
+agente. É o que substitui a detecção por prefixo do mosk — um lockfile diz a
+verdade, um prefixo adivinha, e adivinha errado justamente nas skills que não
+seguem o padrão de nome, como as `tea-*`.
 
 Instalação sem lock não tem nada classificado como nosso. É a leitura segura —
 nada é apagado — mas também significa que **órfão nenhum é limpo**. Se o preflight
@@ -29,11 +31,28 @@ não achar `.claude/anvil.lock`, **avise antes de seguir**: o reset vai instalar
 payload novo por cima e deixar no disco tudo que sobrou da versão anterior.
 
 Nesse caso, ou o usuário aceita e o lock passa a existir a partir daqui, ou ele
-escreve o lock com a lista atual antes de rodar, para o update ter o que comparar:
+escreve o lock com a lista atual antes de rodar, para o update ter o que comparar.
+Tudo o que entra no lock é tratado como do anvil e apagado como órfão se o payload
+novo não o trouxer. Por isso, antes, mostre as skills de `.claude/skills/` e os
+agentes de `.claude/agents/` e **pergunte quais não vieram do anvil**. Eles entram
+em `USER_SKILLS` e `USER_AGENTS` e ficam fora:
 
 ```bash
-ls .claude/skills | sed 's/^/skill: /' > /tmp/lock-atual
+USER_SKILLS="minha-skill outra-skill"   # skills que não vieram do anvil; vazio se nenhuma
+USER_AGENTS="meu-agente"                # agentes que não vieram do anvil, sem o .md; vazio se nenhum
+{ echo "# anvil.lock — o que esta instalacao possui."
+  echo "# Escrito antes do update. Nao edite a mao."
+  ls .claude/skills | while read -r s; do
+    case " $USER_SKILLS " in *" $s "*) ;; *) echo "skill: $s" ;; esac
+  done
+  ls .claude/agents 2>/dev/null | sed -n 's/\.md$//p' | while read -r a; do
+    case " $USER_AGENTS " in *" $a "*) ;; *) echo "agent: $a" ;; esac
+  done
+} > .claude/anvil.lock
 ```
+
+O lock novo aparece no `git status`, e o preflight pede árvore limpa: commite-o
+antes.
 
 ## Fluxo
 
@@ -67,8 +86,11 @@ bloco do `.gitignore`, pode rodar da cópia instalada — é o que o `/anvil-boo
 A saída classifica em quatro grupos: *substituídos* · *órfãos, serão removidos* ·
 *não são do anvil, ficam intocados* · *preservados sempre*.
 
+Skill aparece pelo nome, agente pelo caminho (`.claude/agents/{nome}.md`).
+
 Por último vem o bloco `ANVIL:INSTALLED` do `.gitignore`, regenerado a partir do
-lock novo: uma linha por skill instalada, então uma órfã removida sai dele junto.
+lock novo: uma linha por skill e por agente instalado, então um órfão removido sai
+dele junto.
 Só o bloco muda; o resto do `.gitignore` fica como estava. Projeto sem o bloco
 não ganha um — quem o cria é o `/anvil-boot`.
 
@@ -106,7 +128,7 @@ rm -rf "$TMP"
 - Árvore suja não é resetada sem confirmação explícita.
 - O dry-run vem antes de qualquer remoção, sempre.
 - O reset do `reset-install.sh` roda do `$TMP`, nunca do projeto.
-- Nada é apagado fora do conjunto que o script calcula. **Skill que o usuário
-  escreveu não é do anvil para remover.**
+- Nada é apagado fora do conjunto que o script calcula. **Skill ou agente que o
+  usuário escreveu não é do anvil para remover.**
 - O lockfile é reescrito pelo script. Não edite à mão. O bloco `ANVIL:INSTALLED`
   do `.gitignore` também.
