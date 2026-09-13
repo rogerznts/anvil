@@ -52,3 +52,18 @@ Desvios aceitos: **D1** campos do finding de comportamento no `PROTOCOL.md`, sem
 head" já estava); **D6** linha de agente no bloco do `.gitignore` do README, atrasada do 05. Riscos registrados:
 "Tester primeiro" medido uma vez; o check (e) só reconhece a trava sem aspas, como o check 8; `SendMessage` tardia
 retomou o Tester depois do PRONTO. Gates despachados: Review e Tester.
+
+**Leader, 2026-09-13 — gate Review, rodada 1: APROVADO, sem bloqueante.** Critérios atendidos sobre `1465105`;
+`run.sh` 16/16 em 5.2 e 3.2 rodado pelo Review sobre o HEAD; checks 10 e 12 sem regressão (regex nova equivalente);
+linha-ponteiro com hash idêntico nos sete; RV-F1, RV-F2 e RV-F3 coerentes entre `SKILL.md`, `PROTOCOL.md`, agentes e
+desenho. Achados: **F1** a regra "Tester primeiro" (`SKILL.md:190-194`, D2) não foi exercitada — no turno 2 o Dev saiu
+antes e falhou, e o turno 3 não tem par; e "o Dev só depois que a chamada do Tester voltar" é ambíguo (voltar =
+PRONTO em 188/190), o que serializaria o par; a mesma frase está no desenho. **F2** a conversa lateral do Ponto B teve
+mão do Leader: ele autorizou nova tentativa ao Dev e mandou o Tester enviar o repro sem esperar o pedido; o critério
+literal se sustenta, mas o comentário de entrega acima a descreve como espontânea — **fica corrigido aqui**. **P3** o
+template da Política de escrita não tem a forma do Tester (leitura no checkout, escrita fora dele). **P4** o check (e)
+não pega `/anvil-wayfinder` com barra. **P5** o Review repete o "preferência sem fonte de verdade não é finding" do
+protocolo. **S1** o bloco "com · gate / sem gate" de Review e Tester parafraseia o protocolo. **S3** "regressão quem
+escreve é o Dev" em três lugares. **S4** `SKILL.md:220-221` repete :196-198. **S5** checks 8 e 14 detectam a trava de
+formas diferentes (`true # x`). **S6** a linha-ponteiro diz "inteiro" quatro vezes. Não verificados pelo Review:
+"8 falhas antes do check"; o Tester chegando ao Leader com o Dev discordando (o gate do Tester cobre).
