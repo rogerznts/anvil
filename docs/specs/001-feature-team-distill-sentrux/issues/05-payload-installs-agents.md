@@ -59,3 +59,15 @@ Ficam como ideia: **F4** falsos negativos raros do check (b) (linha com crases i
 span em duas linhas); **F5** duplicação do formato do lock entre boot, update e scripts; **F6** alinhar
 skills em `grep -qxF`; **F8** symlink velho no `dev-link`; **F9** detalhes do awk e do temporário;
 **F10** `name:` com comentário. Aguardando o gate do Tester.
+
+**Leader, 2026-09-13 — gate Tester: APROVADO.** Ponto A: órfão, lock antigo nos dois leitores, lock
+CRLF, payload sem `.claude/agents/`, symlinks, `verify` com uma violação por vez e casos que não podem
+reprovar, `dev-link` num clone. Ponto B isolado: migração com as 12 personas reais do mosk remove só
+elas, o core, as skills `mosk-*` e o hook; o agente do anvil e o do usuário ficam sem diff.
+
+**Ajuste único antes de fechar** (Review + Tester): F1, F2, F3, F7 (= R1 do Tester) e, do Tester, link
+markdown por referência (`[p]: PROTOCOL.md`) passa a reprovar no check (c).
+
+Ficam como ideia, além das do Review: `<a href>` relativo, `.claude/../` que resolve fora, cerca
+indentada 5 espaços e bloco de 4 espaços conferidos, span com `$VAR` ou `:linha`, `mailto:` tratado
+como relativo, agente do usuário chamado `mosk-*` apagado pela migração (o boot mostra o plano antes).
