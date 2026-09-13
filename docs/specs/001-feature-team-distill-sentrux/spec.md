@@ -139,8 +139,8 @@ spec com merge local.
 64. Como mantenedor, quero que a rule do projeto descreva o fluxo por branch de spec com merge local, para que agentes não mandem trabalho de spec direto na `main`.
 65. Como mantenedor, quero que a rule distinga upstream vendorizado de sistema de referência, para que ninguém trate uma pasta passageira como base de merge.
 66. Como mantenedor, quero que o README e o overview parem de dizer que o anvil não tem agentes, para que a documentação conte o que o payload distribui.
-68. Como usuário com um projeto antigo que guarda o glossário na raiz ou ADRs em `docs/adr/`, quero que o boot perceba e me proponha mover para o layout do anvil, para que meu glossário não seja ignorado em silêncio.
 67. Como mantenedor que fecha uma spec com merge local, quero que a guarda bloqueie o `git merge` do branch da spec disparado de qualquer lugar, inclusive da `main`, para que a garantia não dependa de eu lembrar de onde rodar o comando.
+68. Como usuário com um projeto antigo que guarda o glossário na raiz ou ADRs em `docs/adr/`, quero que o boot perceba e me proponha mover para o layout do anvil, para que meu glossário não seja ignorado em silêncio.
 
 ## Implementation Decisions
 
