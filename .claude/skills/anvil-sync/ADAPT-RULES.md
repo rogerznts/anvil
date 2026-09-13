@@ -12,6 +12,7 @@ O catálogo é fechado de propósito. Regra nova exige entrada aqui e um motivo.
 | `invocable` | mecânica | o script |
 | `docs-remap` | julgamento | você, lendo o arquivo |
 | `decursor` | julgamento | você, lendo o arquivo |
+| `tracker-profile` | julgamento | você, lendo o arquivo |
 | `keep` / `strip` | declarativa | o script, pelo manifesto |
 
 ---
@@ -120,6 +121,38 @@ diferentes. O Claude Code só endereça modelos Claude, então a premissa degrad
 para N candidatos do mesmo modelo. Ao adaptar, deixe explícito no arquivo que o
 valor migrou de *diversidade de modelo* para *cross-judge* — senão quem ler
 depois vai achar que está funcionando como o autor pensou.
+
+---
+
+## `tracker-profile` — julgamento
+
+Só na skill de setup, e só para **oferecer o perfil de tracker do `anvil-docs`**.
+São três linhas: a postura padrão do upstream — propor GitHub ou GitLab conforme o
+`git remote` — é **substituída** por propor o perfil do anvil primeiro; a opção
+entra na lista como recomendada; e o passo de escrita manda buscar o perfil no
+`anvil-docs`.
+
+```diff
+-Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. If a `git remote` points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. Otherwise (or if the user prefers), offer:
++Default posture in anvil: propose **anvil docs/specs** first. It is the layout the rest of the toolkit assumes, and the only one where specs are versioned with the code. Propose another only if the user tracks work elsewhere and wants to keep doing so.
++- **anvil docs/specs** (recommended): specs and tickets live under `docs/specs/{NNN}-{type}-{name}/`, versioned in the repo. Call the Skill tool with "anvil-docs" and use the profile it provides at `templates/issue-tracker-anvil.md`
++- **anvil docs/specs**: the profile is owned by the `anvil-docs` skill, not duplicated here. Call the Skill tool with "anvil-docs" to get it
+```
+
+**Por que existe.** O `adr-0002` — a organização documental do anvil é um perfil
+de issue tracker — decide que `docs/specs/` chega aos projetos como um quarto
+perfil, e não reescrevendo as skills de fluxo. O setup do upstream é quem
+apresenta os perfis, então é nele que o perfil do anvil precisa aparecer.
+
+**A perda é deliberada.** Sem a postura do upstream, o setup deixa de sugerir
+GitHub ou GitLab pelo remote. As duas opções continuam na lista. Num merge em que
+o upstream mexa nessa postura, a versão do anvil ganha.
+
+**Por que não é `docs-remap`.** O `docs-remap` exclui de propósito o que o perfil
+de tracker resolve. Esta regra é justamente a entrada desse perfil.
+
+**Estreita.** O perfil mora no `anvil-docs` e não é copiado para o setup, e as
+opções GitHub, GitLab, local e outro ficam verbatim. Hoje só o `anvil-setup` usa.
 
 ---
 

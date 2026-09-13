@@ -38,7 +38,7 @@ bash $S verify              # integridade do payload
 ```
 
 O script faz o **mecânico**: mover bytes, rodar `merge-file`, aplicar o `rename`,
-gravar o pin. Você faz o **julgamento**: `docs-remap` e `decursor`, e resolver
+gravar o pin. Você faz o **julgamento**: `docs-remap`, `decursor` e `tracker-profile`, e resolver
 conflito. O script sinaliza o que falta, sempre.
 
 ## Adotar uma skill nova

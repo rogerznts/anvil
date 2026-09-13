@@ -18,8 +18,8 @@
 # existe, porque submodule é clone completo — a base é recuperável de graça.
 #
 # O script faz o que é MECÂNICO: mover bytes, rodar merge-file, aplicar o
-# `rename` e o `invocable`. As regras de julgamento (`docs-remap`, `decursor`)
-# ele apenas SINALIZA; quem aplica é a skill anvil-sync, que sabe ler o que mudou.
+# `rename` e o `invocable`. As regras de julgamento (`docs-remap`, `decursor`,
+# `tracker-profile`) ele apenas SINALIZA; quem aplica é a skill anvil-sync, que sabe ler o que mudou.
 
 set -uo pipefail
 
@@ -270,6 +270,7 @@ cmd_vendor() {
     local j=""
     case ",$adapt," in *,docs-remap,*) j="$j docs-remap" ;; esac
     case ",$adapt," in *,decursor,*)   j="$j decursor" ;; esac
+    case ",$adapt," in *,tracker-profile,*) j="$j tracker-profile" ;; esac
     if [ -n "$j" ]; then
         echo
         echo "  FALTA APLICAR À MÃO:$j"
@@ -347,6 +348,7 @@ update_one() {
         local j=""
         case ",$adapt," in *,docs-remap,*) j="$j docs-remap" ;; esac
         case ",$adapt," in *,decursor,*)   j="$j decursor" ;; esac
+        case ",$adapt," in *,tracker-profile,*) j="$j tracker-profile" ;; esac
         [ -n "$j" ] && echo "    revise as regras de julgamento:$j"
     else
         echo "    pin NÃO atualizado — resolva os conflitos e rode de novo."

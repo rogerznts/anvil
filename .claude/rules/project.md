@@ -45,7 +45,7 @@ trava.
 
 A cópia no payload não é arquivo livre: tem pin e registro de adaptação. O
 catálogo é **fechado** — `rename`, `invocable`, `docs-remap`, `decursor`,
-`keep`, `strip`, `extra`. Mudança que não cabe em nenhuma dessas não deveria estar sendo feita.
+`tracker-profile`, `keep`, `strip`, `extra`. Mudança que não cabe em nenhuma dessas não deveria estar sendo feita.
 
 Nunca são adaptação: traduzir, enxugar, uniformizar vocabulário entre skills,
 corrigir erro do upstream.
