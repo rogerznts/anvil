@@ -16,29 +16,30 @@ que vai dentro dela.
 
 | verbo | quando | onde está |
 |---|---|---|
-| `scaffold` | projeto novo, sem documentação | aqui embaixo |
-| `adopt` | documentação existente fora do padrão | [ADOPT.md](ADOPT.md) |
+| `scaffold` | projeto sem gatilho do `adopt` | aqui embaixo |
+| `adopt` | projeto com gatilho do `adopt` | [ADOPT.md](ADOPT.md) |
 | `index` | depois de criar, mudar ou arquivar spec | [INDEX.md](INDEX.md) |
 | `archive` | spec fechada | [ARCHIVE.md](ARCHIVE.md) |
 
-Sem verbo explícito, confira primeiro o glossário e os ADRs do layout antigo, que
-moram fora de `docs/`:
+**Gatilho do `adopt`** — basta um dos dois:
 
-```bash
-ls -d CONTEXT.md CONTEXT-MAP.md 2>/dev/null; find docs/adr -type f 2>/dev/null
-```
+- `docs/` com conteúdo fora dos domínios canônicos;
+- a checagem do layout antigo imprime alguma linha:
 
-Sem glob: no zsh, um `docs/adr/*` que não casa aborta o comando inteiro e esconde
-o `CONTEXT.md`.
+  ```bash
+  ls -d CONTEXT.md CONTEXT-MAP.md 2>/dev/null; find docs/adr -type f 2>/dev/null
+  ```
 
-- A checagem imprimiu alguma linha → `adopt`, **mesmo com `docs/` ausente ou só
-  com os README de domínio**. O perfil de domínio que o `anvil-setup` grava,
-  `docs/agents/domain.md`, procura esses arquivos no layout do anvil e manda
-  seguir em silêncio se não os acha: sem o `adopt`, ficam esquecidos.
-- Não imprimiu, e `docs/` não existe ou só tem os README de domínio → `scaffold`.
-- `docs/` tem conteúdo → `adopt`.
+  Sem glob: no zsh, um `docs/adr/*` que não casa aborta o comando inteiro e
+  esconde o `CONTEXT.md`.
 
-Nunca presuma que dá para só criar por cima.
+O glossário e os ADRs do layout antigo moram fora de `docs/`, e contam **mesmo
+com `docs/` ausente ou só com os README de domínio**. O perfil de domínio que o
+`anvil-setup` grava, `docs/agents/domain.md`, procura esses arquivos no layout do
+anvil e manda seguir em silêncio se não os acha: sem o `adopt`, ficam esquecidos.
+
+Sem verbo explícito: com gatilho do `adopt`, é `adopt`; sem, é `scaffold`. Nunca
+presuma que dá para só criar por cima.
 
 ## A árvore canônica
 
@@ -158,6 +159,10 @@ no **destino**.
 
 ## `scaffold`
 
+**Pré-condição**, antes do passo 1 e mesmo com o verbo `scaffold` explícito:
+confira o gatilho do `adopt`, em [Verbos](#verbos). Com gatilho, **pare e use
+`adopt`**.
+
 1. Criar **só os quatro que têm escritor**: `architecture/adr/`, `discovery/`,
    `specs/archive/` e `agents/`. **Nunca sobrescrever** uma que já existe.
    `prd/`, `ui/`, `qa/` e `project/` não nascem agora — nascem quando alguém
@@ -168,10 +173,6 @@ no **destino**.
    É esse arquivo que faz as skills de fluxo publicarem em `docs/specs/` sem
    conhecerem esse caminho.
 4. Rodar o verbo `index`.
-
-Se `docs/` já tiver conteúdo fora dos domínios canônicos, ou a checagem do layout
-antigo em [Verbos](#verbos) imprimir alguma linha, **pare e use `adopt`**. Rode-a
-mesmo quando o verbo `scaffold` vier explícito.
 
 ## Contrato de stack
 
