@@ -8,6 +8,13 @@ de cinco repositórios upstream, mantidos como submodules em `references/`, e as
 vendoriza com adaptação registrada num manifesto — de forma que continuem
 atualizáveis quando o upstream andar.
 
+**Também distribui uma equipe.** A skill autoral `anvil-team` abre o Leader, que
+despacha sete agentes de papel instalados em `.claude/agents/`: PO, Architect,
+Analyst, Designer, Dev, Tester e Review. Não são as personas do mosk: os papéis
+conversam entre si por *agent teams*, e os gates de Tester e Review chegam ao
+Leader sem passar pelo autor — ver o
+[ADR-0007](docs/architecture/adr/adr-0007-equipe-por-papel-sobre-agent-teams.md).
+
 ```bash
 npx degit rogerznts/anvil/anvil . --force
 ```
@@ -133,6 +140,16 @@ revisado, e a guarda de merge impõe a ordem.
 | `anvil-implement` | constrói a partir do ticket; chama `tdd` e `code-review` por dentro | mattpocock |
 | `anvil-code-review` | revisa o diff em dois eixos independentes — Standards e Spec | mattpocock |
 | `anvil-tdd` | ciclo vermelho-verde que produz teste que se mantém, em seams acordados | mattpocock |
+
+### Equipe
+
+| skill | para quê | origem |
+|---|---|---|
+| `anvil-team` | abre o Leader, que trabalha uma spec pelos tickets e despacha os agentes `anvil-team-{papel}`, com gates de Tester e Review que o autor não controla. Só o usuário a abre, e ela exige *agent teams* ligado | autoral |
+
+Os sete agentes trabalham com as skills desta página e leem um protocolo só, dentro da
+`anvil-team`. Nenhum é escolhido por delegação automática: fora da equipe, não têm
+o que fazer.
 
 ### Entender antes de mudar
 
@@ -265,7 +282,7 @@ de `resolved` → em andamento; pasta sob `archive/` → arquivado.
 ## O que fica versionado
 
 O boot escreve no `.gitignore` do projeto um bloco gerado do `anvil.lock`, com uma
-linha por skill que o anvil instalou:
+linha por skill e por agente que o anvil instalou:
 
 ```gitignore
 # ANVIL:INSTALLED:START
@@ -273,14 +290,16 @@ linha por skill que o anvil instalou:
 .claude/skills/anvil-architect/
 …
 .claude/skills/tea-commit/
+.claude/agents/anvil-team-dev.md
+…
 # ANVIL:INSTALLED:END
 ```
 
 Skill instalada é conteúdo do toolkit, reinstalável. Versionar 2 MB de skill de
 terceiro engorda o histórico, e todo update viraria um diff gigante que ninguém
 revisa. A lista é nominal, nunca por prefixo, porque as `tea-*` não seguem o padrão
-de nome. **A skill que você escreve em `.claude/skills/` fica fora do bloco e
-continua versionada.** O `/anvil-update` regenera o bloco a cada reinstalação, então
+de nome. **A skill ou o agente que você escreve em `.claude/` fica fora do bloco e
+continua versionado.** O `/anvil-update` regenera o bloco a cada reinstalação, então
 uma skill órfã removida sai dele também.
 
 Um projeto bootado antes ignorava `.claude/skills/` inteiro. O boot acha essa linha
