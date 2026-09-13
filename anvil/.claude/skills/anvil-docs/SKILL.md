@@ -51,7 +51,7 @@ docs/
 │   ├── context.md                 glossário ubíquo (anvil-domain-modeling)
 │   ├── context-map.md             só em repositório multi-contexto
 │   └── adr/                       decisões, uma por arquivo
-├── discovery/                  ●  pesquisa e notas (anvil-research)
+├── discovery/                  ●  pesquisa e notas (anvil-research, anvil-distill)
 ├── specs/                      ●
 │   ├── {NNN}-{tipo}-{nome}/
 │   │   ├── spec.md                anvil-to-spec — inclui as User Stories
@@ -84,7 +84,7 @@ Duas camadas espelhadas: **base**, que é a verdade do projeto hoje, e
 | domínio | quem |
 |---|---|
 | `architecture/context.md` e `adr/` | `anvil-grill` e `anvil-domain-modeling`, enquanto decidem |
-| `discovery/` | `anvil-research` — ele diz *"salve onde o repositório já guarda essas notas"*, então escreve aqui se a pasta existir. E `anvil-distill`, que destila um sistema de referência: aqui fora de branch de spec, em `specs/{id}/discovery/` dentro dele |
+| `discovery/` | `anvil-research` — ele diz *"salve onde o repositório já guarda essas notas"*, então escreve aqui se a pasta existir. E `anvil-distill`, que destila um sistema de referência: aqui fora de branch de spec; num branch de spec, em `specs/{id}/discovery/` |
 | `specs/{id}/spec.md` | `anvil-to-spec`. **Inclui as User Stories** — no anvil a spec é a unidade, e absorve o que num PRD seria épico e story |
 | `specs/{id}/issues/` | `anvil-to-tickets` |
 | `specs/{id}/ui/` | `anvil-grill`. Fluxo de usuário, comportamento de interface e wireframe são decisão que vira artefato — a mesma natureza de um ADR. Quando a pergunta só se responde vendo rodar, o `anvil-prototype` gera as variantes, você escolhe, e **a decisão volta para o documento**; o protótipo em si é descartável e vive fora da main |
