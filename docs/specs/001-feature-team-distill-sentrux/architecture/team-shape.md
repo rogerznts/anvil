@@ -516,7 +516,7 @@ registrou.
 | `description` | `{papel} · ticket {NN}[ · rodada {n}]` | sempre |
 | `model` | o valor do papel na lista `team` | papel sem entrada, ou valor fora de `opus`, `fable`, `sonnet`, `haiku` → omitir, e vale o modelo da sessão |
 | `isolation` | `"worktree"` | só com outro escritor ativo ao mesmo tempo. Nunca num gate |
-| `run_in_background` | `true` | sempre. O Leader segue disponível para o usuário, e dois papéis vivos ao mesmo tempo é o que torna a conversa lateral possível |
+| `run_in_background` | `true` | sempre. A chamada devolve o lançamento na hora, não o retorno do papel. O Leader segue disponível para o usuário, e dois papéis vivos ao mesmo tempo é o que torna a conversa lateral possível |
 | `prompt` | a delegação | sempre |
 
 `{papel}-{NN}` e não um nome fixo por papel: dois Devs em tickets diferentes
@@ -558,9 +558,8 @@ vivo. Quando o ticket tem comportamento a reproduzir ou pede harness antes da
 solução, o Leader despacha `tester-{NN}` junto com `dev-{NN}`, os dois vivos ao
 mesmo tempo, o Tester com delegação **sem** `gate`: preparar repro e harness,
 mandá-los ao Dev, responder o autor, e voltar `PRONTO`.
-Cada um aparece na linha `Equipe` do outro. O gate do Tester é outra chamada, depois
-da entrega do Dev, com o mesmo name e `· gate`, e só depois que a delegação sem gate
-voltou.
+Cada um aparece na linha `Equipe` do outro. O gate do Tester é outra chamada, com o
+mesmo name e `· gate`, depois da entrega do Dev e do `PRONTO` da delegação sem gate.
 
 **O Tester sai primeiro**, e o Dev logo que a chamada `Agent` do Tester devolver o
 lançamento ("Async agent launched"), sem esperar o `PRONTO` dele. Os dois trabalham
