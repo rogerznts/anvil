@@ -40,3 +40,17 @@ distribuídas: a lista do catálogo no README vai para o ticket 03, que já mexe
 Divergências de ADR registradas e não corrigidas, porque ADR é registro histórico: o ADR-0002 diz
 que o perfil do anvil mora na pasta do setup, e ele mora no `anvil-docs`; o ADR-0004 lista as
 regras sem `invocable` e sem `tracker-profile`.
+
+**Leader, 2026-09-13 — gate Review, parte 1 (`1e21649`, `a07756f`): APROVADO, sem bloqueante.** Todas
+as linhas que diferem do upstream foram classificadas em `rename`, `docs-remap`, `tracker-profile`,
+`invocable` ou `strip`. Três achados ficam neste ticket, num ajuste final:
+
+- **F1** — `SKILL.md` cita `to-tickets` e `to-spec` sem o prefixo das skills adotadas.
+- **F2** — os seeds de tracker GitHub, GitLab e local gravam `/wayfinder` no projeto.
+- **F3** — a definição do `docs-remap` no catálogo fala só de caminho de saída e de uma skill; a
+  prática remapeia também caminhos lidos, em cinco skills.
+
+Fica como ideia, fora da spec: o `verify` não detecta nome de skill adotada sem prefixo nem
+`CONTEXT.md` na raiz, e foi por isso que F1 e F2 passaram até aqui.
+
+Pendente: revisão curta de `adb17b3` e do ajuste final; ponto B do Tester.
