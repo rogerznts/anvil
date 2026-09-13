@@ -58,7 +58,7 @@ skills:
 
   # ---- mattpocock: fluxo principal -----------------------------------------
   - { name: anvil-grill,        source: mattpocock, path: skills/engineering/grill-with-docs,          pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], strip: [agents] }
-  - { name: anvil-to-spec,      source: mattpocock, path: skills/engineering/to-spec,                  pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], strip: [agents] }
+  - { name: anvil-to-spec,      source: mattpocock, path: skills/engineering/to-spec,                  pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], keep: [scripts/new-spec.sh], strip: [agents] }
   - { name: anvil-to-tickets,   source: mattpocock, path: skills/engineering/to-tickets,               pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], strip: [agents] }
   - { name: anvil-implement,    source: mattpocock, path: skills/engineering/implement,                pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], strip: [agents] }
   - { name: anvil-code-review,  source: mattpocock, path: skills/engineering/code-review,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }

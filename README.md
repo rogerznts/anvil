@@ -46,9 +46,9 @@ O resultado, medido em 2026-09-13 com
 | linhas dos arquivos que existem no pin e no payload | 21.887 |
 | **linhas nossas que diferem do upstream** | **202 — 0,92%** |
 | arquivos deixados de fora (`strip`) | 59 |
-| arquivos do anvil dentro de skill vendorizada (`keep`) | 34 arquivos · 7.720 linhas |
+| arquivos do anvil dentro de skill vendorizada (`keep`) | 35 arquivos · 7.866 linhas |
 | material trazido de fora da árvore da skill (`extra`, inclui o `unlazy` do bench) | 45 arquivos · 5.771 linhas · 4 nossas |
-| arquivo sem par, fora da conta | 1 — `anvil-to-spec/scripts/new-spec.sh` |
+| arquivo sem par, fora da conta | 0 |
 
 *Linha nossa* é a que está no payload e não está na versão do pin. A definição
 inteira, com o que conta à parte, está no próprio script.
