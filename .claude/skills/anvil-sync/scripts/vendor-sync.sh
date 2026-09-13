@@ -7,6 +7,7 @@
 #   update [<nome>]     merge 3-way do upstream sobre a cópia adaptada
 #   verify              checagens de integridade do payload
 #   lock                regenera o anvil.lock a partir do payload
+#   stats               a métrica do README: linhas nossas contra o pin
 #
 # A BASE do merge é reconstruída do submodule pelo pin do manifesto:
 #
@@ -613,10 +614,111 @@ PYEOF
     echo "verify: $falhas falha(s)"; return 1
 }
 
+# --- stats --------------------------------------------------------------------
+# A métrica que o README publica. A definição mora aqui; o README cita este
+# comando e a data em que ele rodou.
+#
+# LINHA NOSSA é a linha presente no payload e ausente da versão do pin: o lado
+# nosso (`>`) do diff pin→payload. Linha que o anvil apagou não conta, e linha
+# alterada conta uma vez. Por isso a skill cujo único delta é o `rename` mede
+# exatamente 1, e o `invocable`, que só apaga a trava, não soma nada.
+#
+# A base é o pin, não o HEAD do submodule: mede a cópia contra a versão de onde
+# ela saiu, e o número não muda quando o upstream anda.
+#
+# Cada arquivo de uma skill `vendored` cai num balde só, nesta precedência:
+#
+#   keep     arquivo do anvil dentro da skill. Conta à parte: arquivos e linhas.
+#   extra    arquivo trazido de fora da árvore da skill (`origem::destino`).
+#            Comparado com a origem no pin, mas conta à parte.
+#   strip    arquivo da árvore no pin deixado de fora. Só o número de arquivos.
+#   pareado  existe dos dois lados, na árvore da skill no pin e no payload. É o
+#            ÚNICO balde que entra em "linhas" e "linhas nossas".
+#   sem par  arquivo de um lado só que nenhuma regra acima explica. Fica fora da
+#            conta, mas aparece, para não sumir em silêncio.
+#
+# Linhas de um arquivo contam por awk (NR), que inclui a última sem \n.
+nlines() { awk 'END { print NR }' "$1"; }
+
+nossas() {  # <base> <payload>
+    diff "$1" "$2" | grep -c '^>'
+}
+
+cmd_stats() {
+    local name state sub path pin keep strip extra dest f pair from to dests
+    local arq lin nos k kl e el en s sp
+    local t_sk=0 t_arvore=0 t_arq=0 t_lin=0 t_nos=0 t_um=0 t_s=0 t_sp=0
+    local t_k=0 t_kl=0 t_e=0 t_el=0 t_en=0 sem_arvore="" sem_par=""
+    local base; base="$(mktemp)"
+
+    printf '%-26s %5s %7s %6s %5s %5s %5s %7s\n' SKILL ARQ LINHAS NOSSAS KEEP EXTRA STRIP SEM-PAR
+    while IFS=$'\x1f' read -r name state sub path pin _ keep strip extra; do
+        [ "$state" = "vendored" ] || continue
+        dest="$PAYLOAD/$name"
+        arq=0; lin=0; nos=0; k=0; kl=0; e=0; el=0; en=0; s=0; sp=0
+
+        dests=""
+        if [ -n "$extra" ]; then
+            IFS=',' read -ra arr <<< "$extra"
+            for pair in "${arr[@]}"; do
+                [ -n "$pair" ] || continue
+                from="${pair%%::*}"; to="${pair##*::}"
+                dests="$dests,$to"
+                if [ -f "$dest/$to" ] && git -C "$ROOT/$sub" show "$pin:$from" > "$base" 2>/dev/null; then
+                    e=$((e + 1)); el=$((el + $(nlines "$dest/$to"))); en=$((en + $(nossas "$base" "$dest/$to")))
+                else
+                    sp=$((sp + 1)); sem_par="$sem_par$name/$to, extra sem origem no pin ou sem destino"$'\n'
+                fi
+            done
+        fi
+
+        # lado do payload: keep, extra (já contado), pareado ou sem par
+        while IFS= read -r f; do
+            if is_listed "$f" "$keep"; then k=$((k + 1)); kl=$((kl + $(nlines "$dest/$f"))); continue; fi
+            is_listed "$f" "$dests" && continue
+            if [ -n "$path" ] && git -C "$ROOT/$sub" show "$pin:$path/$f" > "$base" 2>/dev/null; then
+                arq=$((arq + 1)); lin=$((lin + $(nlines "$dest/$f"))); nos=$((nos + $(nossas "$base" "$dest/$f")))
+            else
+                sp=$((sp + 1)); sem_par="$sem_par$name/$f, só no payload"$'\n'
+            fi
+        done < <(cd "$dest" 2>/dev/null && find . -type f | sed 's|^\./||' | LC_ALL=C sort)
+
+        # lado do pin: strip, ou sem par quando sumiu do payload
+        while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            if is_listed "$f" "$strip"; then s=$((s + 1)); continue; fi
+            is_listed "$f" "$keep" && continue
+            [ -f "$dest/$f" ] || { sp=$((sp + 1)); sem_par="$sem_par$name/$f, só no pin"$'\n'; }
+        done < <(tree_files "$sub" "$pin" "$path")
+
+        printf '%-26s %5s %7s %6s %5s %5s %5s %7s\n' "$name" "$arq" "$lin" "$nos" "$k" "$e" "$s" "$sp"
+        t_sk=$((t_sk + 1))
+        if [ -n "$path" ]; then t_arvore=$((t_arvore + 1)); else sem_arvore="$sem_arvore $name"; fi
+        t_arq=$((t_arq + arq)); t_lin=$((t_lin + lin)); t_nos=$((t_nos + nos))
+        [ "$nos" -eq 1 ] && t_um=$((t_um + 1))
+        t_k=$((t_k + k)); t_kl=$((t_kl + kl))
+        t_e=$((t_e + e)); t_el=$((t_el + el)); t_en=$((t_en + en))
+        t_s=$((t_s + s)); t_sp=$((t_sp + sp))
+    done < <(manifest_rows)
+    rm -f "$base"
+
+    echo
+    printf 'skills vendored             %s (%s com árvore no upstream; só keep e extra:%s)\n' "$t_sk" "$t_arvore" "$sem_arvore"
+    printf 'pareados                    %s arquivos · %s linhas\n' "$t_arq" "$t_lin"
+    printf 'linhas nossas               %s — %s%%\n' "$t_nos" \
+        "$(awk -v n="$t_nos" -v d="$t_lin" 'BEGIN { if (d) printf "%.2f", 100 * n / d; else printf "0" }' | tr . ,)"
+    printf 'skills com 1 linha nossa    %s\n' "$t_um"
+    printf 'keep, à parte               %s arquivos · %s linhas\n' "$t_k" "$t_kl"
+    printf 'extra, à parte              %s arquivos · %s linhas · %s nossas\n' "$t_e" "$t_el" "$t_en"
+    printf 'strip, fora                 %s arquivos\n' "$t_s"
+    printf 'sem par, fora               %s arquivos\n' "$t_sp"
+    printf '%s' "$sem_par" | sed 's/^/  /'
+}
+
 # --- despacho -----------------------------------------------------------------
 
 usage() {
-    sed -n '3,8p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '3,10p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 case "${1:-status}" in
@@ -626,6 +728,7 @@ case "${1:-status}" in
     update) shift; cmd_update "$@" ;;
     verify) cmd_verify ;;
     lock)   gerar_lock ;;
+    stats)  cmd_stats ;;
     -h|--help) usage ;;
     *) echo "subcomando desconhecido: $1" >&2; usage >&2; exit 2 ;;
 esac
