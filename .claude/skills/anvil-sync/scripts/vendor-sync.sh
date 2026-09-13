@@ -587,6 +587,27 @@ PYEOF
 )
     done
 
+    # O papel chega ao protocolo pela linha-ponteiro (team-shape.md, secao 3). Sem
+    # ela, age sem saber a delegacao que recebeu nem o retorno que deve. Conta so a
+    # citacao que o check 10 confere: em crase e fora de bloco cercado.
+    echo "12. agente de equipe cita o protocolo"
+    for f in "$AGENTS"/anvil-team-*.md; do
+        [ -f "$f" ] || continue
+        spans_of "$f" | grep -qxF '.claude/skills/anvil-team/PROTOCOL.md' ||
+            { echo "   FALHA agents/$(basename "$f"): nao cita .claude/skills/anvil-team/PROTOCOL.md"; falhas=$((falhas+1)); }
+    done
+
+    # Residuo do port da equipe do Maestri: nota de canvas e erro de conexao, que
+    # depois do degit apontam para o nada. O check 4 e de upstream vendorizado e nao
+    # os pega. Vale em qualquer arquivo e em bloco cercado tambem: nao ha uso legitimo.
+    echo "13. nenhum token do Maestri em skill ou agente"
+    MAESTRI='@team-protocol|@anvil-skills|@mission-control|@anvil-install|No connection to note'
+    while IFS= read -r f; do
+        grep -qIE "$MAESTRI" "$f" 2>/dev/null || continue
+        echo "   FALHA ${f#"$ROOT/anvil/.claude/"}: $(grep -ohE "$MAESTRI" "$f" | sort -u | tr '\n' ' ')"
+        falhas=$((falhas+1))
+    done < <(find "$PAYLOAD" "$AGENTS" -type f 2>/dev/null)
+
     echo
     if [ "$falhas" -eq 0 ]; then echo "verify: limpo"; return 0; fi
     echo "verify: $falhas falha(s)"; return 1
