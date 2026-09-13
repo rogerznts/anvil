@@ -129,3 +129,15 @@ fail-closed declarado no cabeçalho e o texto do item 2, e a correção sugerida
    como heredoc.
 
 Reteste limitado: `repro-reteste.sh` e `adv.sh` do Tester e os casos do N1 do Review.
+
+**Leader, 2026-09-13 — última rodada entregue** em `1d16b07` (guarda), `489e23c` (comentários do
+`validate.sh`) e `33644a2` (cópia instalada). Números: `repro-reteste.sh` 13/13 em bash 5 e 3.2; `adv.sh`
+estável em 10 contornos (item 7) e 2 falsos positivos antigos; `adv2.sh` de 24 contornos e 21 falsos positivos
+para 16 e 13, sem piora; `run.sh` com 120 checagens limpo.
+
+Desvios aceitos: `$(which git) merge {spec}` passa a contar como git; o redirecionamento deixa de separar
+comandos e sai da lista de alvos em vez de derrubar para a lista larga (a forma literal gerava 6 falsos
+positivos no formato de merge dos agentes). Exceção aceita no corpus: um falso positivo novo em comando com alvo
+em variável e outro nome de spec no mesmo comando — custo direto de mandar alvo em variável para a lista larga;
+no uso real só acrescenta o branch atual. Ficam como ideia: `echo a\ #` e `echo \;#` antes de um merge.
+Reteste limitado: Review (casos do N1) e Tester (`repro-reteste.sh`, `adv.sh`).
