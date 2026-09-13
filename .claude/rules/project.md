@@ -1,9 +1,10 @@
 # anvil
 
 Toolkit de skills para Claude Code. Ele **não escreve as próprias skills de
-trabalho**: curadoriza skills de repositórios upstream, mantidos como submodules
-em `references/`, e as vendoriza com a adaptação registrada no manifesto
-`anvil-skills.yaml`.
+trabalho**: curadoriza skills de repositórios upstream e as vendoriza com a
+adaptação registrada no manifesto `anvil-skills.yaml`. Os upstreams são
+submodules em `references/`, mas nem tudo em `references/` é upstream: a tabela
+abaixo separa os dois.
 
 O que o toolkit impõe a um projeto é só **onde** o arquivo é salvo dentro de
 `docs/`. Bateu dúvida, o padrão é o da skill original.
@@ -19,8 +20,8 @@ Confundir as duas coisas é o erro caro daqui.
 | `.claude/skills/anvil-*` | **symlinks** para `anvil/.claude/skills/*`. Editar a skill instalada **é** editar o payload |
 | `.claude/skills/anvil-sync/` | a ferramenta de manutenção. É do repositório e **não vai no degit** |
 | `anvil-skills.yaml` | o manifesto de curadoria. Também não vai no degit |
-| `references/` — upstream vendorizado | submodule com pin, listado em `sources:` no manifesto. De onde vêm as skills vendorizadas. **O pin é a base do merge 3-way** |
-| `references/` — sistema de referência | sistema de terceiro estudado para portar algo, fora do manifesto. Entra passageiro, fora do git por `.git/info/exclude`, ou versionado como submodule, com pin. **Não é base de merge**: o `mosk` está aqui |
+| `references/` — upstream vendorizado | submodule com pin, listado em `sources:` no manifesto. De onde vem o que é vendorizado: skills e, no caso do `unlazy`, material de terceiro dentro do `anvil-bench`. **O pin é a base do merge 3-way** |
+| `references/` — sistema de referência | sistema de terceiro estudado para portar algo, fora do manifesto. Entra passageiro, fora do git por `.git/info/exclude`, ou versionado como submodule, com pin. **Não é base de merge**: o `mosk` — o toolkit de agentes-persona que o anvil sucede — está aqui |
 | `docs/` | a documentação do próprio anvil |
 | `workspace/` | projetos descartáveis para exercitar o toolkit. Fora do git |
 
@@ -76,14 +77,8 @@ Trabalho com spec vai num branch `{tipo}/{NNN}-{nome}`. Fecha com
 `/anvil-docs archive` no próprio branch e `git merge` local na `main`, sem PR.
 Trabalho sem spec vai direto na `main`.
 
-A guarda de merge vale para o branch de spec: bloqueia com ticket sem
-`Status: resolved` ou com a spec fora de `docs/specs/archive/`. Ela olha o branch
-**atual** na hora do comando, então o merge se dispara do branch da spec, num
-comando só:
-
-```bash
-git switch main && git merge {tipo}/{NNN}-{nome}
-```
-
-Rodado já na `main`, o merge passa sem que a guarda olhe a spec. E ela é um hook
-do Claude Code: só vê comando do agente, não o que se digita no terminal.
+O fechamento segue o perfil do tracker, `docs/agents/issue-tracker.md`, menos o
+passo `/tea-open-pr`: aqui não há PR, e a spec fecha com o merge local. O que a
+guarda de merge exige para liberar está no mesmo perfil. Ela confere o `git
+merge` disparado da `main` ou do branch da spec, e é um hook do Claude Code: só vê
+comando do agente, não o que se digita no terminal.
