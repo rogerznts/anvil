@@ -32,3 +32,6 @@ Ajuste antes dos gates: a tabela "Quem escreve onde" do `anvil-docs` e o README 
 `anvil-distill` ao lado do `anvil-research`. Riscos registrados: a sessão principal pode repassar a stack da rule como
 fato ao subagente (o subagente seguiu o código); documentos grandes (770–980 linhas) custam no grill se lidos
 inteiros. Ideia: registrar uma skill autoral exige mexer em quatro lugares.
+
+**Leader, 2026-09-13 — ajuste pré-gate** em `9bc93b6` (`anvil-docs` e README de `discovery/` citam o `anvil-distill`).
+Gates despachados: Review e Tester.
