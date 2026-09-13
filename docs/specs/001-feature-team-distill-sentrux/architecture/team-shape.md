@@ -76,7 +76,7 @@ Com a variável, o Leader lê o `PROTOCOL.md`, relê os tickets, calcula a front
 e fala com o usuário:
 
 ```text
-Spec 001, Equipe, destilação e sentrux
+Spec 001, Equipe e destilação
 
 Frontier, relida dos tickets agora:
   06  anvil-team: Leader, Dev e Review de ponta a ponta   (05 resolved)
@@ -284,7 +284,7 @@ tools: Read, Grep, Glob, Bash, Agent, Skill, SendMessage, ToolSearch
 
 A allowlist existe para impedir edição, e continua sem `Edit` e `Write`. `Agent`
 está nela porque o `anvil-code-review` abre dois subagentes; `Bash`, porque o
-Review roda `git diff`, o comando de verificação e o sentrux. `SendMessage` e
+Review roda `git diff` e o comando de verificação. `SendMessage` e
 `ToolSearch` entraram pela decisão U1: mensagem não edita, a conversa lateral é do
 ADR-0007, e `SendMessage` é diferida dentro do agente (M3), então sem `ToolSearch`
 ela não carrega. **Confira os nomes das ferramentas de leitura na versão
@@ -943,7 +943,7 @@ Cada item diz como ficou depois das decisões do Leader (`3d38ec0`).
    `Edit` e `Write`. A spec foi atualizada.
 2. **"O Review não consegue editar" vale só para as ferramentas de edição.** `Bash`
    escreve arquivo, e `Agent` deixa o Review despachar um `general-purpose` com
-   `Edit`. A allowlist precisa de `Bash` (sentrux, verify) e de `Agent`
+   `Edit`. A allowlist precisa de `Bash` (`git diff`, verify) e de `Agent`
    (`anvil-code-review`). **Decidido (U2):** "não edita" quer dizer sem `Edit` e
    `Write`; `Bash` e `Agent` ficam declarados. O Ponto B do 06 mede pela ferramenta
    `Edit`, e o resto é o protocolo.
