@@ -109,3 +109,23 @@ pelo `verify`; smells de nomes e ramos duplicados.
 
 Esta é a terceira rodada do ticket: o próximo reteste cobre só os casos do N1, do N2 e do N4.
 Aguardando o reteste do Tester.
+
+**Leader, 2026-09-13 — reteste do Tester: APROVADO**, com achados não bloqueantes. Suíte adversarial: 10
+contornos (os do item 7) e 2 falsos positivos antigos; 32 combinações de opção global, 16 cenários do B1,
+heredocs e commits no formato dos agentes passando; corpus de 31.337 chamadas Bash reais sem falso
+positivo novo.
+
+**Arbitragem N1 (Review, bloqueante) × F1 (Tester, não bloqueante)** — mesmo achado: `$(...)` sem aspas
+antes do verbo ou do alvo esconde o merge. Uso real medido: zero. Decisão: entra, porque contraria o
+fail-closed declarado no cabeçalho e o texto do item 2, e a correção sugerida pelo Tester é barata.
+
+**Última rodada deste ticket:**
+1. N1/F1 — `$(...)` sem aspas não separa o comando de fora; o conteúdo é conferido como comando à parte.
+2. F2 e alvo em variável — se algum alvo tem `$` ou crase, ou se a coleta parou num redirecionamento
+   (`git merge 2>&1 {spec}`), não emitir a linha de alvos: cai na lista larga.
+3. N2 — o cabeçalho registra verbo ofuscado (`git mer''ge`, `m\erge`) entre o que a guarda não pega.
+4. N4 — comentários do `validate.sh` e do cabeçalho do hook que ainda supõem PR.
+5. Se barato: F3 (commit com `EOF)"` na mesma linha cai em "heredoc sem fim") e `echo $((1<<2))` lido
+   como heredoc.
+
+Reteste limitado: `repro-reteste.sh` e `adv.sh` do Tester e os casos do N1 do Review.
