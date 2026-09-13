@@ -4,21 +4,21 @@
 
 **Blocked by:** 06
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] `anvil-team-po`, `anvil-team-architect`, `anvil-team-analyst`, `anvil-team-designer` e `anvil-team-tester` existem no payload, com descriptions que não atraem delegação automática.
-- [ ] Cada papel guarda só o que é dele; o comum fica no protocolo.
-- [ ] As skills citadas pelos papéis existem no payload: `anvil-diagnose`, `anvil-tdd` e `anvil-code-review` no lugar dos nomes inexistentes da configuração de origem.
-- [ ] A implementação segue o desenho em `architecture/team-shape.md` (`384fc45`), seção 12, parte do 07.
-- [ ] O `verify` reprova agente que cita skill inexistente no payload ou skill com trava de invocação.
-- [ ] O PO não cita `anvil-to-questionnaire`; o Leader sugere `/anvil-wayfinder` e `/anvil-handoff` ao usuário em vez de despachá-las.
-- [ ] RV-F1 (gate Review do 06): o Tester despachado junto com o Dev deixa de contradizer "um escritor por vez neste checkout" — exceção explícita com commit coordenado, ou o Tester escreve fora do checkout.
-- [ ] RV-F2 (gate Review do 06): a regra de divergência e os campos do finding ficam num lugar só (protocolo), sem cópia nos papéis.
-- [ ] RV-F3 (gate Review do 06): o papel Review (e o Tester) contempla a delegação sem gate prevista no protocolo.
-- [ ] TS-F1 (gate Tester do 06): a linha-ponteiro dos sete agentes manda ler o protocolo INTEIRO antes de agir; um fluxo de reteste mostra o Dev lendo o arquivo todo e carregando a skill delegada pela Skill tool.
-- [ ] TS-R1 (gate Tester do 06): com os sete papéis existindo, um ticket chega a `resolved` pela equipe com os gates de Review e Tester.
-- [ ] O README e o overview dizem que o anvil distribui agentes e a skill de equipe, apontando o ADR-0007.
-- [ ] Ponto B: uma mensagem do Dev chega ao Tester sem passar pelo Leader; o julgamento do Tester chega ao Leader; cada um dos cinco papéis é despachado ao menos uma vez.
+- [x] `anvil-team-po`, `anvil-team-architect`, `anvil-team-analyst`, `anvil-team-designer` e `anvil-team-tester` existem no payload, com descriptions que não atraem delegação automática.
+- [x] Cada papel guarda só o que é dele; o comum fica no protocolo.
+- [x] As skills citadas pelos papéis existem no payload: `anvil-diagnose`, `anvil-tdd` e `anvil-code-review` no lugar dos nomes inexistentes da configuração de origem.
+- [x] A implementação segue o desenho em `architecture/team-shape.md` (`384fc45`), seção 12, parte do 07.
+- [x] O `verify` reprova agente que cita skill inexistente no payload ou skill com trava de invocação.
+- [x] O PO não cita `anvil-to-questionnaire`; o Leader sugere `/anvil-wayfinder` e `/anvil-handoff` ao usuário em vez de despachá-las.
+- [x] RV-F1 (gate Review do 06): o Tester despachado junto com o Dev deixa de contradizer "um escritor por vez neste checkout" — exceção explícita com commit coordenado, ou o Tester escreve fora do checkout.
+- [x] RV-F2 (gate Review do 06): a regra de divergência e os campos do finding ficam num lugar só (protocolo), sem cópia nos papéis.
+- [x] RV-F3 (gate Review do 06): o papel Review (e o Tester) contempla a delegação sem gate prevista no protocolo.
+- [x] TS-F1 (gate Tester do 06): a linha-ponteiro dos sete agentes manda ler o protocolo INTEIRO antes de agir; um fluxo de reteste mostra o Dev lendo o arquivo todo e carregando a skill delegada pela Skill tool.
+- [x] TS-R1 (gate Tester do 06): com os sete papéis existindo, um ticket chega a `resolved` pela equipe com os gates de Review e Tester.
+- [x] O README e o overview dizem que o anvil distribui agentes e a skill de equipe, apontando o ADR-0007.
+- [x] Ponto B: uma mensagem do Dev chega ao Tester sem passar pelo Leader; o julgamento do Tester chega ao Leader; cada um dos cinco papéis é despachado ao menos uma vez.
 
 ## Comments
 
@@ -145,3 +145,20 @@ checkout em edição (passou a usar `git archive`).
 
 Com o gate do Review, os gates da rodada 2 passaram. Passada curta antes de resolver, conferida pelo Leader: RV2-F1,
 RV2-S1, RV2-S3 e **F6** (sanear antes do parse o que o PyYAML recusa, com as fixtures do Tester). F7 fica como ideia.
+
+**Leader, 2026-09-13 — resolvido.** Passada curta em `098858d` e `d447e49`, conferida pelo Leader: **RV2-F1** em PROTOCOL
+§ Gates, gate que encerra sem veredito não é cobrado por `SendMessage` — o Leader o redespacha com `Agent` novo e o
+mesmo name, na mesma rodada; § O retorno aponta para lá (a regra fica no protocolo porque o papel não lê o `SKILL.md`).
+**RV2-S1** o Tester sem gate que recebe "No agent named … is reachable" do autor segue preparando, tenta de novo antes do
+PRONTO e, se falhar, põe o repro em Laterais. **RV2-S3** o gate do Tester sai depois do último PRONTO da delegação sem
+gate. **F6** o `tem_trava` troca por espaço, antes do parse, o que o YAML não aceita como imprimível e todo tab fora da
+indentação: seis fixtures novas (ESC, U+0092, form feed, tab no meio do valor, DEL, U+FFFE) com 12 falhas antes da
+correção; `18-team-roles` 64/64 e `15-team` 21/21 em 5.2 e 3.2 (rodado também pelo Leader); `e-attack2` do Tester sem
+divergência nos casos do F6 (sobram as do F7 e do F4, ideias); 36 de 41 formas medidas no 2.1.270 certas, antes 30.
+`verify` limpo; linha-ponteiro com o mesmo hash nos sete. Com os gates da rodada 2 de Review e Tester, fecha sobre
+`d447e49`.
+
+Ficam como ideia: S1 e S6 do Review da rodada 1; RV2-S2, RV2-S4 (desenho §6 sem as regras do F2), RV2-S5 e RV2-S6; F4 do
+Tester (pontos cegos do check e); F7 (YAML 1.1 × 1.2); CRLF no check 1. Riscos: `SendMessage` enfileirada para papel que
+encerra sem nova rodada de ferramenta não chega — Laterais é o que garante; o Tester sem gate lê checkout em edição;
+harness com pasta fixa rodado pelo par ao mesmo tempo; "Tester primeiro" medido em três amostras de uma sessão cada.
