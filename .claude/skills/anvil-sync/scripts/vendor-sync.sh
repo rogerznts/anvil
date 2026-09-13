@@ -680,11 +680,13 @@ cmd_stats() {
             done
         fi
 
-        # lado do payload: keep, extra (já contado), pareado ou sem par
+        # lado do payload: keep, extra (já contado), strip (contado no lado do
+        # pin), pareado ou sem par
         while IFS= read -r f; do
             if is_listed "$f" "$keep"; then k=$((k + 1)); kl=$((kl + $(nlines "$dest/$f"))); continue; fi
             is_listed "$f" "$dests" && continue
             if [ -n "$path" ] && git -C "$ROOT/$sub" show "$pin:$path/$f" > "$base" 2>/dev/null; then
+                is_listed "$f" "$strip" && continue
                 arq=$((arq + 1)); lin=$((lin + $(nlines "$dest/$f"))); nos=$((nos + $(nossas "$base" "$dest/$f")))
             else
                 sp=$((sp + 1)); sem_par="$sem_par$name/$f, só no payload"$'\n'
