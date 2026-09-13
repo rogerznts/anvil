@@ -51,8 +51,8 @@ USER_AGENTS="meu-agente"                # agentes que não vieram do anvil, sem 
 } > .claude/anvil.lock
 ```
 
-O lock novo aparece no `git status`, e o preflight pede árvore limpa: commite-o
-antes.
+O lock novo aparece no `git status`, e o preflight pede árvore limpa: peça ao
+usuário que commite o lock antes de seguir.
 
 ## Fluxo
 
