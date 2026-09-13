@@ -575,9 +575,14 @@ PYEOF
         done < <(python3 - "$f" <<'PYEOF'
 import re, sys
 for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
-    for m in re.finditer(r'\]\(([^)]*)\)', line):
-        if '://' not in m.group(1):
-            print(m.group(1))
+    alvos = [m.group(1) for m in re.finditer(r'\]\(([^)]*)\)', line)]
+    # link por referencia, "[p]: PROTOCOL.md"; "[^1]: ..." e nota de rodape
+    m = re.match(r' {0,3}\[(?!\^)[^\]]+\]:[ \t]*<?([^\s>]+)', line)
+    if m:
+        alvos.append(m.group(1))
+    for t in alvos:
+        if '://' not in t:
+            print(t)
 PYEOF
 )
     done
