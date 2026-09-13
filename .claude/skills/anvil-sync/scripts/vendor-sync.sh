@@ -648,7 +648,7 @@ cmd_stats() {
     local name state sub path pin keep strip extra dest f pair from to dests
     local arq lin nos k kl e el en s sp
     local t_sk=0 t_arvore=0 t_arq=0 t_lin=0 t_nos=0 t_um=0 t_s=0 t_sp=0
-    local t_k=0 t_kl=0 t_e=0 t_el=0 t_en=0 sem_arvore="" sem_par=""
+    local t_k=0 t_kl=0 t_e=0 t_el=0 t_en=0 sem_arvore="" sem_par="" erros=0
     local base; base="$(mktemp)"
 
     printf '%-26s %5s %7s %6s %5s %5s %5s %7s\n' SKILL ARQ LINHAS NOSSAS KEEP EXTRA STRIP SEM-PAR
@@ -657,6 +657,13 @@ cmd_stats() {
         dest="$PAYLOAD/$name"
         arq=0; lin=0; nos=0; k=0; kl=0; e=0; el=0; en=0; s=0; sp=0
 
+        # Sem o pin, todo `git show` falha e cada arquivo cairia em "sem par":
+        # o número sairia errado sem falha nenhuma.
+        if ! git -C "$ROOT/$sub" cat-file -e "$pin^{commit}" 2>/dev/null; then
+            printf '%-26s ERRO submodule %s sem o pin %s\n' "$name" "$sub" "${pin:0:7}"
+            erros=$((erros + 1)); continue
+        fi
+
         dests=""
         if [ -n "$extra" ]; then
             IFS=',' read -ra arr <<< "$extra"
@@ -664,6 +671,7 @@ cmd_stats() {
                 [ -n "$pair" ] || continue
                 from="${pair%%::*}"; to="${pair##*::}"
                 dests="$dests,$to"
+                is_listed "$to" "$keep" && continue
                 if [ -f "$dest/$to" ] && git -C "$ROOT/$sub" show "$pin:$from" > "$base" 2>/dev/null; then
                     e=$((e + 1)); el=$((el + $(nlines "$dest/$to"))); en=$((en + $(nossas "$base" "$dest/$to")))
                 else
@@ -686,8 +694,8 @@ cmd_stats() {
         # lado do pin: strip, ou sem par quando sumiu do payload
         while IFS= read -r f; do
             [ -n "$f" ] || continue
-            if is_listed "$f" "$strip"; then s=$((s + 1)); continue; fi
             is_listed "$f" "$keep" && continue
+            if is_listed "$f" "$strip"; then s=$((s + 1)); continue; fi
             [ -f "$dest/$f" ] || { sp=$((sp + 1)); sem_par="$sem_par$name/$f, só no pin"$'\n'; }
         done < <(tree_files "$sub" "$pin" "$path")
 
@@ -713,6 +721,7 @@ cmd_stats() {
     printf 'strip, fora                 %s arquivos\n' "$t_s"
     printf 'sem par, fora               %s arquivos\n' "$t_sp"
     printf '%s' "$sem_par" | sed 's/^/  /'
+    [ "$erros" -eq 0 ] || { echo "stats: $erros skill(s) sem o pin no submodule — números incompletos"; return 1; }
 }
 
 # --- despacho -----------------------------------------------------------------
