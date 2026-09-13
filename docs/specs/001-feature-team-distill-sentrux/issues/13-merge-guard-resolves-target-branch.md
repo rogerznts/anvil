@@ -13,4 +13,12 @@
 - [ ] A cópia do hook instalada neste repositório fica igual à do payload.
 - [ ] A rule do projeto deixa de descrever o contorno "disparar do branch da spec".
 - [ ] Ponto A: num projeto descartável com spec de ticket aberto, `git merge` do branch da spec rodado na `main` sai 2, e do próprio branch da spec também; com tickets resolvidos e spec arquivada, os dois saem 0.
+- [ ] A rule do projeto diz que o passo de PR do perfil do tracker (`/tea-open-pr`) não se aplica neste repositório, onde a spec fecha com merge local.
+- [ ] O critério de bloqueio da guarda não é repetido na rule: ela aponta o perfil do tracker.
+- [ ] Na rule, `mosk` ganha glosa na primeira menção, o `unlazy` deixa de ser descrito como origem de skill, e o parágrafo de abertura para de tratar todo `references/` como upstream.
 - [ ] O `verify` sai limpo.
+
+## Comments
+
+**Leader, 2026-09-13 — escopo acrescentado.** Os achados P1, P2 e P3 do gate Review do ticket 01
+entram aqui, porque este ticket reescreve o mesmo parágrafo da rule.
