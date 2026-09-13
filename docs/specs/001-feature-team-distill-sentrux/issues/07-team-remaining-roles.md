@@ -113,3 +113,17 @@ nomeia o diretório do Tester, e o Dev achou o harness no disco antes da mensage
 `SendMessage`, e o caminho é útil); PyYAML (YAML 1.1) pode divergir do Bun.YAML em `0b1`, `1e0`, `0o1`; o
 `apply_invocable` só apaga `true`, e uma trava `yes` de upstream faz o check 8 reprovar alto; três leitores de
 frontmatter no `vendor-sync`. Reteste do Tester e revisão do diff da rodada pelo Review despachados.
+
+**Leader, 2026-09-13 — gate Review, rodada 2: APROVADO, sem bloqueante.** Diff `14b8563..2840c70` e desenho até
+`162754f`. F1, F2 (para autor), F3 + S5, F5, P3, P4, P5 e S4 atendidos; o `tem_trava` conferido contra as strings do
+binário 2.1.270 e julgado proporcional (a segunda tentativa de parse é necessária: um `SKILL.md` real de
+`references/` quebra o primeiro); checks 8 e 14 coerentes com o `apply_invocable` (reprova alto, nunca em silêncio);
+52/52 e 21/21 em 5.2 e 3.2; `verify` limpo em `22c1f25`; 17 casos de borda do `tem_trava`. Correção do registro da
+rodada: contra o script de `14b8563` são 18 falhas de fixture, não 12. Achados: **RV2-F1** "mensagem final sem palavra
+não é entrega, o Leader pede o retorno por `SendMessage`" (`PROTOCOL.md:78-79`) colide com "rodada nunca vai por
+`SendMessage`" e "o veredito é sempre o resultado de uma chamada `Agent`" quando quem encerra sem palavra é um gate.
+**RV2-S1** corrida inversa: o Tester sem gate manda o repro antes de o Dev existir e, pelo protocolo, volta
+`BLOQUEADO`. **RV2-S2** o S3 ficou parcial (regra em `SKILL.md` e no Tester, públicos diferentes). **RV2-S3** com o
+Tester retomado depois do PRONTO, qual PRONTO libera o gate — o último. **RV2-S4** desenho §6 sem as regras do F2.
+**RV2-S5** redação (negrito em proibição, linha longa, `.git` sem crase). **RV2-S6** identificadores em pt-BR, no estilo
+do script. Risco: harness do Tester em `/tmp` com pasta fixa rodado ao mesmo tempo pelo par deu falso vermelho.
