@@ -36,3 +36,17 @@ admitir a linha de exclusão local e o `.gitmodules`, que o bullet URL já autor
 pasta existente cai em "pasta presente" sem comparar o remoto; no interativo, o AskUserQuestion e a permissão do
 `git clone` não foram testados. Ideias: comparar `remote get-url origin` com a URL; registrar a URL na Origem.
 Gates: Review despachado; Tester depois do gate do 07.
+
+**Leader, 2026-09-13 — gate Review, rodada 1: APROVADO, sem bloqueante.** Critérios atendidos sobre `4d44e64`; o
+download pela sessão principal julgado correto; `ls-files --stage` conferido em rascunho sem quebrar o caso local do
+09 (submodule commitado, recém-adicionado, cópia versionada no próprio git, clone solto); shell em zsh 5.9 e
+`/bin/bash` 3.2 (clone que falha não toca o exclude, linha idempotente, `--git-path` em worktree). Achados: **RV-1**
+(média) o `echo >> "$exclude"` não garante quebra de linha antes — exclude sem `\n` final gruda na regra anterior
+(`*.log/references/up/`) e desfaz as duas em silêncio; sem `.git/info/` o clone fica e a exclusão falha; correção
+testada nos dois shells no relatório do Review. **RV-2** a invariante do `DISTILL.md` abre por "escreve em dois
+lugares" para um subagente que escreve um. **RV-3** o que cada forma grava está em três lugares, e a lista de
+proibidos em dois (já divergem em `checkout`). **RV-4** o risco registrado acima está errado: URL com barra final dá
+segmento vazio, a pasta vira `references/`, que existe, e o fluxo destila `references/` inteiro — "último segmento não
+vazio". **RV-5** `ls-files --stage` numa cópia versionada lista todos os arquivos da pasta; filtrar pela entrada
+160000. **RV-6** a description não cita URL; o disparo por linguagem natural com URL não foi testado. **RV-7** "as
+direções que vieram com a URL" não diz que viram a funcionalidade no despacho.
