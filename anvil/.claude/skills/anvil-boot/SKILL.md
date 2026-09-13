@@ -37,7 +37,7 @@ Fica, sem ser tocado:
 |---|---|
 | `.claude/agents/`, fora as personas | os agentes do anvil e os que o projeto escreveu |
 | `.claude/rules/` | é do projeto, não do toolkit. Só o `project.md` é revisado no passo 4, porque cita caminhos do mosk |
-| `docs/` | é o trabalho. Vai para o verbo `adopt` no passo 5 |
+| `docs/` | é o trabalho. O passo 5 chama o `anvil-docs`, que escolhe entre `scaffold` e `adopt` |
 | `.claude/settings.json` | pode ter hook do projeto. O passo 8 **mescla**, não sobrescreve |
 
 As `tea-*` existem nos dois e são substituídas pelas do anvil, que já não
@@ -113,18 +113,9 @@ Chame a Skill tool com **anvil-docs**, sem verbo. Quem escolhe entre `scaffold` 
 `adopt` é a regra "Sem verbo explícito" dele, que olha também o glossário e os
 ADRs do layout antigo, fora de `docs/`.
 
-As rules do passo 4 foram escritas antes da mudança. Se o `adopt` moveu glossário
-ou ADR, as rules que citam o caminho antigo entram na lista de referências que ele
-avisa: proponha trocar pelo caminho novo e espere aprovação.
-
-O `scaffold` cria **quatro** domínios, não oito: `architecture/`, `discovery/`,
-`specs/` e `agents/` — os que têm skill escrevendo neles. `prd/`, `ui/`, `qa/` e
-`project/` continuam canônicos, mas nascem quando alguém escrever ali. Pasta
-vazia prometendo um autor que não existe ensina quem lê a ignorar a árvore.
-
-Nunca presuma que dá para criar por cima. O `adopt` é a operação em que um
-palpite errado sai caro de desfazer, e ele mostra o plano inteiro antes de mover
-qualquer coisa.
+As rules do passo 4 foram escritas antes da movimentação do `adopt`. Se ele moveu
+glossário ou ADR, as rules que citam o caminho antigo entram na lista de
+referências que ele avisa: proponha trocar pelo caminho novo e espere aprovação.
 
 ## 6. Issue tracker
 
