@@ -926,7 +926,16 @@ escritor só, ou isolar em worktree. Leitura se paraleliza à vontade.
 
 Com dois escritores:
 
-1. O Leader commita o que tiver pendente nos tickets.
+0. O Leader acrescenta a linha `/.claude/worktrees/` à exclusão local do git, o
+   arquivo que `git rev-parse --git-path info/exclude` devolve, só se a linha ainda
+   não estiver lá. O `.gitignore` do projeto não muda. Motivo medido (M5): sem ela,
+   `?? .claude/worktrees/` aparece no status do checkout principal, e um `git add -A`
+   (`anvil-implement` ou `tea-commit` num Dev sem worktree, como o do passo 6)
+   stagearia os worktrees como repositório embutido.
+1. O Leader commita por caminho explícito os tickets e o `mission-control.md`
+   pendentes. O sha da Base é o `HEAD` depois desse commit. Motivo medido (M5): o
+   worktree de `isolation: "worktree"` parte do `HEAD` do checkout principal, sem as
+   mudanças não commitadas.
 2. Despacha os dois, **ambos** com `isolation: "worktree"`, no mesmo turno. O
    checkout principal fica com o Leader, que escreve os tickets.
 3. Cada delegação leva `Base: {branch} em {sha}`, `Protocolo: {caminho absoluto}`,
@@ -934,19 +943,29 @@ Com dois escritores:
 4. O papel confere que o `HEAD` do worktree contém o sha da Base antes de
    escrever. Não contendo, volta `BLOQUEADO` sem escrever.
 5. Quando os dois voltam, o Leader integra um de cada vez no branch da spec:
-   `git cherry-pick {sha-da-base}..{branch-do-worktree}`.
-   **Não `git merge`**: a guarda de merge o bloqueia no branch de uma spec com
+   `git cherry-pick {sha-da-base}..{branch-do-worktree}`. O branch é
+   `worktree-agent-{id}`, o worktree fica em `.claude/worktrees/agent-{id}`, e os
+   dois aparecem em `git worktree list`; worktree com commit sobrevive ao agente
+   (M5). **Não `git merge`**: a guarda de merge o bloqueia no branch de uma spec com
    ticket aberto.
 6. Conflito → `git cherry-pick --abort`, e o Leader despacha um Dev sem worktree
    com o conflito como Objetivo.
 7. Integrados os dois, o Leader roda o comando de verificação do projeto. Só então
    despacha os gates, sobre o intervalo integrado.
-8. Remove cada worktree e o branch dele só depois de `git cherry {branch-da-spec}
-   {branch-do-worktree}` não listar nenhum commit com `+`.
+8. Remove cada worktree com `git worktree remove {caminho}` e o branch com
+   `git branch -D {branch}`, só depois de `git cherry {branch-da-spec}
+   {branch-do-worktree}` não listar nenhum commit com `+`. O `-D` é preciso: commit
+   trazido por `cherry-pick` não conta como merge para o `-d`. Sem `--force` no
+   `worktree remove`: se ele recusar por mudança não commitada, o Leader para e
+   pergunta ao usuário. Se sobrar `+` porque o conflito do passo 6 foi resolvido
+   num commit diferente, o worktree fica, e o Leader pergunta ao usuário antes de
+   remover.
 
-`git cherry-pick` fora da guarda de merge é critério do ticket 13. Se a Skill tool
-enxerga as skills instaladas de dentro do worktree é medição do Ponto B do 08 (M5);
-se não enxergar, a solução entra no 08, e o passo 3 ganha o que ela exigir.
+`git cherry-pick` fora da guarda de merge é critério do ticket 13. A Skill tool
+enxerga as skills instaladas de dentro do worktree, carregadas do checkout
+principal (M5), então `.worktreeinclude` não é preciso e o passo 3 não ganha nada.
+No worktree não existe `.claude/skills/`, e a linha `Protocolo:` absoluta continua
+necessária. O Tester continua fora de qualquer checkout, inclusive worktree (§5).
 
 ## 12. O que cabe em cada ticket
 
@@ -991,8 +1010,8 @@ Cada item diz como ficou depois das decisões do Leader (`3d38ec0`).
    pelo git. Num worktree, o caminho do protocolo não existe. Saída adotada: caminho
    absoluto na linha `Protocolo:` do Contexto. Se a Skill tool também não enxergar as
    skills de dentro do worktree, um Dev isolado não roda `anvil-implement`.
-   **Em aberto, com dono:** a medição é critério do Ponto B do 08 (M5), e a solução,
-   se precisar, entra no 08.
+   **Medido (M5):** a Skill tool enxerga as skills, carregadas do checkout
+   principal, e a linha `Protocolo:` absoluta basta.
 6. **O port também tira `ai-memory`, que não é do Maestri.** A spec manda tirar
    visibilidade de notas, erro de conexão e bootstrap. `ai-memory` é um MCP do
    ambiente de quem configurou a equipe, e o payload vai para projetos que não o têm;
@@ -1121,9 +1140,14 @@ feitas num teste de sondagem no Claude Code 2.1.270, com agent teams ligado.
 - **M4. Aberta, Ponto B do 06.** Um papel em background que precisa de permissão não
   pré-aprovada recebe o pedido na sessão do Leader, ou a chamada é negada em
   silêncio?
-- **M5. Aberta, critério do 08.** Num worktree de `isolation: "worktree"`: de que
-  commit ele parte, e a Skill tool enxerga as skills instaladas? Se não enxergar, o
-  caminho candidato é o `.worktreeinclude`, e a solução entra no 08.
+- **M5. Medido no 08.** O worktree de `isolation: "worktree"` parte do `HEAD` do
+  checkout principal, sem as mudanças não commitadas, em
+  `.claude/worktrees/agent-{id}` com branch `worktree-agent-{id}`, e sobrevive ao
+  agente quando tem commit. A Skill tool enxerga as skills instaladas, carregadas do
+  checkout principal, então `.worktreeinclude` não é preciso. No worktree não existe
+  `.claude/skills/`, e a linha `Protocolo:` absoluta continua necessária. O
+  `?? .claude/worktrees/` no status do checkout principal virou o passo 0 da seção
+  11.
 - **M6. Aberta, Ponto B do 06.** Reusar um `name` com `Agent` substitui o agente
   anterior sem erro?
 - **M7. Aberta, Ponto B do 06.** Os nomes das ferramentas de leitura do `tools:` do
