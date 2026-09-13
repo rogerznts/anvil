@@ -66,6 +66,11 @@ nova, não a da versão velha.
 A saída classifica em quatro grupos: *substituídos* · *órfãos, serão removidos* ·
 *não são do anvil, ficam intocados* · *preservados sempre*.
 
+Por último vem o bloco `ANVIL:INSTALLED` do `.gitignore`, regenerado a partir do
+lock novo: uma linha por skill instalada, então uma órfã removida sai dele junto.
+Só o bloco muda; o resto do `.gitignore` fica como estava. Projeto sem o bloco
+não ganha um — quem o cria é o `/anvil-boot`.
+
 ### 4. Avisar e esperar
 
 Diga numa frase o que será apagado e o que será preservado, **nomeando os
@@ -100,4 +105,5 @@ rm -rf "$TMP"
 - O `reset-install.sh` roda do `$TMP`, nunca do projeto.
 - Nada é apagado fora do conjunto que o script calcula. **Skill que o usuário
   escreveu não é do anvil para remover.**
-- O lockfile é reescrito pelo script. Não edite à mão.
+- O lockfile é reescrito pelo script. Não edite à mão. O bloco `ANVIL:INSTALLED`
+  do `.gitignore` também.

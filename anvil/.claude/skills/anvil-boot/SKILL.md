@@ -176,16 +176,57 @@ Diga ao usuário que a guarda está ativa e o que ela bloqueia.
 
 ## 9. Ignorar o toolkit no git
 
-`.claude/skills/` é conteúdo do toolkit, reinstalável por `npx degit`. Versionar
-2 MB de skill de terceiro no repositório do projeto engorda o histórico, e todo
-`/anvil-update` viraria um diff gigante que ninguém revisa.
+As skills que o anvil instalou são conteúdo do toolkit, reinstalável por
+`npx degit`. Versionar 2 MB de skill de terceiro no repositório do projeto engorda
+o histórico, e todo `/anvil-update` viraria um diff gigante que ninguém revisa.
 
-Acrescente ao `.gitignore` do projeto, **sem duplicar** se já estiver lá:
+Mas `.claude/skills/` não é só do anvil: a skill que o usuário escreve ali é do
+projeto e continua versionada. Por isso o `.gitignore` ganha um bloco com **uma
+linha por skill do `.claude/anvil.lock`**, nunca por prefixo — as `tea-*` não
+seguem o padrão de nome:
 
 ```gitignore
-# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil . --force`
-.claude/skills/
+# ANVIL:INSTALLED:START
+# Gerado do .claude/anvil.lock. Nao edite: o proximo update reescreve.
+.claude/skills/anvil-architect/
+…
+.claude/skills/tea-commit/
+# ANVIL:INSTALLED:END
 ```
+
+O bloco sai do lock. Sem `.claude/anvil.lock`, o script para com erro: faça o
+passo 10 antes e volte aqui.
+
+**Primeiro, a linha antiga.** Um boot anterior ignorava `.claude/skills/` inteiro,
+com um comentário exato em cima — em duas versões, com e sem o `--force`. Procure
+pelas duas:
+
+```bash
+grep -nxF -A1 \
+  -e '# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil . --force`' \
+  -e '# anvil — o toolkit se reinstala com `npx degit rogerznts/anvil/anvil .`' \
+  .gitignore
+```
+
+- **Achou um dos comentários, e a linha seguinte é `.claude/skills/`** → foi o
+  boot que escreveu. Mostre o antes (as duas linhas) e o depois (o bloco, pelo
+  dry-run abaixo) e **espere aprovação**. Aprovado, troque as duas linhas por
+  `# ANVIL:INSTALLED:START` e `# ANVIL:INSTALLED:END`; o script preenche o bloco
+  no lugar.
+- **Não achou** → não toque em linha nenhuma que ignore `.claude/skills/`, mesmo
+  parecida. Foi o usuário que escreveu. Avise que ela continua ignorando as
+  skills que ele escrever ali.
+
+**Depois, o bloco.** Mostre-o e escreva com aprovação:
+
+```bash
+bash .claude/skills/anvil-update/scripts/reset-install.sh --gitignore-only --dry-run --to .
+bash .claude/skills/anvil-update/scripts/reset-install.sh --gitignore-only --to .
+```
+
+O script lê o lock e reescreve **só o bloco**: substitui entre os marcadores se
+eles existem, acrescenta no fim se não. Rodar de novo não muda nada, e o
+`/anvil-update` regenera o bloco a cada reinstalação.
 
 O que **fica versionado**, porque é do projeto e não se reinstala:
 
@@ -196,8 +237,9 @@ O que **fica versionado**, porque é do projeto e não se reinstala:
 
 Avise que quem clonar o repositório precisa rodar o degit uma vez para ter as
 skills, e que o `anvil.lock` diz o que esperar. Se o projeto preferir versionar
-tudo — por CI que não roda instalação, por exemplo — **respeite e não escreva a
-linha**; é decisão do projeto, não do toolkit.
+tudo — por CI que não roda instalação, por exemplo — **respeite e não escreva o
+bloco**; é decisão do projeto, não do toolkit. Sem o bloco, o update também não o
+cria.
 
 ## 10. Conferir o `anvil.lock`
 
@@ -218,6 +260,14 @@ reescreva a partir do disco.
   ls .claude/skills | sed 's/^/skill: /'
 } > .claude/anvil.lock
 ```
+
+**Antes de gravar, tire da lista as skills que o usuário escreveu** — pergunte
+quais são. Skill no lock é tratada como do anvil: o update a apaga como órfã e o
+bloco do `.gitignore` a ignora. Skill que só está no disco, fora do lock, costuma
+ser justamente essa, e não é divergência a corrigir.
+
+Se reescreveu o lock e o `.gitignore` tem o bloco, rode de novo o
+`--gitignore-only` do passo 9: o bloco sai do lock.
 
 **Sem lock, o update não limpa órfão nenhum** — ele não tem como distinguir o que
 o anvil instalou do que você escreveu, e o lado seguro é não apagar nada.

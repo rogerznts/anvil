@@ -256,16 +256,30 @@ de `resolved` → em andamento; pasta sob `archive/` → arquivado.
 
 ## O que fica versionado
 
-O boot acrescenta ao `.gitignore` do projeto:
+O boot escreve no `.gitignore` do projeto um bloco gerado do `anvil.lock`, com uma
+linha por skill que o anvil instalou:
 
 ```gitignore
-# anvil — reinstalável com `npx degit rogerznts/anvil/anvil . --force`
-.claude/skills/
+# ANVIL:INSTALLED:START
+# Gerado do .claude/anvil.lock. Nao edite: o proximo update reescreve.
+.claude/skills/anvil-architect/
+…
+.claude/skills/tea-commit/
+# ANVIL:INSTALLED:END
 ```
 
-`.claude/skills/` é conteúdo do toolkit, reinstalável. Versionar 2 MB de skill de
+Skill instalada é conteúdo do toolkit, reinstalável. Versionar 2 MB de skill de
 terceiro engorda o histórico, e todo update viraria um diff gigante que ninguém
-revisa. **Fica versionado o que é do projeto e não se reinstala:**
+revisa. A lista é nominal, nunca por prefixo, porque as `tea-*` não seguem o padrão
+de nome. **A skill que você escreve em `.claude/skills/` fica fora do bloco e
+continua versionada.** O `/anvil-update` regenera o bloco a cada reinstalação, então
+uma skill órfã removida sai dele também.
+
+Um projeto bootado antes ignorava `.claude/skills/` inteiro. O boot acha essa linha
+pelo comentário que ele mesmo escreveu, mostra o antes e o depois, e troca pelo
+bloco com aprovação. Uma linha parecida sem esse comentário não é tocada.
+
+**Fica versionado o que é do projeto e não se reinstala:**
 
 | | |
 |---|---|
@@ -275,7 +289,7 @@ revisa. **Fica versionado o que é do projeto e não se reinstala:**
 | `docs/` | o trabalho |
 
 Projeto que prefira versionar tudo — por CI que não roda instalação, por exemplo
-— é respeitado; a linha não é escrita.
+— é respeitado; o bloco não é escrito, e o update não o cria.
 
 ---
 
