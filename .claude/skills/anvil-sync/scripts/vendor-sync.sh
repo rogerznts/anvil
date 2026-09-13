@@ -533,12 +533,12 @@ PYEOF
     # anvil/, a raiz do payload, e o link e falha em qualquer lugar do arquivo.
     #
     # Span em crase de uma linha, como no CommonMark: abre e fecha com a mesma
-    # quantidade de crases. Fica de fora o que e padrao e nao caminho (`*`, `{`, `<`)
-    # e o que esta em bloco cercado, que e exemplo. A cerca e de crase ou de til, e
-    # so fecha com a mesma marca e pelo menos o mesmo comprimento: uma cerca de
-    # quatro crases pode mostrar uma de tres por dentro.
-    spans_of() {
-        python3 - "$1" <<'PYEOF'
+    # quantidade de crases. Sai so o span que casa inteiro com a regex dada, e fica
+    # de fora o que esta em bloco cercado, que e exemplo. A cerca e de crase ou de
+    # til, e so fecha com a mesma marca e pelo menos o mesmo comprimento: uma cerca
+    # de quatro crases pode mostrar uma de tres por dentro.
+    spans_of() {  # <arquivo> <regex>
+        python3 - "$1" "$2" <<'PYEOF'
 import re, sys
 fence = None
 for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
@@ -554,10 +554,12 @@ for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
         t = m.group(2)
         if len(t) > 1 and t[0] == ' ' and t[-1] == ' ':
             t = t[1:-1]
-        if t.startswith('.claude/') and not re.search(r'[*{<]', t):
+        if re.fullmatch(sys.argv[2], t):
             print(t)
 PYEOF
     }
+    # caminho do payload, sem o que e padrao e nao caminho (`*`, `{`, `<`)
+    SPAN_PATH='\.claude/[^*{<]*'
 
     echo "10. caminho .claude/ citado por agente existe no payload"
     for f in "$AGENTS"/*.md; do
@@ -565,7 +567,7 @@ PYEOF
         while IFS= read -r t; do
             [ -n "$t" ] || continue
             [ -e "$ROOT/anvil/$t" ] || { echo "   FALHA agents/$(basename "$f") -> $t"; falhas=$((falhas+1)); }
-        done < <(spans_of "$f")
+        done < <(spans_of "$f" "$SPAN_PATH")
     done
 
     echo "11. nenhum link markdown relativo em agente"
@@ -594,7 +596,7 @@ PYEOF
     echo "12. agente de equipe cita o protocolo"
     for f in "$AGENTS"/anvil-team-*.md; do
         [ -f "$f" ] || continue
-        spans_of "$f" | grep -qxF '.claude/skills/anvil-team/PROTOCOL.md' ||
+        spans_of "$f" "$SPAN_PATH" | grep -qxF '.claude/skills/anvil-team/PROTOCOL.md' ||
             { echo "   FALHA agents/$(basename "$f"): nao cita .claude/skills/anvil-team/PROTOCOL.md"; falhas=$((falhas+1)); }
     done
 
@@ -608,6 +610,26 @@ PYEOF
         echo "   FALHA ${f#"$ROOT/anvil/.claude/"}: $(grep -ohE "$MAESTRI" "$f" | sort -u | tr '\n' ' ')"
         falhas=$((falhas+1))
     done < <(find "$PAYLOAD" "$AGENTS" -type f 2>/dev/null)
+
+    # O papel carrega pela Skill tool a skill que o proprio arquivo cita. Nome que nao
+    # existe no payload (o `anvil-debug` da configuracao de origem) ou skill com trava
+    # de invocacao, que a Skill tool recusa, roteiam o papel para o vazio. Nome de
+    # agente do payload passa: e endereco, nao skill. Mesma forma de citar do check
+    # 10: span em crase, fora de bloco cercado.
+    echo "14. skill citada por agente existe no payload e não tem trava"
+    for f in "$AGENTS"/*.md; do
+        [ -f "$f" ] || continue
+        while IFS= read -r t; do
+            [ -n "$t" ] || continue
+            [ -f "$AGENTS/$t.md" ] && continue
+            if [ ! -f "$PAYLOAD/$t/SKILL.md" ]; then
+                echo "   FALHA agents/$(basename "$f"): $t nao existe no payload"; falhas=$((falhas+1))
+            elif awk '{ sub(/[ \t\r]+$/, "") } NR == 1 { if ($0 != "---") exit; next } $0 == "---" { exit }
+                      /^disable-model-invocation: *true$/ { found = 1; exit } END { exit !found }' "$PAYLOAD/$t/SKILL.md"; then
+                echo "   FALHA agents/$(basename "$f"): $t tem trava de invocacao"; falhas=$((falhas+1))
+            fi
+        done < <(spans_of "$f" 'anvil-[a-z0-9-]+' | sort -u)
+    done
 
     echo
     if [ "$falhas" -eq 0 ]; then echo "verify: limpo"; return 0; fi
