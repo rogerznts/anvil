@@ -10,4 +10,5 @@
 - [ ] Duas execuções seguidas dão o mesmo resultado.
 - [ ] Uma skill cujo único delta é o `rename` mede exatamente uma linha nossa.
 - [ ] O README troca os números antigos pelos medidos, com o comando e a data.
+- [ ] A lista do catálogo de adaptações no README inclui `invocable` e `tracker-profile`, na mesma ordem do `ADAPT-RULES.md`.
 - [ ] Ponto A: as três verificações acima rodam contra o payload real.

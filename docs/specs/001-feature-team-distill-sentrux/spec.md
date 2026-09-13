@@ -149,7 +149,10 @@ spec com merge local.
   do glossário, do mapa de contextos e dos ADRs, e `rename` nas referências a
   skills adotadas. A referência a `improve-codebase-architecture`, que não foi
   adotada, fica verbatim, como o catálogo manda. No manifesto, o `adapt` do
-  `anvil-setup` passa a ser `rename`, `docs-remap` e `invocable`.
+  `anvil-setup` passa a ser `rename`, `docs-remap`, `tracker-profile` e `invocable`.
+- **Regra `tracker-profile`.** Regra de julgamento nova no catálogo, estreita: a skill
+  de setup oferece o perfil de tracker do `anvil-docs`, como decide o ADR-0002.
+  Registra as linhas que o anvil acrescentou ao setup e que o `docs-remap` não cobre.
 - **Passo do issue tracker no boot e no scaffold.** O texto não muda. A regra
   `invocable` (`c8e99de`) já tornou a instrução executável.
 - **Bloco de gitignore.** Delimitado por `ANVIL:INSTALLED:START` e `END`, com uma
@@ -308,7 +311,8 @@ payload e contra um projeto descartável.
   órfão e agente do usuário como alheio. O bloco gerado lista skills e agentes,
   inclusive as `tea-*`. O modo `--gitignore-only` reescreve só o bloco, e rodar
   duas vezes não muda nada.
-- A linha do `anvil-setup` no manifesto tem `docs-remap`, e o `verify` sai limpo.
+- A linha do `anvil-setup` no manifesto tem `docs-remap` e `tracker-profile`, o
+  `vendor-sync` sinaliza `tracker-profile` para revisão, e o `verify` sai limpo.
 - A guarda bloqueia o `git merge` de uma spec aberta disparado do branch da spec e da
   `main`, e libera os dois depois do archive.
 
