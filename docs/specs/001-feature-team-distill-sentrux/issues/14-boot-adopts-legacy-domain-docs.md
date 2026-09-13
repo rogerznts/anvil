@@ -49,3 +49,10 @@ Ficam como ideia: **F3** usuário que recusa a movimentação fica com o perfil 
 `ADOPT.md` não trata os links relativos de um `CONTEXT-MAP.md` movido; **F6** `src/*/docs/adr/` chamado de
 layout antigo no `ADOPT.md` e válido no `anvil-setup`. O Tester julga depois do ajuste, cobrindo
 `CONTEXT-MAP.md` e o turno de aprovação na versão final.
+
+**Leader, 2026-09-13 — ajuste entregue** em `0b61a59` (`anvil-docs`: F1 pré-condição do `scaffold` antes do
+passo 1; F2 "gatilho do `adopt`" definido uma vez em Verbos e citado na tabela, na regra e na pré-condição) e
+`14ff955` (boot: F4). Decisão confirmada no F2: a condição sobre `docs/` é "conteúdo fora dos domínios canônicos",
+a mesma do `validate.sh docs-paths` — o boot rodado de novo num projeto que já segue o anvil vai para o
+`scaffold`, que não sobrescreve nada. Pendente: checagem curta do Review sobre o ajuste e gate do Tester
+(com `CONTEXT-MAP.md` e o turno de aprovação na versão final).
