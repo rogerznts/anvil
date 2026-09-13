@@ -551,6 +551,20 @@ Despacho, só para autor:
 
 Gate não entra nesta regra: rodada de gate já é sempre `Agent` novo.
 
+**Autor que trabalhou em worktree já integrado.** Correção de finding depois da
+integração (seção 11, passos 5 a 8) não vai por `SendMessage` ao autor: o cwd dele
+é um worktree removido, ou prestes a ser, e o branch dele não tem os commits do
+outro escritor. Vai a `Agent` novo com o mesmo name, com o Contexto apontando o
+ticket e os comentários, e trabalha sobre o branch da spec já integrado.
+
+- Um corretor só: sem worktree.
+- Dois corretores ao mesmo tempo: são dois escritores de novo, e a seção 11 recomeça
+  do passo 0, com a Base no `HEAD` integrado.
+
+Por isso remover o worktree logo depois da integração, antes do veredito dos gates,
+não custa nada: a correção nunca voltaria para ele. O que `SendMessage` faz com um
+agente cujo cwd sumiu não foi medido, e esta regra não depende disso.
+
 ### Tester junto com o Dev
 
 Para o Dev pedir um repro ao Tester sem passar pelo Leader, o Tester precisa estar
@@ -966,6 +980,8 @@ enxerga as skills instaladas de dentro do worktree, carregadas do checkout
 principal (M5), então `.worktreeinclude` não é preciso e o passo 3 não ganha nada.
 No worktree não existe `.claude/skills/`, e a linha `Protocolo:` absoluta continua
 necessária. O Tester continua fora de qualquer checkout, inclusive worktree (§5).
+Finding de gate sobre trabalho integrado volta a `Agent` novo com o mesmo name, e
+não ao worktree (§5, "Autor que trabalhou em worktree já integrado").
 
 ## 12. O que cabe em cada ticket
 
