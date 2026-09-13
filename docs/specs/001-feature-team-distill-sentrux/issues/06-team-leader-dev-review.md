@@ -62,3 +62,6 @@ genérico da documentação; `anvil-diagnose` e demais skills citadas pelos pap�
 Riscos registrados: `ListAgents` do Leader enxerga sessões de toda a máquina (a regra filtra, mas nomes podem
 colidir); no interativo o resultado do papel chega duplicado (retorno e `SendMessage`); eixos do
 `anvil-code-review` em paralelo não re-medidos depois do texto novo.
+
+**Leader, 2026-09-13 — ajustes pré-gate** em `09dbc56` (exemplos da skill na spec genérica 012) e `d7297fd`
+(`anvil-diagnose` no roster; era a única skill citada pelos papéis fora dele). Gates despachados: Review e Tester.
