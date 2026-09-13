@@ -509,23 +509,48 @@ PYEOF
 
     # A trava de invocacao, numa forma so para os checks 8 e 14: a leitura do Claude
     # Code 2.1.270, tirada do binario. Sem BOM, o frontmatter e o que casa com
-    # /^---\s*\n([\s\S]*?)---\s*\n?/, lido como YAML; se nao parseia, tenta de novo
-    # com tab de inicio de linha virando espacos, e se ainda falha nao ha trava. O
-    # valor trava se for booleano true, ou string ou numero que, em minusculas e sem
-    # espaco nas pontas, e 1, true, yes ou on. O PyYAML nao aceita o tab entre a
-    # chave e o valor, que o parser do Claude Code aceita, e o tab vira espaco antes.
+    # /^---\s*\n([\s\S]*?)---\s*\n?/, lido como YAML. Se nao parseia, tenta de novo
+    # com o valor de cada `chave: valor` que tem `: ` ou caractere especial posto
+    # entre aspas, e com tab de inicio de linha virando espacos; se ainda falha, nao
+    # ha trava. O valor trava se for booleano true, ou string ou numero que, em
+    # minusculas e sem espaco nas pontas, e 1, true, yes ou on. O PyYAML nao aceita o
+    # tab entre a chave e o valor, que o parser do Claude Code aceita, e o tab vira
+    # espaco antes.
     tem_trava() {  # <SKILL.md>
         python3 - "$1" <<'PYEOF'
 import re, sys, yaml
-t = open(sys.argv[1], encoding='utf-8', errors='replace').read()
+t = open(sys.argv[1], encoding='utf-8', errors='replace', newline='').read()
 if t.startswith('\ufeff'):
     t = t[1:]
 m = re.match(r'---\s*\n(.*?)---\s*\n?', t, re.S)
 if not m:
     sys.exit(1)
 fm = re.sub(r'^([^\s#][^:\n]*):\t[ \t]*', r'\1: ', m.group(1), flags=re.M)
+
+def entre_aspas(texto):
+    linhas = []
+    for linha in texto.split('\n'):
+        c = re.match(r'([a-zA-Z_-]+):\s+([^\r\n]+)$', linha)
+        if c:
+            k, s = c.groups()
+            if s[0] == s[-1] == '"' or s[0] == s[-1] == "'":
+                linhas.append(linha)
+                continue
+            if s.startswith('[') and s.endswith(']'):
+                try:
+                    if isinstance(yaml.safe_load(s), list):
+                        linhas.append(linha)
+                        continue
+                except yaml.YAMLError:
+                    pass
+            if re.search(r'[{}\[\]*&#!|>%@`]|: ', s):
+                linhas.append('%s: "%s"' % (k, s.replace('\\', '\\\\').replace('"', '\\"')))
+                continue
+        linhas.append(linha)
+    return '\n'.join(linhas)
+
 v = None
-for texto in (fm, re.sub(r'^\t+', lambda x: '  ' * len(x.group()), fm, flags=re.M)):
+for texto in (fm, re.sub(r'^\t+', lambda x: '  ' * len(x.group()), entre_aspas(fm), flags=re.M)):
     try:
         d = yaml.safe_load(texto)
     except yaml.YAMLError:
