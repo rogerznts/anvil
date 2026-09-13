@@ -27,3 +27,25 @@
    update apagar a skill do usuário como órfã.
 
 Gates pendentes: Review (Standards e Spec) e Tester (pontos A e B).
+
+**Leader, 2026-09-12 — gate Review: APROVADO, sem bloqueante.** O ticket não fecha ainda.
+Voltam ao Dev, junto com o resultado do Tester, para corrigir neste ticket:
+
+- **S1** — o passo 9 do boot não é idempotente quando a troca da linha antiga é recusada:
+  o segundo boot cria um segundo par de marcadores e o script para com rc=2. Correção: com
+  bloco existente, a troca só apaga as duas linhas; a aprovação da troca vale para o bloco.
+- **S2** — o passo 10 manda reescrever o lock a partir do disco em qualquer divergência, e
+  skill do usuário no disco sempre diverge: ela entraria no lock, passaria a ser ignorada e
+  seria apagada como órfã no update seguinte. Correção: divergência é lock ausente ou skill
+  do lock fora do disco; exclusão das skills do usuário antes do comando; lock conferido
+  antes do bloco, o que também desfaz a ida e volta entre os passos 9 e 10 (P4).
+- **Risco (a)** — `--from` com `--gitignore-only` sai com erro (rc=2), como as outras guardas.
+- **P2** — o aviso "rode a cópia recém-baixada" vale só para o modo reset.
+- **S3** — sem bloco, o update sugere rodar o `/anvil-boot`.
+
+Ficam fora, com motivo: **P1** (identificadores em português — o arquivo inteiro já é assim, e
+migrar é mudança à parte), **P3**, **P5** e **P6** (smells sem efeito no comportamento).
+
+Correção da justificativa do desvio 3, pelo Review: quem apaga a skill do usuário é o lock que
+a inclui, e isso já existia; o que o bloco acrescenta é passar a ignorá-la, quebrando a user
+story 1. É esse o motivo de o passo 10 estar neste ticket.
