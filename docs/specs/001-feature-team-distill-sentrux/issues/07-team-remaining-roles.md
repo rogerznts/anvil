@@ -67,3 +67,28 @@ protocolo. **S1** o bloco "com · gate / sem gate" de Review e Tester parafrasei
 escreve é o Dev" em três lugares. **S4** `SKILL.md:220-221` repete :196-198. **S5** checks 8 e 14 detectam a trava de
 formas diferentes (`true # x`). **S6** a linha-ponteiro diz "inteiro" quatro vezes. Não verificados pelo Review:
 "8 falhas antes do check"; o Tester chegando ao Leader com o Dev discordando (o gate do Tester cobre).
+
+**Leader, 2026-09-13 — gate Tester, rodada 1: REPROVADO.** Isolado, payload de `14b8563`, projeto Python diferente
+do do Dev, sete execuções, US$ 8,67. Passaram: divergência provocada — o gate do Tester reprovou, o Dev discordou, e o
+julgamento chegou ao Leader e ficou literal no ticket, que voltou a `ready-for-agent`; um ticket chegou a `resolved`
+com os dois gates; onze despachos (os cinco papéis novos inclusive), todos com `cat` do protocolo inteiro e a skill
+da delegação pela Skill tool, subagentes de skill em foreground; o Review sem `Edit`/`Write` nem por `ToolSearch`;
+"revisa esse diff" com os sete instalados não despachou papel. **F1 (bloqueante)** — a medição do F1 do Review: "o
+Dev só depois que a chamada do Tester voltar" foi lido como esperar o PRONTO em 2 de 2 tickets; o par nunca ficou vivo
+junto, zero `SendMessage` entre papéis no fluxo natural, e o repro chegou ao Dev colado pelo Leader na delegação. A
+lateral só aconteceu quando o prompt pediu, retomando um Tester já encerrado. **F2** o Dev encerrou "esperando a
+resposta do tester-02" com `sleep 60` em background, sem palavra do protocolo, e depois emitiu três retornos. **F3**
+medido na 2.1.270: travam `true`, `True`, `yes`, `1`, `"true"`, tab, `true # x` e BOM; não travam `false`, `no`,
+`"false"` — os checks 8 e 14 só reconhecem `true`. **F4** o check (e) não vê `skills:` no frontmatter do agente, agente
+em subdiretório, span com argumento, cerca com crase no info string, span em duas linhas, e reprova bloco indentado.
+**F5** o Tester em gate fez `git worktree add` no checkout e removeu em seguida. Fora do 07: SIGTRAP do `/bin/bash`
+3.2 no `verify` desta máquina (anterior); CRLF reprova o check 1.
+
+Decisão do Leader para a rodada de ajuste (a mesma, já em curso com o Dev): **F1** "voltar" = a chamada `Agent` do
+Tester devolver o lançamento; o Dev é despachado logo em seguida, com o Tester vivo; o Leader não cola o repro na
+delegação do Dev — ele chega por `SendMessage` do Tester; alinhar `SKILL.md`, agente do Tester e desenho §5 (Architect).
+**F2** no protocolo: papel não encerra à espera de lateral; retorno sem palavra do protocolo não é entrega; retorno
+repetido não se registra. **F3** entra no S5 do Review: os checks 8 e 14 reconhecem a trava como o Claude Code
+(`true`/`yes`/`1`, maiúsculas, aspas, comentário, tab, BOM). **F5** o agente do Tester nomeia que nada escreve no `.git`
+do checkout (sem `git worktree add`). Ficam como ideia: **F4** (exceto o que o F3 cobre), CRLF no check 1. Reteste do
+Tester: caso 1 com F2, e o ataque ao check (e)/trava.
