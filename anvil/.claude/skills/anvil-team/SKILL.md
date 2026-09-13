@@ -150,7 +150,8 @@ escolha do papel". Skill com trava de invocação não se delega; o papel a
 recusaria.
 
 **Um escritor ativo por vez neste checkout.** Leitura se despacha em paralelo à
-vontade.
+vontade. O Tester não conta como escritor: ele escreve fora do checkout (ver
+[Tester junto com o Dev](#tester-junto-com-o-dev)).
 
 **Agente ausente.** Se o despacho falhar com erro de tipo de agente, um
 `anvil-team-*` não está instalado: pare e sugira `/anvil-update` ao usuário.
@@ -184,10 +185,21 @@ Gate não entra nesta regra: rodada de gate já é `Agent` novo.
 
 Quando o ticket tem comportamento a reproduzir ou pede harness antes da solução,
 despache `tester-{NN}` junto com `dev-{NN}`, com delegação **sem** `gate`:
-preparar repro e harness numa região própria, responder o autor e voltar
-`PRONTO`. Cada um vai na linha `Equipe` do outro. O gate do Tester é outra
-chamada, depois da entrega do Dev e depois que a delegação sem gate voltou, com o
-mesmo name e `· gate`.
+preparar repro e harness, responder o autor e voltar `PRONTO`. Cada um vai na
+linha `Equipe` do outro. O gate do Tester é outra chamada, depois da entrega do
+Dev e depois que a delegação sem gate voltou, com o mesmo name e `· gate`.
+
+**O Tester escreve fora do checkout**, com ou sem gate. A Política de escrita dele
+nomeia um diretório fora de qualquer checkout, escolhido por você, e diz
+`Commit: não`. Dois escritores no mesmo checkout disputam o índice, e arquivo não
+rastreado do Tester entraria no commit do Dev, porque `anvil-implement` e
+`tea-commit` stageiam o que estiver pendente.
+
+- O repro chega ao Dev por `SendMessage`, com caminho e comando.
+- Repro que vira teste de regressão, quem escreve e commita é o Dev, na região
+  dele.
+- Anote o caminho do repro no comentário do ticket e repasse-o no Contexto da
+  delegação de gate do Tester.
 
 ## Gates
 
@@ -201,7 +213,8 @@ mesmo name e `· gate`.
 - **O Contexto do gate** aponta o intervalo de commits `{base}..{head}`, o ticket e
   os comentários dele. **Não leva o resumo do autor**: o gate julga o artefato, e
   os desvios declarados já estão no comentário que você registrou.
-- **Política de escrita do gate:** somente leitura, `Commit: não`.
+- **Política de escrita do gate:** `Commit: não`. Review, somente leitura. Tester,
+  leitura no checkout e escrita só no diretório fora dele que você nomear.
 - **Review é sempre exigido** para resolver um ticket. **Tester é exigido** quando
   o ticket declara um cenário de comportamento a provar.
 

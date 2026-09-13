@@ -78,8 +78,11 @@ A sua última mensagem é o retorno, e chega a quem despachou você. Forma:
   com finding não bloqueante é `APROVADO`.
 - **Severidade.** `bloqueante` · `relevante` · `sugestão` · `pergunta`. Os ids
   são os que a skill produzir; sem ids, `F1`, `F2`…
-- **Finding.** Localização (`arquivo:linha`, ou passos mínimos de repro), condição,
-  impacto e correção esperada.
+- **Finding.** Específico, acionável e apoiado em evidência: id, severidade,
+  localização (`arquivo:linha`, ou passos mínimos de repro), condição, impacto e
+  correção esperada. Finding de comportamento traz também o esperado, o observado,
+  o ambiente e os dados relevantes, e o determinismo, quando se sabe. Preferência
+  sem fonte de verdade que a sustente não é finding.
 - **Seções.** Só as que têm conteúdo, nesta ordem. Registro no ticket é o texto
   que o Leader anexa ao ticket, literal. Laterais diz com quem você falou, sobre o
   quê, e o que ficou acertado ou em aberto.
@@ -93,9 +96,10 @@ A sua última mensagem é o retorno, e chega a quem despachou você. Forma:
 - **O autor não controla o gate que avalia o trabalho dele.** Conversa lateral
   esclarece finding e não muda veredito. Avaliação que mudou só vale numa rodada
   nova, que o Leader despacha.
-- **Autor que discorda de um finding** escreve a discordância, com evidência, na
-  seção Divergências do próprio retorno. A discordância chega ao Leader ao lado do
-  veredito, e o gate continua valendo.
+- **Finding é evidência a investigar.** O autor corrige o que procede. O que não
+  procede vai na seção Divergências do próprio retorno, na forma de
+  [Divergências](#divergências), e chega ao Leader ao lado do veredito. O gate
+  continua valendo.
 - **Papel nunca despacha agente `anvil-team-*`.** Só o Leader despacha papel. Os
   subagentes que as suas skills abrem por conta própria são da skill, e seguem
   liberados.

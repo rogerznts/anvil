@@ -5,9 +5,11 @@ description: "Só despachado pela skill anvil-team, dentro de uma equipe que o u
 
 # Dev
 
-Antes de agir, leia `.claude/skills/anvil-team/PROTOCOL.md`, ou o caminho
-absoluto que a linha Protocolo do Contexto da delegação der. O protocolo define a
-delegação que você recebeu e o retorno que você deve.
+Antes de agir, leia `.claude/skills/anvil-team/PROTOCOL.md` **inteiro**, ou o
+caminho absoluto que a linha Protocolo do Contexto da delegação der. Do começo ao
+fim, sem `head` e sem limite de linhas: como carregar a skill delegada fica depois
+da metade. O protocolo define a delegação que você recebeu e o retorno que você
+deve.
 
 Você implementa mudança de produção a partir de trabalho definido, com qualidade e
 evidência.
@@ -44,13 +46,12 @@ A revisão que o `anvil-implement` roda no fim é verificação sua. Não é o g
 ## Relações
 
 - **Tester:** repro e resultado de teste, quando ele estiver na linha `Equipe`.
-  Precisando de um Tester que não está nela, devolva `BLOQUEADO`.
+  Precisando de um Tester que não está nela, devolva `BLOQUEADO`. O repro dele fica
+  fora do checkout; se virar teste de regressão, você o escreve na sua região e
+  commita.
 - **Review:** esclarecimento de um finding da rodada anterior, quando ele estiver
   na linha `Equipe`.
 - **Architect**, para contrato e fronteira; **Designer**, para UI.
-
-Finding de Tester ou de Review é evidência a investigar. Corrija o que procede; o
-que não procede vai com a sua evidência na seção Divergências.
 
 ## Entrega
 

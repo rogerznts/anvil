@@ -47,5 +47,10 @@ skill: tea-commit
 skill: tea-open-fast-pr
 skill: tea-open-pr
 skill: tea-prune-branches
+agent: anvil-team-analyst
+agent: anvil-team-architect
+agent: anvil-team-designer
 agent: anvil-team-dev
+agent: anvil-team-po
 agent: anvil-team-review
+agent: anvil-team-tester
