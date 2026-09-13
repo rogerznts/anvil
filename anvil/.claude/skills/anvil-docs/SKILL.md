@@ -165,9 +165,10 @@ fluxo do bench. O contrato está em [STACK-CONTRACT.md](STACK-CONTRACT.md).
 
 - `bash scripts/validate.sh docs-paths` — as saídas declaradas ficam sob os
   domínios canônicos. Consultivo, não bloqueia.
-- `bash scripts/validate.sh ship-ready` — a spec do branch atual está fechada
-  (tickets `resolved`) **e arquivada**. É o que o hook de merge chama, e é o que
-  impõe o `archive` antes do PR.
+- `bash scripts/validate.sh ship-ready [branch...]` — a spec do branch atual, e
+  a de cada branch passado, está fechada (tickets `resolved`) **e arquivada**. É
+  o que o hook de merge chama, passando os branches que o `git merge` nomeia, e é
+  o que impõe o `archive` antes do PR.
 - `bash scripts/find-dupes.sh docs` — conteúdo duplicado: mesmo hash, mesmo
   identificador de artefato, mesmo título. O `adopt` roda no começo e no fim;
   vale rodar à mão depois de qualquer movimentação em massa.
