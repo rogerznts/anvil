@@ -53,3 +53,11 @@ contadores de uma a três letras; **S3** leitura de `extra` repete `copy_extras`
 binário alterado mede 0 sem aviso; **S6** vírgula em nome de arquivo quebra as listas. Lacuna da spec: o
 `docs/architecture/overview.md` repete a métrica velha (171 em 25.064, 0,68%, vinte e uma; linha 104) e nenhum
 ticket a cobre — a spec diz "README e overview … a métrica ganha comando e data".
+
+**Leader, 2026-09-13 — rodada de ajuste** em `bd67288` (F1: no laço do payload, arquivo do pin listado em `strip`
+não entra em pareado; um `strip` ausente do pin segue em "sem par", sem sumir), `5a27347` (F2 e F3 no README: 36
+entradas = as 35 curadas e o `anvil-bench`; a linha única vale para os pareados, e o `anvil-stack-payload` carrega 29
+`keep`) e `93839e3` (métrica do `overview.md` com números, comando e data). Prova do F1 numa cópia: o script antigo
+contava o `strip` plantado em dois baldes (203 nossas); o novo sai idêntico por `cmp` à cópia sem plantio. `stats` do
+payload real idêntico ao publicado em 3.2 e 5.2; `verify` limpo. Conferido pelo Leader. Desvio aceito: F2 resolvido
+na linha da tabela, onde o 36 aparece, e não na introdução. Aguarda o gate do Tester.
