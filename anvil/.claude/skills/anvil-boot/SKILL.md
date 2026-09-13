@@ -294,7 +294,7 @@ awk '{ sub(/[ \t\r]+$/, "") } 1' .gitignore | grep -nxF -A1 \
       { cr = sub(/\r$/, "") ? "\r" : "" }
       NR == n     { if (!has) print "# ANVIL:INSTALLED:START" cr; next }
       NR == n + 1 { if (!has) print "# ANVIL:INSTALLED:END" cr; next }
-      { print $0 cr }' .gitignore > .gitignore.anvil
+      { print $0 cr }' .gitignore > .gitignore.anvil &&
   cat .gitignore.anvil > .gitignore && rm .gitignore.anvil
   ```
 
