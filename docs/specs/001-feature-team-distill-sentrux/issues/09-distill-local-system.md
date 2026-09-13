@@ -35,3 +35,17 @@ inteiros. Ideia: registrar uma skill autoral exige mexer em quatro lugares.
 
 **Leader, 2026-09-13 — ajuste pré-gate** em `9bc93b6` (`anvil-docs` e README de `discovery/` citam o `anvil-distill`).
 Gates despachados: Review e Tester.
+
+**Leader, 2026-09-13 — gate Review, rodada 1: APROVADO, sem bloqueante.** Critérios atendidos sobre `9bc93b6`;
+`check-pointers.py` reexecutado (p-spec 166/45, p-base 166/49, sem falha); p-neg sem skill; destilação da r3 lida
+inteira e julgada útil a quem implementa (21 conceitos nas quatro classes, 8 perguntas abertas). Achados:
+**R1** o `ls -d` do destino (`SKILL.md:33`) aborta em zsh quando um dos globs não casa — o caso comum, spec não
+arquivada — e a pasta existente some da saída; o p-spec bateu nisso e se recuperou com outro comando; um modelo
+menos insistente pararia em branch válido. **S1** a sessão principal repassou a stack da rule como fato ao
+subagente nas duas rodadas finais (o risco já registrado se repetiu). **N1** a árvore do `anvil-docs/SKILL.md:54`
+ainda cita só o `anvil-research` em `discovery/`, e a linha 87 tem "dentro dele" ambíguo. **N2** a regra de destino
+repete o perfil do tracker; num projeto com perfil GitHub/GitLab (sem `docs/specs/`), `feature/123-login` cai no
+"pare". Sugestões: sem funcionalidade cobre o sistema inteiro também no `DISTILL.md`; ponteiro "a partir da raiz"
+com referência fora do projeto; criar `docs/` quando não existe; nomear "não executar a referência nem os testes";
+critério de "grande demais". Fora do ticket: `docs/architecture/overview.md:30-31` desatualizado (contagem de
+autorais, sem `anvil-team`).

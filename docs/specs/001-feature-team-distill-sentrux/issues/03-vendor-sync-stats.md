@@ -13,3 +13,23 @@
 - [ ] A lista do catálogo de adaptações no README inclui `invocable` e `tracker-profile`, na mesma ordem do `ADAPT-RULES.md`.
 - [ ] O diagrama do fluxo no README mostra o boot chamando o `anvil-docs` sem verbo, que escolhe entre `scaffold` e `adopt` (ticket 14).
 - [ ] Ponto A: as três verificações acima rodam contra o payload real.
+
+## Comments
+
+**Leader, 2026-09-13 — entrega do Dev** em `e89099d` (verbo `stats` com a definição no `cmd_stats`), `b778ca5`
+(README: números medidos com comando e data, `tracker-profile` no catálogo, boot chamando o `anvil-docs` sem verbo) e
+`3c7c56d` (pin ausente dá ERRO e exit 1; um balde por arquivo). Ponto A contra o payload real: duas execuções em
+`/bin/bash` 3.2 e uma em bash 5.2 idênticas por `cmp`; `anvil-research` com rename puro mede 1, e a linha é o
+`name:`; somar uma linha e apagar outra dá 2; pin inexistente dá ERRO e exit 1; `verify` limpo em 3.2 e 5.
+Números: 36 entradas vendored (34 com árvore upstream) · 186 pareados, 21.887 linhas · 202 nossas (0,92%) ·
+17 skills com uma linha · keep 34 arquivos, 7.720 linhas · extra 45 arquivos, 5.771 linhas, 4 nossas · strip 59 ·
+sem par 1. Antes: 35 / 25.064 / 171 (0,68%) / 21.
+
+Desvios aceitos: o README publica as linhas dos pareados (o denominador da definição) e keep e extra à parte, sem
+total geral; "skills com uma linha" é contagem, e a frase de que a linha é o `name:` foi conferida à mão; o `stats`
+lê o working tree, como o `verify`. A medição ad hoc (34 / 21.954 / 241 / 16) não tem método escrito e não se
+reconcilia.
+
+Ajuste antes dos gates: `anvil-to-spec/scripts/new-spec.sh` é arquivo do anvil dentro de skill vendorizada e não
+está no `keep` — o `stats` o mostra sem par, e o `update` não tem ordem de preservá-lo; entra `keep`. O bloco
+"Comandos" da `anvil-sync/SKILL.md` passa a listar `lock` e `stats`.
