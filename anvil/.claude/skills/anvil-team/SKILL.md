@@ -189,6 +189,10 @@ preparar repro e harness, responder o autor e voltar `PRONTO`. Cada um vai na
 linha `Equipe` do outro. O gate do Tester é outra chamada, depois da entrega do
 Dev e depois que a delegação sem gate voltou, com o mesmo name e `· gate`.
 
+**Despache o Tester primeiro**, e o Dev só depois que a chamada do Tester voltar.
+`SendMessage` a um name que ainda não foi despachado falha com "No agent named …
+is reachable", e o Dev que pede o repro logo ao começar volta `BLOQUEADO` (medido).
+
 **O Tester escreve fora do checkout**, com ou sem gate. A Política de escrita dele
 nomeia um diretório fora de qualquer checkout, escolhido por você, e diz
 `Commit: não`. Dois escritores no mesmo checkout disputam o índice, e arquivo não
