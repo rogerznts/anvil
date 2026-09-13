@@ -12,3 +12,18 @@
 - [ ] Depois do boot, o glossário e os ADRs estão no layout do anvil e o perfil de domínio aponta para eles; nenhuma rule do projeto continua citando o caminho antigo sem aviso.
 - [ ] Ponto B, com `claude -p` isolado do `CLAUDE.md` e das rules do repo pai: um projeto com `CONTEXT.md` na raiz recebe o plano do `adopt` e só move com aprovação; um projeto limpo segue pelo `scaffold`.
 - [ ] O `verify` sai limpo.
+
+## Comments
+
+**Leader, 2026-09-13 — entrega do Dev** em `7feda2d` e `0c71304` (passo 5 do boot). Ponto B isolado: projeto
+com `CONTEXT.md` na raiz e projeto com `docs/adr/` seguem pelo `adopt`, mostram o plano, param e só movem
+com aprovação; projeto limpo segue pelo `scaffold`. Cinco execuções, US$ 2,73.
+
+**Ampliação antes dos gates:** a regra "sem verbo explícito" do `anvil-docs` é a fonte da escolha entre
+`scaffold` e `adopt`, e o boot só a repete. Sem a exceção lá, `/anvil-docs` rodado direto num projeto antigo
+ainda cai no `scaffold` e ignora o glossário. A exceção vai para o `anvil-docs` (regra e parada do
+`scaffold`), e o passo 5 do boot aponta para ela.
+
+Ficam como ideia: `ARCHITECTURE.md`/`ROADMAP.md` soltos na raiz e `src/*/docs/adr/` como gatilho (o ticket
+nomeia três caminhos). Aceito: a cláusula de `docs/adr/` é redundante com "conteúdo fora dos domínios", mas o
+ticket a nomeia. `CONTEXT-MAP.md` sem execução própria vai para o gate do Tester.
