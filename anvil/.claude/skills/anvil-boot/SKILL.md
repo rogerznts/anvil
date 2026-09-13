@@ -125,9 +125,9 @@ ls -d CONTEXT.md CONTEXT-MAP.md 2>/dev/null; find docs/adr -type f 2>/dev/null
 ```
 
 São o glossário e os ADRs do layout antigo. O `scaffold` só olha dentro de `docs/`,
-e o perfil de domínio que o passo 6 grava os procura no layout do anvil: sem o
-`adopt`, eles ficam esquecidos, e o perfil manda seguir em silêncio. O `adopt` já
-sabe para onde cada um vai.
+e o perfil de domínio que o passo 6 grava, `docs/agents/domain.md`, os procura no
+layout do anvil: sem o `adopt`, eles ficam esquecidos, e o perfil manda seguir em
+silêncio. O `adopt` já sabe para onde cada um vai.
 
 As rules do passo 4 foram escritas antes da mudança. Se o `adopt` moveu algum
 desses arquivos, as que citam o caminho antigo entram na lista de referências que
