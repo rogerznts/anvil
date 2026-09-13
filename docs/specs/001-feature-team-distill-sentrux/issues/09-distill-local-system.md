@@ -49,3 +49,20 @@ repete o perfil do tracker; num projeto com perfil GitHub/GitLab (sem `docs/spec
 com referência fora do projeto; criar `docs/` quando não existe; nomear "não executar a referência nem os testes";
 critério de "grande demais". Fora do ticket: `docs/architecture/overview.md:30-31` desatualizado (contagem de
 autorais, sem `anvil-team`).
+
+**Leader, 2026-09-13 — gate Tester, rodada 1: APROVADO.** Isolado, payload igual a `696ae61`, referência Ruby
+(faraday-retry 1.0.3) e projeto-alvo Go com a rule dizendo outra stack de propósito. Branch `fix/042-…` → discovery
+da spec, seis seções, 105 ponteiros limpos, quatro classes com trecho do projeto, divergência rule × `go.mod` com
+ponteiro dos dois lados, Origem "sem versão verificável" para cópia versionada no próprio git; `feat/…` sem número →
+`docs/discovery/` mesmo com spec existente como isca; `fix/043-…` sem pasta → parou antes de despachar, sem escrever;
+"porta X de references/Y" disparou; "analisa esse código" (no projeto e em `references/`) não disparou; `git status`
+só com o documento e referência intacta. Sete sessões, US$ 5,21. Achados: **A** a stack da rule foi repassada como
+fato em 4 de 4 despachos (o S1 do Review, já no ajuste); **B** em `-p` com `permissionMode` default o Write do
+subagente em background é negado e nada é gravado — a skill avisa e oferece retomar; no interativo não foi testado
+(risco, coerente com a M4 do ticket 06); **C** o `check-pointers.py` do Dev aprova 10 de 16 ponteiros falsos
+(`workspace/16-distill-tester/checker/fakes.py`); o verificador estrito do Tester confirma r2 e r3 limpos.
+
+Rodada única de ajuste com o Dev: R1, S1 (= A), N1, N2 (sem `docs/specs/`, número no branch vai para a base) e duas
+linhas no `DISTILL.md` (sem funcionalidade cobre o sistema inteiro; não executar a referência nem os testes).
+Ficam como ideia: `check-pointers.py` estrito se for reusado como prova; ponteiro com referência fora do projeto;
+criar `docs/` quando não existe; critério de "grande demais"; `overview.md` desatualizado (autorais, `anvil-team`).
