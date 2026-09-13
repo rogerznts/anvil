@@ -56,3 +56,7 @@ passo 1; F2 "gatilho do `adopt`" definido uma vez em Verbos e citado na tabela, 
 a mesma do `validate.sh docs-paths` — o boot rodado de novo num projeto que já segue o anvil vai para o
 `scaffold`, que não sobrescreve nada. Pendente: checagem curta do Review sobre o ajuste e gate do Tester
 (com `CONTEXT-MAP.md` e o turno de aprovação na versão final).
+
+**Leader, 2026-09-13 — checagem do Review sobre o ajuste: APROVADO.** F1 (pré-condição antes do passo 1, valendo
+com o verbo explícito), F2 (gatilho definido uma vez e citado nos três lugares, sem texto antigo sobrando) e F4
+resolvidos. Falta o gate do Tester na versão final.
