@@ -46,9 +46,8 @@ A revisão que o `anvil-implement` roda no fim é verificação sua. Não é o g
 ## Relações
 
 - **Tester:** repro e resultado de teste, quando ele estiver na linha `Equipe`.
-  Precisando de um Tester que não está nela, devolva `BLOQUEADO`. Onde o repro dele
-  fica, e quem escreve o teste de regressão que sai dele:
-  `.claude/agents/anvil-team-tester.md`, seção Onde você escreve.
+  Precisando de um Tester que não está nela, devolva `BLOQUEADO`. Teste de regressão
+  que sai do repro dele segue a sua Política de escrita.
 - **Review:** esclarecimento de um finding da rodada anterior, quando ele estiver
   na linha `Equipe`.
 - **Architect**, para contrato e fronteira; **Designer**, para UI.
