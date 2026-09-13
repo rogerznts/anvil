@@ -4,25 +4,25 @@
 
 **Blocked by:** 04
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] O lock ganha linhas `agent:`, e um leitor antigo as ignora sem quebrar.
-- [ ] A geração do lock no `vendor-sync` emite os agentes do payload.
-- [ ] O `reset-install` classifica agentes em substituídos, órfãos, alheios e preservados, e o dry-run mostra a classificação.
-- [ ] O bloco `ANVIL:INSTALLED` lista os agentes instalados.
-- [ ] O `verify` reprova um lock sem um agente do payload, e um agente que cita caminho inexistente.
-- [ ] O `dev-link` liga os agentes do payload neste repositório.
-- [ ] A migração do mosk no boot remove só as personas do mosk, não o diretório de agentes.
-- [ ] Contrato de citação com a equipe (desenho, seção 3): num agente, caminho do payload se cita só em crase, relativo à raiz de instalação (`.claude/...`).
-- [ ] O `verify` reprova: `name:` do agente diferente do nome do arquivo; span em crase começando com `.claude/` (sem `*`, `{` ou `<`, fora de bloco cercado) que não existe no payload; link markdown relativo num arquivo de agente.
-- [ ] Achados do Review no ticket 04 que ficam aqui, porque este ticket mexe no lock e no bloco nos mesmos passos do boot:
-- [ ] N1 — com skill do lock faltando no disco, a pergunta do passo do lock cobre também as skills (e agora os agentes) que o lock lista: nada do usuário volta ao lock sem ter sido perguntado.
-- [ ] N2 — a busca da linha antiga e do START no passo do gitignore normaliza o fim de linha como o script (espaço, tab e `\r`).
-- [ ] N3 — a troca da linha antiga pelos marcadores mantém o fim de linha do arquivo.
-- [ ] N4 — a pergunta é "quais não vieram do anvil", não "quais o usuário escreveu".
-- [ ] N5 — o identificador `MINHAS` nos `SKILL.md` vira `USER_SKILLS`.
-- [ ] A receita do `anvil-update` para instalação sem lock deixa de pôr no lock o que não veio do anvil e não grava em `/tmp` como se fosse o lock.
-- [ ] Ponto A: payload de teste com um agente, e projeto descartável com um agente do usuário.
+- [x] O lock ganha linhas `agent:`, e um leitor antigo as ignora sem quebrar.
+- [x] A geração do lock no `vendor-sync` emite os agentes do payload.
+- [x] O `reset-install` classifica agentes em substituídos, órfãos, alheios e preservados, e o dry-run mostra a classificação.
+- [x] O bloco `ANVIL:INSTALLED` lista os agentes instalados.
+- [x] O `verify` reprova um lock sem um agente do payload, e um agente que cita caminho inexistente.
+- [x] O `dev-link` liga os agentes do payload neste repositório.
+- [x] A migração do mosk no boot remove só as personas do mosk, não o diretório de agentes.
+- [x] Contrato de citação com a equipe (desenho, seção 3): num agente, caminho do payload se cita só em crase, relativo à raiz de instalação (`.claude/...`).
+- [x] O `verify` reprova: `name:` do agente diferente do nome do arquivo; span em crase começando com `.claude/` (sem `*`, `{` ou `<`, fora de bloco cercado) que não existe no payload; link markdown relativo num arquivo de agente.
+- [x] Achados do Review no ticket 04 que ficam aqui, porque este ticket mexe no lock e no bloco nos mesmos passos do boot:
+- [x] N1 — com skill do lock faltando no disco, a pergunta do passo do lock cobre também as skills (e agora os agentes) que o lock lista: nada do usuário volta ao lock sem ter sido perguntado.
+- [x] N2 — a busca da linha antiga e do START no passo do gitignore normaliza o fim de linha como o script (espaço, tab e `\r`).
+- [x] N3 — a troca da linha antiga pelos marcadores mantém o fim de linha do arquivo.
+- [x] N4 — a pergunta é "quais não vieram do anvil", não "quais o usuário escreveu".
+- [x] N5 — o identificador `MINHAS` nos `SKILL.md` vira `USER_SKILLS`.
+- [x] A receita do `anvil-update` para instalação sem lock deixa de pôr no lock o que não veio do anvil e não grava em `/tmp` como se fosse o lock.
+- [x] Ponto A: payload de teste com um agente, e projeto descartável com um agente do usuário.
 
 ## Comments
 
@@ -94,3 +94,9 @@ orientar o aviso de colisão (comparar com a cópia do `$TMP`; se o arquivo for 
 **N3** o check (c) reprova prosa como `[nota]: veja isto`; **N4** referência indentada 4 espaços passa;
 Standards: `{ [ -f ] || [ -L ]; }` repetido três vezes, identificador `alvos` num heredoc Python, "e"/"é"
 num comentário. Falta o reteste do Tester (ajuste das duas checagens do R1 para o destaque).
+
+**Leader, 2026-09-13 — resolvido.** Reteste do Tester sobre o ajuste: APROVADO — as duas checagens do R1
+conferem a decisão (destaque, aviso e sobrescrita), destaque correto com e sem lock, lock CRLF e lock antigo;
+F3 nos três grupos; check (c) por referência; suítes do 05 e do 04 limpas em bash 5 e 3.2. Com o reteste do
+Review, os gates passaram sobre `cb956b9`. Ideia registrada: lock editado à mão com espaço no fim da linha
+gera destaque de colisão falso (só o aviso; lock, bloco e grupos saem corretos).
