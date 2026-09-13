@@ -59,9 +59,10 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" \
      --dry-run --from "$TMP" --to .
 ```
 
-**Rode a cópia recém-baixada, nunca a instalada.** O script apaga o próprio
-diretório onde vive. Rodar do `$TMP` também garante que a lógica de reset é a
-nova, não a da versão velha.
+**No reset, rode a cópia recém-baixada, nunca a instalada.** O reset apaga o
+próprio diretório onde o script vive. Rodar do `$TMP` também garante que a lógica
+de reset é a nova, não a da versão velha. O `--gitignore-only`, que só reescreve o
+bloco do `.gitignore`, pode rodar da cópia instalada — é o que o `/anvil-boot` faz.
 
 A saída classifica em quatro grupos: *substituídos* · *órfãos, serão removidos* ·
 *não são do anvil, ficam intocados* · *preservados sempre*.
@@ -88,6 +89,8 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP" -
 - o que mudou localmente: `git status --short` e `git diff --stat`
 - o que há de novo no toolkit
 - o que ficou no disco para você decidir
+- `.gitignore` sem o bloco `ANVIL:INSTALLED`: ficou intocado; sugira rodar
+  `/anvil-boot` para criá-lo, se o projeto não optou por versionar tudo
 - se a estrutura de rules ou templates mudou, sugira rodar `/anvil-boot` de novo
 
 **Nunca commite sozinho.** O diff é para o usuário revisar.
@@ -102,7 +105,7 @@ rm -rf "$TMP"
 
 - Árvore suja não é resetada sem confirmação explícita.
 - O dry-run vem antes de qualquer remoção, sempre.
-- O `reset-install.sh` roda do `$TMP`, nunca do projeto.
+- O reset do `reset-install.sh` roda do `$TMP`, nunca do projeto.
 - Nada é apagado fora do conjunto que o script calcula. **Skill que o usuário
   escreveu não é do anvil para remover.**
 - O lockfile é reescrito pelo script. Não edite à mão. O bloco `ANVIL:INSTALLED`

@@ -17,8 +17,9 @@
 # do lock. O update só regenera o bloco que já existe; quem o cria é o boot, pelo
 # --gitignore-only, que lê o lock existente e reescreve só o bloco.
 #
-# RODE A CÓPIA RECÉM-BAIXADA, NUNCA A INSTALADA: este script apaga o próprio
-# diretório onde vive, e rodar do $TMP garante que a lógica de reset é a nova.
+# NO RESET, RODE A CÓPIA RECÉM-BAIXADA, NUNCA A INSTALADA: o reset apaga o próprio
+# diretório onde o script vive, e rodar do $TMP garante que a lógica é a nova. O
+# --gitignore-only não apaga nada e roda da cópia instalada, como faz o boot.
 
 set -euo pipefail
 
@@ -29,10 +30,14 @@ while [ $# -gt 0 ]; do
         --to)   TO="${2:-}";   shift 2 ;;
         --dry-run) DRY=1; shift ;;
         --gitignore-only) GITIGNORE_ONLY=1; shift ;;
-        -h|--help) sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
     esac
 done
+
+if [ "$GITIGNORE_ONLY" -eq 1 ] && [ -n "$FROM" ]; then
+    echo "erro: --gitignore-only não usa --from — o bloco sai do lock de --to" >&2; exit 2
+fi
 
 TO_ABS="$(cd "$TO" && pwd)"
 LOCK="$TO_ABS/.claude/anvil.lock"
@@ -45,34 +50,48 @@ GITIGNORE="$TO_ABS/.gitignore"
 INICIO="# ANVIL:INSTALLED:START"
 FIM="# ANVIL:INSTALLED:END"
 
-# Le um lock na entrada padrao e imprime o bloco.
+# Le um lock na entrada padrao e imprime o bloco. O \r de um lock CRLF sai antes:
+# ".claude/skills/tea-x\r/" nao casa com diretorio nenhum.
 bloco_gitignore() {
     echo "$INICIO"
     echo "# Gerado do .claude/anvil.lock. Nao edite: o proximo update reescreve."
-    sed -n 's|^skill: *\(.*\)$|.claude/skills/\1/|p'
+    tr -d '\r' | sed -n 's|^skill: *\(.*\)$|.claude/skills/\1/|p'
     echo "$FIM"
 }
 
-tem_bloco() { [ -f "$GITIGNORE" ] && grep -qxF "$INICIO" "$GITIGNORE"; }
+# Os tres awk comparam o marcador com a linha sem o espaco, tab e \r do fim (l): um
+# checkout com core.autocrlf=true poe \r em toda linha, e o bloco tem de continuar
+# sendo achado.
+tem_bloco() {
+    [ -f "$GITIGNORE" ] && awk -v ini="$INICIO" '
+        { l = $0; sub(/[ \t\r]+$/, "", l) }
+        l == ini { achou = 1; exit }
+        END { exit !achou }' "$GITIGNORE"
+}
 
-# Reescreve so o bloco, a partir do lock gravado. Sem bloco, acrescenta no fim.
+# Reescreve so o bloco, a partir do lock gravado. Sem bloco, acrescenta no fim. O
+# bloco sai com o fim de linha da primeira linha do arquivo, CRLF ou LF.
 escrever_gitignore() {
-    local bloco tmp
+    local bloco tmp cr=""
     bloco="$(bloco_gitignore < "$LOCK")"
+    [ -f "$GITIGNORE" ] && head -n1 "$GITIGNORE" | grep -q $'\r$' && cr=$'\r'
     tmp="$(mktemp)"
     if tem_bloco; then
-        BLOCO="$bloco" awk -v ini="$INICIO" -v fim="$FIM" '
-            $0 == ini { print ENVIRON["BLOCO"]; dentro = 1; next }
-            dentro && $0 == fim { dentro = 0; next }
+        BLOCO="$bloco" CR="$cr" awk -v ini="$INICIO" -v fim="$FIM" '
+            { l = $0; sub(/[ \t\r]+$/, "", l) }
+            l == ini { n = split(ENVIRON["BLOCO"], b, "\n")
+                       for (i = 1; i <= n; i++) print b[i] ENVIRON["CR"]
+                       dentro = 1; next }
+            dentro && l == fim { dentro = 0; next }
             !dentro { print }' "$GITIGNORE" > "$tmp"
     else
         {
             if [ -s "$GITIGNORE" ]; then
                 cat "$GITIGNORE"
-                [ -n "$(tail -c1 "$GITIGNORE")" ] && echo
-                echo
+                [ -n "$(tail -c1 "$GITIGNORE")" ] && printf '%s\n' "$cr"
+                printf '%s\n' "$cr"
             fi
-            printf '%s\n' "$bloco"
+            printf '%s\n' "$bloco" | while IFS= read -r linha; do printf '%s%s\n' "$linha" "$cr"; done
         } > "$tmp"
     fi
     # cat em vez de mv, para o .gitignore manter as permissoes que tinha
@@ -82,8 +101,9 @@ escrever_gitignore() {
 # Marcador fora de um unico par START..END faria o awk engolir linhas do usuario.
 # Checado antes de qualquer escrita, para o update nao parar no meio do reset.
 if [ -f "$GITIGNORE" ] && ! awk -v ini="$INICIO" -v fim="$FIM" '
-        $0 == ini { if (i || f) { ruim = 1; exit } i = 1 }
-        $0 == fim { if (!i || f) { ruim = 1; exit } f = 1 }
+        { l = $0; sub(/[ \t\r]+$/, "", l) }
+        l == ini { if (i || f) { ruim = 1; exit } i = 1 }
+        l == fim { if (!i || f) { ruim = 1; exit } f = 1 }
         END { exit (ruim || i != f) }' "$GITIGNORE"; then
     echo "erro: $GITIGNORE tem marcadores ANVIL:INSTALLED fora de um único par START..END — conserte à mão" >&2; exit 2
 fi
@@ -118,7 +138,7 @@ done
 # veio de antes do lockfile, ou de um degit feito a mao.
 possui=""
 if [ -f "$LOCK" ]; then
-    possui="$(sed -n 's/^skill: *//p' "$LOCK")"
+    possui="$(tr -d '\r' < "$LOCK" | sed -n 's/^skill: *//p')"
 fi
 
 # --- classificacao ------------------------------------------------------------
