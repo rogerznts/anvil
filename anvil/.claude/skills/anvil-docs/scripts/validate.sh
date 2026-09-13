@@ -38,10 +38,10 @@ get_current_branch() {
 # diferentes de propósito. Comparar por igualdade quebra — é o erro que o
 # ADR-0017 do mosk documentou depois de uma spec ser lida com o número errado.
 #
-# Procura nos DOIS lugares, e `specs/` vem primeiro. O archive roda ANTES do PR,
-# dentro do mesmo branch, então quando o merge chega a spec já está sob
-# `specs/archive/`. Olhando só em `specs/`, o hook bloqueava justamente o fluxo
-# correto — e com a mensagem errada, "não há pasta correspondente".
+# Procura nos DOIS lugares, e `specs/` vem primeiro. O archive roda ANTES do
+# merge ou do PR, dentro do mesmo branch, então quando o merge chega a spec já
+# está sob `specs/archive/`. Olhando só em `specs/`, o hook bloqueava justamente o
+# fluxo correto — e com a mensagem errada, "não há pasta correspondente".
 #
 # O branch pode vir qualificado — `refs/heads/feature/012-x`, `origin/feature/012-x`
 # —, e o prefixo não muda qual spec ele é.
@@ -155,9 +155,10 @@ EOF
     # ao branch padrão sem archive, e até aqui essa metade da garantia era só
     # prosa no rodapé da mensagem — o script nunca a verificou.
     #
-    # Verificar é possível porque o archive roda ANTES do PR, no mesmo branch: o
-    # move para archive/ e a promoção do ADR entram no diff que vai ser revisado.
-    # Depois do merge não haveria onde commitar sem abrir um segundo PR.
+    # Verificar é possível porque o archive roda ANTES do merge ou do PR, no mesmo
+    # branch: o move para archive/ e a promoção do ADR vão no commit que é
+    # mesclado. Depois do merge, o archive já não caberia no branch da spec: seria
+    # commit direto no branch padrão, ou um segundo PR.
     case "$spec_dir" in
         docs/specs/archive/*) ;;
         *)
