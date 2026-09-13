@@ -35,6 +35,8 @@ bash $S pull                # atualiza os submodules para o HEAD remoto
 bash $S vendor <nome>       # primeira cópia de uma skill `planned`
 bash $S update [<nome>]     # merge 3-way; sem argumento, todas
 bash $S verify              # integridade do payload
+bash $S lock                # regenera o anvil.lock a partir do payload
+bash $S stats               # a métrica do README: linhas nossas contra o pin
 ```
 
 O script faz o **mecânico**: mover bytes, rodar `merge-file`, aplicar o `rename`,
