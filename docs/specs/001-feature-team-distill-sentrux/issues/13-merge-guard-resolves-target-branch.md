@@ -30,3 +30,25 @@ na `main` a pasta não existe. Gates despachados: Review e Tester. Riscos declar
 nos gates: `git -c k=v merge` e `git merge <sha>` não são reconhecidos; archive não commitado; nome de
 branch fora do conjunto sem python3; perfil do tracker não diz que `git merge` bloqueia sem archive;
 `gh pr merge <branch>` da `main`.
+
+**Leader, 2026-09-13 — gate Review: REPROVADO por B1.**
+
+- **B1** — merge disparado do próprio branch da spec confere o disco, não o commit: archive e resolved
+  feitos e não commitados passam (`git switch main && git merge {spec}` rc=0), e a `main` recebe a
+  spec com ticket aberto e fora de `archive/`. É o estado que o `/anvil-docs archive` deixa. Reproduzido
+  de ponta a ponta. Correção: o branch atual também é lido do commit (HEAD), o que fecha ainda o risco 2
+  no fluxo de PR.
+
+Critérios 1–12 atendidos; fail-closed e decisão isolada mantidos; desvios do Dev (refs qualificados,
+`-`/`@{-1}`, lista larga sem python3, textos) se sustentam.
+
+Entram na correção deste ticket, por serem contornos da mesma guarda e baratos:
+- `git -C <dir> merge` e `git -c k=v merge` passam sem verificação — o `-C` é a forma usual dos agentes;
+- o perfil do tracker (template e este repo) diz que o merge bloqueia sem archive, não só o `tea pr create`;
+- o rodapé e a mensagem do `validate.sh` não falam em PR quando o merge é local;
+- a rule deixa de chamar o `anvil-bench` de "sem upstream" sem ressalvar o material do `unlazy`.
+
+Ficam como ideia, fora da spec: merge por SHA ou alvo que ainda não resolve (fail-closed incompleto —
+registrar a limitação no cabeçalho, isto sim entra), `gh pr merge <branch>` a partir da `main` (fluxo
+de PR), `git ls-tree` sem `-z` com nome não-ASCII, e os smells de regex repetida.
+Aguardando o gate do Tester antes de devolver ao Dev.
