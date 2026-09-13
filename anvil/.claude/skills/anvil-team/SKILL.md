@@ -184,10 +184,11 @@ Gate não entra nesta regra: rodada de gate já é `Agent` novo.
 ### Tester junto com o Dev
 
 Quando o ticket tem comportamento a reproduzir ou pede harness antes da solução,
-despache `tester-{NN}` junto com `dev-{NN}`, com delegação **sem** `gate`:
-preparar repro e harness, responder o autor e voltar `PRONTO`. Cada um vai na
-linha `Equipe` do outro. O gate do Tester é outra chamada, depois da entrega do
-Dev e depois que a delegação sem gate voltou, com o mesmo name e `· gate`.
+despache `tester-{NN}` junto com `dev-{NN}`, os dois vivos ao mesmo tempo, o Tester
+com delegação **sem** `gate`: preparar repro e harness, mandá-los ao Dev, responder
+o autor e voltar `PRONTO`. Cada um vai na linha `Equipe` do outro. O gate do Tester
+é outra chamada, depois da entrega do Dev e depois que a delegação sem gate voltou,
+com o mesmo name e `· gate`.
 
 **Despache o Tester primeiro**, e o Dev logo que a chamada `Agent` do Tester
 devolver o lançamento ("Async agent launched"), sem esperar o `PRONTO` dele.
@@ -200,7 +201,9 @@ nomeia um diretório fora de qualquer checkout, escolhido por você, e diz
 rastreado do Tester entraria no commit do Dev, porque `anvil-implement` e
 `tea-commit` stageiam o que estiver pendente.
 
-- O repro chega ao Dev por `SendMessage`, com caminho e comando.
+- O repro chega ao Dev por `SendMessage` do Tester, com caminho e comando, ou
+  quando o Dev pede. Não o cole na delegação do Dev: ela sai antes de o repro
+  existir.
 - Repro que vira teste de regressão, quem escreve e commita é o Dev, na região
   dele.
 - Anote o caminho do repro no comentário do ticket e repasse-o no Contexto da
@@ -268,7 +271,8 @@ Seções exigidas: Registro no ticket, Evidência.`
 ## Tickets
 
 Você é o **único escritor** de `Status:` e de `## Comments` enquanto a Equipe
-roda. A cada retorno de entrega ou de gate, nesta ordem:
+roda. A cada retorno de entrega ou de gate ([o que conta como
+retorno](PROTOCOL.md#o-retorno)), nesta ordem:
 
 1. Anexe em `## Comments` o bloco Registro no ticket do retorno, **literal**.
 2. Logo abaixo, a sua decisão, assinada:
