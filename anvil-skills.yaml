@@ -61,7 +61,7 @@ skills:
   - { name: anvil-code-review,  source: mattpocock, path: skills/engineering/code-review,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
 
   # ---- mattpocock: setup e dependências ocultas ----------------------------
-  - { name: anvil-setup,           source: mattpocock, path: skills/engineering/setup-matt-pocock-skills, pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], strip: [agents] }
+  - { name: anvil-setup,           source: mattpocock, path: skills/engineering/setup-matt-pocock-skills, pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap, invocable], strip: [agents] }
   - { name: anvil-grilling,        source: mattpocock, path: skills/productivity/grilling,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
   - { name: anvil-domain-modeling, source: mattpocock, path: skills/engineering/domain-modeling,        pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
   - { name: anvil-codebase-design, source: mattpocock, path: skills/engineering/codebase-design,        pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
