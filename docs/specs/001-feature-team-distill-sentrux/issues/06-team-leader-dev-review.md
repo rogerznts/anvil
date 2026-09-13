@@ -65,3 +65,10 @@ colidir); no interativo o resultado do papel chega duplicado (retorno e `SendMes
 
 **Leader, 2026-09-13 — ajustes pré-gate** em `09dbc56` (exemplos da skill na spec genérica 012) e `d7297fd`
 (`anvil-diagnose` no roster; era a única skill citada pelos papéis fora dele). Gates despachados: Review e Tester.
+
+**Leader, 2026-09-13 — gate Review, rodada 1: APROVADO, sem bloqueante.** Os 14 critérios atendidos sobre
+`9f612bf`; 17 mutações dos checks d e f com o resultado esperado; payload sem texto específico deste repositório.
+Achados que dependem dos papéis do 07 e viram critério lá: **F1** "um escritor por vez neste checkout" contradiz o
+Tester despachado junto com o Dev; **F2** regra de divergência e campos do finding repetidos entre papéis e
+protocolo; **F3** o Review se descreve sempre como gate, e o protocolo prevê Review sem gate. Fica como ideia:
+**F4** comentário do `vendor-sync.sh` que aponta o desenho por um caminho que muda no archive. Falta o Tester.
