@@ -479,7 +479,7 @@ Dentro: {…}
 Fora: {…}
 
 ## Política de escrita
-{somente leitura | documentação em {caminhos} | protótipo descartável em {caminho} | código em {caminhos}}
+{somente leitura | documentação em {caminhos} | protótipo descartável em {caminho} | código em {caminhos} | leitura no checkout, escrita só em {diretório fora de qualquer checkout}}
 Não toque: `docs/specs/**/issues/*.md`, o Leader escreve o ticket.
 Commit: {não | sim, no branch atual | sim, no branch do worktree}
 
@@ -561,7 +561,9 @@ Cada um aparece na linha `Equipe` do outro. O gate do Tester é outra chamada, d
 da entrega do Dev, com o mesmo name e `· gate`, e só depois que a delegação sem gate
 voltou.
 
-**O Tester sai primeiro**, e o Dev só depois que a chamada do Tester voltar. Um name
+**O Tester sai primeiro**, e o Dev logo que a chamada `Agent` do Tester devolver o
+lançamento ("Async agent launched"), sem esperar o `PRONTO` dele. Os dois trabalham
+em paralelo; a ordem só garante que o name do Tester existe. Um name
 que ainda não foi despachado não recebe mensagem ("No agent named … is reachable"),
 e o Dev que pede o repro logo ao começar volta `BLOQUEADO`. Medido no Ponto B do 07,
 com 11 s entre os dois despachos.
