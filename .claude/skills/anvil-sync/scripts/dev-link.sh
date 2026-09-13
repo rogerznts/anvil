@@ -49,6 +49,7 @@ anvil-to-tickets
 anvil-team
 anvil-implement
 anvil-tdd
+anvil-diagnose
 anvil-codebase-design
 anvil-code-review
 anvil-docs
