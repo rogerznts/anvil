@@ -46,6 +46,7 @@ anvil-grilling
 anvil-domain-modeling
 anvil-to-spec
 anvil-to-tickets
+anvil-team
 anvil-implement
 anvil-tdd
 anvil-codebase-design
@@ -156,6 +157,7 @@ for s in $conjunto; do
     for ref in $(grep -rhoE '"(anvil|tea)-[a-z0-9-]+"|\.\./(anvil|tea)-[a-z0-9-]+' "$PAYLOAD/$s" 2>/dev/null \
                  | grep -oE '(anvil|tea)-[a-z0-9-]+' | sort -u); do
         [ "$ref" = "$s" ] && continue
+        [ -f "$AGENTS/$ref.md" ] && continue   # agente do payload, nao skill: ja ligado acima
         printf '%s\n' "$conjunto"    | grep -qx "$ref" && continue
         printf '%s\n' "$penduradas"  | grep -q "^$s -> $ref\$" && continue
         penduradas="$penduradas$s -> $ref"$'\n'
