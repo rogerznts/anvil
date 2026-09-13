@@ -32,3 +32,13 @@ o desenho em `architecture/team-shape.md` (`384fc45`), para o 06 não precisar r
 **Leader, 2026-09-13 — escopo acrescentado.** N1–N5 e a receita do update vêm do reteste do Review no
 ticket 04 (detalhe nos comentários de lá). Cobrir no cenário: lock antigo com skill do usuário e skill
 do lock faltando no disco; START com espaço no fim; troca em CRLF mantendo CRLF.
+
+**Leader, 2026-09-13 — entrega do Dev** em `bb1f92f..2ebd015` (7 commits): lock com `agent:`, segundo laço no
+`reset-install`, bloco com os agentes, `verify` com as checagens do contrato (a, b, c), `dev-link` ligando
+agentes, migração do mosk removendo só `mosk-*.md`, N1–N5 e a receita do update. Cenário
+`workspace/12-payload-agents/run.sh` limpo em bash 5 e 3.2 (64 falhas antes); suítes do 04 limpas.
+
+Decisões: link de âncora (`](#…)`) continua reprovando no check (c) — isentar só quando houver agente
+que precise (ideia registrada); "preservados sempre" continua sendo o grupo fixo; (c) vale no arquivo
+inteiro; a adaptação da suíte do 04 ao `USER_SKILLS` é aceita. Gates despachados: Review e Tester
+(ponto A e ponto B da migração do mosk, isolado).

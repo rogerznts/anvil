@@ -18,6 +18,7 @@
 - [ ] O `verify` reprova agente de equipe que não cita o protocolo, e token do Maestri (`@team-protocol`, `@anvil-skills`, `@mission-control`, `@anvil-install`, `No connection to note`) em skill ou agente do payload.
 - [ ] A frontier sai dos tickets, e os findings do Review ficam nos comentários do ticket.
 - [ ] Ponto B: sem a variável, a skill para; com ela, um ticket vai do Dev ao Review e o julgamento chega ao Leader; um "revisa esse diff" fora da skill não cai em papel nenhum; o Review não consegue editar.
+- [ ] A skill `anvil-team` entra no roster do `dev-link`, e os agentes da equipe ficam ligados neste repositório.
 - [ ] O `verify` sai limpo, incluindo a checagem de caminhos citados por agentes.
 
 ## Comments
