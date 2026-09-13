@@ -36,3 +36,13 @@ chega à sessão principal; **M2** o de um agente retomado por `SendMessage` tam
 é diferida dentro do agente e precisa de `ToolSearch`. Ficam para o ponto B deste ticket: **M4**
 permissão pedida por papel em background, **M6** reuso de `name`, **M7** nomes das ferramentas de
 leitura na allowlist.
+
+**Leader, 2026-09-13 — mudanças de desenho durante a implementação** (Architect, `team-shape.md` em `9ad85de`, a
+partir de medições do ponto B do Dev):
+
+1. **Sessão do Leader retomada** (`--resume` ou `-p`) não alcança papel pelo `name`. Regra só para autor: listar
+   os agentes; exatamente um subagente desta sessão com o `name` → retomar por `SendMessage` pelo id; nenhum ou
+   mais de um → `Agent` novo com o mesmo `name`, apontando ticket e comentários. Gate não muda.
+2. **Subagente de skill em background** perdia o resultado. A linha do protocolo vira exceção explícita à regra
+   "o protocolo de uma skill vence este": dentro da equipe, foreground mesmo quando a skill manda background; as
+   chamadas da mesma mensagem continuam em paralelo.
