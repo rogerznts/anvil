@@ -12,3 +12,24 @@
 - [ ] O texto do passo do tracker no boot e no scaffold não muda.
 - [ ] Ponto B: num projeto descartável, o boot roda o passo do tracker sem intervenção, e o perfil de domínio escrito aponta para o layout do anvil.
 - [ ] O `verify` sai limpo.
+
+## Comments
+
+**Leader, 2026-09-13 — entrega do Dev em `1e21649`, e escopo acrescentado ao ticket:**
+
+1. **O `SKILL.md` do `anvil-setup` também é remapeado**, pelo mesmo `docs-remap`: ele ainda
+   mandava procurar `CONTEXT.md` na raiz e `docs/adr/`, e prometia esse layout ao usuário,
+   embora o arquivo gravado já saísse certo.
+2. **Regra nova `tracker-profile`** (decisão do usuário). As três linhas que acrescentam a opção
+   "anvil docs/specs" ao setup existem desde `ca39c5c` e não cabem em nenhuma regra do catálogo
+   — o `docs-remap` exclui explicitamente o que o perfil de tracker resolve. A regra é de
+   julgamento e estreita: a skill de setup oferece o perfil de tracker do `anvil-docs`, como
+   decide o ADR-0002. Entra no catálogo com o motivo, no manifesto do `anvil-setup` e no aviso
+   de revisão do `vendor-sync`.
+
+Critérios acrescentados:
+
+- [ ] O `SKILL.md` do `anvil-setup` cita o glossário, o mapa de contextos e os ADRs no layout do anvil.
+- [ ] O catálogo tem a regra `tracker-profile`, com natureza, quem aplica e motivo.
+- [ ] O manifesto registra `rename`, `docs-remap`, `tracker-profile` e `invocable` para o `anvil-setup`.
+- [ ] O `vendor-sync` sinaliza `tracker-profile` para revisão no `vendor` e no `update`, como faz com `docs-remap`.
