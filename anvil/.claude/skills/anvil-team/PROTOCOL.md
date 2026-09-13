@@ -107,6 +107,9 @@ A sua última mensagem é o retorno, e chega a quem despachou você. Forma:
   de memória o que a skill faz não é seguir a skill.
 - **Skills primárias são roteamento preferencial**, não whitelist. Uma skill que
   chama outra segue a composição dela.
+- **Subagente que a sua skill abre vai com `run_in_background: false`**, e o
+  retorno só sai depois do resultado de cada um. Resultado de subagente em
+  background não chega a quem já encerrou o turno: o retorno sairia sem ele.
 - **O protocolo de uma skill vence este** quando os dois conflitam.
 - **Skill ausente, ou recusada pela trava de invocação:** retorno `BLOQUEADO`,
   dizendo qual. Instalar ou reinstalar o anvil é decisão do usuário.
