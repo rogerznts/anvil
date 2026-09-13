@@ -127,3 +127,21 @@ não é entrega, o Leader pede o retorno por `SendMessage`" (`PROTOCOL.md:78-79`
 Tester retomado depois do PRONTO, qual PRONTO libera o gate — o último. **RV2-S4** desenho §6 sem as regras do F2.
 **RV2-S5** redação (negrito em proibição, linha longa, `.git` sem crase). **RV2-S6** identificadores em pt-BR, no estilo
 do script. Risco: harness do Tester em `/tmp` com pasta fixa rodado ao mesmo tempo pelo par deu falso vermelho.
+
+**Leader, 2026-09-13 — gate Tester, rodada 2: APROVADO.** Isolado, payload de `22c1f25`, projeto horas, quatro runs de
+equipe e três sondas, US$ 6,94. **F1** em duas amostras sem o prompt pedir lateral: Dev despachado 12 s depois do
+Tester e antes do PRONTO dele; delegação do Dev sem o repro; `SendMessage` nos dois sentidos (Dev pede, Tester manda
+caminho e comando antes do PRONTO); repro fora do checkout. **F2** nenhum `sleep`, todo fim de turno com palavra do
+protocolo; Tester retomado voltou PRONTO duas vezes com trabalho novo (retorno sem palavra não apareceu). **F5** gate do
+Tester só com git de leitura; vigia do `.git` a cada segundo sem escrita em index, refs ou worktrees. **F3 e P4**
+20/20 formas certas nos checks 8 e 14 em 5.2 e 3.2; `/anvil-…` com barra reprova; `on` medido: trava. Regressão: um
+ticket chegou a `resolved` com os dois gates. Achados: **F6** (relevante, regressão do `tem_trava`) — tab no meio de
+um valor ou caractere de controle que o PyYAML recusa e o Claude Code aceita faz as duas tentativas falharem, e uma
+trava `true` canônica passa pelos checks (o 2.1.270 recusa a skill; o script de `14b8563` reprovava); latente, nenhum
+`SKILL.md` do payload tem esses caracteres. **F7** (sugestão) YAML 1.1 × 1.2 medido: `1e0` e `0o1` travam no Claude Code
+e o check não vê; `0b1`, `0_1` e `0:01` não travam e o check reprova. Riscos: `SendMessage` enfileirada para um papel que
+encerra sem nova rodada de ferramenta não chega (2 de 2) — só Laterais garante a entrega; o Tester sem gate lê um
+checkout em edição (passou a usar `git archive`).
+
+Com o gate do Review, os gates da rodada 2 passaram. Passada curta antes de resolver, conferida pelo Leader: RV2-F1,
+RV2-S1, RV2-S3 e **F6** (sanear antes do parse o que o PyYAML recusa, com as fixtures do Tester). F7 fica como ideia.
