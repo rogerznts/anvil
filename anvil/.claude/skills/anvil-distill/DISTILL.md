@@ -6,13 +6,20 @@ Leia o código, escreva o documento e devolva o caminho e três linhas.
 
 ## Invariante: política de escrita
 
-A destilação escreve **um arquivo**: o documento, dentro de `docs/`, criando a
-pasta `discovery/` se ela faltar. O sistema de referência e o código do projeto
-são **somente leitura** — nenhum arquivo editado, criado, movido ou apagado neles,
-e nenhum comando que os altere: `git pull`, `checkout`, instalador de dependência,
-build, formatter, nem executar o sistema de referência ou os testes do projeto, que
-deixam cache como `.pytest_cache` e `.unlazy/`. Comando git de leitura — `log`,
-`show`, `rev-parse`, `ls-tree`, `status` — é livre.
+A destilação escreve em dois lugares:
+
+- **o documento**, dentro de `docs/`, criando a pasta `discovery/` se ela faltar;
+- **a pasta do sistema em `references/`**, quando ele vem de uma URL que ainda não
+  tem pasta — com a linha em `.git/info/exclude`, se passageiro, ou o
+  `.gitmodules` e o pin no índice, se versionado. Quem baixa é a sessão principal,
+  antes do despacho: você recebe a pasta pronta e não baixa nada.
+
+Fora isso, o sistema de referência e o código do projeto são **somente leitura** —
+nenhum arquivo editado, criado, movido ou apagado neles, e nenhum comando que os
+altere: `git fetch`, `pull`, `checkout`, `submodule update`, instalador de
+dependência, build, formatter, nem executar o sistema de referência ou os testes do
+projeto, que deixam cache como `.pytest_cache` e `.unlazy/`. Comando git de leitura
+— `log`, `show`, `rev-parse`, `ls-files`, `ls-tree`, `status` — é livre.
 
 ## A stack do projeto
 
@@ -40,9 +47,11 @@ Um intervalo que nenhum trecho cobre é paráfrase, não ponteiro.
 O documento tem exatamente estas seções, nesta ordem:
 
 1. **Origem** — o sistema, onde está e a versão:
-   - *submodule* — `git ls-tree HEAD <pasta>` devolve uma entrada `commit`: a
-     versão é esse pin. Se `git -C <pasta> rev-parse HEAD` difere dele, registre
-     os dois e diga que os ponteiros valem para o checkout;
+   - *submodule* — `git ls-files --stage <pasta>` devolve uma entrada de modo
+     `160000`: a versão é esse pin. É o índice, não o `HEAD`, porque um
+     submodule recém-adicionado ainda não foi commitado. Se
+     `git -C <pasta> rev-parse HEAD` difere dele, registre os dois e diga que os
+     ponteiros valem para o checkout;
    - *repositório próprio* — `git -C <pasta> rev-parse --show-toplevel` devolve a
      própria pasta: a versão é o `rev-parse HEAD` dela. Numa pasta que não é
      repositório, o mesmo comando devolve a raiz do projeto, e o commit seria o do
