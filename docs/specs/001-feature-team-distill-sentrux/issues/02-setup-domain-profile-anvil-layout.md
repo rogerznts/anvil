@@ -54,3 +54,13 @@ Fica como ideia, fora da spec: o `verify` não detecta nome de skill adotada sem
 `CONTEXT.md` na raiz, e foi por isso que F1 e F2 passaram até aqui.
 
 Pendente: revisão curta de `adb17b3` e do ajuste final; ponto B do Tester.
+
+**Leader, 2026-09-13 — gate Tester, ponto B: APROVADO.** Rodado isolado do `CLAUDE.md` e das rules do
+repo pai, em projeto limpo e em projeto com `CONTEXT.md` na raiz: o boot chega ao passo do tracker
+sem intervenção, o `anvil-setup` roda sem ser digitado, o perfil de domínio aponta para o layout do
+anvil e o perfil do tracker é o do `anvil-docs`. O ponto B do Dev pode ter sido contaminado pelo
+`CLAUDE.md` do repo pai; o do Tester não foi, e é ele que vale.
+
+Achado: com `CONTEXT.md` na raiz, o glossário antigo passa despercebido, porque o boot escolhe o
+`scaffold` olhando só `docs/` e o setup agora procura no layout do anvil. Regressão desta spec,
+corrigida no ticket 14. Pendente para fechar o 02: revisão curta de `adb17b3` e `f51f937`.

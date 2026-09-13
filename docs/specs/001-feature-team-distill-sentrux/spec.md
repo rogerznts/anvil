@@ -139,6 +139,7 @@ spec com merge local.
 64. Como mantenedor, quero que a rule do projeto descreva o fluxo por branch de spec com merge local, para que agentes não mandem trabalho de spec direto na `main`.
 65. Como mantenedor, quero que a rule distinga upstream vendorizado de sistema de referência, para que ninguém trate uma pasta passageira como base de merge.
 66. Como mantenedor, quero que o README e o overview parem de dizer que o anvil não tem agentes, para que a documentação conte o que o payload distribui.
+68. Como usuário com um projeto antigo que guarda o glossário na raiz ou ADRs em `docs/adr/`, quero que o boot perceba e me proponha mover para o layout do anvil, para que meu glossário não seja ignorado em silêncio.
 67. Como mantenedor que fecha uma spec com merge local, quero que a guarda bloqueie o `git merge` do branch da spec disparado de qualquer lugar, inclusive da `main`, para que a garantia não dependa de eu lembrar de onde rodar o comando.
 
 ## Implementation Decisions
@@ -179,6 +180,10 @@ spec com merge local.
 - **`dev-link`.** Liga também os agentes do payload neste repositório.
 - **Migração do mosk no boot.** Remove só as personas do mosk dentro de
   `.claude/agents/`, não o diretório.
+- **Documentação de domínio antiga fora de `docs/`.** O passo 5 do boot trata
+  `CONTEXT.md` e `CONTEXT-MAP.md` na raiz, e `docs/adr/`, como gatilho do `adopt`.
+  Achado no gate do ticket 02: depois do remapeamento do `anvil-setup`, esses arquivos
+  deixavam de ser notados.
 - **Guarda de merge.** Identifica a spec também pelo branch nomeado no `git merge`,
   não só pelo branch atual. Achado durante a implementação: rodado na `main`, o merge
   local passava com ticket aberto.
@@ -318,6 +323,8 @@ payload e contra um projeto descartável.
 
 ### Ponto B — skills num projeto descartável
 
+- **Isolamento:** todo `claude -p` rodado num projeto dentro de `workspace/` exclui o
+  `CLAUDE.md` e as rules do repositório pai, que de outro modo contaminam o teste.
 - **Boot:** o passo do issue tracker roda sem intervenção. Projeto com a linha
   antiga e o comentário recebe a proposta de troca; linha sem o comentário fica
   intocada. A migração do mosk remove só as personas dele.
