@@ -4,22 +4,22 @@
 
 **Blocked by:** 05
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Sem a variável de *agent teams*, a skill para e mostra a configuração que falta. Não há modo degradado.
-- [ ] O Leader é a skill, na sessão principal, e é o único que conversa com o usuário.
-- [ ] O protocolo, portado do usado no Maestri sem visibilidade de notas, erro de conexão com nota e bootstrap pelo Leader, fica num lugar só dentro da skill, e os agentes o leem antes de agir.
-- [ ] A delegação tem os sete campos: objetivo, contexto, skills, escopo, política de escrita, critério de pronto e retorno.
-- [ ] `anvil-team-dev` e `anvil-team-review` existem no payload, com descriptions que dizem que só são despachados pela `anvil-team` e que não atraem delegação automática.
-- [ ] O Review declara allowlist com leitura, `Bash`, `Agent` e `Skill`, sem `Edit` e `Write`.
-- [ ] A implementação segue o desenho em `architecture/team-shape.md` (`384fc45`), seção 12, parte do 06.
-- [ ] O Review declara também `SendMessage` e `ToolSearch` na allowlist, e continua sem `Edit` e `Write`.
-- [ ] A `anvil-team` tem trava de invocação: só o usuário a abre.
-- [ ] O `verify` reprova agente de equipe que não cita o protocolo, e token do Maestri (`@team-protocol`, `@anvil-skills`, `@mission-control`, `@anvil-install`, `No connection to note`) em skill ou agente do payload.
-- [ ] A frontier sai dos tickets, e os findings do Review ficam nos comentários do ticket.
-- [ ] Ponto B: sem a variável, a skill para; com ela, um ticket vai do Dev ao Review e o julgamento chega ao Leader; um "revisa esse diff" fora da skill não cai em papel nenhum; o Review não consegue editar.
-- [ ] A skill `anvil-team` entra no roster do `dev-link`, e os agentes da equipe ficam ligados neste repositório.
-- [ ] O `verify` sai limpo, incluindo a checagem de caminhos citados por agentes.
+- [x] Sem a variável de *agent teams*, a skill para e mostra a configuração que falta. Não há modo degradado.
+- [x] O Leader é a skill, na sessão principal, e é o único que conversa com o usuário.
+- [x] O protocolo, portado do usado no Maestri sem visibilidade de notas, erro de conexão com nota e bootstrap pelo Leader, fica num lugar só dentro da skill, e os agentes o leem antes de agir.
+- [x] A delegação tem os sete campos: objetivo, contexto, skills, escopo, política de escrita, critério de pronto e retorno.
+- [x] `anvil-team-dev` e `anvil-team-review` existem no payload, com descriptions que dizem que só são despachados pela `anvil-team` e que não atraem delegação automática.
+- [x] O Review declara allowlist com leitura, `Bash`, `Agent` e `Skill`, sem `Edit` e `Write`.
+- [x] A implementação segue o desenho em `architecture/team-shape.md` (`384fc45`), seção 12, parte do 06.
+- [x] O Review declara também `SendMessage` e `ToolSearch` na allowlist, e continua sem `Edit` e `Write`.
+- [x] A `anvil-team` tem trava de invocação: só o usuário a abre.
+- [x] O `verify` reprova agente de equipe que não cita o protocolo, e token do Maestri (`@team-protocol`, `@anvil-skills`, `@mission-control`, `@anvil-install`, `No connection to note`) em skill ou agente do payload.
+- [x] A frontier sai dos tickets, e os findings do Review ficam nos comentários do ticket.
+- [x] Ponto B: sem a variável, a skill para; com ela, um ticket vai do Dev ao Review e o julgamento chega ao Leader; um "revisa esse diff" fora da skill não cai em papel nenhum; o Review não consegue editar.
+- [x] A skill `anvil-team` entra no roster do `dev-link`, e os agentes da equipe ficam ligados neste repositório.
+- [x] O `verify` sai limpo, incluindo a checagem de caminhos citados por agentes.
 
 ## Comments
 
@@ -72,3 +72,16 @@ Achados que dependem dos papéis do 07 e viram critério lá: **F1** "um escrito
 Tester despachado junto com o Dev; **F2** regra de divergência e campos do finding repetidos entre papéis e
 protocolo; **F3** o Review se descreve sempre como gate, e o protocolo prevê Review sem gate. Fica como ideia:
 **F4** comentário do `vendor-sync.sh` que aponta o desenho por um caminho que muda no archive. Falta o Tester.
+
+**Leader, 2026-09-13 — resolvido.** Gate do Tester, isolado: APROVADO — sem a variável a skill para; fluxo com
+frontier, Dev, Review em gate, veredito chegando ao Leader e registro literal no ticket; "revisa esse diff" fora da
+skill não despacha papel; o Review recusa editar mesmo com permissão máxima e sem `Edit`/`Write`; checks d e f e
+`dev-link` conferidos. Com o gate do Review, os gates passaram sobre `9f612bf`.
+
+Vão para o ticket 07, que cria os outros cinco agentes: **F1** o Dev leu só as 80 primeiras linhas do protocolo e
+pulou a seção de skills (fez TDD de memória) — a linha-ponteiro dos sete agentes manda ler o arquivo inteiro, com
+reteste de um fluxo; **R1** hoje nenhum ticket chega a `resolved` pela equipe, porque o gate do Tester é exigido e o
+agente não existe (fecha quando o 07 cria os papéis). Ficam como ideia: **F2** checks de agente olham só o primeiro
+nível de `.claude/agents/`, e a 2.1.270 carrega subdiretórios; **F3** check (d) aceita a citação em description,
+comentário HTML ou bloco indentado; **F4** reprovação falsa com crase no info string de cerca; **F5** check (f) por
+linha não pega token quebrado entre linhas.
