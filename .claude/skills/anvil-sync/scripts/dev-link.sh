@@ -59,6 +59,8 @@ anvil-distill
 anvil-how
 anvil-architect
 anvil-arena
+anvil-principles
+anvil-prototype
 anvil-unslop
 anvil-writing-for-agents
 tea-commit"
