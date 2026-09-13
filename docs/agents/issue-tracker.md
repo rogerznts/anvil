@@ -64,8 +64,9 @@ prefixo numérico em `docs/specs/`.
 Qualquer ticket cujos bloqueadores estejam todos `resolved`. Numa cadeia
 puramente linear isso é de cima para baixo.
 
-Ao concluir um ticket, marque `Status: resolved`. O hook de merge varre
-`issues/` atrás de arquivo sem essa marca e bloqueia o merge enquanto houver.
+Ao concluir um ticket, marque `Status: resolved` e commite. O hook de merge varre
+`issues/` no commit do branch atrás de arquivo sem essa marca e bloqueia o merge
+enquanto houver.
 
 ## Fechar a spec
 
@@ -80,7 +81,9 @@ merge
 
 O `archive` vem **antes** do PR, não depois do merge: mover a pasta é mudança em
 arquivo e precisa de um commit, e depois do merge não sobra branch onde ele
-caiba. O hook bloqueia o `tea pr create` enquanto a spec não estiver arquivada.
+caiba. O hook bloqueia o `tea pr create` e o `git merge` enquanto a spec não
+estiver arquivada no commit do branch — o `git merge` disparado da `main`
+inclusive, porque a spec do branch mesclado também é conferida.
 
 ## Wayfinding operations
 
