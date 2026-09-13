@@ -185,11 +185,11 @@ que cobrar."
 | Seção | Conteúdo |
 |---|---|
 | A delegação | template literal dos sete campos ([5](#5-delegação)); todo contexto chega nela; `mission-control.md` é do Leader e não se lê; name fora da linha `Equipe` não se inventa |
-| O retorno | a última mensagem é o retorno e chega a quem despachou; primeira linha fixa; seções; severidade de finding ([6](#6-retorno-e-gates)) |
+| O retorno | a última mensagem é o retorno e chega a quem despachou; primeira linha fixa; seções; severidade de finding ([6](#6-retorno-e-gates)); mensagem final sem palavra do protocolo não é entrega, e o Leader não a registra; o mesmo retorno emitido de novo, sem trabalho novo, o Leader não registra outra vez |
 | Gates | Tester e Review são gate só quando a delegação diz `gate`; o veredito existe só no retorno; conversa lateral esclarece finding e não muda veredito; o autor discorda na seção Divergências do próprio retorno, e a discordância não elimina o gate; **papel nunca despacha agente `anvil-team-*`**, só os subagentes que as próprias skills abrem |
 | Skills | carregar a skill real pela Skill tool e seguir o `SKILL.md`, sem simular; skills primárias não são whitelist; subagente que a skill abre vai com `run_in_background: false`, **mesmo quando a skill manda background**, e várias chamadas na mesma mensagem continuam em paralelo (medido no Ponto B do 06: resultado de subagente em background não chega a papel que encerrou o turno); fora essa exceção, o protocolo de uma skill vence este; skill ausente ou travada → `BLOQUEADO`, nunca instalar |
 | Fontes de verdade | a ordem da referência, com `.claude/rules/` no item de regras locais e "memória de sessões anteriores, quando houver" no último; memória é histórico, não estado; o Mission Control não é fonte |
-| Comunicação | `SendMessage` aos names da linha `Equipe`; `SendMessage` é ferramenta diferida dentro do agente, e se carrega com `ToolSearch` `select:SendMessage` antes do primeiro envio (medido, M3); texto comum de um agente não chega a outro; não simular a opinião de um colega que está na Equipe; o que nasceu em conversa lateral e importa (finding, repro, divergência, acordo) vai na seção Laterais do retorno; erro de entrega não se repete, vira `BLOQUEADO` |
+| Comunicação | `SendMessage` aos names da linha `Equipe`; `SendMessage` é ferramenta diferida dentro do agente, e se carrega com `ToolSearch` `select:SendMessage` antes do primeiro envio (medido, M3); texto comum de um agente não chega a outro; não simular a opinião de um colega que está na Equipe; o que nasceu em conversa lateral e importa (finding, repro, divergência, acordo) vai na seção Laterais do retorno; não encerrar à espera de resposta lateral: esperar dentro do turno, ou devolver com o que tem e pôr o pendente em Laterais; erro de entrega não se repete, vira `BLOQUEADO` |
 | Ownership de escrita | um escritor por região; a Política de escrita é a fronteira; `Status:` e `## Comments` de ticket são do Leader; sobreposição descoberta no meio → parar e devolver `BLOQUEADO`, e quem escolhe a saída é o Leader; em worktree, conferir que `HEAD` contém o sha da Base antes de escrever, e não conter é `BLOQUEADO` |
 | Verificação | "done" não é evidência; formas de prova da referência; provar que funciona sempre que der |
 | Divergências | evidência, não hierarquia; os quatro passos da referência; o quinto é a seção Divergências do retorno |
@@ -322,7 +322,7 @@ inexistente". Para os dois lados fecharem, o check lê a forma acima:
 | b | todo span em crase que começa com `.claude/` e não tem `*`, `{` nem `<`, fora de bloco cercado, existe em `anvil/{span}` | 05 |
 | c | link markdown relativo (`](…)` sem `://`) num arquivo de agente é falha | 05 |
 | d | todo `anvil-team-*.md` cita `` `.claude/skills/anvil-team/PROTOCOL.md` `` | 06 |
-| e | todo span em crase `/?anvil-[a-z0-9-]+` num agente, com a barra do comando tirada antes da conferência, nomeia um diretório de skill ou um arquivo de agente do payload, e a skill não tem trava. Trava é a linha `disable-model-invocation: true` dentro do frontmatter, aceitando espaço sobrando ou comentário YAML depois do `true`; fora do frontmatter não conta, e com aspas não é reconhecida. É a mesma leitura do check 8 | 07 |
+| e | todo span em crase `/?anvil-[a-z0-9-]+` num agente, com a barra do comando tirada antes da conferência, nomeia um diretório de skill ou um arquivo de agente do payload, e a skill não tem trava. Trava é lida como o Claude Code 2.1.270 a lê: o frontmatter é o bloco `---` do topo, sem BOM, parseado como YAML, e `disable-model-invocation` trava quando é booleano `true` ou quando, em minúsculas e sem espaço nas pontas, vale `1`, `true`, `yes` ou `on`, com ou sem aspas. Fora do frontmatter não conta. A regra exata mora nos checks 8 e 14 (`0619011`), que são a fonte | 07 |
 | f | tokens do Maestri (`@team-protocol`, `@anvil-skills`, `@mission-control`, `@anvil-install`, `No connection to note`) não aparecem em skill nem agente do payload | 06 |
 
 O check (e) é a user story 53, que pede que toda skill citada pelos papéis exista;
@@ -555,8 +555,9 @@ Gate não entra nesta regra: rodada de gate já é sempre `Agent` novo.
 
 Para o Dev pedir um repro ao Tester sem passar pelo Leader, o Tester precisa estar
 vivo. Quando o ticket tem comportamento a reproduzir ou pede harness antes da
-solução, o Leader despacha `tester-{NN}` junto com `dev-{NN}`, com delegação
-**sem** `gate`: preparar repro e harness, responder o autor, e voltar `PRONTO`.
+solução, o Leader despacha `tester-{NN}` junto com `dev-{NN}`, os dois vivos ao
+mesmo tempo, o Tester com delegação **sem** `gate`: preparar repro e harness,
+mandá-los ao Dev, responder o autor, e voltar `PRONTO`.
 Cada um aparece na linha `Equipe` do outro. O gate do Tester é outra chamada, depois
 da entrega do Dev, com o mesmo name e `· gate`, e só depois que a delegação sem gate
 voltou.
@@ -575,7 +576,12 @@ no mesmo checkout disputam o índice, e arquivo não rastreado do Tester entrari
 commit do Dev, porque `anvil-implement` e `tea-commit` stageiam o que estiver
 pendente.
 
-- O repro chega ao Dev por `SendMessage`, com caminho e comando.
+- O repro chega ao Dev por `SendMessage` do Tester, com caminho e comando, ou quando
+  o Dev pede. **Não o cole na delegação do Dev**: ela sai antes de o repro existir.
+  Medido no gate do Tester do 07 (2 de 2): com o repro colado na delegação, o par
+  nunca ficou vivo junto.
+- Nada do Tester escreve no `.git` do checkout: sem `git worktree add`, sem `stash`,
+  sem branch. A regra mora no agente do Tester, § Onde você escreve.
 - Se o repro virar teste de regressão, quem o escreve e commita é o Dev, na região
   dele.
 - O Leader anota o caminho do repro no comentário do ticket e o repassa no Contexto
