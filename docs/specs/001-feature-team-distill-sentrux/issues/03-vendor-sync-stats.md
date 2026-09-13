@@ -61,3 +61,21 @@ entradas = as 35 curadas e o `anvil-bench`; a linha única vale para os pareados
 contava o `strip` plantado em dois baldes (203 nossas); o novo sai idêntico por `cmp` à cópia sem plantio. `stats` do
 payload real idêntico ao publicado em 3.2 e 5.2; `verify` limpo. Conferido pelo Leader. Desvio aceito: F2 resolvido
 na linha da tabela, onde o 36 aparece, e não na introdução. Aguarda o gate do Tester.
+
+**Leader, 2026-09-13 — gate Tester, rodada 1: REPROVADO.** Numa cópia em `93839e3`. Passaram: determinismo (3.2 ×2,
+5.2, 5.2 com `LC_ALL=pt_BR.UTF-8`, `cmp` idêntico); rename puro mede 1 no `anvil-handoff`, e nas 17 skills com uma
+linha o único delta pareado é o `name:`, conferido por script; linha somada, apagada, alterada, arquivo novo sem e
+com `keep`, `keep` de diretório, `strip` (inclusive o F1 do Review corrigido), pin inexistente, blob ou vazio,
+submodule desinicializado, `.DS_Store`, nome com espaço e `extra`; todos os números do README e do `overview.md`
+reproduzidos; `verify`, `status` e `lock` sem regressão. **Falha F1 (média):** arquivo só do payload com `[`, `*` ou
+`?` no nome conta como pareado e soma todas as linhas como nossas, sem aparecer em "sem par" — `git show
+"$pin:$path/$f"` trata o argumento como pathspec e sai 0 com saída vazia (linhas 675 e 688 do `cmd_stats`). Repro:
+`[slug].md` de 5 linhas no `anvil-handoff` → 202 para 207 nossas. Caso real: tirar `bench` do `keep` do
+`anvil-stack-payload` → os três arquivos `[[...segments]]`/`[...slug]` entram como pareados, 202 para 266. O número
+publicado não muda (esses arquivos estão em `keep`). Correção provável: `git cat-file blob`/`-e` onde o código de
+saída decide. Observações que ficam como ideia: symlink dentro de skill ignorado em silêncio; a frase curta do README
+("não está na versão do pin") é menos precisa que o "lado > do diff" do script. Inconclusivo e anterior ao 03:
+`verify` em `/bin/bash` 3.2 morre com SIGTRAP na checagem 3 na cópia do Tester (também com o script de `e89099d^`;
+no repo real passa).
+
+Correção vai ao Dev como parte da mesma rodada de ajuste (o gate do Tester não tinha voltado quando ela abriu).
