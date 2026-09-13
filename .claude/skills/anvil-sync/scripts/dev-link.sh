@@ -55,6 +55,7 @@ anvil-code-review
 anvil-docs
 anvil-setup
 anvil-research
+anvil-distill
 anvil-how
 anvil-architect
 anvil-arena
