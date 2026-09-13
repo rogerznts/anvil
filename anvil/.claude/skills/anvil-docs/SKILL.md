@@ -16,14 +16,29 @@ que vai dentro dela.
 
 | verbo | quando | onde está |
 |---|---|---|
-| `scaffold` | projeto novo, `docs/` vazio ou ausente | aqui embaixo |
-| `adopt` | `docs/` existente com conteúdo fora do padrão | [ADOPT.md](ADOPT.md) |
+| `scaffold` | projeto novo, sem documentação | aqui embaixo |
+| `adopt` | documentação existente fora do padrão | [ADOPT.md](ADOPT.md) |
 | `index` | depois de criar, mudar ou arquivar spec | [INDEX.md](INDEX.md) |
 | `archive` | spec fechada | [ARCHIVE.md](ARCHIVE.md) |
 
-Sem verbo explícito: se `docs/` não existe ou só tem os README de domínio, é
-`scaffold`. Se tem conteúdo, é `adopt` — nunca presuma que dá para só criar por
-cima.
+Sem verbo explícito, confira primeiro o glossário e os ADRs do layout antigo, que
+moram fora de `docs/`:
+
+```bash
+ls -d CONTEXT.md CONTEXT-MAP.md 2>/dev/null; find docs/adr -type f 2>/dev/null
+```
+
+Sem glob: no zsh, um `docs/adr/*` que não casa aborta o comando inteiro e esconde
+o `CONTEXT.md`.
+
+- A checagem imprimiu alguma linha → `adopt`, **mesmo com `docs/` ausente ou só
+  com os README de domínio**. O perfil de domínio que o `anvil-setup` grava,
+  `docs/agents/domain.md`, procura esses arquivos no layout do anvil e manda
+  seguir em silêncio se não os acha: sem o `adopt`, ficam esquecidos.
+- Não imprimiu, e `docs/` não existe ou só tem os README de domínio → `scaffold`.
+- `docs/` tem conteúdo → `adopt`.
+
+Nunca presuma que dá para só criar por cima.
 
 ## A árvore canônica
 
@@ -154,7 +169,9 @@ no **destino**.
    conhecerem esse caminho.
 4. Rodar o verbo `index`.
 
-Se `docs/` já tiver conteúdo fora dos domínios canônicos, **pare e use `adopt`**.
+Se `docs/` já tiver conteúdo fora dos domínios canônicos, ou a checagem do layout
+antigo em [Verbos](#verbos) imprimir alguma linha, **pare e use `adopt`**. Rode-a
+mesmo quando o verbo `scaffold` vier explícito.
 
 ## Contrato de stack
 
