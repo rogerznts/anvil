@@ -118,7 +118,8 @@ com uma linha só, o `name:` do frontmatter.
 O core do mosk tinha 252 arquivos e 2,2 MB. Sobrevivem ~11 arquivos e dois blobs
 (o hallmark e o starter do Payload), e nenhum sobrevivente é compartilhado por
 mais de uma skill — cada um mora dentro da skill que o usa. O payload do `degit`
-não tem diretório compartilhado: é `.claude/skills/` e, com a equipe, `.claude/agents/`.
+não tem diretório compartilhado: é `.claude/skills/` e, com a equipe,
+`.claude/agents/`.
 
 O que sobreviveu e por quê está registrado no
 [plano](../project/plan.md#o-corte-do-core-do-mosk).

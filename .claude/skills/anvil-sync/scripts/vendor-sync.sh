@@ -561,7 +561,7 @@ for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
 PYEOF
     }
     # caminho do payload, sem o que e padrao e nao caminho (`*`, `{`, `<`)
-    SPAN_PATH='\.claude/[^*{<]*'
+    PAYLOAD_PATH_RE='\.claude/[^*{<]*'
 
     echo "10. caminho .claude/ citado por agente existe no payload"
     for f in "$AGENTS"/*.md; do
@@ -569,7 +569,7 @@ PYEOF
         while IFS= read -r t; do
             [ -n "$t" ] || continue
             [ -e "$ROOT/anvil/$t" ] || { echo "   FALHA agents/$(basename "$f") -> $t"; falhas=$((falhas+1)); }
-        done < <(spans_of "$f" "$SPAN_PATH")
+        done < <(spans_of "$f" "$PAYLOAD_PATH_RE")
     done
 
     echo "11. nenhum link markdown relativo em agente"
@@ -598,7 +598,7 @@ PYEOF
     echo "12. agente de equipe cita o protocolo"
     for f in "$AGENTS"/anvil-team-*.md; do
         [ -f "$f" ] || continue
-        spans_of "$f" "$SPAN_PATH" | grep -qxF '.claude/skills/anvil-team/PROTOCOL.md' ||
+        spans_of "$f" "$PAYLOAD_PATH_RE" | grep -qxF '.claude/skills/anvil-team/PROTOCOL.md' ||
             { echo "   FALHA agents/$(basename "$f"): nao cita .claude/skills/anvil-team/PROTOCOL.md"; falhas=$((falhas+1)); }
     done
 

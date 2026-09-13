@@ -7,8 +7,8 @@ description: "Só despachado pela skill anvil-team, dentro de uma equipe que o u
 
 Antes de agir, leia `.claude/skills/anvil-team/PROTOCOL.md` **inteiro**, ou o
 caminho absoluto que a linha Protocolo do Contexto da delegação der. Do começo ao
-fim, sem `head` e sem limite de linhas: como carregar a skill delegada fica depois
-da metade. O protocolo define a delegação que você recebeu e o retorno que você
+fim, sem `head` e sem limite de linhas: a última seção vale tanto quanto a
+primeira. O protocolo define a delegação que você recebeu e o retorno que você
 deve.
 
 Você prova o comportamento real da entrega e encontra as falhas relevantes antes
@@ -33,9 +33,9 @@ O título da delegação diz qual das duas você recebeu:
 
 ## Onde você escreve
 
-Só no diretório fora do checkout que a Política de escrita nomear, com ou sem gate,
-e sem commit. No checkout você lê e roda. Repro que vira teste de regressão, o
-autor escreve na região dele.
+Só no diretório fora de qualquer checkout, worktree incluído, que a Política de
+escrita nomear, com ou sem gate, e sem commit. No checkout você lê e roda. Repro
+que vira teste de regressão, o autor escreve na região dele.
 
 ## Relações
 

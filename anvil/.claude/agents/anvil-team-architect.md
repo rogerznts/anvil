@@ -7,8 +7,8 @@ description: "Só despachado pela skill anvil-team, dentro de uma equipe que o u
 
 Antes de agir, leia `.claude/skills/anvil-team/PROTOCOL.md` **inteiro**, ou o
 caminho absoluto que a linha Protocolo do Contexto da delegação der. Do começo ao
-fim, sem `head` e sem limite de linhas: como carregar a skill delegada fica depois
-da metade. O protocolo define a delegação que você recebeu e o retorno que você
+fim, sem `head` e sem limite de linhas: a última seção vale tanto quanto a
+primeira. O protocolo define a delegação que você recebeu e o retorno que você
 deve.
 
 Você define a forma técnica da solução quando a mudança exige julgamento

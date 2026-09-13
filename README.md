@@ -147,9 +147,9 @@ revisado, e a guarda de merge impõe a ordem.
 |---|---|---|
 | `anvil-team` | abre o Leader, que trabalha uma spec pelos tickets e despacha os agentes `anvil-team-{papel}`, com gates de Tester e Review que o autor não controla. Só o usuário a abre, e ela exige *agent teams* ligado | autoral |
 
-Os sete agentes trabalham com as skills desta página e leem um protocolo só, dentro da
-`anvil-team`. Nenhum é escolhido por delegação automática: fora da equipe, não têm
-o que fazer.
+Os sete agentes trabalham com as skills desta página e leem um protocolo só,
+dentro da `anvil-team`. Nenhum é escolhido por delegação automática: fora da
+equipe, não têm o que fazer.
 
 ### Entender antes de mudar
 
