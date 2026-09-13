@@ -23,3 +23,10 @@
 
 **Leader, 2026-09-13 — escopo acrescentado.** Os achados P1, P2 e P3 do gate Review do ticket 01
 entram aqui, porque este ticket reescreve o mesmo parágrafo da rule.
+
+**Leader, 2026-09-13 — entrega do Dev** em `c1fcb74` (guarda e `validate.sh`), `f82b902` (cópia instalada
+do hook) e `720b74e` (rule). A spec de cada branch nomeado no merge é lida do commit do branch, porque
+na `main` a pasta não existe. Gates despachados: Review e Tester. Riscos declarados pelo Dev, a julgar
+nos gates: `git -c k=v merge` e `git merge <sha>` não são reconhecidos; archive não commitado; nome de
+branch fora do conjunto sem python3; perfil do tracker não diz que `git merge` bloqueia sem archive;
+`gh pr merge <branch>` da `main`.
