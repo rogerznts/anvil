@@ -91,3 +91,21 @@ continuação de linha e `$(`, fechando dois contornos antigos; **D3** `ARCHIVE.
 `anvil-docs` dizem que a spec é lida do commit; **D4** texto neutro "merge ou PR". Efeito aceito do B1: no
 branch de uma spec cuja pasta ainda não foi commitada, `git merge main` bloqueia até o commit.
 Reteste despachado: Review e Tester.
+
+**Leader, 2026-09-13 — reteste do Review: REPROVADO por N1.** Os itens 1, 3, 4, 5, 6 e 7 estão resolvidos;
+o B1 fechou de ponta a ponta; D1–D4 se sustentam; nenhuma regressão nos critérios originais.
+
+- **N1** (bloqueante, item 2 incompleto) — `$(...)` sem aspas antes do verbo ou dos alvos quebra o parse
+  e a guarda libera um merge de verdade: `git -C $(pwd) merge {spec}`, `git --work-tree $(pwd) merge`,
+  `git -c user.name=$(whoami) merge`, e `git merge -m $(printf x) {spec}` com alvo truncado. O shlex separa
+  comando no `(`. Correção: `$(...)` sem aspas é parte da palavra, e o conteúdo é conferido como comando
+  à parte (`echo $(git merge x)` continua verificando).
+
+Entram junto: **N2** verbo ofuscado (`git mer\ge`, `git mer''ge`) documentado no cabeçalho, na lista do que
+a guarda não pega; **N4** comentários do `validate.sh` e do cabeçalho do hook que ainda supõem PR.
+Ficam como ideia: **N3** `git commit … && git switch main && git merge` bloqueia porque o hook roda antes
+do commit (conservador, a mensagem orienta); **N5** a cópia instalada do hook não tem paridade conferida
+pelo `verify`; smells de nomes e ramos duplicados.
+
+Esta é a terceira rodada do ticket: o próximo reteste cobre só os casos do N1, do N2 e do N4.
+Aguardando o reteste do Tester.
