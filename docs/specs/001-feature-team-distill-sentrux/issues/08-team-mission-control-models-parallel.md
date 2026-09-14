@@ -134,3 +134,27 @@ ativo no checkout enquanto o gate do PRONTO roda, e o commit de ticket espera; u
 pelo Dev, roda no modelo do Dev; "com commit a retomada fica no worktree" medido só com `general-purpose`; não
 exercitados: conflito no cherry-pick, `+` que sobra, gatilhos 1, 3 e 4 e o próprio caminho do F8. Rodada 2 dos gates
 despachada.
+
+**Leader, 2026-09-13 — gate Review, rodada 2: REPROVADO.** Diff `71ccf7e..37aa4de`. Resolvidos: F1 a F6 do Review
+(o `git checkout` do R1 veio do próprio `review-01`, então a regra no agente alcança quem fez; a Política nova não
+contradiz o protocolo nem a allowlist), F2 e F3 do Tester, D1 a D4. **RV2-F1 (bloqueante)** a regra "papel em worktree
+nunca se retoma por `SendMessage`" obriga só o Leader; o Tester manda o repro sem esperar pedido, o gate conversa com o
+autor, e "pergunte a ele" vale para todos — um Dev que voltou BLOQUEADO na conferência de base (worktree sem mudança,
+apagado) é retomado pela lateral no cwd de quem manda, o checkout principal, onde a Base passa e ele commita no branch
+da spec em paralelo com o outro Dev. Dedução de duas mecânicas medidas (probe3 e F2), não executada. **RV2-F2**
+`PROTOCOL.md:78-79` (o Leader pede o retorno por `SendMessage`) e `:203` (a resposta volta por `SendMessage`) contradizem
+a exceção para papel em worktree. **RV2-F3** o caminho do F8 manda "passos 5 a 7" para o PRONTO e deixa de fora o passo
+8 (remoção e tabela do Mission Control); o worktree do bloqueado some sozinho e a linha dele fica velha. **RV2-F4** no
+caminho do F8 o escritor único fica ativo enquanto o gate do PRONTO volta; o registro do gate anexado ao ticket e não
+commitado entra no commit do Dev (`anvil-implement`/`tea-commit` stageiam o pendente). **RV2-F5** a mecânica escrita diz
+"sem commit, o worktree é apagado" e o medido é "sem mudança"; o cherry-pick `{Base}..worktree-agent-{id}` de um
+worktree que sobrou repete commits já integrados — trazer só os `+` do `git cherry`. **RV2-F6** a regra "nunca por
+`SendMessage`" em quatro trechos, ponteiros circulares, rótulo divergente do desenho. **RV2-F7** o Review roda
+verificação e sensores sem dizer onde; caches e build escrevem no checkout.
+
+Decisão do Leader, mesma rodada de ajuste: **RV2-F1** guarda do lado do papel, valendo para qualquer remetente —
+`PROTOCOL.md` § Ownership, em worktree: antes de cada escrita e de cada commit, conferir que o checkout é o worktree da
+delegação; se não for, `BLOQUEADO` sem escrever. **RV2-F2** ressalva de worktree nas duas linhas do protocolo. **RV2-F3**
+"passos 5 a 8", e o passo 8 cobre também o worktree que sumiu sozinho. **RV2-F4** com escritor ativo no checkout, o
+Leader guarda o registro e só o escreve no ticket quando o escritor voltar. **RV2-F5** "sem mudança" e cherry-pick só
+dos `+`. Ficam como ideia: RV2-F6 e RV2-F7.
