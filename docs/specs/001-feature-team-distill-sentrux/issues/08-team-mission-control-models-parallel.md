@@ -4,19 +4,19 @@
 
 **Blocked by:** 06
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] O Mission Control nasce na pasta da spec, só em feature grande, criado pelo Leader.
-- [ ] Seções: objetivo e resultado esperado, trabalho em execução e ownership de escrita, gates com evidência, bloqueios, decisões abertas, riscos e próximo passo. Não tem estado na frontier nem estado global, e um aviso no topo diz que ele não é fonte de estado.
-- [ ] Os papéis não leem o Mission Control; recebem o contexto na delegação.
-- [ ] A rule do anvil ganha a lista `team`, de papel para modelo. O Leader passa o modelo na chamada, e sem esse suporte o papel usa o modelo da sessão.
-- [ ] Nenhum agente fixa modelo nem isolamento no frontmatter.
-- [ ] A implementação segue o desenho em `architecture/team-shape.md` (`384fc45`), seção 12, parte do 08.
-- [ ] O Mission Control nasce a pedido, com dois escritores em paralelo, com sessão acabando com trabalho pendente, ou quando os tickets da spec não cabem numa sessão.
-- [ ] O `anvil-boot` escreve a lista `team` com os sete papéis sem modelo (cada um herda o da sessão); a rule deste repositório também.
-- [ ] A integração dos worktrees é por `cherry-pick`, e depois vêm verificação e gates.
-- [ ] Ponto B mede se a Skill tool enxerga as skills instaladas de dentro de um worktree (as skills são ignoradas pelo git); se não enxergar, a solução entra neste ticket.
-- [ ] Ponto B: dois Devs em paralelo em worktrees, integrados no branch da spec antes do Review; um papel despachado com o modelo da rule.
+- [x] O Mission Control nasce na pasta da spec, só em feature grande, criado pelo Leader.
+- [x] Seções: objetivo e resultado esperado, trabalho em execução e ownership de escrita, gates com evidência, bloqueios, decisões abertas, riscos e próximo passo. Não tem estado na frontier nem estado global, e um aviso no topo diz que ele não é fonte de estado.
+- [x] Os papéis não leem o Mission Control; recebem o contexto na delegação.
+- [x] A rule do anvil ganha a lista `team`, de papel para modelo. O Leader passa o modelo na chamada, e sem esse suporte o papel usa o modelo da sessão.
+- [x] Nenhum agente fixa modelo nem isolamento no frontmatter.
+- [x] A implementação segue o desenho em `architecture/team-shape.md` (`384fc45`), seção 12, parte do 08.
+- [x] O Mission Control nasce a pedido, com dois escritores em paralelo, com sessão acabando com trabalho pendente, ou quando os tickets da spec não cabem numa sessão.
+- [x] O `anvil-boot` escreve a lista `team` com os sete papéis sem modelo (cada um herda o da sessão); a rule deste repositório também.
+- [x] A integração dos worktrees é por `cherry-pick`, e depois vêm verificação e gates.
+- [x] Ponto B mede se a Skill tool enxerga as skills instaladas de dentro de um worktree (as skills são ignoradas pelo git); se não enxergar, a solução entra neste ticket.
+- [x] Ponto B: dois Devs em paralelo em worktrees, integrados no branch da spec antes do Review; um papel despachado com o modelo da rule.
 
 ## Comments
 
@@ -228,3 +228,27 @@ recebeu o caminho do worktree; retomado por `SendMessage` depois de o worktree s
 devolveu o checkout principal e ele respondeu "diferente". Nenhum bloco `test "$(git` no protocolo nem no desenho;
 `verify` limpo; 64/64 e 21/21 em 5.2 e 3.2; agentes inalterados. Reteste do Tester despachado: controle e caminho do
 RV2-F1 com o texto novo.
+
+**Leader, 2026-09-13 — gate Tester, rodada 4: APROVADO.** Isolado, payload de `52dd793`, US$ 0,93. Controle: `anvil-team-dev`
+em worktree anotou o toplevel ao ler o protocolo, conferiu com o comando puro antes do commit, sem nenhuma recusa do
+harness, commitou no worktree; checkout principal intacto. Caminho do RV2-F1: o Dev conferiu no começo do turno,
+voltou `BLOQUEADO` na base sem escrever; retomado por `SendMessage` de outro agente no checkout principal, a primeira
+ferramenta do turno foi a conferência, e ele voltou "BLOQUEADO, não escrevo neste cwd"; nenhum arquivo nem commit no
+checkout. T3-F1 e T3-F2 resolvidos. **T4-F1** (relevante, anterior a este ticket) um `anvil-team-dev` pulou a leitura do
+protocolo (1 em 15 despachos nas quatro rodadas) e ficou sem guarda — um Dev assim que volte BLOQUEADO e seja retomado
+pela lateral reabriria o RV2-F1 (deduzido); o system-reminder "no longer a git worktree" do harness é sinal
+independente, mas nada manda o papel agir sobre ele. **S1** o texto diz que `&&` é recusado, e não se reproduz (as
+recusas medidas tinham `$(…)` ou `test`). **S2** "sozinho numa chamada" nem sempre seguido, sem efeito.
+
+**Leader, 2026-09-13 — resolvido.** Gate Review, rodada 4: APROVADO — a guarda com o comando puro, anotada ao ler o
+protocolo e conferida no começo de cada turno e antes de cada commit, fecha o RV2-F1 como a rodada 3 pediu, com o
+desenho em espelho e sem resto da forma com `test`/`$(…)`; `verify` limpo. Com o gate do Tester da rodada 4, os gates
+passaram sobre `52dd793`.
+
+Ficam como ideia: F7 do Review R1 (modelos aceitos repetidos no `anvil-boot`); F4 do Tester R1 (Mission Control depois do
+passo 0); RV2-F6 (fonte única da regra "nunca por `SendMessage`", rótulos, ponteiros circulares) e RV2-F7 (onde o Review
+roda verificação e sensores); S1 a S3 do Tester R2 (`__pycache__/`, Dev novo sem linha Protocolo, subagente com `mktemp`
+próprio); S1 e S2 do Tester R4 (a afirmação sobre `&&` é mais larga que o medido; "sozinho numa chamada" nem sempre
+seguido). Riscos: **T4-F1** um Dev que pula a leitura do protocolo fica sem guarda (1 em 15 despachos; anterior a este
+ticket); não exercitados — conflito no cherry-pick, `+` que sobra, gatilhos 1, 3 e 4 do Mission Control, retomada com
+worktree vivo; modelo herdado na retomada lateral; mecânica medida só no Claude Code 2.1.270.
