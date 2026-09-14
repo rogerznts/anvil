@@ -158,3 +158,18 @@ delegação; se não for, `BLOQUEADO` sem escrever. **RV2-F2** ressalva de workt
 "passos 5 a 8", e o passo 8 cobre também o worktree que sumiu sozinho. **RV2-F4** com escritor ativo no checkout, o
 Leader guarda o registro e só o escreve no ticket quando o escritor voltar. **RV2-F5** "sem mudança" e cherry-pick só
 dos `+`. Ficam como ideia: RV2-F6 e RV2-F7.
+
+**Leader, 2026-09-13 — gate Tester, rodada 2: APROVADO** (sobre `19da767`, antes do ajuste do RV2-F1). Isolado, cinco
+execuções, US$ 7,81. **F1 de ponta a ponta com `anvil-team-dev`**: paralelo em worktrees com `sonnet`; o `dev-02`
+conferiu a base e voltou PERGUNTA sem escrever, e o worktree dele sumiu; o Leader integrou só o PRONTO (cherry-pick,
+testes, `git cherry` só com `-`, remoção sem `--force`, gates), sem nenhuma `SendMessage` ao papel de worktree; com a
+resposta, `Agent` novo `dev-02` sem `isolation` sobre a Base integrada, commit no branch da spec pelo fluxo; reflog só
+com o Leader, o cherry-pick e o `dev-02` novo. **F2 e F3**: Tester retomado pelo Dev com cwd no worktree gravou só no
+caminho absoluto; diretório por `mktemp -d` único em seis despachos. **F1 do Review**: com o Leader commitando no
+checkout, Reviews e subagentes só com git de leitura e `git archive | tar -x` no diretório da Política; nenhuma entrada
+de papel no reflog. Regressão: exclusão local, Mission Control com a tabela vazia depois do passo 8 (F6), decisão
+citando o intervalo integrado (F5), dois tickets `resolved`. Sugestões que ficam como ideia: **S1** `__pycache__/`
+deixado por Tester e Review no checkout e no worktree (sem a linha no `.gitignore`, iria para o commit do Dev); **S2** o
+`dev-02` novo sem linha Protocolo não leu o protocolo antes de agir; **S3** subagente da `anvil-code-review` extraiu
+num `mktemp` próprio. Não exercitados: BLOQUEADO; worktree que sobrevive com commit; escritor único ativo durante o
+gate do PRONTO; conflito no cherry-pick; `+` que sobra; gatilhos 1, 3 e 4; modelo herdado na retomada.
