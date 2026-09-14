@@ -35,6 +35,11 @@ Você lê e roda; quem muda arquivo é o autor. `Bash` serve para o diff, o coma
 de verificação e os sensores do projeto, e `Agent`, para os subagentes da skill. O
 que precisa mudar vira finding.
 
+Somente leitura inclui o `HEAD`, o índice e o working tree do checkout, onde o
+Leader commita enquanto você lê: sem `checkout`, `switch`, `stash`, `reset`, branch
+nem `git worktree add`. Para rodar testes num commit, extraia-o num diretório que
+você cria fora de qualquer checkout: `git archive {sha} | tar -x -C {diretório}`.
+
 ## Relações
 
 O autor pode pedir, por `SendMessage`, esclarecimento de um finding, e você

@@ -311,6 +311,20 @@ lá não existe `.claude/skills/`: por isso a linha `Protocolo:` absoluta.
 
    Nunca `git merge`: a guarda de merge o bloqueia no branch de uma spec com ticket
    aberto.
+
+   A sua decisão sobre cada entrega registra no ticket o intervalo integrado dele,
+   `{HEAD antes}..{HEAD depois}` do cherry-pick: o sha do branch do worktree deixa
+   de existir no passo 8.
+
+   **Um volta `PRONTO` e o outro `BLOQUEADO` ou `PERGUNTA`:** integre o `PRONTO`,
+   com os passos 5 a 7 para ele. O outro vira escritor único: resolva o bloqueio ou
+   a pergunta e despache `Agent` novo com o mesmo name, sem worktree, no branch da
+   spec já integrado. Não vai por `SendMessage`, e não volta ao worktree antigo: o
+   worktree sem commit some com o agente, e o `isolation: "worktree"` sempre cria
+   um novo. Se o worktree dele sobreviveu com commit, o Contexto aponta `{sha da
+   Base}..worktree-agent-{id}`, e o papel traz esses commits por `cherry-pick`
+   antes de continuar; esse worktree sai pelo passo 8. Se o outro papel voltar a
+   escrever enquanto isso, são dois escritores de novo, e tudo recomeça do passo 0.
 6. **Conflito:** `git cherry-pick --abort`, e despache um Dev **sem** worktree com o
    conflito como Objetivo.
 7. **Verificação, depois gates.** Integrados os dois, rode o comando de verificação
@@ -329,6 +343,8 @@ lá não existe `.claude/skills/`: por isso a linha `Protocolo:` absoluta.
    Sem `--force`: se o `worktree remove` recusar por mudança não commitada, pare e
    pergunte ao usuário. Sobrou `+`, porque o conflito do passo 6 foi resolvido num
    commit diferente: o worktree fica, e você pergunta ao usuário antes de remover.
+
+   Cada worktree removido sai da tabela "Trabalho em execução" do Mission Control.
 
 Finding de gate sobre trabalho integrado não volta ao worktree: ver [Autor que
 trabalhou em worktree](#despachar-ou-retomar).
@@ -443,8 +459,8 @@ As regras:
 - **Em divergência com um ticket, vale o ticket.**
 - **Papel não lê.** O que um papel precisar daqui vai copiado para o Contexto da
   delegação; o arquivo não aparece em delegação nenhuma.
-- **Nenhuma skill ou hook o lê.** Numa sessão nova, onde o trabalho parou sai dos
-  tickets.
+- **Nenhuma skill ou hook o lê como fonte de estado.** Numa sessão nova, onde o
+  trabalho parou sai dos tickets.
 
 Ele se commita junto com os tickets, pela mesma regra. No `archive`, fica congelado
 dentro da spec.
@@ -473,5 +489,5 @@ Antes de declarar o trabalho concluído:
 Responda ao usuário em CONCLUÍDO, PENDENTE, BLOQUEADO, RISCO e PRÓXIMO PASSO.
 
 Sessão acabando com trabalho aberto: se o [Mission Control](#mission-control)
-existe, ou o gatilho dele vale, atualize-o; senão, sugira ao usuário
-`/anvil-handoff`, que tem trava de invocação.
+existe, atualize-o; se não existe e o gatilho dele vale, crie-o; senão, sugira ao
+usuário `/anvil-handoff`, que tem trava de invocação.
