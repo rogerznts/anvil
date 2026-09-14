@@ -41,3 +41,31 @@ Decisão do Leader sobre o risco levantado na M5 — `?? .claude/worktrees/` apa
 worktrees como repositório embutido: antes de abrir worktrees, o Leader acrescenta `/.claude/worktrees/` à exclusão
 local do git, idempotente, sem tocar o `.gitignore` do projeto. Entra em SKILL § Paralelismo na fase 2 e no desenho §11
 (Architect). A fase 2 espera o 07 resolver.
+
+**Leader, 2026-09-13 — entrega do Dev (fase 2)** em `394430c` (SKILL § Mission Control com os quatro gatilhos e as
+regras; § Modelo por papel com a lista `team`; § Paralelismo e integração; saem os provisórios "um escritor por vez",
+"Mission Control fora" e "model omitido") e `c6f175e` (autorrevisão: o passo 5 integra só os dois worktrees do despacho,
+pelo id do lançamento; o passo 0 cria `info/` e não cola na última linha; a Conclusão não cria Mission Control fora do
+gatilho). Desenho pelo Architect em `be16c4e` (§11: passo 0 da exclusão local, M5, remoção sem `--force`, "+" que sobra
+vai ao usuário) e `7d01d1e` (§5: correção depois da integração vai a `Agent` novo com o mesmo name). `PROTOCOL.md` sem
+mudança. `verify` limpo; `18-team-roles` 64/64 e `15-team` 21/21 em 5.2 e 3.2; nenhum agente com `model` ou
+`isolation`; linha-ponteiro com o mesmo hash nos sete.
+
+Ponto B isolado, dois runs em dois turnos (o final sobre `c6f175e`), US$ 5,76. O Leader propôs sozinho o paralelo em
+worktrees: Mission Control escrito pelo gatilho "dois escritores" e commitado; passo 0 com a linha em `info/exclude` e
+o `.gitignore` intacto; `dev-01` e `dev-02` na mesma mensagem com `isolation: "worktree"` e `model: "sonnet"` da lista
+`team`, cada delegação com Base (sha), Protocolo absoluto, a região do outro em Fora e Commit no worktree; os dois
+leram o protocolo pelo caminho absoluto, conferiram a base com `merge-base --is-ancestor` e carregaram a skill pela
+Skill tool dentro do worktree; cherry-pick um de cada vez, `node --test` 6/6, e só então os dois Reviews sobre o
+intervalo integrado; `git cherry` só com "-", worktrees e branches removidos; os dois tickets a `resolved`. Os Reviews,
+sem valor na lista, saíram sem `model` e rodaram no modelo da sessão; com a linha `tester` removida, o Leader avisou
+uma vez. Nenhum papel leu o Mission Control nem o recebeu na delegação.
+
+Desvios: **D1** as pré-condições do `SKILL.md` não trazem "ou isolar em worktree" para sobreposição, que o §11 do
+desenho traz — o Dev argumenta que o worktree só adia a colisão para o conflito do passo 6 (a julgar no gate); **D2** o
+Ponto B não despachou Tester com worktrees; **D3** não exercitados: conflito no cherry-pick, "+" que sobra, correção
+depois da integração, gatilhos 1, 3 e 4 do Mission Control. Riscos: **R1** o `review-01` rodou `git checkout` de um
+commit no checkout principal e voltou ao branch — papel somente leitura mexendo no HEAD que o Leader commita; **R2** o
+Mission Control ficou com os Devs em execução depois da integração (nota velha; vale o ticket); **R4** efeito cruzado
+entre os dois tickets coberto só pelos testes do projeto; mecânica medida só na 2.1.270. Gates despachados: Review e
+Tester.
