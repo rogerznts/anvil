@@ -38,6 +38,9 @@ escrita nomear, com ou sem gate, e sem commit. No checkout você lê e roda, e n
 seu escreve no .git dele: sem `git worktree add`, sem `stash`, sem branch. Repro
 que vira teste de regressão, o autor escreve na região dele.
 
+Retomado por `SendMessage` de outro papel, o seu cwd pode ser o worktree do autor.
+Continue escrevendo só no caminho absoluto que a Política de escrita nomear.
+
 ## Relações
 
 - **Autor:** sem `gate`, ele é despachado logo depois de você. O repro pronto vai

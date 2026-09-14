@@ -203,7 +203,10 @@ Se a chamada `Agent` recusar `model`, despache sem ele: vale o modelo da sessão
   ticket: `SendMessage` ao name, que retoma com o contexto intacto. É o caso de
   correção de finding, resposta de `PERGUNTA` e próxima pergunta do grill. Se a
   `SendMessage` estiver diferida, carregue com `ToolSearch`,
-  `select:SendMessage`.
+  `select:SendMessage`. **Exceção:** papel despachado com `isolation: "worktree"`
+  nunca se retoma por `SendMessage`. Ver [Autor que trabalhou em
+  worktree](#despachar-ou-retomar), abaixo, e o passo 5 de [Paralelismo e
+  integração](#paralelismo-e-integração).
 - **Gate:** sempre `Agent` novo com o mesmo name, rodada `n+1`. Ver
   [Gates](#gates).
 
@@ -222,13 +225,19 @@ falha com "No agent named … is reachable". Então:
 
 Gate não entra nesta regra: rodada de gate já é `Agent` novo.
 
-**Autor que trabalhou em worktree.** Correção depois da integração, e resposta a
-`BLOQUEADO` ou `PERGUNTA` de quem voltou de um worktree, não vão por `SendMessage`
-ao autor: o cwd dele é um worktree removido, ou prestes a ser, e o branch dele não
-tem os commits do outro escritor. Vão a `Agent` novo, como no item 3 acima, sobre o
-branch da spec já integrado.
+**Autor que trabalhou em worktree.** Papel despachado com `isolation: "worktree"`
+não se retoma por `SendMessage`: nem para correção depois da integração, nem para
+responder `BLOQUEADO` ou `PERGUNTA`. Sem commit, o worktree some com o branch quando
+o agente encerra, e a retomada roda no cwd de quem manda, o checkout principal, onde
+o papel commita no branch da spec (medido). Com commit, a retomada fica no worktree,
+mas a `SendMessage` não distingue um caso do outro. Vai a `Agent` novo, como no item
+3 acima, sobre o branch da spec já integrado, com a resposta ou a correção no
+Contexto. Se o worktree dele sobreviveu com commit, o Contexto aponta `{sha da
+Base}..worktree-agent-{id}`, e o papel traz esses commits por `cherry-pick` antes de
+continuar; esse worktree sai pelo passo 8 de [Paralelismo e
+integração](#paralelismo-e-integração).
 
-- Um autor corrigindo: sem worktree.
+- Um autor: sem worktree.
 - Dois ao mesmo tempo são dois escritores de novo: [Paralelismo e
   integração](#paralelismo-e-integração) recomeça do passo 0, com a Base no `HEAD`
   integrado.
@@ -247,11 +256,24 @@ devolver o lançamento ("Async agent launched"), sem esperar o `PRONTO` dele.
 `SendMessage` a um name que ainda não foi despachado falha com "No agent named …
 is reachable", e o Dev que pede o repro logo ao começar volta `BLOQUEADO` (medido).
 
-**O Tester escreve fora de qualquer checkout**, com ou sem gate. A Política de
-escrita dele nomeia um diretório fora de qualquer checkout, escolhido por você, e
-diz `Commit: não`. Dois escritores no mesmo checkout disputam o índice, e arquivo
-não rastreado do Tester entraria no commit do Dev, porque `anvil-implement` e
-`tea-commit` stageiam o que estiver pendente.
+**O Tester escreve fora de qualquer checkout**, com ou sem gate. Dois escritores no
+mesmo checkout disputam o índice, e arquivo não rastreado do Tester entraria no
+commit do Dev, porque `anvil-implement` e `tea-commit` stageiam o que estiver
+pendente. A Política de escrita dele diz `Commit: não` e nomeia, só por caminho
+absoluto, um diretório novo, que você cria para este despacho:
+
+```bash
+mktemp -d "${TMPDIR:-/tmp}/anvil-{NNN}-{name}.XXXXXX"
+```
+
+Um nome fixo se repete entre projetos e sessões, e o Tester escreveria por cima dos
+restos de outro despacho.
+
+**Retomada por lateral.** Mecânica medida no Claude Code 2.1.270: papel retomado
+por `SendMessage` de outro papel roda no cwd de quem manda e, se foi despachado sem
+`model`, no modelo de quem manda; com `model`, fica no dele. O `tester-{NN}`
+retomado por um `dev-{NN}` em worktree roda no worktree do Dev, e caminho relativo
+resolve lá: por isso a Política dele só tem caminho absoluto.
 
 - O repro chega ao Dev por `SendMessage` do Tester, com caminho e comando, ou
   quando o Dev pede. Não o cole na delegação do Dev: ela sai antes de o repro
@@ -276,7 +298,8 @@ checkout e não recebe worktree; gate também não.
 Mecânica medida no Claude Code 2.1.270: o worktree de `isolation: "worktree"` parte
 do `HEAD` do checkout principal, **sem o que não foi commitado**, em
 `.claude/worktrees/agent-{id}`, no branch `worktree-agent-{id}`, e sobrevive ao
-agente quando tem commit. A Skill tool do papel enxerga as skills instaladas, mas
+agente quando tem commit. Sem commit, o worktree é apagado com o branch quando o
+agente encerra, e uma `SendMessage` a ele o retoma no cwd de quem manda. A Skill tool do papel enxerga as skills instaladas, mas
 lá não existe `.claude/skills/`: por isso a linha `Protocolo:` absoluta.
 
 0. **Exclusão local.** Antes do primeiro worktree, ponha `/.claude/worktrees/` na
@@ -320,10 +343,7 @@ lá não existe `.claude/skills/`: por isso a linha `Protocolo:` absoluta.
    **Um volta `PRONTO` e o outro `BLOQUEADO` ou `PERGUNTA`:** integre o `PRONTO`,
    com os passos 5 a 7 para ele. O outro vira escritor único: resolva o bloqueio ou
    a pergunta e despache-o como [Autor que trabalhou em
-   worktree](#despachar-ou-retomar), sem worktree. Se o worktree dele sobreviveu
-   com commit, o Contexto aponta `{sha da Base}..worktree-agent-{id}`, e o papel
-   traz esses commits por `cherry-pick` antes de continuar; esse worktree sai pelo
-   passo 8.
+   worktree](#despachar-ou-retomar), sem worktree e nunca por `SendMessage`.
 6. **Conflito:** `git cherry-pick --abort`, e despache um Dev **sem** worktree com o
    conflito como Objetivo.
 7. **Verificação, depois gates.** Integrados os dois, rode o comando de verificação
@@ -363,8 +383,8 @@ trabalhou em worktree](#despachar-ou-retomar).
   os comentários dele. **Não leva o resumo do autor**: o gate julga o artefato, e
   os desvios declarados já estão no comentário que você registrou.
 - **Política de escrita do gate:** `Commit: não`. Review, leitura no checkout e
-  escrita só num diretório fora de qualquer checkout, escolhido por você, onde ele
-  extrai o commit que testa. Tester, a de [Tester junto com o
+  escrita só num diretório fora de qualquer checkout, criado por você como o do
+  [Tester](#tester-junto-com-o-dev), onde ele extrai o commit que testa. Tester, a de [Tester junto com o
   Dev](#tester-junto-com-o-dev), que vale com ou sem gate.
 - **Review é sempre exigido** para resolver um ticket. **Tester é exigido** quando
   o ticket declara um cenário de comportamento a provar.
@@ -472,9 +492,11 @@ dentro da spec.
 
 - **Retorno `PERGUNTA`:** decida se a decisão é mesmo do usuário. Se é, pergunte
   e devolva a resposta por `SendMessage` **ao mesmo name**, que retoma com o
-  contexto dele, a não ser que ele tenha voltado de um worktree ([Autor que
-  trabalhou em worktree](#despachar-ou-retomar)). Se não é, responda você, ou diga
-  ao papel onde descobrir.
+  contexto dele. **Exceção:** papel despachado com `isolation: "worktree"` nunca se
+  retoma por `SendMessage`; a resposta vai a `Agent` novo, por [Autor que trabalhou
+  em worktree](#despachar-ou-retomar) e pelo passo 5 de [Paralelismo e
+  integração](#paralelismo-e-integração). Se a decisão não é do usuário, responda
+  você, ou diga ao papel onde descobrir.
 - **Discovery do PO:** `anvil-grill` → `anvil-to-spec` → `anvil-to-tickets` ficam
   num `po` só, retomado a cada pergunta, sem reiniciar o contexto entre as três.
   Enquanto o PO faz discovery, nenhum outro papel escreve: o `new-spec.sh` troca o
