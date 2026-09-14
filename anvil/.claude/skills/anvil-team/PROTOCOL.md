@@ -76,8 +76,10 @@ A sua última mensagem é o retorno, e chega a quem despachou você. Forma:
 - **Primeira linha.** Delegação comum: `PRONTO`, `BLOQUEADO` ou `PERGUNTA`.
   Delegação `gate`: `APROVADO`, `REPROVADO`, `BLOQUEADO` ou `PERGUNTA`. Aprovar
   com finding não bloqueante é `APROVADO`. Mensagem final sem uma dessas palavras
-  não é entrega: o Leader não a registra e pede o retorno por `SendMessage`. Se
-  quem encerrou é um gate, ver [Gates](#gates).
+  não é entrega: o Leader não a registra e pede o retorno por `SendMessage`, ou,
+  se você roda em worktree, por `Agent` novo (ver [Ownership de
+  escrita](#ownership-de-escrita)). Se quem encerrou é um gate, ver
+  [Gates](#gates).
 - **Retorno repetido.** O mesmo retorno emitido de novo, sem trabalho novo, o
   Leader não registra outra vez.
 - **Severidade.** `bloqueante` · `relevante` · `sugestão` · `pergunta`. Os ids
@@ -175,6 +177,18 @@ fonte de verdade.
 - **Em worktree**, antes da primeira escrita, confira que o `HEAD` contém o sha da
   Base (`git merge-base --is-ancestor {sha} HEAD`). Não contendo, devolva
   `BLOQUEADO` sem escrever.
+- **Em worktree, fique nele.** Logo depois de ler este protocolo, anote o caminho do
+  worktree que você recebeu, a saída de `git rev-parse --show-toplevel`. Antes de
+  **cada** escrita e de **cada** commit, confira, sem `cd`:
+
+  ```bash
+  test "$(git rev-parse --show-toplevel)" = "{caminho anotado}"
+  ```
+
+  Falhando, devolva `BLOQUEADO` sem escrever, dizendo que foi retomado fora do
+  worktree. Uma `SendMessage`, de qualquer remetente, retoma você no cwd de quem
+  manda, e o worktree sem mudança já foi apagado quando você encerrou: escrever
+  nesse cwd seria escrever no checkout de outro.
 
 ## Verificação
 
@@ -200,7 +214,9 @@ outro papel:
 Vira `PERGUNTA` a decisão que é do usuário: intenção de produto, preferência,
 requisito ausente, trade-off de negócio, informação indisponível, ação
 irreversível relevante. A pergunta vai na seção Perguntas, pronta para o Leader
-levar ao usuário, e a resposta volta a você por `SendMessage`, na mesma sessão.
+levar ao usuário, e a resposta volta a você por `SendMessage`, na mesma sessão;
+se você roda em worktree, volta num `Agent` novo (ver [Ownership de
+escrita](#ownership-de-escrita)).
 
 O que se descobre lendo o código, rodando, pesquisando, prototipando, testando ou
 perguntando a um colega da Equipe você descobre, e segue.

@@ -227,15 +227,15 @@ Gate não entra nesta regra: rodada de gate já é `Agent` novo.
 
 **Autor que trabalhou em worktree.** Papel despachado com `isolation: "worktree"`
 não se retoma por `SendMessage`: nem para correção depois da integração, nem para
-responder `BLOQUEADO` ou `PERGUNTA`. Sem commit, o worktree some com o branch quando
+responder `BLOQUEADO` ou `PERGUNTA`. Sem mudança, o worktree some com o branch quando
 o agente encerra, e a retomada roda no cwd de quem manda, o checkout principal, onde
 o papel commita no branch da spec (medido). Com commit, a retomada fica no worktree,
 mas a `SendMessage` não distingue um caso do outro. Vai a `Agent` novo, como no item
 3 acima, sobre o branch da spec já integrado, com a resposta ou a correção no
-Contexto. Se o worktree dele sobreviveu com commit, o Contexto aponta `{sha da
-Base}..worktree-agent-{id}`, e o papel traz esses commits por `cherry-pick` antes de
-continuar; esse worktree sai pelo passo 8 de [Paralelismo e
-integração](#paralelismo-e-integração).
+Contexto. Se o worktree dele sobreviveu, o Contexto aponta os commits que `git cherry
+{branch da spec} worktree-agent-{id}` marca com `+`, e o papel traz só esses por
+`cherry-pick` antes de continuar: os marcados com `-` já estão integrados. Esse
+worktree sai pelo passo 8 de [Paralelismo e integração](#paralelismo-e-integração).
 
 - Um autor: sem worktree.
 - Dois ao mesmo tempo são dois escritores de novo: [Paralelismo e
@@ -298,7 +298,7 @@ checkout e não recebe worktree; gate também não.
 Mecânica medida no Claude Code 2.1.270: o worktree de `isolation: "worktree"` parte
 do `HEAD` do checkout principal, **sem o que não foi commitado**, em
 `.claude/worktrees/agent-{id}`, no branch `worktree-agent-{id}`, e sobrevive ao
-agente quando tem commit. Sem commit, o worktree é apagado com o branch quando o
+agente quando tem commit. Sem mudança, o worktree é apagado com o branch quando o
 agente encerra, e uma `SendMessage` a ele o retoma no cwd de quem manda. A Skill
 tool do papel enxerga as skills instaladas, mas lá não existe `.claude/skills/`:
 por isso a linha `Protocolo:` absoluta.
@@ -342,9 +342,11 @@ por isso a linha `Protocolo:` absoluta.
    pelo sha do branch do worktree, que fica inalcançável depois do passo 8.
 
    **Um volta `PRONTO` e o outro `BLOQUEADO` ou `PERGUNTA`:** integre o `PRONTO`,
-   com os passos 5 a 7 para ele. O outro vira escritor único: resolva o bloqueio ou
+   com os passos 5 a 8 para ele. O outro vira escritor único: resolva o bloqueio ou
    a pergunta e despache-o como [Autor que trabalhou em
    worktree](#despachar-ou-retomar), sem worktree e nunca por `SendMessage`.
+   Enquanto ele escreve no checkout, o registro dos gates do `PRONTO` e a tabela do
+   passo 8 esperam a volta dele (ver [Tickets](#tickets)).
 6. **Conflito:** `git cherry-pick --abort`, e despache um Dev **sem** worktree com o
    conflito como Objetivo.
 7. **Verificação, depois gates.** Integrados os dois, rode o comando de verificação
@@ -364,9 +366,12 @@ por isso a linha `Protocolo:` absoluta.
    pergunte ao usuário. Sobrou `+`, porque o conflito do passo 6 foi resolvido num
    commit diferente: o worktree fica, e você pergunta ao usuário antes de remover.
 
-   Removido um worktree, atualize a tabela "Trabalho em execução e ownership de
-   escrita" do Mission Control: a linha de quem terminou sai, e a de quem segue
-   escrevendo sem worktree fica com a coluna Worktree vazia.
+   Worktree que sumiu sozinho, porque o papel encerrou sem mudança, já não aparece
+   em `git worktree list`: não há o que remover.
+
+   Removido um worktree, ou sumido sozinho, atualize a tabela "Trabalho em execução
+   e ownership de escrita" do Mission Control: a linha de quem terminou sai, e a de
+   quem segue escrevendo sem worktree fica com a coluna Worktree vazia.
 
 Finding de gate sobre trabalho integrado não volta ao worktree: ver [Autor que
 trabalhou em worktree](#despachar-ou-retomar).
@@ -460,6 +465,11 @@ artefato.
 **Commit** do ticket: `docs(spec-{NNN}): record {review|tester} gate for ticket
 {NN}`, por caminho explícito, e só sem escritor ativo neste checkout, porque dois
 `git commit` no mesmo checkout disputam o índice.
+
+Com escritor ativo neste checkout, nem escreva no ticket nem no Mission Control:
+guarde o Registro e a sua decisão, de entrega ou de gate, e escreva-os quando ele
+voltar. Arquivo alterado e não commitado entraria no commit dele, porque
+`anvil-implement` e `tea-commit` stageiam o que estiver pendente.
 
 ## Mission Control
 
