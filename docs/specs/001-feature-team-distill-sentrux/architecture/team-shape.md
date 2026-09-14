@@ -185,15 +185,15 @@ que cobrar."
 | Seção | Conteúdo |
 |---|---|
 | A delegação | template literal dos sete campos ([5](#5-delegação)); todo contexto chega nela; `mission-control.md` é do Leader e não se lê; name fora da linha `Equipe` não se inventa |
-| O retorno | a última mensagem é o retorno e chega a quem despachou; primeira linha fixa; seções; severidade de finding ([6](#6-retorno-e-gates)); mensagem final sem palavra do protocolo não é entrega, e o Leader não a registra; o mesmo retorno emitido de novo, sem trabalho novo, o Leader não registra outra vez |
+| O retorno | a última mensagem é o retorno e chega a quem despachou; primeira linha fixa; seções; severidade de finding ([6](#6-retorno-e-gates)); mensagem final sem palavra do protocolo não é entrega, e o Leader não a registra e pede o retorno por `SendMessage`, ou por `Agent` novo se o papel roda em worktree; o mesmo retorno emitido de novo, sem trabalho novo, o Leader não registra outra vez |
 | Gates | Tester e Review são gate só quando a delegação diz `gate`; o veredito existe só no retorno; conversa lateral esclarece finding e não muda veredito; o autor discorda na seção Divergências do próprio retorno, e a discordância não elimina o gate; **papel nunca despacha agente `anvil-team-*`**, só os subagentes que as próprias skills abrem |
 | Skills | carregar a skill real pela Skill tool e seguir o `SKILL.md`, sem simular; skills primárias não são whitelist; subagente que a skill abre vai com `run_in_background: false`, **mesmo quando a skill manda background**, e várias chamadas na mesma mensagem continuam em paralelo (medido no Ponto B do 06: resultado de subagente em background não chega a papel que encerrou o turno); fora essa exceção, o protocolo de uma skill vence este; skill ausente ou travada → `BLOQUEADO`, nunca instalar |
 | Fontes de verdade | a ordem da referência, com `.claude/rules/` no item de regras locais e "memória de sessões anteriores, quando houver" no último; memória é histórico, não estado; o Mission Control não é fonte |
 | Comunicação | `SendMessage` aos names da linha `Equipe`; `SendMessage` é ferramenta diferida dentro do agente, e se carrega com `ToolSearch` `select:SendMessage` antes do primeiro envio (medido, M3); texto comum de um agente não chega a outro; não simular a opinião de um colega que está na Equipe; o que nasceu em conversa lateral e importa (finding, repro, divergência, acordo) vai na seção Laterais do retorno; não encerrar à espera de resposta lateral: esperar dentro do turno, ou devolver com o que tem e pôr o pendente em Laterais; erro de entrega não se repete, vira `BLOQUEADO` |
-| Ownership de escrita | um escritor por região; a Política de escrita é a fronteira; `Status:` e `## Comments` de ticket são do Leader; sobreposição descoberta no meio → parar e devolver `BLOQUEADO`, e quem escolhe a saída é o Leader; em worktree, conferir que `HEAD` contém o sha da Base antes de escrever, e não conter é `BLOQUEADO` |
+| Ownership de escrita | um escritor por região; a Política de escrita é a fronteira; `Status:` e `## Comments` de ticket são do Leader; sobreposição descoberta no meio → parar e devolver `BLOQUEADO`, e quem escolhe a saída é o Leader; em worktree, conferir que `HEAD` contém o sha da Base antes de escrever, e não conter é `BLOQUEADO`; **em worktree, ficar nele**: logo depois de ler o protocolo, anotar a saída de `git rev-parse --show-toplevel`, e antes de cada escrita e de cada commit conferir, sem `cd`, `test "$(git rev-parse --show-toplevel)" = "{caminho anotado}"`; falhando, `BLOQUEADO` sem escrever, dizendo que foi retomado fora do worktree. `--show-toplevel`, e não `--git-dir` sob `worktrees/`, porque essa variante passa no worktree do outro Dev (medido num repo descartável) |
 | Verificação | "done" não é evidência; formas de prova da referência; provar que funciona sempre que der |
 | Divergências | evidência, não hierarquia; os quatro passos da referência; o quinto é a seção Divergências do retorno |
-| Perguntas e autonomia | decisão do usuário (intenção de produto, preferência, requisito ausente, trade-off de negócio, informação indisponível, ação irreversível) vira `PERGUNTA`; o que se descobre lendo, rodando, pesquisando ou perguntando a um colega não vira; trabalho reversível avança com evidência suficiente |
+| Perguntas e autonomia | decisão do usuário (intenção de produto, preferência, requisito ausente, trade-off de negócio, informação indisponível, ação irreversível) vira `PERGUNTA`, e a resposta volta por `SendMessage`, na mesma sessão, ou num `Agent` novo se o papel roda em worktree; o que se descobre lendo, rodando, pesquisando ou perguntando a um colega não vira; trabalho reversível avança com evidência suficiente |
 | Contexto | ponteiro, não cópia; não duplicar o que tem fonte canônica |
 
 ### Os agentes
@@ -559,10 +559,12 @@ correção de finding depois da integração, nem para responder `BLOQUEADO` ou
 com a resposta ou a correção no Contexto, e o Contexto apontando o ticket e os
 comentários.
 
-- Se o worktree dele sobreviveu com commit, o Contexto aponta
-  `{sha-da-Base}..worktree-agent-{id}`, e o papel traz esses commits por
-  `cherry-pick` antes de continuar. Esse worktree sai pelo passo 8 da seção 11,
-  quando `git cherry` não listar `+`.
+- Se o worktree dele sobreviveu, o Contexto aponta os commits que
+  `git cherry {branch-da-spec} worktree-agent-{id}` marca com `+`, e o papel traz só
+  esses por `cherry-pick` antes de continuar. Os `-` já estão integrados; o intervalo
+  desde a Base os repetiria, e o `cherry-pick` para no commit já integrado, que fica
+  vazio (medido). Esse worktree sai pelo passo 8 da seção 11, quando `git cherry` não
+  listar `+`.
 - Um escrevendo só: sem worktree.
 - Dois ao mesmo tempo: são dois escritores de novo, e a seção 11 recomeça do passo
   0, com a Base no `HEAD` integrado.
@@ -570,7 +572,7 @@ comentários.
 Por quê, medido no gate Tester do 08 (o achado F1, Dev em worktree commitando no
 branch da spec):
 
-- **Sem commit**, o worktree é apagado com o branch quando o agente encerra, e uma
+- **Sem mudança**, o worktree é apagado com o branch quando o agente encerra, e uma
   `SendMessage` a ele o retoma no cwd de quem manda. O Dev que voltou `PERGUNTA` sem
   commit, retomado pelo Leader, commitou direto no branch da spec.
 - **Com commit**, a retomada fica no worktree. Mas a `SendMessage` não distingue os
@@ -582,6 +584,13 @@ branch da spec):
 
 Por isso remover o worktree logo depois da integração, antes do veredito dos gates,
 não custa nada: a correção nunca voltaria para ele.
+
+**A regra do Leader não alcança a lateral.** Um papel em worktree retomado por
+`SendMessage` de outro papel também roda no cwd de quem manda. Quem cobre esse caso
+é a guarda do lado do papel, em PROT § Ownership de escrita: o papel anota o
+`git rev-parse --show-toplevel` do worktree ao começar e confere antes de cada
+escrita e de cada commit, e fora dele volta `BLOQUEADO` sem escrever (RV2-F1 do
+Review R2 do 08, a guarda que vale para qualquer remetente).
 
 ### Tester junto com o Dev
 
@@ -870,6 +879,13 @@ caminho explícito, e só com nenhum escritor ativo no checkout principal, porqu
 dois `git commit` no mesmo checkout disputam o índice. Antes de abrir worktrees, o
 Leader commita o que tiver pendente nos tickets, para a Base conter o registro.
 
+**Com escritor ativo no checkout, o Leader não escreve.** Nem no ticket nem no
+Mission Control: guarda o Registro e a decisão (de entrega ou de gate) e os escreve
+quando o escritor voltar. O commit do escritor stagearia o que estivesse pendente
+(`anvil-implement` e `tea-commit` stageiam tudo). O Mission Control entra na regra
+porque se commita do mesmo jeito e o passo 8 da seção 11 o edita (RV2-F4 do Review
+R2 do 08).
+
 ## 9. Mission Control
 
 ### Quando
@@ -1006,8 +1022,10 @@ Com dois escritores:
    fica inalcançável depois do passo 8.
 
    Se um volta `PRONTO` e o outro `BLOQUEADO` ou `PERGUNTA`, o Leader integra o
-   `PRONTO` (passos 5 a 7 para ele), e o outro segue a regra do §5, "Papel
-   despachado com worktree".
+   `PRONTO` (passos 5 a 8 para ele), e o outro segue a regra do §5, "Papel
+   despachado com worktree". Enquanto esse escritor único escreve no checkout, o
+   registro dos gates do `PRONTO` e a tabela do passo 8 esperam a volta dele (§8,
+   "Com escritor ativo no checkout, o Leader não escreve").
 6. Conflito → `git cherry-pick --abort`, e o Leader despacha um Dev sem worktree
    com o conflito como Objetivo.
 7. Integrados os dois, o Leader roda o comando de verificação do projeto. Só então
@@ -1019,7 +1037,9 @@ Com dois escritores:
    `worktree remove`: se ele recusar por mudança não commitada, o Leader para e
    pergunta ao usuário. Se sobrar `+` porque o conflito do passo 6 foi resolvido
    num commit diferente, o worktree fica, e o Leader pergunta ao usuário antes de
-   remover. Removido um worktree, o Leader atualiza a tabela "Trabalho em execução e
+   remover. Worktree que sumiu sozinho (o papel encerrou sem mudança) não aparece em
+   `git worktree list`, e não há o que remover. Removido um worktree, ou sumido
+   sozinho, o Leader atualiza a tabela "Trabalho em execução e
    ownership de escrita" do Mission Control: a linha de quem terminou sai, e a de quem
    segue escrevendo sem worktree fica com a coluna Worktree vazia. O Mission Control
    já existe aqui, porque dois escritores em paralelo são gatilho dele (seção 9).
@@ -1031,8 +1051,8 @@ No worktree não existe `.claude/skills/`, e a linha `Protocolo:` absoluta conti
 necessária. O Tester continua fora de qualquer checkout, inclusive worktree (§5).
 Finding de gate sobre trabalho integrado volta a `Agent` novo com o mesmo name, e
 não ao worktree (§5, "Papel despachado com worktree"). Mecânica medida no 2.1.270:
-sem commit, o worktree é apagado com o branch quando o agente encerra, e uma
-`SendMessage` a ele o retoma no cwd de quem manda.
+sem mudança, o worktree é apagado com o branch quando o agente encerra, e uma
+`SendMessage` a ele, de qualquer remetente, o retoma no cwd de quem manda.
 
 ## 12. O que cabe em cada ticket
 
@@ -1214,7 +1234,7 @@ feitas num teste de sondagem no Claude Code 2.1.270, com agent teams ligado.
   checkout principal, então `.worktreeinclude` não é preciso. No worktree não existe
   `.claude/skills/`, e a linha `Protocolo:` absoluta continua necessária. O
   `?? .claude/worktrees/` no status do checkout principal virou o passo 0 da seção
-  11. Medido depois, no gate Tester do 08: sem commit, o worktree é apagado com o
+  11. Medido depois, no gate Tester do 08: sem mudança, o worktree é apagado com o
   branch quando o agente encerra, e `SendMessage` a ele o retoma no cwd de quem
   manda; papel retomado por lateral roda no cwd e, sem `model`, no modelo de quem
   manda.
