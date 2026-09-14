@@ -208,3 +208,23 @@ Decisão do Leader: **T3-F1** a conferência é `git rev-parse --show-toplevel` 
 comparada ao caminho anotado. **T3-F2** a conferência acontece no começo de cada turno — inclusive quando uma mensagem
 retoma o papel — e antes de cada commit, no lugar de "antes de cada escrita"; a retomada é sempre um turno novo, e é
 ela que abre o caminho do RV2-F1. Reteste: controle e caminho do RV2-F1 com o texto novo.
+
+**Leader, 2026-09-13 — gate Review, rodada 3: REPROVADO só pelo T3-F1** (diff `19da767..8026fd7`). Sem bloqueante novo.
+RV2-F1: a lógica da guarda está certa — protocolo lido por todo papel, vale para qualquer remetente, anotação antes da
+conferência de base e de qualquer PERGUNTA; semântica conferida num repo descartável (passa no worktree e em
+subdiretório; falha no checkout principal, no worktree do outro Dev, fora de checkout e no diretório recriado) —, mas a
+forma literal não roda no agente isolado (o T3-F1, já decidido). RV2-F2 a F5 resolvidos (cherry-pick só dos `+`
+conferido com commit integrado de sha diferente). Espelho pendente: o desenho ainda traz a forma literal e "antes de
+cada escrita" (`team-shape.md:193`, `:588-593`), a corrigir junto com o T3-F1 e o T3-F2. Não avaliado, fica como risco:
+para quem vai o `BLOQUEADO` de um papel retomado por lateral (o remetente, não o Leader, pela mecânica) — o Leader já
+recebeu a volta original do papel e segue pelo caminho do F8.
+
+**Leader, 2026-09-13 — ajuste da rodada 3** em `f92e888` e, no desenho pelo Architect, `7d5685d`. **T3-F1** a guarda é
+`git rev-parse --show-toplevel` sozinho numa chamada Bash, com a saída comparada ao caminho anotado (a anotação sai do
+mesmo comando); o texto diz que composto com `$(…)`, `test` ou `&&` o harness o recusa no worktree. **T3-F2** a
+conferência é no começo de cada turno, inclusive na retomada, e antes de cada commit. Prova dentro de agente isolado
+(`claude -p` com `haiku`, US$ 0,06): um `general-purpose` com `isolation: "worktree"` rodou o comando puro sem recusa e
+recebeu o caminho do worktree; retomado por `SendMessage` depois de o worktree sem mudança ser apagado, o mesmo comando
+devolveu o checkout principal e ele respondeu "diferente". Nenhum bloco `test "$(git` no protocolo nem no desenho;
+`verify` limpo; 64/64 e 21/21 em 5.2 e 3.2; agentes inalterados. Reteste do Tester despachado: controle e caminho do
+RV2-F1 com o texto novo.
