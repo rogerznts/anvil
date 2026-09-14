@@ -299,8 +299,9 @@ Mecânica medida no Claude Code 2.1.270: o worktree de `isolation: "worktree"` p
 do `HEAD` do checkout principal, **sem o que não foi commitado**, em
 `.claude/worktrees/agent-{id}`, no branch `worktree-agent-{id}`, e sobrevive ao
 agente quando tem commit. Sem commit, o worktree é apagado com o branch quando o
-agente encerra, e uma `SendMessage` a ele o retoma no cwd de quem manda. A Skill tool do papel enxerga as skills instaladas, mas
-lá não existe `.claude/skills/`: por isso a linha `Protocolo:` absoluta.
+agente encerra, e uma `SendMessage` a ele o retoma no cwd de quem manda. A Skill
+tool do papel enxerga as skills instaladas, mas lá não existe `.claude/skills/`:
+por isso a linha `Protocolo:` absoluta.
 
 0. **Exclusão local.** Antes do primeiro worktree, ponha `/.claude/worktrees/` na
    exclusão local do git, sem tocar o `.gitignore` do projeto:
@@ -384,8 +385,8 @@ trabalhou em worktree](#despachar-ou-retomar).
   os desvios declarados já estão no comentário que você registrou.
 - **Política de escrita do gate:** `Commit: não`. Review, leitura no checkout e
   escrita só num diretório fora de qualquer checkout, criado por você como o do
-  [Tester](#tester-junto-com-o-dev), onde ele extrai o commit que testa. Tester, a de [Tester junto com o
-  Dev](#tester-junto-com-o-dev), que vale com ou sem gate.
+  [Tester](#tester-junto-com-o-dev), onde ele extrai o commit que testa. Tester, a
+  de [Tester junto com o Dev](#tester-junto-com-o-dev), que vale com ou sem gate.
 - **Review é sempre exigido** para resolver um ticket. **Tester é exigido** quando
   o ticket declara um cenário de comportamento a provar.
 
