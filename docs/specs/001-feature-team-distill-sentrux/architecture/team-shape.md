@@ -175,7 +175,7 @@ description dos agentes e a trava da skill.
 | Paralelismo e integração | [11](#11-dois-escritores-em-paralelo) |
 | Perguntas ao usuário | retorno `PERGUNTA` → o Leader decide se é mesmo do usuário, pergunta, e devolve a resposta por `SendMessage` **ao mesmo name**. `anvil-grill` → `anvil-to-spec` → `anvil-to-tickets` fica num `po` só, retomado a cada pergunta. Enquanto o PO faz discovery, nenhum outro papel escreve: o `new-spec.sh` troca o branch do checkout |
 | Mission Control | quando criar e as regras ([9](#9-mission-control)); aponta `templates/mission-control.md` |
-| Conclusão | reunir, conferir o artefato, conferir gates, expor divergências, reler tickets; responder em CONCLUÍDO / PENDENTE / BLOQUEADO / RISCO / PRÓXIMO PASSO; delegar não transfere responsabilidade; sessão acabando com trabalho aberto → atualizar o Mission Control (feature grande) ou sugerir `/anvil-handoff` ao usuário, que tem trava |
+| Conclusão | reunir, conferir o artefato, conferir gates, expor divergências, reler tickets; responder em CONCLUÍDO / PENDENTE / BLOQUEADO / RISCO / PRÓXIMO PASSO; delegar não transfere responsabilidade; sessão acabando com trabalho aberto → Mission Control existindo, atualizar; inexistente e com gatilho da [seção 9](#9-mission-control) valendo, criar; nenhum dos dois, sugerir `/anvil-handoff` ao usuário, que tem trava |
 
 ### `PROTOCOL.md`, o contrato
 
@@ -359,7 +359,7 @@ mecânica do Maestri vira a do Claude Code.
 | Comunicação | muda | PROT § Comunicação | conexão do Maestri vira `SendMessage` por name; "decisões e bloqueios chegam ao Leader" vira seções do retorno |
 | Delegação, OBJECTIVE a DONE WHEN | muda | PROT § A delegação | campos em pt-BR, com os nomes da spec, como template literal; "nota acessível" sai |
 | Delegação › RETURN | muda | PROT § O retorno | vira formato com primeira linha fixa |
-| Ownership de escrita | muda, divide | PROT § Ownership (um escritor, sobreposição → `BLOQUEADO`) · SKILL § Paralelismo e integração (as três saídas, separar antes de serializar) | o papel obedece à fronteira; quem escolhe a saída é o Leader |
+| Ownership de escrita | muda, divide | PROT § Ownership (um escritor, sobreposição → `BLOQUEADO`) · SKILL § Paralelismo e integração (as saídas, sequência ou um escritor só na região, e separar antes de serializar) | o papel obedece à fronteira; quem escolhe a saída é o Leader |
 | Paralelismo | sai do protocolo | SKILL § Paralelismo e integração | papel não despacha trabalho paralelo |
 | Frontier | sai do protocolo | SKILL § Abrir a spec | só o Leader inicia ticket |
 | Verificação | fica | PROT § Verificação | o papel prova, o Leader cobra |
@@ -856,7 +856,7 @@ Sem `promote:` no front-matter: no `archive`, ele congela dentro da spec arquiva
 - Ponteiro em vez de cópia: spec, ticket, comentário, commit.
 - Em divergência com um ticket, vale o ticket.
 - Papel não lê. O que o papel precisar daqui vai copiado para o Contexto da delegação.
-- Nenhuma skill ou hook o lê.
+- Nenhuma skill ou hook o lê como fonte de estado.
 
 ### `templates/mission-control.md`
 
@@ -935,8 +935,9 @@ Configurado, um papel fica assim: `` - `dev`: `opus` ``.
 
 Pré-condições para paralelizar escrita, em SKILL § Paralelismo e integração:
 nenhuma dependência entre os tickets, regiões de escrita declaradas e disjuntas,
-integração decidida antes. Sobreposição → executar em sequência, dar a região a um
-escritor só, ou isolar em worktree. Leitura se paraleliza à vontade.
+integração decidida antes. Sobreposição → executar em sequência, ou dar a região a
+um escritor só. Worktree não resolve sobreposição: só adia a colisão para o conflito
+do passo 6. Leitura se paraleliza à vontade.
 
 Com dois escritores:
 
@@ -961,7 +962,25 @@ Com dois escritores:
    `worktree-agent-{id}`, o worktree fica em `.claude/worktrees/agent-{id}`, e os
    dois aparecem em `git worktree list`; worktree com commit sobrevive ao agente
    (M5). **Não `git merge`**: a guarda de merge o bloqueia no branch de uma spec com
-   ticket aberto.
+   ticket aberto. A decisão que o Leader registra no ticket anota o sha integrado de
+   cada ticket no branch da spec: o sha do branch do worktree some com o
+   `branch -D` do passo 8.
+
+   Se um volta `PRONTO` e o outro `BLOQUEADO` ou `PERGUNTA`, o Leader integra o
+   `PRONTO` (passos 5 a 7) e resolve o outro como delegação comum:
+   - o worktree dele ainda aparece em `git worktree list` → a resposta vai por
+     `SendMessage` ao name, e ele continua no próprio worktree até voltar `PRONTO` e
+     passar pelos passos 5 a 8. `Agent` novo não serve aqui: `isolation: "worktree"`
+     sempre cria um worktree novo, e sem ela o agente cai no checkout principal;
+   - o worktree sumiu (worktree sem mudança sai junto com o agente), ou a retomada
+     falhou → `Agent` novo com o mesmo name, sem worktree se nenhum outro escritor
+     estiver ativo, senão a seção recomeça do passo 0.
+
+   Não foi medido se o agente retomado continua com o cwd no próprio worktree, e a
+   conferência do passo 4 não pega o caso contrário: o `HEAD` do checkout principal
+   também contém a Base. Por isso a mensagem de retomada leva o caminho do worktree,
+   e o papel confere que `git rev-parse --show-toplevel` é esse caminho antes de
+   escrever. Não sendo, volta `BLOQUEADO` sem escrever.
 6. Conflito → `git cherry-pick --abort`, e o Leader despacha um Dev sem worktree
    com o conflito como Objetivo.
 7. Integrados os dois, o Leader roda o comando de verificação do projeto. Só então
@@ -973,7 +992,8 @@ Com dois escritores:
    `worktree remove`: se ele recusar por mudança não commitada, o Leader para e
    pergunta ao usuário. Se sobrar `+` porque o conflito do passo 6 foi resolvido
    num commit diferente, o worktree fica, e o Leader pergunta ao usuário antes de
-   remover.
+   remover. Ao remover, o Leader tira os dois escritores da tabela "Trabalho em
+   execução" do Mission Control, se ele existe.
 
 `git cherry-pick` fora da guarda de merge é critério do ticket 13. A Skill tool
 enxerga as skills instaladas de dentro do worktree, carregadas do checkout
