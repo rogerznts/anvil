@@ -173,3 +173,20 @@ deixado por Tester e Review no checkout e no worktree (sem a linha no `.gitignor
 `dev-02` novo sem linha Protocolo não leu o protocolo antes de agir; **S3** subagente da `anvil-code-review` extraiu
 num `mktemp` próprio. Não exercitados: BLOQUEADO; worktree que sobrevive com commit; escritor único ativo durante o
 gate do PRONTO; conflito no cherry-pick; `+` que sobra; gatilhos 1, 3 e 4; modelo herdado na retomada.
+
+**Leader, 2026-09-13 — ajuste da rodada 2** em `f08e0c3` e, no desenho pelo Architect, `8026fd7`. **RV2-F1** PROTOCOL §
+Ownership: em worktree, o papel anota o `git rev-parse --show-toplevel` logo depois de ler o protocolo e, antes de cada
+escrita e de cada commit, confere sem `cd` que o toplevel é o anotado; falhando, volta `BLOQUEADO` sem escrever — vale
+para qualquer remetente. Provado com o comando real num repo descartável: passa no worktree e num subdiretório dele;
+falha no checkout principal, no worktree do outro Dev, fora de checkout e depois de o worktree ser removido.
+**RV2-F2** as duas linhas do protocolo ganham a ressalva de worktree (volta por `Agent` novo). **RV2-F3** o PRONTO
+segue os passos 5 a 8; o passo 8 cobre o worktree que sumiu sozinho. **RV2-F4** com escritor ativo no checkout, o
+Leader não escreve no ticket nem no Mission Control até ele voltar. **RV2-F5** "sem mudança"; worktree que sobreviveu
+traz só os commits `+` do `git cherry` (provado: o intervalo inteiro para no commit já integrado; só os `+` fecha
+limpo). `verify` limpo; 64/64 e 21/21 em 5.2 e 3.2; agentes inalterados.
+
+Desvios aceitos: **D1** RV2-F4 estendido ao Mission Control (o passo 8 edita a tabela); **D2** guarda por toplevel, não
+por `--git-dir` (que passaria no worktree do outro Dev); **D3** anotação logo depois de ler o protocolo, para cobrir
+PERGUNTA antes da primeira escrita. Riscos: sem a anotação a comparação falha para o lado do `BLOQUEADO`; papel com
+worktree vivo retomado fora dele volta `BLOQUEADO` (conservador). Rodada 3: Review do diff e Tester medindo o caminho
+do RV2-F1 com a guarda.
