@@ -966,21 +966,23 @@ Com dois escritores:
    cada ticket no branch da spec: o sha do branch do worktree some com o
    `branch -D` do passo 8.
 
-   Se um volta `PRONTO` e o outro `BLOQUEADO` ou `PERGUNTA`, o Leader integra o
-   `PRONTO` (passos 5 a 7) e resolve o outro como delegação comum:
-   - o worktree dele ainda aparece em `git worktree list` → a resposta vai por
-     `SendMessage` ao name, e ele continua no próprio worktree até voltar `PRONTO` e
-     passar pelos passos 5 a 8. `Agent` novo não serve aqui: `isolation: "worktree"`
-     sempre cria um worktree novo, e sem ela o agente cai no checkout principal;
-   - o worktree sumiu (worktree sem mudança sai junto com o agente), ou a retomada
-     falhou → `Agent` novo com o mesmo name, sem worktree se nenhum outro escritor
-     estiver ativo, senão a seção recomeça do passo 0.
+   Se um volta `PRONTO` e o outro `BLOQUEADO` ou `PERGUNTA` (decisão do Leader no
+   ticket 08, F8):
+   - o Leader integra o `PRONTO` (passos 5 a 7 para ele);
+   - o outro vira escritor único. O Leader resolve o bloqueio ou a pergunta e
+     despacha `Agent` novo com o mesmo name, **sem worktree**, no branch da spec já
+     integrado;
+   - se o worktree dele sobreviveu com commit, o Contexto aponta
+     `{sha-da-Base}..worktree-agent-{id}`, e o papel traz esses commits por
+     `cherry-pick` antes de continuar. Esse worktree sai pelo passo 8, quando
+     `git cherry` não listar `+`;
+   - se o outro papel voltar a escrever ao mesmo tempo, são dois escritores de novo,
+     e a seção recomeça do passo 0.
 
-   Não foi medido se o agente retomado continua com o cwd no próprio worktree, e a
-   conferência do passo 4 não pega o caso contrário: o `HEAD` do checkout principal
-   também contém a Base. Por isso a mensagem de retomada leva o caminho do worktree,
-   e o papel confere que `git rev-parse --show-toplevel` é esse caminho antes de
-   escrever. Não sendo, volta `BLOQUEADO` sem escrever.
+   Por que não continuar no worktree antigo: `Agent` com `isolation: "worktree"`
+   sempre cria um worktree novo a partir do `HEAD` do checkout principal e não
+   aceita um que já existe, e mandar o papel ao worktree antigo pelo Contexto seria
+   mecânica não medida, com o git rodando no cwd do checkout principal.
 6. Conflito → `git cherry-pick --abort`, e o Leader despacha um Dev sem worktree
    com o conflito como Objetivo.
 7. Integrados os dois, o Leader roda o comando de verificação do projeto. Só então
