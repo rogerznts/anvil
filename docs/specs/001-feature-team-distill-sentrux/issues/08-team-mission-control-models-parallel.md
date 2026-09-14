@@ -87,3 +87,27 @@ sha de entrega citado no Registro; registrar o sha integrado. **F6** a tabela "T
 depois da integração. **F7** a lista de modelos aceitos repetida no `anvil-boot`. **F8** o passo 5 não diz o que fazer
 quando um escritor volta `BLOQUEADO` ou `PERGUNTA` e o outro `PRONTO`. Não exercitados: D2, D3 (conflito no
 cherry-pick, `+` que sobra, correção depois da integração, gatilhos 1, 3 e 4).
+
+**Leader, 2026-09-13 — gate Tester, rodada 1: REPROVADO.** Isolado, payload de `ce1fa0c`, projeto Python diferente do do
+Dev, 13 execuções, US$ 11,65. Passaram os seis casos: paralelo com exclusão local antes dos worktrees, Tester primeiro
+e escrevendo só em `/tmp` com repro por `SendMessage` (o D2), dois Devs em `sonnet` com Base, Protocolo absoluto e
+conferência de base, cherry-pick um de cada vez, testes antes dos gates, `git cherry` sem `+` e remoção sem `--force`;
+região sobreposta — o Leader recusou o paralelo e serializou mesmo com o usuário pedindo worktree; commit pendente — o
+Leader commitou só o ticket e usou esse sha como Base; correção depois da integração por `Agent` novo sem worktree com
+gates da rodada 2; lista `team` (com valor, sem valor, valor fora do enum, lista ausente com aviso único); Mission
+Control pelo gatilho, sem estado, nenhum papel lendo, e não criado em pedido comum; `anvil-boot` em projeto novo e em
+`anvil.md` existente só com o acréscimo; `verify` limpo. **F1 (bloqueante)** um Dev em worktree que volta PERGUNTA ou
+BLOQUEADO sem commitar tem o worktree apagado com o branch ao encerrar; retomado por `SendMessage`, como SKILL §
+Perguntas manda, roda no checkout principal e commita no branch da spec (medido com `general-purpose`: commit
+`91e2ddf` em `bugfix/001-x`; controle com commit fica no worktree). **F2** papel retomado por `SendMessage` de outro
+papel roda no cwd e, sem `model` na chamada original, no modelo de quem manda — o Tester retomado pelo Dev rodou em
+`sonnet` com cwd no worktree do Dev (2/2); com `model` explícito a retomada mantém o modelo. **F3** diretórios fixos do
+Tester em `/tmp` com restos de runs anteriores. **F4** Mission Control criado 8 s depois do passo 0, que o SKILL põe
+antes (sem efeito). Não exercitados: conflito no cherry-pick e `+` que sobra; gatilhos 1, 3 e 4.
+
+Decisão do Leader, na mesma rodada de ajuste: **F1** papel despachado com worktree nunca é retomado por `SendMessage`
+— PERGUNTA ou BLOQUEADO dele vão a `Agent` novo, pela regra do F8 (decisão sobre a proposta do Dev: escritor único sem
+worktree no branch integrado, trazendo por cherry-pick o que o worktree tiver); SKILL § Perguntas e § Despachar ou
+retomar abrem essa exceção. **F2** registrar a mecânica (retomada lateral herda cwd e, sem `model`, o modelo de quem
+manda) e a Política do Tester nomear só caminho absoluto. **F3** diretório do Tester único por despacho. F4 fica como
+ideia. Reteste do Tester: o probe do F1 com o texto novo e o `anvil-team-dev`, e o F2.
