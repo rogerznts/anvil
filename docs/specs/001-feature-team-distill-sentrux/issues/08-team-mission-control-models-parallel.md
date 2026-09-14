@@ -111,3 +111,26 @@ worktree no branch integrado, trazendo por cherry-pick o que o worktree tiver); 
 retomar abrem essa exceção. **F2** registrar a mecânica (retomada lateral herda cwd e, sem `model`, o modelo de quem
 manda) e a Política do Tester nomear só caminho absoluto. **F3** diretório do Tester único por despacho. F4 fica como
 ideia. Reteste do Tester: o probe do F1 com o texto novo e o `anvil-team-dev`, e o F2.
+
+**Leader, 2026-09-13 — rodada de ajuste** em `f75f1cc`, `ed0c4f0`, `881a1b9` e `51e2b2a`; desenho pelo Architect em
+`df905a1`, `cd327fc`, `1da5e13` e `37aa4de`. Review: **F1** o agente Review não mexe em HEAD, índice nem working tree
+(sem checkout, switch, stash, reset, branch, `worktree add`) e extrai o commit a testar com `git archive` num diretório
+fora de qualquer checkout — decisão do Leader sobre proposta do Dev: a Política do gate Review passa a "leitura no
+checkout, escrita só em {diretório fora de qualquer checkout}" (coerente com a U2; allowlist e `PROTOCOL.md`
+inalterados); **F2** §11 e §4 do desenho sem "isolar em worktree"; **F3** Conclusão cria o Mission Control quando o
+gatilho vale e ele não existe; **F4** "como fonte de estado"; **F5** a decisão do Leader cita o intervalo integrado no
+branch da spec; **F6** passo 8 atualiza a tabela do Mission Control; **F8** decisão do Leader sobre proposta do Dev:
+com um PRONTO e outro BLOQUEADO/PERGUNTA, integra-se o PRONTO e o outro vira escritor único por `Agent` novo sem
+worktree no branch integrado, trazendo por cherry-pick o que o worktree tiver. Tester: **F1** papel despachado com
+worktree nunca se retoma por `SendMessage` (exceção explícita em § Despachar ou retomar e § Perguntas, apontando para
+"Autor que trabalhou em worktree"); **F2** a retomada lateral herda cwd e, sem `model`, o modelo de quem manda — nota
+de versão e Política do Tester só com caminho absoluto; **F3** diretório do Tester por `mktemp -d` a cada despacho.
+`verify` limpo; 64/64 e 21/21 em 5.2 e 3.2; linha-ponteiro inalterada; nenhum agente com `model` ou `isolation`.
+
+Desvios aceitos: **D1** Tester e Review não contam como escritores (senão o diretório do Review travaria o commit de
+ticket); **D2** diretório do gate Review também por `mktemp`; **D3** ponteiros do F1 ao bloco da regra e ao passo 5;
+**D4** redação em § Perguntas. Ficam como ideia: F7 do Review; F4 do Tester. Riscos: o escritor único do F8 fica
+ativo no checkout enquanto o gate do PRONTO roda, e o commit de ticket espera; um Tester sem valor na lista, retomado
+pelo Dev, roda no modelo do Dev; "com commit a retomada fica no worktree" medido só com `general-purpose`; não
+exercitados: conflito no cherry-pick, `+` que sobra, gatilhos 1, 3 e 4 e o próprio caminho do F8. Rodada 2 dos gates
+despachada.
