@@ -69,3 +69,21 @@ commit no checkout principal e voltou ao branch — papel somente leitura mexend
 Mission Control ficou com os Devs em execução depois da integração (nota velha; vale o ticket); **R4** efeito cruzado
 entre os dois tickets coberto só pelos testes do projeto; mecânica medida só na 2.1.270. Gates despachados: Review e
 Tester.
+
+**Leader, 2026-09-13 — gate Review, rodada 1: APROVADO, sem bloqueante.** Os onze critérios atendidos sobre `c6f175e`
+(e `4b0a6cc`); template igual ao §9; tabela da lista `team` igual ao §10; oito passos presentes, com "nunca `git
+merge`", conferência de base, verificação antes dos gates e remoção só com `git cherry` sem `+`; provisórios
+removidos de `anvil/` e do desenho; nenhum texto deste repositório no payload. Simulação num repo descartável: passo 0
+de subdiretório, idempotente e criando `info/`; `git cherry` só com `-` depois dos dois cherry-picks; `branch -d`
+recusa, então `-D` é preciso. `verify` limpo; 64/64 e 21/21 em 5.2 e 3.2. Achados: **F1** (relevante; o R1 da
+entrega) o agente Review não diz que somente leitura inclui HEAD, índice e working tree — o `review-01` fez `git
+checkout` de um commit no checkout principal enquanto o `review-02` lia a mesma árvore; com dois gates em paralelo no
+passo 7 e o commit de ticket do Leader esperando só o escritor ativo, o commit cairia fora do branch da spec. **F2**
+(relevante, desenho) o §11 exige regiões disjuntas e depois aceita "ou isolar em worktree" para sobreposição, e o §4
+fala em "três saídas" — resto do port; o `SKILL.md` está certo (D1). **F3** a Conclusão diz "atualize-o" quando o
+gatilho vale e o arquivo não existe; o §1 do desenho ficou sem o gatilho. **F4** "nenhuma skill ou hook o lê"
+contradiz o Leader, que é skill — falta "como fonte de estado". **F5** o `branch -D` do passo 8 deixa inalcançável o
+sha de entrega citado no Registro; registrar o sha integrado. **F6** a tabela "Trabalho em execução" fica velha
+depois da integração. **F7** a lista de modelos aceitos repetida no `anvil-boot`. **F8** o passo 5 não diz o que fazer
+quando um escritor volta `BLOQUEADO` ou `PERGUNTA` e o outro `PRONTO`. Não exercitados: D2, D3 (conflito no
+cherry-pick, `+` que sobra, correção depois da integração, gatilhos 1, 3 e 4).
