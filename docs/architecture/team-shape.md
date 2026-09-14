@@ -1,3 +1,8 @@
+---
+promote: docs/architecture/team-shape.md
+promote_mode: copy
+---
+
 # Forma da `anvil-team` e dos sete papéis
 
 Desenho dos tickets 06 (Leader, Dev e Review de ponta a ponta), 07 (os outros
@@ -5,13 +10,13 @@ cinco papéis e a conversa entre papéis) e 08 (Mission Control, modelo por pape
 dois escritores em paralelo). O Dev implementa a partir daqui.
 
 As decisões de fundo estão no
-[ADR-0007](../../../architecture/adr/adr-0007-equipe-por-papel-sobre-agent-teams.md)
-e na [spec](../spec.md), seção "Implementation Decisions > `anvil-team`". Este
+[ADR-0007](./adr/adr-0007-equipe-por-papel-sobre-agent-teams.md)
+e na [spec](../specs/archive/001-feature-team-distill-sentrux/spec.md), seção "Implementation Decisions > `anvil-team`". Este
 documento não as reabre. Onde achei contradição, ela está em
 [Contradições encontradas](#contradições-encontradas), com a saída que o desenho
 adota até alguém decidir outra coisa.
 
-Vocabulário do [glossário](../../../architecture/context.md): Equipe, Leader,
+Vocabulário do [glossário](./context.md): Equipe, Leader,
 Papel, Mission Control, Frontier.
 
 ## Problema

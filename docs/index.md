@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-13T01:20:05Z
+Last updated: 2026-09-14T01:46:35Z
 
 ## Visão geral
 
@@ -10,13 +10,11 @@ Last updated: 2026-09-13T01:20:05Z
 
 ## Specs ativas
 
-| Spec | Branch | Estado | Tickets |
-|---|---|---|---|
-| [001 — Equipe e destilação](./specs/001-feature-team-distill-sentrux/spec.md) | `feature/001-team-distill-sentrux` | em andamento | 12/12 |
+Nenhuma.
 
 ## Specs arquivadas
 
-Nenhuma.
+- [001 — Equipe e destilação](./specs/archive/001-feature-team-distill-sentrux/spec.md) — `feature/001-team-distill-sentrux`, 12 tickets
 
 ## Conteúdo por domínio
 
@@ -34,6 +32,9 @@ Nenhuma.
   equipe, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
   impõe, como o estado é lido do disco, e a herança do mosk.
+- [team-shape.md](./architecture/team-shape.md) — a forma da `anvil-team` e dos sete
+  papéis: mapa de arquivos, protocolo, delegação, gates, Mission Control, lista
+  `team` e dois escritores em worktree; promovido da spec 001.
 - **ADRs**
   - [adr-0001](./architecture/adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md)
     — skills vendorizadas seguem o padrão original; o anvil impõe só o caminho em `docs/`
