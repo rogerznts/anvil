@@ -190,3 +190,21 @@ por `--git-dir` (que passaria no worktree do outro Dev); **D3** anotação logo 
 PERGUNTA antes da primeira escrita. Riscos: sem a anotação a comparação falha para o lado do `BLOQUEADO`; papel com
 worktree vivo retomado fora dele volta `BLOQUEADO` (conservador). Rodada 3: Review do diff e Tester medindo o caminho
 do RV2-F1 com a guarda.
+
+**Leader, 2026-09-13 — gate Tester, rodada 3: REPROVADO.** Isolado, payload de `094e1f4`, quatro execuções, US$ 1,21.
+**Caminho do RV2-F1 — PASS:** um `anvil-team-dev` em worktree voltou `BLOQUEADO` na conferência de base sem escrever, o
+worktree sumiu; retomado por `SendMessage` de outro agente com cwd no checkout principal (onde a Base já passava), rodou
+`git rev-parse --show-toplevel`, comparou com o anotado e voltou "BLOQUEADO, fui retomado fora do worktree"; nenhum
+commit nem arquivo no checkout. **T3-F1 (bloqueante)** a linha literal da guarda, `test "$(git rev-parse
+--show-toplevel)" = "…"`, é recusada pelo harness dentro de agente com `isolation: "worktree"` ("command names git in a
+form too complex to verify"); também `[ … ]`, `T=$(git …) && test` e `sh -c`. Só `git rev-parse --show-toplevel` puro
+roda. No controle o `sonnet` trocou o comando por conta própria; ao pé da letra, todo Dev em worktree bloquearia. A
+prova do ajuste rodou num shell, não num agente isolado. **T3-F2** "antes de cada escrita" não foi seguido no controle
+(nenhum dos quatro Edits conferido logo antes). Sugestões que ficam como ideia: o Dev carregou a skill antes de ler o
+protocolo; o Dev bloqueado pediu "worktree novo ou o mesmo recriado". Observação: o ticket ambíguo que gerou PERGUNTA
+na rodada 2 foi implementado sem perguntar nesta (1 de 2).
+
+Decisão do Leader: **T3-F1** a conferência é `git rev-parse --show-toplevel` sozinho numa chamada Bash, com a saída
+comparada ao caminho anotado. **T3-F2** a conferência acontece no começo de cada turno — inclusive quando uma mensagem
+retoma o papel — e antes de cada commit, no lugar de "antes de cada escrita"; a retomada é sempre um turno novo, e é
+ela que abre o caminho do RV2-F1. Reteste: controle e caminho do RV2-F1 com o texto novo.
