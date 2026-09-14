@@ -169,11 +169,11 @@ description dos agentes e a trava da skill.
 | Pré-condição | o `printenv` e a mensagem literal de [Uso](#uso). Nenhum modo degradado |
 | Abrir a spec | resolver a spec e calcular a frontier, como em [8](#8-frontier) |
 | Papéis e roteamento | modelo mental, uma linha por papel; tabela situação → papel da referência; Architect antes da implementação quando a mudança mexe em módulo, contrato, estado ou fronteira; Designer para UI, e UI que muda estado põe Designer e Architect na Equipe um do outro; o Dev é dono da implementação, e não se tira de uma skill a responsabilidade interna dela; trabalho grande ou nebuloso → **sugerir ao usuário** `/anvil-wayfinder`, que tem trava; eficiência: tarefa simples é Leader e um papel |
-| Despacho | parâmetros da chamada `Agent` ([5](#5-delegação)); nomes; modelo pela lista `team` ([10](#10-lista-team)); despachar ou retomar; o que o Mission Control tem e o papel precisa vai **copiado** para o Contexto; nota de que tudo nesta seção foi medido no Claude Code 2.1.270 e se reverifica por versão |
+| Despacho | parâmetros da chamada `Agent` ([5](#5-delegação)); nomes; modelo pela lista `team` ([10](#10-lista-team)); despachar ou retomar; escrita: o Tester e o Review não contam como escritores, porque escrevem fora de qualquer checkout; o que o Mission Control tem e o papel precisa vai **copiado** para o Contexto; nota de que tudo nesta seção foi medido no Claude Code 2.1.270 e se reverifica por versão |
 | Gates | só o Leader despacha Tester e Review como gate; rodada = chamada nova; Contexto do gate sem o resumo do autor ([6](#6-retorno-e-gates)) |
 | Tickets | único escritor de `Status:` e `## Comments`; forma do registro; quando vira `resolved`; quando commitar ([8](#8-frontier)) |
 | Paralelismo e integração | [11](#11-dois-escritores-em-paralelo) |
-| Perguntas ao usuário | retorno `PERGUNTA` → o Leader decide se é mesmo do usuário, pergunta, e devolve a resposta por `SendMessage` **ao mesmo name**. `anvil-grill` → `anvil-to-spec` → `anvil-to-tickets` fica num `po` só, retomado a cada pergunta. Enquanto o PO faz discovery, nenhum outro papel escreve: o `new-spec.sh` troca o branch do checkout |
+| Perguntas ao usuário | retorno `PERGUNTA` → o Leader decide se é mesmo do usuário, pergunta, e devolve a resposta por `SendMessage` **ao mesmo name**, a não ser que o papel tenha voltado de um worktree ([5](#5-delegação), "Autor que trabalhou em worktree"). `anvil-grill` → `anvil-to-spec` → `anvil-to-tickets` fica num `po` só, retomado a cada pergunta. Enquanto o PO faz discovery, nenhum outro papel escreve: o `new-spec.sh` troca o branch do checkout |
 | Mission Control | quando criar e as regras ([9](#9-mission-control)); aponta `templates/mission-control.md` |
 | Conclusão | reunir, conferir o artefato, conferir gates, expor divergências, reler tickets; responder em CONCLUÍDO / PENDENTE / BLOQUEADO / RISCO / PRÓXIMO PASSO; delegar não transfere responsabilidade; sessão acabando com trabalho aberto → Mission Control existindo, atualizar; inexistente e com gatilho da [seção 9](#9-mission-control) valendo, criar; nenhum dos dois, sugerir `/anvil-handoff` ao usuário, que tem trava |
 
@@ -551,15 +551,29 @@ Despacho, só para autor:
 
 Gate não entra nesta regra: rodada de gate já é sempre `Agent` novo.
 
-**Autor que trabalhou em worktree já integrado.** Correção de finding depois da
-integração (seção 11, passos 5 a 8) não vai por `SendMessage` ao autor: o cwd dele
-é um worktree removido, ou prestes a ser, e o branch dele não tem os commits do
-outro escritor. Vai a `Agent` novo com o mesmo name, com o Contexto apontando o
-ticket e os comentários, e trabalha sobre o branch da spec já integrado.
+**Autor que trabalhou em worktree.** Quem voltou de um worktree da seção 11 não é
+retomado por `SendMessage` em dois casos.
 
-- Um corretor só: sem worktree.
-- Dois corretores ao mesmo tempo: são dois escritores de novo, e a seção 11 recomeça
-  do passo 0, com a Base no `HEAD` integrado.
+- **Correção de finding depois da integração** (seção 11, passos 5 a 8). O cwd dele
+  é um worktree removido, ou prestes a ser, e o branch dele não tem os commits do
+  outro escritor.
+- **Resposta a `BLOQUEADO` ou `PERGUNTA` antes da integração dele, com o outro
+  escritor `PRONTO`.** É o F8 do gate Review do 08. O `PRONTO` é integrado primeiro
+  (passos 5 a 7), e a resposta não volta ao worktree antigo. O parâmetro
+  `isolation` do `Agent` só aceita `"worktree"`, sem caminho, então sempre cria um
+  worktree novo a partir do `HEAD` do checkout principal (pelo schema da
+  ferramenta, não medido). Mandar o papel ao worktree antigo pelo Contexto seria
+  mecânica não medida, com o git rodando no cwd do checkout principal. Se o worktree
+  dele sobreviveu com commit, o Contexto aponta `{sha-da-Base}..worktree-agent-{id}`,
+  e o papel traz esses commits por `cherry-pick` antes de continuar. Esse worktree
+  sai pelo passo 8, quando `git cherry` não listar `+`.
+
+Nos dois casos vai `Agent` novo com o mesmo name, com o Contexto apontando o ticket
+e os comentários, e o papel trabalha sobre o branch da spec já integrado.
+
+- Um escrevendo só: sem worktree.
+- Dois ao mesmo tempo: são dois escritores de novo, e a seção 11 recomeça do passo
+  0, com a Base no `HEAD` integrado.
 
 Por isso remover o worktree logo depois da integração, antes do veredito dos gates,
 não custa nada: a correção nunca voltaria para ele. O que `SendMessage` faz com um
@@ -734,7 +748,7 @@ Dentro: o diff \`{base}..{head}\` e os critérios de aceite do ticket 06.
 Fora: os papéis do 07 e o Mission Control do 08; critério que só um Ponto B em sessão nova prova fica como "não verificável".
 
 ## Política de escrita
-Somente leitura.
+Leitura no checkout, escrita só em \`{diretório fora de qualquer checkout}\`, onde você extrai o commit que testa com \`git archive {head} | tar -x -C {diretório}\`.
 Commit: não.
 
 ## Critério de pronto
@@ -746,6 +760,15 @@ Primeira linha: APROVADO ou REPROVADO.
 Seções exigidas: Registro no ticket, Evidência.`
 })
 ```
+
+A Política de escrita do Review é a do Tester, e não "somente leitura". Medido no
+gate Review do 08 (o achado F1, Review mexendo no `HEAD` do checkout principal): um
+Review fez `git checkout` de um commit no checkout principal para testá-lo. Com dois
+gates em paralelo no passo 7 da seção 11, e o commit de ticket do Leader esperando
+só pelo escritor ativo, esse commit cairia fora do branch da spec. O Review extrai o
+commit num diretório fora do checkout e não mexe no `HEAD`, no índice nem no working
+tree. A allowlist e o PROTOCOL não mudam: "o Review não edita" é sem `Edit` e
+`Write` (U2), com `Bash` declarado.
 
 **Dev pede repro ao Tester, sem o Leader** (ticket 07; `tester-07` foi despachado
 junto com `dev-07`, sem gate):
@@ -962,27 +985,14 @@ Com dois escritores:
    `worktree-agent-{id}`, o worktree fica em `.claude/worktrees/agent-{id}`, e os
    dois aparecem em `git worktree list`; worktree com commit sobrevive ao agente
    (M5). **Não `git merge`**: a guarda de merge o bloqueia no branch de uma spec com
-   ticket aberto. A decisão que o Leader registra no ticket anota o sha integrado de
-   cada ticket no branch da spec: o sha do branch do worktree some com o
-   `branch -D` do passo 8.
+   ticket aberto. A decisão do Leader sobre cada entrega é escrita depois do
+   cherry-pick dela e cita os commits pelo intervalo no branch da spec,
+   `{HEAD antes}..{HEAD depois}`. Não cita o sha do branch do worktree: esse commit
+   fica inalcançável depois do passo 8.
 
-   Se um volta `PRONTO` e o outro `BLOQUEADO` ou `PERGUNTA` (decisão do Leader no
-   ticket 08, F8):
-   - o Leader integra o `PRONTO` (passos 5 a 7 para ele);
-   - o outro vira escritor único. O Leader resolve o bloqueio ou a pergunta e
-     despacha `Agent` novo com o mesmo name, **sem worktree**, no branch da spec já
-     integrado;
-   - se o worktree dele sobreviveu com commit, o Contexto aponta
-     `{sha-da-Base}..worktree-agent-{id}`, e o papel traz esses commits por
-     `cherry-pick` antes de continuar. Esse worktree sai pelo passo 8, quando
-     `git cherry` não listar `+`;
-   - se o outro papel voltar a escrever ao mesmo tempo, são dois escritores de novo,
-     e a seção recomeça do passo 0.
-
-   Por que não continuar no worktree antigo: `Agent` com `isolation: "worktree"`
-   sempre cria um worktree novo a partir do `HEAD` do checkout principal e não
-   aceita um que já existe, e mandar o papel ao worktree antigo pelo Contexto seria
-   mecânica não medida, com o git rodando no cwd do checkout principal.
+   Se um volta `PRONTO` e o outro `BLOQUEADO` ou `PERGUNTA`, o Leader integra o
+   `PRONTO` (passos 5 a 7 para ele), e o outro segue a regra do §5, "Autor que
+   trabalhou em worktree".
 6. Conflito → `git cherry-pick --abort`, e o Leader despacha um Dev sem worktree
    com o conflito como Objetivo.
 7. Integrados os dois, o Leader roda o comando de verificação do projeto. Só então
@@ -994,8 +1004,10 @@ Com dois escritores:
    `worktree remove`: se ele recusar por mudança não commitada, o Leader para e
    pergunta ao usuário. Se sobrar `+` porque o conflito do passo 6 foi resolvido
    num commit diferente, o worktree fica, e o Leader pergunta ao usuário antes de
-   remover. Ao remover, o Leader tira os dois escritores da tabela "Trabalho em
-   execução" do Mission Control, se ele existe.
+   remover. Removido um worktree, o Leader atualiza a tabela "Trabalho em execução e
+   ownership de escrita" do Mission Control: a linha de quem terminou sai, e a de quem
+   segue escrevendo sem worktree fica com a coluna Worktree vazia. O Mission Control
+   já existe aqui, porque dois escritores em paralelo são gatilho dele (seção 9).
 
 `git cherry-pick` fora da guarda de merge é critério do ticket 13. A Skill tool
 enxerga as skills instaladas de dentro do worktree, carregadas do checkout
@@ -1003,7 +1015,7 @@ principal (M5), então `.worktreeinclude` não é preciso e o passo 3 não ganha
 No worktree não existe `.claude/skills/`, e a linha `Protocolo:` absoluta continua
 necessária. O Tester continua fora de qualquer checkout, inclusive worktree (§5).
 Finding de gate sobre trabalho integrado volta a `Agent` novo com o mesmo name, e
-não ao worktree (§5, "Autor que trabalhou em worktree já integrado").
+não ao worktree (§5, "Autor que trabalhou em worktree").
 
 ## 12. O que cabe em cada ticket
 
