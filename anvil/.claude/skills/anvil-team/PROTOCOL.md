@@ -177,16 +177,14 @@ fonte de verdade.
 - **Em worktree**, antes da primeira escrita, confira que o `HEAD` contém o sha da
   Base (`git merge-base --is-ancestor {sha} HEAD`). Não contendo, devolva
   `BLOQUEADO` sem escrever.
-- **Em worktree, fique nele.** Logo depois de ler este protocolo, anote o caminho do
-  worktree que você recebeu, a saída de `git rev-parse --show-toplevel`. Antes de
-  **cada** escrita e de **cada** commit, confira, sem `cd`:
-
-  ```bash
-  test "$(git rev-parse --show-toplevel)" = "{caminho anotado}"
-  ```
-
-  Falhando, devolva `BLOQUEADO` sem escrever, dizendo que foi retomado fora do
-  worktree. Uma `SendMessage`, de qualquer remetente, retoma você no cwd de quem
+- **Em worktree, fique nele.** Logo depois de ler este protocolo, rode
+  `git rev-parse --show-toplevel` e anote a saída: é o caminho do worktree que você
+  recebeu. No começo de **cada** turno, inclusive quando uma mensagem retoma você, e
+  antes de **cada** commit, rode o mesmo comando e compare a saída com o caminho
+  anotado. O comando vai sozinho numa chamada Bash, sem `cd`: composto com `$(…)`,
+  `test` ou `&&`, o harness o recusa dentro do worktree. Saída diferente, devolva
+  `BLOQUEADO` sem escrever, dizendo que foi retomado fora do worktree. Uma
+  `SendMessage`, de qualquer remetente, retoma você num turno novo, no cwd de quem
   manda, e o worktree sem mudança já foi apagado quando você encerrou: escrever
   nesse cwd seria escrever no checkout de outro.
 
