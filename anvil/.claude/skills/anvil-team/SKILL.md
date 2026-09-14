@@ -151,9 +151,9 @@ recusaria.
 
 **Escrita.** Leitura se despacha em paralelo à vontade. Um escritor por checkout:
 dois escritores ao mesmo tempo só em worktrees, por [Paralelismo e
-integração](#paralelismo-e-integração). O Tester não conta como escritor: ele
-escreve fora de qualquer checkout (ver [Tester junto com o
-Dev](#tester-junto-com-o-dev)).
+integração](#paralelismo-e-integração). O Tester e o Review não contam como
+escritores: escrevem fora de qualquer checkout (ver [Tester junto com o
+Dev](#tester-junto-com-o-dev) e [Gates](#gates)).
 
 **Agente ausente.** Se o despacho falhar com erro de tipo de agente, um
 `anvil-team-*` não está instalado: pare e sugira `/anvil-update` ao usuário.
@@ -222,10 +222,11 @@ falha com "No agent named … is reachable". Então:
 
 Gate não entra nesta regra: rodada de gate já é `Agent` novo.
 
-**Autor que trabalhou em worktree.** Correção depois da integração não vai por
-`SendMessage` ao autor: o cwd dele é um worktree removido, ou prestes a ser, e o
-branch dele não tem os commits do outro escritor. Vai a `Agent` novo, como no item
-3 acima, sobre o branch da spec já integrado.
+**Autor que trabalhou em worktree.** Correção depois da integração, e resposta a
+`BLOQUEADO` ou `PERGUNTA` de quem voltou de um worktree, não vão por `SendMessage`
+ao autor: o cwd dele é um worktree removido, ou prestes a ser, e o branch dele não
+tem os commits do outro escritor. Vão a `Agent` novo, como no item 3 acima, sobre o
+branch da spec já integrado.
 
 - Um autor corrigindo: sem worktree.
 - Dois ao mesmo tempo são dois escritores de novo: [Paralelismo e
@@ -312,19 +313,17 @@ lá não existe `.claude/skills/`: por isso a linha `Protocolo:` absoluta.
    Nunca `git merge`: a guarda de merge o bloqueia no branch de uma spec com ticket
    aberto.
 
-   A sua decisão sobre cada entrega registra no ticket o intervalo integrado dele,
-   `{HEAD antes}..{HEAD depois}` do cherry-pick: o sha do branch do worktree deixa
-   de existir no passo 8.
+   A sua decisão sobre cada entrega, escrita depois do cherry-pick dela, cita os
+   commits pelo intervalo no branch da spec, `{HEAD antes}..{HEAD depois}`, e não
+   pelo sha do branch do worktree, que fica inalcançável depois do passo 8.
 
    **Um volta `PRONTO` e o outro `BLOQUEADO` ou `PERGUNTA`:** integre o `PRONTO`,
    com os passos 5 a 7 para ele. O outro vira escritor único: resolva o bloqueio ou
-   a pergunta e despache `Agent` novo com o mesmo name, sem worktree, no branch da
-   spec já integrado. Não vai por `SendMessage`, e não volta ao worktree antigo: o
-   worktree sem commit some com o agente, e o `isolation: "worktree"` sempre cria
-   um novo. Se o worktree dele sobreviveu com commit, o Contexto aponta `{sha da
-   Base}..worktree-agent-{id}`, e o papel traz esses commits por `cherry-pick`
-   antes de continuar; esse worktree sai pelo passo 8. Se o outro papel voltar a
-   escrever enquanto isso, são dois escritores de novo, e tudo recomeça do passo 0.
+   a pergunta e despache-o como [Autor que trabalhou em
+   worktree](#despachar-ou-retomar), sem worktree. Se o worktree dele sobreviveu
+   com commit, o Contexto aponta `{sha da Base}..worktree-agent-{id}`, e o papel
+   traz esses commits por `cherry-pick` antes de continuar; esse worktree sai pelo
+   passo 8.
 6. **Conflito:** `git cherry-pick --abort`, e despache um Dev **sem** worktree com o
    conflito como Objetivo.
 7. **Verificação, depois gates.** Integrados os dois, rode o comando de verificação
@@ -344,7 +343,9 @@ lá não existe `.claude/skills/`: por isso a linha `Protocolo:` absoluta.
    pergunte ao usuário. Sobrou `+`, porque o conflito do passo 6 foi resolvido num
    commit diferente: o worktree fica, e você pergunta ao usuário antes de remover.
 
-   Cada worktree removido sai da tabela "Trabalho em execução" do Mission Control.
+   Removido um worktree, atualize a tabela "Trabalho em execução e ownership de
+   escrita" do Mission Control: a linha de quem terminou sai, e a de quem segue
+   escrevendo sem worktree fica com a coluna Worktree vazia.
 
 Finding de gate sobre trabalho integrado não volta ao worktree: ver [Autor que
 trabalhou em worktree](#despachar-ou-retomar).
@@ -361,8 +362,10 @@ trabalhou em worktree](#despachar-ou-retomar).
 - **O Contexto do gate** aponta o intervalo de commits `{base}..{head}`, o ticket e
   os comentários dele. **Não leva o resumo do autor**: o gate julga o artefato, e
   os desvios declarados já estão no comentário que você registrou.
-- **Política de escrita do gate:** `Commit: não`. Review, somente leitura. Tester,
-  a de [Tester junto com o Dev](#tester-junto-com-o-dev), que vale com ou sem gate.
+- **Política de escrita do gate:** `Commit: não`. Review, leitura no checkout e
+  escrita só num diretório fora de qualquer checkout, escolhido por você, onde ele
+  extrai o commit que testa. Tester, a de [Tester junto com o
+  Dev](#tester-junto-com-o-dev), que vale com ou sem gate.
 - **Review é sempre exigido** para resolver um ticket. **Tester é exigido** quando
   o ticket declara um cenário de comportamento a provar.
 
@@ -395,7 +398,7 @@ Dentro: o diff \`{base}..{head}\` e os critérios de aceite do ticket 03.
 Fora: critério que só uma sessão nova prova fica como "não verificável".
 
 ## Política de escrita
-Somente leitura.
+Leitura no checkout, escrita só em \`{diretório fora de qualquer checkout}\`.
 Commit: não.
 
 ## Critério de pronto
@@ -469,7 +472,9 @@ dentro da spec.
 
 - **Retorno `PERGUNTA`:** decida se a decisão é mesmo do usuário. Se é, pergunte
   e devolva a resposta por `SendMessage` **ao mesmo name**, que retoma com o
-  contexto dele. Se não é, responda você, ou diga ao papel onde descobrir.
+  contexto dele, a não ser que ele tenha voltado de um worktree ([Autor que
+  trabalhou em worktree](#despachar-ou-retomar)). Se não é, responda você, ou diga
+  ao papel onde descobrir.
 - **Discovery do PO:** `anvil-grill` → `anvil-to-spec` → `anvil-to-tickets` ficam
   num `po` só, retomado a cada pergunta, sem reiniciar o contexto entre as três.
   Enquanto o PO faz discovery, nenhum outro papel escreve: o `new-spec.sh` troca o

@@ -37,8 +37,9 @@ que precisa mudar vira finding.
 
 Somente leitura inclui o `HEAD`, o índice e o working tree do checkout, onde o
 Leader commita enquanto você lê: sem `checkout`, `switch`, `stash`, `reset`, branch
-nem `git worktree add`. Para rodar testes num commit, extraia-o num diretório que
-você cria fora de qualquer checkout: `git archive {sha} | tar -x -C {diretório}`.
+nem `git worktree add`. Para rodar testes num commit, extraia-o no diretório fora
+de qualquer checkout que a Política de escrita nomear:
+`git archive {sha} | tar -x -C {diretório}`.
 
 ## Relações
 
