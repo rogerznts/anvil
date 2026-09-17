@@ -76,10 +76,10 @@ A sua última mensagem é o retorno, e chega a quem despachou você. Forma:
 - **Primeira linha.** Delegação comum: `PRONTO`, `BLOQUEADO` ou `PERGUNTA`.
   Delegação `gate`: `APROVADO`, `REPROVADO`, `BLOQUEADO` ou `PERGUNTA`. Aprovar
   com finding não bloqueante é `APROVADO`. Mensagem final sem uma dessas palavras
-  não é entrega: o Leader não a registra e pede o retorno por `SendMessage`, ou,
-  se você roda em worktree, por `Agent` novo (ver [Ownership de
-  escrita](#ownership-de-escrita)). Se quem encerrou é um gate, ver
-  [Gates](#gates).
+  não é entrega: o Leader não a registra e pede o retorno pelo adaptador do
+  runtime. No Codex ele usa `send_message` ou `followup_task`; no Claude Code,
+  `SendMessage` ou um `Agent` novo no caso de worktree. Se quem encerrou é um
+  gate, ver [Gates](#gates).
 - **Retorno repetido.** O mesmo retorno emitido de novo, sem trabalho novo, o
   Leader não registra outra vez.
 - **Severidade.** `bloqueante` · `relevante` · `sugestão` · `pergunta`. Os ids
@@ -98,8 +98,8 @@ A sua última mensagem é o retorno, e chega a quem despachou você. Forma:
 - **Tester e Review são gate só quando o título da delegação diz `gate`.** Sem
   isso, a entrega volta `PRONTO` como qualquer outra.
 - **O veredito existe só no retorno do gate.** Mensagem lateral não aprova nem
-  reprova. Gate que encerra sem veredito não é cobrado por `SendMessage`: o Leader
-  o redespacha com `Agent` novo e o mesmo name, e conta como a mesma rodada.
+  reprova. Gate que encerra sem veredito não é retomado por mensagem: o Leader o
+  redespacha num agente novo do runtime e conta como a mesma rodada.
 - **O autor não controla o gate que avalia o trabalho dele.** Conversa lateral
   esclarece finding e não muda veredito. Avaliação que mudou só vale numa rodada
   nova, que o Leader despacha.
@@ -113,19 +113,22 @@ A sua última mensagem é o retorno, e chega a quem despachou você. Forma:
 
 ## Skills
 
-- **Carregue a skill real** pela Skill tool e siga o `SKILL.md` dela. O campo
-  Skills diz qual, ou deixa a escolha entre as primárias do seu papel. Reproduzir
-  de memória o que a skill faz não é seguir a skill.
+- **Carregue a skill real** pelo mecanismo do runtime e siga o `SKILL.md` dela. O
+  campo Skills diz qual, ou deixa a escolha entre as primárias do seu papel.
+  Reproduzir de memória o que a skill faz não é seguir a skill.
 - **Skills primárias são roteamento preferencial**, não whitelist. Uma skill que
   chama outra segue a composição dela.
-- **Subagente que a sua skill abre vai com `run_in_background: false`**, mesmo
-  quando a skill manda background. Várias chamadas na mesma mensagem continuam em
-  paralelo, e o retorno só sai depois do resultado de cada uma. Resultado de
-  subagente em background não chega a quem já encerrou o turno.
+- **Subagente auxiliar aberto por uma skill:** no Claude Code use
+  `run_in_background: false`, mesmo quando a skill mandar background. No Codex,
+  siga a política de colaboração da sessão e não abra outro agente sem instrução
+  explícita da skill ou do Leader.
 - **Fora essa exceção, o protocolo de uma skill vence este** quando os dois
   conflitam.
-- **Skill ausente, ou recusada pela trava de invocação:** retorno `BLOQUEADO`,
-  dizendo qual. Instalar ou reinstalar o anvil é decisão do usuário.
+- **Skill auxiliar indisponível no runtime:** isso, sozinho, não bloqueia o papel.
+  Execute a responsabilidade definida no arquivo do papel com as ferramentas
+  nativas e as regras do projeto, e declare a ausência em Divergências. Só retorne
+  `BLOQUEADO` quando faltar uma capacidade realmente necessária para produzir ou
+  verificar o resultado.
 
 ## Fontes de verdade
 
@@ -148,11 +151,11 @@ fonte de verdade.
 
 ## Comunicação
 
-- **Fale com os names da linha `Equipe` por `SendMessage`.** Dentro do agente ela
-  é ferramenta diferida: carregue com `ToolSearch`, query `select:SendMessage`,
-  antes do primeiro envio.
-- **Texto comum da sua resposta não chega a outro papel.** Só `SendMessage`
-  chega.
+- **Fale somente com os agentes da linha `Equipe`.** No Codex use
+  `send_message` para agente ativo; no Claude Code use `SendMessage` e carregue a
+  ferramenta diferida quando necessário.
+- **Texto comum da sua resposta não chega a outro papel.** Use a ferramenta de
+  mensagem do runtime.
 - **Quando um colega da Equipe responde melhor uma dúvida, pergunte a ele.** A
   opinião de quem está na Equipe se pede, não se simula.
 - **Não encerre à espera de resposta lateral.** Espere dentro do turno, seguindo no
@@ -162,8 +165,9 @@ fonte de verdade.
 - **Conversa lateral não passa pelo Leader.** O que nasceu nela e importa —
   finding, repro, divergência, acordo — vai na seção Laterais do retorno, e é assim
   que chega a ele.
-- **Erro de entrega de `SendMessage` não se repete.** Retorno `BLOQUEADO`, com o
-  name e o erro.
+- **Erro de entrega não se repete às cegas.** Confira uma vez o inventário do
+  runtime. Se o destinatário não estiver alcançável, retorno `BLOQUEADO`, com o
+  identificador e o erro.
 
 ## Ownership de escrita
 
@@ -174,10 +178,10 @@ fonte de verdade.
 - **Sobreposição descoberta no meio do trabalho** — precisar escrever fora da
   fronteira, ou achar outro escritor na mesma região: pare e devolva `BLOQUEADO`,
   dizendo a região. Quem escolhe a saída é o Leader.
-- **Em worktree**, antes da primeira escrita, confira que o `HEAD` contém o sha da
+- **Em worktree do Claude Code**, antes da primeira escrita, confira que o `HEAD` contém o sha da
   Base (`git merge-base --is-ancestor {sha} HEAD`). Não contendo, devolva
   `BLOQUEADO` sem escrever.
-- **Em worktree, fique nele.** Logo depois de ler este protocolo, rode
+- **Em worktree do Claude Code, fique nele.** Logo depois de ler este protocolo, rode
   `git rev-parse --show-toplevel` e anote a saída: é o caminho do worktree que você
   recebeu. No começo de **cada** turno, inclusive quando uma mensagem retoma você, e
   antes de **cada** commit, rode o mesmo comando e compare a saída com o caminho
@@ -187,6 +191,10 @@ fonte de verdade.
   `SendMessage`, de qualquer remetente, retoma você num turno novo, no cwd de quem
   manda, e o worktree sem mudança já foi apagado quando você encerrou: escrever
   nesse cwd seria escrever no checkout de outro.
+- **No Codex, o checkout é compartilhado.** Respeite literalmente a Política de
+  escrita. Se ela permite escrita e outro escritor estiver ativo, devolva
+  `BLOQUEADO`; o Leader serializa os escritores. Não crie worktree por conta
+  própria.
 
 ## Verificação
 
@@ -212,9 +220,9 @@ outro papel:
 Vira `PERGUNTA` a decisão que é do usuário: intenção de produto, preferência,
 requisito ausente, trade-off de negócio, informação indisponível, ação
 irreversível relevante. A pergunta vai na seção Perguntas, pronta para o Leader
-levar ao usuário, e a resposta volta a você por `SendMessage`, na mesma sessão;
-se você roda em worktree, volta num `Agent` novo (ver [Ownership de
-escrita](#ownership-de-escrita)).
+levar ao usuário. No Codex, a resposta volta por `send_message` ou
+`followup_task`; no Claude Code, por `SendMessage`, ou num `Agent` novo quando o
+autor estava em worktree (ver [Ownership de escrita](#ownership-de-escrita)).
 
 O que se descobre lendo o código, rodando, pesquisando, prototipando, testando ou
 perguntando a um colega da Equipe você descobre, e segue.
