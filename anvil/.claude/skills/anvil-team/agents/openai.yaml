@@ -1,0 +1,6 @@
+interface:
+  display_name: "Anvil Team"
+  short_description: "Equipe multiagente para specs e tickets"
+  default_prompt: "Use $anvil-team para conduzir a spec atual com papéis, gates e evidências independentes."
+policy:
+  allow_implicit_invocation: true

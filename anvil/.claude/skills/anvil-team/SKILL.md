@@ -1,7 +1,6 @@
 ---
 name: anvil-team
-description: "Abre uma equipe de papéis (PO, Architect, Analyst, Designer, Dev, Tester e Review) coordenada pelo Leader, que trabalha uma spec pelos tickets com gates de Tester e Review que o autor não controla. Exige agent teams ligado."
-disable-model-invocation: true
+description: "Coordena uma equipe de papéis (PO, Architect, Analyst, Designer, Dev, Tester e Review) para trabalhar uma spec por tickets, com gates independentes e suporte nativo a Codex e Claude Code. Use quando pedirem para assumir o Anvil Team, executar uma spec com equipe, delegar tickets ou conduzir implementação com revisão e testes independentes."
 ---
 
 # Leader
@@ -19,32 +18,20 @@ cobra.
 /anvil-team 012      a spec 012, de qualquer branch
 ```
 
-## Pré-condição
+## Runtime
 
-Antes de qualquer outra coisa, inclusive de ler a spec:
+Antes de ler a spec, identifique o runtime pelas ferramentas disponíveis e leia
+[RUNTIMES.md](RUNTIMES.md):
 
-```bash
-printenv CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
-```
+1. `spawn_agent` disponível: **Codex**. Use a colaboração nativa do Codex. Não
+   consulte nem exija `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`.
+2. `Agent` e `SendMessage` disponíveis: **Claude Code**. Nesse runtime apenas,
+   confirme que `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` antes do despacho.
+3. Nenhum dos dois adaptadores disponível: trabalhe como Leader sem inventar
+   delegação e informe que a sessão não oferece um runtime multiagente.
 
-Saída exatamente `1` passa. Qualquer outra, pare e mostre isto, literal, sem
-oferecer alternativa:
-
-```text
-A equipe precisa de agent teams, e ele não está ligado nesta sessão.
-
-Ligue de um destes jeitos e abra uma sessão nova:
-
-  só para você, em ~/.claude/settings.json
-    { "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" } }
-
-  só nesta execução
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude
-
-É um recurso experimental do Claude Code. O anvil não o liga por você.
-```
-
-Não há modo degradado, e o `settings.json` é do usuário: você não o escreve.
+Codex é um runtime de primeira classe, não modo degradado. O protocolo, os papéis,
+os tickets e os gates são os mesmos; só mudam despacho, retomada, nomes e isolamento.
 
 ## Abrir a spec
 
@@ -129,36 +116,34 @@ Proposta: dev-02 primeiro, Review sobre a entrega, depois o 04. Sigo?
 
 ## Despacho
 
-Mecânica medida no Claude Code 2.1.270, com agent teams experimental. Reverifique
-a cada versão.
+Use o adaptador do runtime em [RUNTIMES.md](RUNTIMES.md). Em ambos, o despacho
+leva a delegação do [protocolo](PROTOCOL.md#a-delegação), com os sete campos.
 
-| Parâmetro do `Agent` | Valor | Regra |
-|---|---|---|
-| `subagent_type` | `anvil-team-{papel}` | sempre |
-| `name` | `{papel}-{NN}` no trabalho de um ticket; `{papel}` fora de ticket (discovery do PO, design antes dos tickets) | sempre. Sem `name` o agente não entra no time, e ninguém fala com ele |
-| `description` | `{papel} · ticket {NN}[ · rodada {n}]` | sempre |
-| `model` | o valor do papel na lista `team` | só quando o papel tem valor válido. Ver [Modelo por papel](#modelo-por-papel) |
-| `isolation` | `"worktree"` | só com dois escritores ao mesmo tempo, os dois isolados. Ver [Paralelismo e integração](#paralelismo-e-integração) |
-| `run_in_background` | `true` | sempre. A chamada devolve o lançamento na hora, não o retorno do papel. Você segue disponível para o usuário, e dois papéis vivos ao mesmo tempo é o que torna a conversa lateral possível |
-| `prompt` | a delegação do [protocolo](PROTOCOL.md#a-delegação), com os sete campos | sempre |
+O identificador lógico é `{papel}-{NN}`. No Codex, o `task_name` equivalente é
+`{papel}_{NN}` e cada rodada de gate recebe sufixo `_r{n}`. Guarde o id e o nome
+canônico devolvidos pelo despacho; são eles que endereçam mensagens e retomadas.
 
-`{papel}-{NN}`, e não um name fixo por papel: dois Devs em tickets diferentes
-precisam de endereços diferentes, e reusar um name substitui o agente anterior.
+**O campo Skills** sai do catálogo disponível no runtime: a skill que o trabalho
+pede, ou "à escolha do papel". Se uma auxiliar não estiver disponível no Codex, o
+papel segue sua responsabilidade diretamente e registra a divergência, conforme o
+[protocolo](PROTOCOL.md#skills); não bloqueie só por diferença de catálogo.
 
-**O campo Skills** sai da lista da Skill tool: a skill que o trabalho pede, ou "à
-escolha do papel". Skill com trava de invocação não se delega; o papel a
-recusaria.
+**Escrita.** Leitura se despacha em paralelo até o limite do runtime. Um escritor
+por checkout. No Codex, os agentes compartilham o checkout: só um papel escritor
+fica ativo por vez. No Claude Code, dois escritores podem usar worktrees conforme
+[Paralelismo e integração](#paralelismo-e-integração). Tester e Review não contam
+como escritores quando a política limita a escrita a diretório temporário externo.
 
-**Escrita.** Leitura se despacha em paralelo à vontade. Um escritor por checkout:
-dois escritores ao mesmo tempo só em worktrees, por [Paralelismo e
-integração](#paralelismo-e-integração). O Tester e o Review não contam como
-escritores: escrevem fora de qualquer checkout (ver [Tester junto com o
-Dev](#tester-junto-com-o-dev) e [Gates](#gates)).
-
-**Agente ausente.** Se o despacho falhar com erro de tipo de agente, um
-`anvil-team-*` não está instalado: pare e sugira `/anvil-update` ao usuário.
+**Capacidade ou agente ausente.** No Codex, se não houver slot, aguarde um papel
+encerrar ou reutilize um agente ocioso compatível; isso não é incompatibilidade.
+No Claude Code, erro de tipo `anvil-team-*` indica instalação incompleta: sugira
+`/anvil-update`.
 
 ### Modelo por papel
+
+Esta seção vale somente para Claude Code. No Codex, omita override de modelo, salvo
+quando o usuário ou uma regra do projeto o exigir explicitamente; vale o modelo da
+sessão.
 
 Antes do primeiro despacho da sessão, leia a lista `team` em
 `.claude/rules/anvil.md`, na seção "Modelos por papel":
@@ -199,31 +184,22 @@ Se a chamada `Agent` recusar `model`, despache sem ele: vale o modelo da sessão
 
 ### Despachar ou retomar
 
-- **Autor** (PO, Architect, Analyst, Designer, Dev) com mais trabalho no mesmo
-  ticket: `SendMessage` ao name, que retoma com o contexto intacto. É o caso de
-  correção de finding, resposta de `PERGUNTA` e próxima pergunta do grill. Se a
-  `SendMessage` estiver diferida, carregue com `ToolSearch`,
-  `select:SendMessage`. **Exceção:** papel despachado com `isolation: "worktree"`
-  nunca se retoma por `SendMessage`. Ver [Autor que trabalhou em
-  worktree](#despachar-ou-retomar), abaixo, e o passo 5 de [Paralelismo e
-  integração](#paralelismo-e-integração).
-- **Gate:** sempre `Agent` novo com o mesmo name, rodada `n+1`. Ver
-  [Gates](#gates).
+- **Autor ativo:** mensagem ao agente (`send_message` no Codex; `SendMessage` no
+  Claude Code).
+- **Autor ocioso ou encerrado:** `followup_task` no Codex; no Claude Code,
+  `SendMessage` quando alcançável ou novo `Agent` quando não estiver.
+- **Gate:** sempre agente novo, com contexto limpo e rodada `n+1`. No Codex use um
+  `task_name` único, como `review_03_r2`. Ver [Gates](#gates).
 
-**Name inalcançável.** Numa sessão sua retomada em processo novo (`claude
---resume`, ou cada turno de `claude -p`), a `SendMessage` ao name de um autor
-falha com "No agent named … is reachable". Então:
+**Agente inalcançável.** Liste os agentes do runtime e procure o id canônico que
+esta sessão despachou. Então:
 
-1. Rode `ListAgents` e procure o name exato **entre os subagentes que esta sessão
-   despachou**. Sessão de outra máquina, sessão local alheia ou sessão na nuvem não
-   conta, mesmo com o mesmo name: mandar a delegação para ela é entregar trabalho
-   da Equipe a quem não é da Equipe.
-2. Uma linha só: `SendMessage` pelo agentId dela, que retoma com o contexto
-   intacto.
-3. Nenhuma, ou mais de uma: `Agent` novo com o mesmo name, com o Contexto apontando
-   o ticket e os comentários. O papel relê em vez de lembrar.
+1. Considere apenas agentes filhos desta execução. Sessão alheia não conta.
+2. Um resultado: retome pelo id, conforme o adaptador.
+3. Nenhum ou mais de um: crie agente novo com identificador único e Contexto
+   apontando ticket e comentários. O papel relê em vez de lembrar.
 
-Gate não entra nesta regra: rodada de gate já é `Agent` novo.
+Gate não entra nesta regra: cada rodada já nasce em agente novo do runtime.
 
 **Autor que trabalhou em worktree.** Papel despachado com `isolation: "worktree"`
 não se retoma por `SendMessage`: nem para correção depois da integração, nem para
@@ -236,6 +212,9 @@ Contexto. Se o worktree dele sobreviveu, o Contexto aponta os commits que `git c
 {branch da spec} worktree-agent-{id}` marca com `+`, e o papel traz só esses por
 `cherry-pick` antes de continuar: os marcados com `-` já estão integrados. Esse
 worktree sai pelo passo 8 de [Paralelismo e integração](#paralelismo-e-integração).
+
+Este parágrafo é exclusivo do adaptador Claude Code. O Codex não despacha escritor
+em worktree implícito: serializa os escritores no checkout compartilhado.
 
 - Um autor: sem worktree.
 - Dois ao mesmo tempo são dois escritores de novo: [Paralelismo e
@@ -251,10 +230,9 @@ o autor e voltar `PRONTO`. Cada um vai na linha `Equipe` do outro. O gate do Tes
 é outra chamada, depois da entrega do Dev e do último `PRONTO` da delegação sem
 gate, com o mesmo name e `· gate`.
 
-**Despache o Tester primeiro**, e o Dev logo que a chamada `Agent` do Tester
-devolver o lançamento ("Async agent launched"), sem esperar o `PRONTO` dele.
-`SendMessage` a um name que ainda não foi despachado falha com "No agent named …
-is reachable", e o Dev que pede o repro logo ao começar volta `BLOQUEADO` (medido).
+**Despache o Tester primeiro**, e o Dev logo que o runtime devolver o lançamento,
+sem esperar o `PRONTO` dele. Mensagem a um agente ainda não despachado falha, e o
+Dev que pede o repro logo ao começar pode voltar `BLOQUEADO`.
 
 **O Tester escreve fora de qualquer checkout**, com ou sem gate. Dois escritores no
 mesmo checkout disputam o índice, e arquivo não rastreado do Tester entraria no
@@ -269,7 +247,7 @@ mktemp -d "${TMPDIR:-/tmp}/anvil-{NNN}-{name}.XXXXXX"
 Um nome fixo se repete entre projetos e sessões, e o Tester escreveria por cima dos
 restos de outro despacho.
 
-**Retomada por lateral.** Mecânica medida no Claude Code 2.1.270: papel retomado
+**Retomada por lateral no Claude Code.** Mecânica medida no Claude Code 2.1.270: papel retomado
 por `SendMessage` de outro papel roda no cwd de quem manda e, se foi despachado sem
 `model`, no modelo de quem manda; com `model`, fica no dele. O `tester-{NN}`
 retomado por um `dev-{NN}` em worktree roda no worktree do Dev, e caminho relativo
@@ -284,6 +262,22 @@ resolve lá: por isso a Política dele só tem caminho absoluto.
   delegação de gate do Tester.
 
 ## Paralelismo e integração
+
+### Codex
+
+Os agentes Codex compartilham o mesmo filesystem e checkout. Leitores podem rodar
+em paralelo, respeitando os slots disponíveis. Escritores rodam em sequência:
+
+1. despache um único autor com a região de escrita declarada;
+2. aguarde o retorno e confira `git status` e o diff;
+3. registre e commite a entrega quando o protocolo pedir;
+4. só então despache o próximo escritor;
+5. rode os gates depois da entrega, com escrita restrita a diretório temporário.
+
+Não crie isolamento fictício nem bloqueie a skill por falta de worktree automático.
+Se a frontier tiver dois tickets independentes, ordene-os e informe a sequência.
+
+### Claude Code
 
 Dois escritores ao mesmo tempo, só com as três pré-condições:
 
@@ -381,10 +375,9 @@ trabalhou em worktree](#despachar-ou-retomar).
 - **Só você despacha Tester e Review como gate**, depois de registrar a entrega do
   autor no ticket. O retorno de um gate despachado por outro papel iria a ele, não
   a você.
-- **Cada rodada é uma chamada `Agent` sua**, com `· gate` no título da delegação e
-  `· rodada {n}` na description. O veredito é a primeira linha do resultado dessa
-  chamada. Rodada nunca vai por `SendMessage`: a nova recomeça do zero, relendo o
-  ticket, sem herdar a conversa lateral da anterior.
+- **Cada rodada é um agente novo do runtime**, com `· gate` no título da delegação
+  e `· rodada {n}` na descrição. O veredito é a primeira linha do resultado. Uma
+  rodada nunca é retomada por mensagem: recomeça do zero, relendo o ticket.
 - **O Contexto do gate** aponta o intervalo de commits `{base}..{head}`, o ticket e
   os comentários dele. **Não leva o resumo do autor**: o gate julga o artefato, e
   os desvios declarados já estão no comentário que você registrou.
@@ -395,8 +388,9 @@ trabalhou em worktree](#despachar-ou-retomar).
 - **Review é sempre exigido** para resolver um ticket. **Tester é exigido** quando
   o ticket declara um cenário de comportamento a provar.
 
-Delegação de referência, depois que `dev-03` voltou `PRONTO` com
-`{base}..{head}` e a entrega foi registrada:
+Delegação de referência para Claude Code, depois que `dev-03` voltou `PRONTO` com
+`{base}..{head}` e a entrega foi registrada. No Codex, use os campos equivalentes
+documentados em [RUNTIMES.md](RUNTIMES.md):
 
 ```js
 Agent({
@@ -502,12 +496,10 @@ dentro da spec.
 ## Perguntas ao usuário
 
 - **Retorno `PERGUNTA`:** decida se a decisão é mesmo do usuário. Se é, pergunte
-  e devolva a resposta por `SendMessage` **ao mesmo name**, que retoma com o
-  contexto dele. **Exceção:** papel despachado com `isolation: "worktree"` nunca se
-  retoma por `SendMessage`; a resposta vai a `Agent` novo, por [Autor que trabalhou
-  em worktree](#despachar-ou-retomar) e pelo passo 5 de [Paralelismo e
-  integração](#paralelismo-e-integração). Se a decisão não é do usuário, responda
-  você, ou diga ao papel onde descobrir.
+  e devolva a resposta ao mesmo agente pelo adaptador do runtime. Em Claude Code,
+  a exceção de worktree continua valendo; no Codex, use `send_message` se ativo ou
+  `followup_task` se o agente estiver ocioso. Se a decisão não é do usuário,
+  responda você, ou diga ao papel onde descobrir.
 - **Discovery do PO:** `anvil-grill` → `anvil-to-spec` → `anvil-to-tickets` ficam
   num `po` só, retomado a cada pergunta, sem reiniciar o contexto entre as três.
   Enquanto o PO faz discovery, nenhum outro papel escreve: o `new-spec.sh` troca o
