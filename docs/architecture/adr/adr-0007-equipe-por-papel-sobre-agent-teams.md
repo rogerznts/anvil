@@ -1,6 +1,6 @@
 # ADR-0007 — Equipe por papel, coordenada por agent teams
 
-- Status: aceito
+- Status: substituído pelo [ADR-0008](./adr-0008-equipe-sai-do-toolkit.md) em 2026-09-21 — a equipe saiu do toolkit
 - Data: 2026-09-12
 - Contexto: o anvil volta a distribuir agentes, e o [ADR-0003](./adr-0003-sem-maquina-de-fases.md) registrou o fim dos agentes-persona. Este ADR o complementa; não o revoga.
 

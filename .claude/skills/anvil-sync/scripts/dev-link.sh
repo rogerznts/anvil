@@ -46,7 +46,6 @@ anvil-grilling
 anvil-domain-modeling
 anvil-to-spec
 anvil-to-tickets
-anvil-team
 anvil-implement
 anvil-tdd
 anvil-diagnose

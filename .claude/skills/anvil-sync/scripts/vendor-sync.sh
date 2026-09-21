@@ -507,7 +507,7 @@ PYEOF
         [ -n "$so_disco" ] && { echo "   FALHA agente no payload e nao no lock: $(echo "$so_disco" | tr '\n' ' ')"; falhas=$((falhas+1)); }
     fi
 
-    # A trava de invocacao, numa forma so para os checks 8 e 14: a leitura do Claude
+    # A trava de invocacao, numa forma so para os checks 8 e 13: a leitura do Claude
     # Code 2.1.270, tirada do binario. Sem BOM, o frontmatter e o que casa com
     # /^---\s*\n([\s\S]*?)---\s*\n?/, lido como YAML. Se nao parseia, tenta de novo
     # com o valor de cada `chave: valor` que tem `: ` ou caractere especial posto
@@ -589,7 +589,7 @@ PYEOF
         [ "$n" = "$fm" ] || { echo "   FALHA agents/$n.md: frontmatter diz '$fm'"; falhas=$((falhas+1)); }
     done
 
-    # Contrato de citacao com a equipe (spec 001, team-shape.md, secao 3). Num agente,
+    # Contrato de citacao de agente (spec 001, adr-0008). Num agente,
     # caminho do payload se cita so em crase e relativo a raiz de instalacao, porque
     # o modelo resolve caminho a partir do cwd, a raiz do projeto, e nao do arquivo
     # do agente. Link relativo resolveria para o verify e nao para o modelo:
@@ -654,20 +654,10 @@ PYEOF
 )
     done
 
-    # O papel chega ao protocolo pela linha-ponteiro (team-shape.md, secao 3). Sem
-    # ela, age sem saber a delegacao que recebeu nem o retorno que deve. Conta so a
-    # citacao que o check 10 confere: em crase e fora de bloco cercado.
-    echo "12. agente de equipe cita o protocolo"
-    for f in "$AGENTS"/anvil-team-*.md; do
-        [ -f "$f" ] || continue
-        spans_of "$f" "$PAYLOAD_PATH_RE" | grep -qxF '.claude/skills/anvil-team/PROTOCOL.md' ||
-            { echo "   FALHA agents/$(basename "$f"): nao cita .claude/skills/anvil-team/PROTOCOL.md"; falhas=$((falhas+1)); }
-    done
-
     # Residuo do port da equipe do Maestri: nota de canvas e erro de conexao, que
     # depois do degit apontam para o nada. O check 4 e de upstream vendorizado e nao
     # os pega. Vale em qualquer arquivo e em bloco cercado tambem: nao ha uso legitimo.
-    echo "13. nenhum token do Maestri em skill ou agente"
+    echo "12. nenhum token do Maestri em skill ou agente"
     MAESTRI='@team-protocol|@anvil-skills|@mission-control|@anvil-install|No connection to note'
     while IFS= read -r f; do
         grep -qIE "$MAESTRI" "$f" 2>/dev/null || continue
@@ -681,7 +671,7 @@ PYEOF
     # agente do payload passa: e endereco, nao skill. Mesma forma de citar do check
     # 10: span em crase, fora de bloco cercado; com ou sem a barra do comando
     # (`/anvil-wayfinder`).
-    echo "14. skill citada por agente existe no payload e não tem trava"
+    echo "13. skill citada por agente existe no payload e não tem trava"
     for f in "$AGENTS"/*.md; do
         [ -f "$f" ] || continue
         while IFS= read -r t; do

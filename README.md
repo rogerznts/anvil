@@ -8,13 +8,6 @@ de cinco repositórios upstream, mantidos como submodules em `references/`, e as
 vendoriza com adaptação registrada num manifesto — de forma que continuem
 atualizáveis quando o upstream andar.
 
-**Também distribui uma equipe.** A skill autoral `anvil-team` abre o Leader, que
-despacha sete agentes de papel instalados em `.claude/agents/`: PO, Architect,
-Analyst, Designer, Dev, Tester e Review. Não são as personas do mosk: os papéis
-conversam entre si por *agent teams*, e os gates de Tester e Review chegam ao
-Leader sem passar pelo autor — ver o
-[ADR-0007](docs/architecture/adr/adr-0007-equipe-por-papel-sobre-agent-teams.md).
-
 ```bash
 npx degit rogerznts/anvil/anvil . --force
 ```
@@ -141,16 +134,6 @@ revisado, e a guarda de merge impõe a ordem.
 | `anvil-code-review` | revisa o diff em dois eixos independentes — Standards e Spec | mattpocock |
 | `anvil-tdd` | ciclo vermelho-verde que produz teste que se mantém, em seams acordados | mattpocock |
 
-### Equipe
-
-| skill | para quê | origem |
-|---|---|---|
-| `anvil-team` | abre o Leader, que trabalha uma spec pelos tickets e despacha os agentes `anvil-team-{papel}`, com gates de Tester e Review que o autor não controla. Só o usuário a abre, e ela exige *agent teams* ligado | autoral |
-
-Os sete agentes trabalham com as skills desta página e leem um protocolo só,
-dentro da `anvil-team`. Nenhum é escolhido por delegação automática: fora da
-equipe, não têm o que fazer.
-
 ### Entender antes de mudar
 
 | skill | para quê | origem |
@@ -209,7 +192,7 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 
 | skill | para quê | origem |
 |---|---|---|
-| `anvil-boot` | prepara o projeto: diretivas, rules, `docs/`, tracker, stack, hook, gitignore | autoral |
+| `anvil-boot` | prepara o projeto: diretivas, rules, `docs/`, tracker, stack, hook, lock | autoral |
 | `anvil-update` | reinstala do zero, apagando órfãos pelo `anvil.lock` | autoral |
 | `anvil-docs` | onde o documento mora, como a spec se chama, e o que acontece quando fecha | autoral |
 | `anvil-setup` | escreve o perfil do issue tracker que o fluxo lê | mattpocock |
@@ -281,42 +264,29 @@ de `resolved` → em andamento; pasta sob `archive/` → arquivado.
 
 ## O que fica versionado
 
-O boot escreve no `.gitignore` do projeto um bloco gerado do `anvil.lock`, com uma
-linha por skill e por agente que o anvil instalou:
+**Tudo.** O que o degit escreve em `.claude/` — skills, agentes e o `anvil.lock` —
+entra no repositório do projeto como qualquer outro arquivo. O boot não escreve
+bloco no `.gitignore`, não pergunta o que ignorar e não oferece tirar o toolkit do
+versionamento.
 
-```gitignore
-# ANVIL:INSTALLED:START
-# Gerado do .claude/anvil.lock. Nao edite: o proximo update reescreve.
-.claude/skills/anvil-architect/
-…
-.claude/skills/tea-commit/
-.claude/agents/anvil-team-dev.md
-…
-# ANVIL:INSTALLED:END
-```
-
-Skill instalada é conteúdo do toolkit, reinstalável. Versionar 2 MB de skill de
-terceiro engorda o histórico, e todo update viraria um diff gigante que ninguém
-revisa. A lista é nominal, nunca por prefixo, porque as `tea-*` não seguem o padrão
-de nome. **A skill ou o agente que você escreve em `.claude/` fica fora do bloco e
-continua versionado.** O `/anvil-update` regenera o bloco a cada reinstalação, então
-uma skill órfã removida sai dele também.
-
-Um projeto bootado antes ignorava `.claude/skills/` inteiro. O boot acha essa linha
-pelo comentário que ele mesmo escreveu, mostra o antes e o depois, e troca pelo
-bloco com aprovação. Uma linha parecida sem esse comentário não é tocada.
-
-**Fica versionado o que é do projeto e não se reinstala:**
+A razão é a reprodutibilidade: quem clona o repositório tem o toolkit na versão em
+que o projeto foi trabalhado, sem rodar instalação nenhuma, e o diff de um
+`/anvil-update` é a revisão do que mudou no toolkit — não um buraco no histórico.
 
 | | |
 |---|---|
+| `.claude/skills/` | as skills instaladas |
+| `.claude/agents/` | os agentes instalados, se o payload trouxer algum |
+| `.claude/anvil.lock` | o que esta instalação possui, e o que o update usa para calcular órfãos |
 | `.claude/rules/` | o contexto que o boot levantou deste projeto |
-| `.claude/anvil.lock` | diz a um clone novo qual versão instalar |
 | `.claude/settings.json` | a configuração, incluindo o hook |
 | `docs/` | o trabalho |
 
-Projeto que prefira versionar tudo — por CI que não roda instalação, por exemplo
-— é respeitado; o bloco não é escrito, e o update não o cria.
+Um projeto bootado antes ignorava o toolkit, por um bloco `ANVIL:INSTALLED` ou por
+uma linha que cobria `.claude/skills/` inteiro. O boot acha os dois, mostra o antes
+e o depois, e **propõe removê-los** para o toolkit voltar a ser versionado. O
+`/anvil-update` remove o bloco sozinho na reinstalação, e o relata. Linha parecida
+que o boot não escreveu não é tocada.
 
 ---
 

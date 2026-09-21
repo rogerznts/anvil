@@ -9,11 +9,6 @@ repositórios upstream, mantidos como submodules em `references/`, e as vendoriz
 com adaptação registrada — ver
 [adr-0001](./adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md).
 
-Distribui também uma equipe: a skill autoral `anvil-team` é o Leader, e sete
-agentes `anvil-team-{papel}` em `.claude/agents/` são os papéis que ele despacha,
-coordenados por *agent teams* — ver
-[adr-0007](./adr/adr-0007-equipe-por-papel-sobre-agent-teams.md).
-
 ## As quatro camadas
 
 ```
@@ -32,9 +27,8 @@ coordenados por *agent teams* — ver
 │  anvil-stack-payload: RULE · reference/ · bench/          │
 │  contrato de 6 capacidades                                │
 └───────────────────────────────────────────────────────────┘
-      apoiadas por 11 skills autorais: docs · boot · update ·
-      bench · ui · team · distill · tea-* (4)
-      e por 7 agentes de papel, que só a team despacha
+      apoiadas por 10 skills autorais: docs · boot · update ·
+      bench · ui · distill · tea-* (4)
 ```
 
 ## O que o anvil impõe, e só isso
@@ -118,8 +112,7 @@ com uma linha só, o `name:` do frontmatter.
 O core do mosk tinha 252 arquivos e 2,2 MB. Sobrevivem ~11 arquivos e dois blobs
 (o hallmark e o starter do Payload), e nenhum sobrevivente é compartilhado por
 mais de uma skill — cada um mora dentro da skill que o usa. O payload do `degit`
-não tem diretório compartilhado: é `.claude/skills/` e, com a equipe,
-`.claude/agents/`.
+não tem diretório compartilhado: é `.claude/skills/`.
 
 O que sobreviveu e por quê está registrado no
 [plano](../project/plan.md#o-corte-do-core-do-mosk).

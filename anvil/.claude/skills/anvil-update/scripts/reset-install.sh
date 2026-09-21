@@ -12,32 +12,32 @@
 # tem uma linha `skill:` por skill e uma `agent:` por agente.
 #
 #   reset-install.sh --from <tmp> --to <projeto> [--dry-run]
-#   reset-install.sh --gitignore-only --to <projeto> [--dry-run]
+#   reset-install.sh --unignore --to <projeto> [--dry-run]
 #
-# O .gitignore do projeto ganha um bloco ANVIL:INSTALLED com uma linha por skill
-# e por agente do lock. O update só regenera o bloco que já existe; quem o cria
-# é o boot, pelo --gitignore-only, que lê o lock existente e reescreve só o bloco.
+# O toolkit instalado FICA VERSIONADO: nada é escrito no .gitignore do projeto. Um
+# projeto instalado por uma versão antiga tem um bloco ANVIL:INSTALLED que o
+# ignorava; o reset o remove, e o --unignore o remove sem reinstalar nada.
 #
 # NO RESET, RODE A CÓPIA RECÉM-BAIXADA, NUNCA A INSTALADA: o reset apaga o próprio
 # diretório onde o script vive, e rodar do $TMP garante que a lógica é a nova. O
-# --gitignore-only não apaga nada e roda da cópia instalada, como faz o boot.
+# --unignore não apaga skill nenhuma e roda da cópia instalada, como faz o boot.
 
 set -euo pipefail
 
-FROM=""; TO="."; DRY=0; GITIGNORE_ONLY=0
+FROM=""; TO="."; DRY=0; UNIGNORE=0
 while [ $# -gt 0 ]; do
     case "$1" in
         --from) FROM="${2:-}"; shift 2 ;;
         --to)   TO="${2:-}";   shift 2 ;;
         --dry-run) DRY=1; shift ;;
-        --gitignore-only) GITIGNORE_ONLY=1; shift ;;
+        --unignore) UNIGNORE=1; shift ;;
         -h|--help) sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
     esac
 done
 
-if [ "$GITIGNORE_ONLY" -eq 1 ] && [ -n "$FROM" ]; then
-    echo "erro: --gitignore-only não usa --from — o bloco sai do lock de --to" >&2; exit 2
+if [ "$UNIGNORE" -eq 1 ] && [ -n "$FROM" ]; then
+    echo "erro: --unignore não usa --from — ele só mexe no .gitignore de --to" >&2; exit 2
 fi
 
 TO_ABS="$(cd "$TO" && pwd)"
@@ -47,21 +47,12 @@ AGENTS="$TO_ABS/.claude/agents"
 GITIGNORE="$TO_ABS/.gitignore"
 
 # --- bloco do .gitignore ------------------------------------------------------
-# Uma linha por skill e por agente do lock, nunca por prefixo: as `tea-*` quebram o
-# prefixo, e a skill ou o agente que o usuario escreveu precisa continuar versionado.
+# O toolkit instalado fica versionado. O bloco so existe em projeto instalado por
+# uma versao antiga, que o ignorava: aqui ele e procurado e removido, nunca escrito.
 INICIO="# ANVIL:INSTALLED:START"
 FIM="# ANVIL:INSTALLED:END"
 
-# Le um lock na entrada padrao e imprime o bloco. O \r de um lock CRLF sai antes:
-# ".claude/skills/tea-x\r/" nao casa com diretorio nenhum.
-bloco_gitignore() {
-    echo "$INICIO"
-    echo "# Gerado do .claude/anvil.lock. Nao edite: o proximo update reescreve."
-    tr -d '\r' | sed -n -e 's|^skill: *\(.*\)$|.claude/skills/\1/|p' -e 's|^agent: *\(.*\)$|.claude/agents/\1.md|p'
-    echo "$FIM"
-}
-
-# Os tres awk comparam o marcador com a linha sem o espaco, tab e \r do fim (l): um
+# Os awk comparam o marcador com a linha sem o espaco, tab e \r do fim (l): um
 # checkout com core.autocrlf=true poe \r em toda linha, e o bloco tem de continuar
 # sendo achado.
 tem_bloco() {
@@ -71,31 +62,19 @@ tem_bloco() {
         END { exit !achou }' "$GITIGNORE"
 }
 
-# Reescreve so o bloco, a partir do lock gravado. Sem bloco, acrescenta no fim. O
-# bloco sai com o fim de linha da primeira linha do arquivo, CRLF ou LF.
-escrever_gitignore() {
-    local bloco tmp cr=""
-    bloco="$(bloco_gitignore < "$LOCK")"
-    [ -f "$GITIGNORE" ] && head -n1 "$GITIGNORE" | grep -q $'\r$' && cr=$'\r'
-    tmp="$(mktemp)"
-    if tem_bloco; then
-        BLOCO="$bloco" CR="$cr" awk -v ini="$INICIO" -v fim="$FIM" '
-            { l = $0; sub(/[ \t\r]+$/, "", l) }
-            l == ini { n = split(ENVIRON["BLOCO"], b, "\n")
-                       for (i = 1; i <= n; i++) print b[i] ENVIRON["CR"]
-                       dentro = 1; next }
-            dentro && l == fim { dentro = 0; next }
-            !dentro { print }' "$GITIGNORE" > "$tmp"
-    else
-        {
-            if [ -s "$GITIGNORE" ]; then
-                cat "$GITIGNORE"
-                [ -n "$(tail -c1 "$GITIGNORE")" ] && printf '%s\n' "$cr"
-                printf '%s\n' "$cr"
-            fi
-            printf '%s\n' "$bloco" | while IFS= read -r linha; do printf '%s%s\n' "$linha" "$cr"; done
-        } > "$tmp"
-    fi
+# Tira o bloco inteiro, e com ele a linha em branco que o precedia: o bloco foi
+# acrescentado no fim depois de uma linha vazia que, sem ele, nao separa mais nada.
+# A linha em branco fica pendente ate se saber o que vem depois dela.
+remover_bloco() {
+    local tmp; tmp="$(mktemp)"
+    awk -v ini="$INICIO" -v fim="$FIM" '
+        { l = $0; sub(/[ \t\r]+$/, "", l) }
+        l == ini { pend = 0; dentro = 1; next }
+        dentro   { if (l == fim) dentro = 0; next }
+        pend     { print vazia; pend = 0 }
+        l == ""  { vazia = $0; pend = 1; next }
+                 { print }
+        END      { if (pend) print vazia }' "$GITIGNORE" > "$tmp"
     # cat em vez de mv, para o .gitignore manter as permissoes que tinha
     cat "$tmp" > "$GITIGNORE"; rm -f "$tmp"
 }
@@ -110,15 +89,20 @@ if [ -f "$GITIGNORE" ] && ! awk -v ini="$INICIO" -v fim="$FIM" '
     echo "erro: $GITIGNORE tem marcadores ANVIL:INSTALLED fora de um único par START..END — conserte à mão" >&2; exit 2
 fi
 
-if [ "$GITIGNORE_ONLY" -eq 1 ]; then
-    [ -f "$LOCK" ] || { echo "erro: $LOCK ausente — sem lock não há o que ignorar" >&2; exit 2; }
+if [ "$UNIGNORE" -eq 1 ]; then
+    if ! tem_bloco; then
+        echo "sem bloco ANVIL:INSTALLED em $GITIGNORE — o toolkit já está versionado"; exit 0
+    fi
     if [ "$DRY" -eq 1 ]; then
-        echo "(dry-run: nada foi alterado) bloco para $GITIGNORE:"
-        bloco_gitignore < "$LOCK"
+        echo "(dry-run: nada foi alterado) sairiam de $GITIGNORE:"
+        awk -v ini="$INICIO" -v fim="$FIM" '
+            { l = $0; sub(/[ \t\r]+$/, "", l) }
+            l == ini { dentro = 1 }
+            dentro   { print "  " $0; if (l == fim) dentro = 0 }' "$GITIGNORE"
         exit 0
     fi
-    escrever_gitignore
-    echo "bloco ANVIL:INSTALLED reescrito em $GITIGNORE"
+    remover_bloco
+    echo "bloco ANVIL:INSTALLED removido de $GITIGNORE — o toolkit fica versionado"
     exit 0
 fi
 
@@ -227,8 +211,7 @@ conteudo_lock() {
 }
 
 if tem_bloco; then
-    echo "bloco ANVIL:INSTALLED do .gitignore, será reescrito:"
-    conteudo_lock | bloco_gitignore | sed 's/^/  /'
+    echo "bloco ANVIL:INSTALLED do .gitignore, será REMOVIDO: o toolkit fica versionado"
 else
     echo ".gitignore sem bloco ANVIL:INSTALLED, fica intocado"
 fi
@@ -256,9 +239,9 @@ fi
 
 conteudo_lock > "$LOCK"
 
-# So regenera o bloco que o boot criou: projeto que optou por versionar tudo nao
-# ganha bloco num update.
-tem_bloco && escrever_gitignore
+# O toolkit instalado fica versionado: o bloco que uma versao antiga escreveu sai
+# aqui, e nenhum e criado.
+tem_bloco && remover_bloco
 
 echo
 echo "pronto. $(conta "$novo") skills e $(conta "$novo_ag") agentes instalados, $(conta "$orfaos$orfaos_ag") órfão(s) removido(s)."

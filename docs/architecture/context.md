@@ -49,25 +49,7 @@ O documento que mapeia um sistema de referência para a stack corrente, com
 ponteiros verificáveis, sem implementar nada.
 _Avoid_: port, análise, estudo
 
-### Equipe
-
-**Equipe**:
-O Leader e os papéis que ele despacha. Existe só enquanto a skill de equipe roda.
-_Avoid_: time, squad, agent team
-
-**Leader**:
-O papel que coordena a equipe e o único que conversa com o usuário.
-_Avoid_: orquestrador, coordenador, agente principal
-
-**Papel**:
-Especialização de equipe — PO, Architect, Analyst, Designer, Dev, Tester ou
-Review — que o Leader despacha.
-_Avoid_: persona, agente
-
-**Mission Control**:
-Bloco de notas do Leader com anotações objetivas de uma feature grande. Nunca é
-fonte de estado.
-_Avoid_: painel, estado global, status
+### Tickets
 
 **Frontier**:
 Os tickets cujos bloqueadores já estão todos resolvidos.

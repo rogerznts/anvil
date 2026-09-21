@@ -213,7 +213,6 @@ skills:
 # Skills autorais do anvil, fora do sync porque não têm upstream:
 #   anvil-docs · anvil-ui (roteador) · anvil-boot · anvil-update
 #   tea-commit · tea-open-pr · tea-open-fast-pr · tea-prune-branches
-#   anvil-team · agentes anvil-team-* (anvil/.claude/agents/)
 #   anvil-distill
 #
 # O anvil-bench é autoral E tem entrada no sync: o SKILL.md e o GATE.md são

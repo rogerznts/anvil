@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-14T01:46:35Z
+Last updated: 2026-09-21T00:00:00Z
 
 ## Visão geral
 
@@ -29,12 +29,9 @@ Nenhuma.
 ### Architecture
 
 - [context.md](./architecture/context.md) — o glossário: curadoria, referências e
-  equipe, com os termos a evitar.
+  tickets, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
   impõe, como o estado é lido do disco, e a herança do mosk.
-- [team-shape.md](./architecture/team-shape.md) — a forma da `anvil-team` e dos sete
-  papéis: mapa de arquivos, protocolo, delegação, gates, Mission Control, lista
-  `team` e dois escritores em worktree; promovido da spec 001.
 - **ADRs**
   - [adr-0001](./architecture/adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md)
     — skills vendorizadas seguem o padrão original; o anvil impõe só o caminho em `docs/`
@@ -49,7 +46,11 @@ Nenhuma.
   - [adr-0006](./architecture/adr/adr-0006-stack-como-camada-propria.md)
     — stack é camada própria, com contrato de seis capacidades
   - [adr-0007](./architecture/adr/adr-0007-equipe-por-papel-sobre-agent-teams.md)
-    — equipe por papel, coordenada por agent teams; complementa o adr-0003
+    — equipe por papel, coordenada por agent teams; **substituído pelo adr-0008**
+  - [adr-0008](./architecture/adr/adr-0008-equipe-sai-do-toolkit.md)
+    — a equipe por papel sai do toolkit; a máquina de agentes fica
+  - [adr-0009](./architecture/adr/adr-0009-toolkit-instalado-fica-versionado.md)
+    — o toolkit instalado fica versionado; o boot não escreve no `.gitignore`
 
 ### Project
 

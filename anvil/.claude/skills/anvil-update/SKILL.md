@@ -82,8 +82,9 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" \
 
 **No reset, rode a cópia recém-baixada, nunca a instalada.** O reset apaga o
 próprio diretório onde o script vive. Rodar do `$TMP` também garante que a lógica
-de reset é a nova, não a da versão velha. O `--gitignore-only`, que só reescreve o
-bloco do `.gitignore`, pode rodar da cópia instalada — é o que o `/anvil-boot` faz.
+de reset é a nova, não a da versão velha. O `--unignore`, que só tira do
+`.gitignore` o bloco de uma instalação antiga, pode rodar da cópia instalada — é o
+que o `/anvil-boot` faz.
 
 A saída classifica em quatro grupos: *substituídos* · *órfãos, serão removidos* ·
 *não são do anvil, ficam intocados* · *preservados sempre*.
@@ -96,11 +97,10 @@ usuário escreveu com o nome de um do payload. Ele será sobrescrito e passa a
 constar do lock. Sem lock tudo está fora dele, não há como distinguir, e o
 destaque não aparece.
 
-Por último vem o bloco `ANVIL:INSTALLED` do `.gitignore`, regenerado a partir do
-lock novo: uma linha por skill e por agente instalado, então um órfão removido sai
-dele junto.
-Só o bloco muda; o resto do `.gitignore` fica como estava. Projeto sem o bloco
-não ganha um — quem o cria é o `/anvil-boot`.
+Por último vem o `.gitignore`. **O toolkit instalado fica versionado**, então nada
+é escrito ali. Instalação de uma versão antiga tem um bloco `ANVIL:INSTALLED` que
+ignorava as skills e os agentes: o reset o **remove**, e o dry-run avisa. Só o
+bloco sai; o resto do `.gitignore` fica como estava.
 
 ### 4. Avisar e esperar
 
@@ -120,8 +120,8 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP" -
 - o que mudou localmente: `git status --short` e `git diff --stat`
 - o que há de novo no toolkit
 - o que ficou no disco para você decidir
-- `.gitignore` sem o bloco `ANVIL:INSTALLED`: ficou intocado; sugira rodar
-  `/anvil-boot` para criá-lo, se o projeto não optou por versionar tudo
+- `.gitignore`: o bloco `ANVIL:INSTALLED` removido, se havia um; diga que as
+  skills e os agentes instalados passam a aparecer no `git status`
 - se a estrutura de rules ou templates mudou, sugira rodar `/anvil-boot` de novo
 
 **Nunca commite sozinho.** O diff é para o usuário revisar.
@@ -139,5 +139,6 @@ rm -rf "$TMP"
 - O reset do `reset-install.sh` roda do `$TMP`, nunca do projeto.
 - Nada é apagado fora do conjunto que o script calcula. **Skill ou agente que o
   usuário escreveu não é do anvil para remover.**
-- O lockfile é reescrito pelo script. Não edite à mão. O bloco `ANVIL:INSTALLED`
-  do `.gitignore` também.
+- O lockfile é reescrito pelo script. Não edite à mão.
+- Nenhum bloco é escrito no `.gitignore`. O toolkit instalado é versionado como o
+  resto do projeto.
