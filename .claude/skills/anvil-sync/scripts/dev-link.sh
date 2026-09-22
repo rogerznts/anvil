@@ -62,6 +62,7 @@ anvil-principles
 anvil-prototype
 anvil-unslop
 anvil-writing-for-agents
+anvil-next
 tea-commit"
 
 MODO="roster"; DRY=0

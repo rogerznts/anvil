@@ -187,6 +187,7 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 | `anvil-to-questionnaire` | vira o que você não sabe responder num questionário para outra pessoa | mattpocock |
 | `anvil-teach` | ensina um conceito, com aulas em HTML e registro de aprendizado | mattpocock |
 | `anvil-handoff` | compacta a sessão num documento para outro agente continuar | mattpocock |
+| `anvil-next` | escolhe a próxima rota e gera um prompt curto para continuar em outra sessão | autoral |
 
 ### Infraestrutura do toolkit
 
