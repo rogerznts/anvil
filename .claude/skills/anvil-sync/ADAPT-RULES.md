@@ -13,6 +13,7 @@ O catálogo é fechado de propósito. Regra nova exige entrada aqui e um motivo.
 | `docs-remap` | julgamento | você, lendo o arquivo |
 | `decursor` | julgamento | você, lendo o arquivo |
 | `tracker-profile` | julgamento | você, lendo o arquivo |
+| `verification-profile` | julgamento | você, lendo o arquivo |
 | `keep` / `strip` | declarativa | o script, pelo manifesto |
 
 ---
@@ -158,6 +159,55 @@ de tracker resolve. Esta regra é justamente a entrada desse perfil.
 
 **Estreita.** O perfil mora no `anvil-docs` e não é copiado para o setup, e as
 opções GitHub, GitLab, local e outro ficam verbatim. Hoje só o `anvil-setup` usa.
+
+---
+
+## `verification-profile` — julgamento
+
+Aponta a skill para `docs/agents/verification.md`, o perfil de **parada** que o
+`anvil-docs` fornece em `templates/verification-anvil.md` e o `/anvil-boot`
+escreve no projeto. É a mesma forma do `tracker-profile`: um documento do
+projeto, lido pela skill, em vez de conteúdo copiado para dentro dela.
+
+O delta fica restrito aos seams do processo — descoberta da rodada, brief dos
+subagentes, agregação e entrega ao caller:
+
+```diff
+ The issue tracker should have been provided to you. …
++Read `docs/agents/verification.md` too …
+
+-If they didn't specify [a fixed point], ask for it.
++Without one, read the latest `Review:`: none is round 1; round 1 supplies the
++fixed point for round 2; round 2 stops before a third.
+
+ - The brief: "Report … Skip anything tooling enforces.
++  Classify each finding P1/P2/P3 per `docs/agents/verification.md` and state, in
++  the same sentence, what breaks if it stays. Under 400 words."
+
+-End with a one-line summary: total findings per axis …
++End with a verdict per axis and a ready-to-paste `Review:` line.
+
+ Once done, use /anvil-code-review …
++Append its `Review:` line; P1 sets `Status: claimed`; actionable P2/P3 become
++comments with class and consequence.
+```
+
+**Por que existe.** O `adr-0010` — a verificação tem critério de parada, e ele é
+ausência de P1 — decide que a régua de parada chega às skills como perfil do
+projeto. A skill do upstream sabe **como achar** e não diz **quando parar**;
+sem essa linha, o padrão que se instala é "nenhum achado aberto", que termina em
+código e não termina em prosa.
+
+**Por que não fica só no `claude_boot.md`.** A diretiva está lá também, mas quem
+decide o formato do achado é o brief colado no subagente. Diretiva que o brief
+contradiz perde: o subagente devolve o que o prompt pediu.
+
+**Estreita.** Os perfis moram no `anvil-docs`, não são copiados para dentro das
+skills, e o resto de cada arquivo fica verbatim — inclusive a linha de base de
+smells e os dois eixos. As trocas substantivas são só duas: fixed point e rodada
+passam a vir do histórico `Review:`, e o resumo final deixa de ser contagem para
+virar veredito por P1. Num merge em que o upstream mexa nesses seams, a versão do
+anvil ganha.
 
 ---
 

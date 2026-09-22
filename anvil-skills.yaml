@@ -40,6 +40,9 @@ sources:
 #   tracker-profile
 #               julgamento — a skill aplica, o script sinaliza; a skill de
 #               setup oferece o perfil de tracker do anvil-docs
+#   verification-profile
+#               julgamento — a skill aplica, o script sinaliza; as skills de
+#               verificação leem o perfil de parada em docs/agents/verification.md
 #   invocable   mecânica — o script aplica; tira a trava disable-model-invocation
 #
 # keep: arquivos do anvil DENTRO da skill vendorizada. O sync não os toca, não
@@ -60,8 +63,8 @@ skills:
   - { name: anvil-grill,        source: mattpocock, path: skills/engineering/grill-with-docs,          pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], strip: [agents] }
   - { name: anvil-to-spec,      source: mattpocock, path: skills/engineering/to-spec,                  pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], keep: [scripts/new-spec.sh], strip: [agents] }
   - { name: anvil-to-tickets,   source: mattpocock, path: skills/engineering/to-tickets,               pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], strip: [agents] }
-  - { name: anvil-implement,    source: mattpocock, path: skills/engineering/implement,                pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], strip: [agents] }
-  - { name: anvil-code-review,  source: mattpocock, path: skills/engineering/code-review,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-implement,    source: mattpocock, path: skills/engineering/implement,                pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable, verification-profile], strip: [agents] }
+  - { name: anvil-code-review,  source: mattpocock, path: skills/engineering/code-review,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, verification-profile], strip: [agents] }
 
   # ---- mattpocock: setup e dependências ocultas ----------------------------
   - { name: anvil-setup,           source: mattpocock, path: skills/engineering/setup-matt-pocock-skills, pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap, tracker-profile, invocable], strip: [agents] }

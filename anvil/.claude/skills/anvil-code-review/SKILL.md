@@ -10,17 +10,15 @@ Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
 
-The issue tracker should have been provided to you. If `docs/agents/issue-tracker.md` is missing, tell the user to run `/anvil-setup`.
+The issue tracker should have been provided to you. If `docs/agents/issue-tracker.md` is missing, tell the user to run `/anvil-setup`. Read `docs/agents/verification.md` too: it carries the stopping criterion — finding classes, the round budget, and the diff-only scope from round 2 on. If it is missing, tell the user to run `/anvil-boot`.
 
 ## Process
 
 ### 1. Pin the fixed point
 
-Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.). If they didn't specify one, ask for it.
+An explicit commit SHA, branch, tag, `main`, `HEAD~5`, etc. wins. Otherwise, resolve the relevant local ticket using `docs/agents/issue-tracker.md`: no `Review:` means round 1 and you ask for the fixed point; latest `round=1` means round 2 and its `sha` is the fixed point; latest `round=2` or higher means stop unless the user explicitly opens another round.
 
-Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
-
-Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside two parallel sub-agents.
+Capture `git diff <fixed-point>...HEAD`, `git log <fixed-point>..HEAD --oneline`, and the measured `HEAD` SHA. Confirm the ref resolves and the diff is non-empty before spawning. Round 2 is diff-only: remeasure prior findings and sweep only for regressions caused by their fixes.
 
 ### 2. Identify the spec source
 
@@ -61,13 +59,13 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 - The full diff command and commit list.
 - The list of standards-source files you found in step 3, **plus the smell baseline from step 3** pasted in full (the sub-agent has no other access to it).
-- The brief: "Report, per file/hunk where relevant, (a) every place the diff violates a documented standard: cite the standard (file + the rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations from judgement calls: documented-standard breaches can be hard, but baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Skip anything tooling enforces. Under 400 words."
+- The brief: "Report, per file/hunk where relevant, (a) every place the diff violates a documented standard: cite the standard (file + the rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations from judgement calls: documented-standard breaches can be hard, but baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Skip anything tooling enforces. Classify each finding P1/P2/P3 per `docs/agents/verification.md` and state, in the same sentence, what breaks if it stays. Under 400 words."
 
 **Spec sub-agent prompt** should include:
 
 - The diff command and commit list.
 - The path or fetched contents of the spec.
-- The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Under 400 words."
+- The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Classify each finding P1/P2/P3 per `docs/agents/verification.md` and state, in the same sentence, what breaks if it stays. Under 400 words."
 
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
 
@@ -75,7 +73,7 @@ If the spec is missing, skip the Spec sub-agent and note this in the final repor
 
 Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings, because the two axes are deliberately separate (see _Why two axes_).
 
-End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
+End with a verdict per axis: open P1 findings decide it; list every actionable P2/P3 with class and consequence for `## Comments`. Don't pick a winner across axes. Then emit `**Review:** round=<N>; sha=<HEAD>; scope=<full|diff:OLD..HEAD>; verdict=<pass|fail>; p1=<open|none>`; fail iff any axis has P1. Do not write the ticket. A failing round 2 stops and hands the open P1s to the user; a third round still requires their explicit choice.
 
 ## Why two axes
 

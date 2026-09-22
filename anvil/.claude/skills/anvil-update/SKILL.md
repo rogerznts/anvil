@@ -122,6 +122,26 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP" -
 - o que ficou no disco para você decidir
 - `.gitignore`: o bloco `ANVIL:INSTALLED` removido, se havia um; diga que as
   skills e os agentes instalados passam a aparecer no `git status`
+- **o que o update não toca e pode ter ficado para trás.** O reset troca
+  `.claude/skills/` e `.claude/agents/`, e só. O bloco `ANVIL:DIRECTIVES` do
+  `CLAUDE.md` e os perfis em `docs/agents/` são escritos pelo `/anvil-boot`, então
+  uma versão nova do toolkit pode trazer diretiva ou perfil que este projeto ainda
+  não tem. Confira os dois e, se algum acusar, **sugira rodar `/anvil-boot`**:
+
+  ```bash
+  awk '/ANVIL:DIRECTIVES:START/{f=1;next} /ANVIL:DIRECTIVES:END/{f=0} f' CLAUDE.md |
+    diff -q - .claude/skills/anvil-boot/claude_boot.md >/dev/null ||
+    echo "bloco de diretivas do CLAUDE.md diverge do claude_boot.md novo"
+  if [ ! -f docs/agents/verification.md ]; then
+    echo "sem docs/agents/verification.md — o critério de parada da verificação não chegou"
+  elif ! cmp -s docs/agents/verification.md \
+      .claude/skills/anvil-docs/templates/verification-anvil.md; then
+    echo "docs/agents/verification.md diverge do template novo — mostre o diff"
+  fi
+  ```
+
+  Perfil que existe e diverge do template **não** é sobrescrito: o projeto pode
+  tê-lo ajustado. Mostre o diff e pergunte.
 - se a estrutura de rules ou templates mudou, sugira rodar `/anvil-boot` de novo
 
 **Nunca commite sozinho.** O diff é para o usuário revisar.

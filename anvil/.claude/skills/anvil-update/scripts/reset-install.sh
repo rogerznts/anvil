@@ -183,6 +183,34 @@ lista() {
     printf '%s' "$2" | sed 's|^\(.*\)$|  .claude/agents/\1.md|'
 }
 
+# O reset instala skills, agentes e lock. Diretivas e perfis sao do projeto e
+# ficam intocados; esta checagem roda da copia NOVA, em $FROM_ABS, para que ate um
+# /anvil-update invocado pela skill velha avise o que o boot precisa promover.
+reporta_boot_pendente() {
+    local fonte_diretivas fonte_perfil destino_perfil
+    fonte_diretivas="$FROM_ABS/.claude/skills/anvil-boot/claude_boot.md"
+    fonte_perfil="$FROM_ABS/.claude/skills/anvil-docs/templates/verification-anvil.md"
+    destino_perfil="$TO_ABS/docs/agents/verification.md"
+
+    if [ -f "$fonte_diretivas" ]; then
+        if [ ! -f "$TO_ABS/CLAUDE.md" ] || ! awk '
+                /ANVIL:DIRECTIVES:START/ { dentro = 1; next }
+                /ANVIL:DIRECTIVES:END/   { dentro = 0 }
+                dentro                   { print }' "$TO_ABS/CLAUDE.md" |
+                cmp -s - "$fonte_diretivas"; then
+            echo "BOOT PENDENTE: bloco ANVIL:DIRECTIVES diverge do claude_boot.md novo"
+        fi
+    fi
+
+    if [ -f "$fonte_perfil" ]; then
+        if [ ! -f "$destino_perfil" ]; then
+            echo "BOOT PENDENTE: sem docs/agents/verification.md"
+        elif ! cmp -s "$destino_perfil" "$fonte_perfil"; then
+            echo "BOOT PENDENTE: docs/agents/verification.md diverge do template novo"
+        fi
+    fi
+}
+
 # --- relatorio ----------------------------------------------------------------
 echo "reset-install: $FROM_ABS -> $TO_ABS"
 [ "$DRY" -eq 1 ] && echo "(dry-run: nada foi alterado)"
@@ -215,6 +243,7 @@ if tem_bloco; then
 else
     echo ".gitignore sem bloco ANVIL:INSTALLED, fica intocado"
 fi
+reporta_boot_pendente
 
 [ "$DRY" -eq 1 ] && exit 0
 

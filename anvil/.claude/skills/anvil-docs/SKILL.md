@@ -47,6 +47,7 @@ presuma que dá para só criar por cima.
 docs/
 ├── index.md                    gerado pelo verbo `index`
 ├── agents/issue-tracker.md     ●  o perfil que as skills de fluxo leem
+├── agents/verification.md      ●  o critério de parada que as skills de verificação leem
 ├── architecture/               ●  desenho do sistema
 │   ├── context.md                 glossário ubíquo (anvil-domain-modeling)
 │   ├── context-map.md             só em repositório multi-contexto
@@ -172,7 +173,12 @@ confira o gatilho do `adopt`, em [Verbos](#verbos). Com gatilho, **pare e use
    do perfil em [templates/issue-tracker-anvil.md](templates/issue-tracker-anvil.md).
    É esse arquivo que faz as skills de fluxo publicarem em `docs/specs/` sem
    conhecerem esse caminho.
-4. Rodar o verbo `index`.
+4. Instalar [templates/verification-anvil.md](templates/verification-anvil.md)
+   como `docs/agents/verification.md`. Ausente → copiar. Idêntico → seguir.
+   Divergente → mostrar o diff e esperar aprovação; **nunca sobrescrever** um
+   perfil que o projeto pode ter ajustado. É dele que `anvil-code-review` e
+   `anvil-implement` tiram classe, orçamento e escopo diff-only.
+5. Rodar o verbo `index`.
 
 ## Contrato de stack
 

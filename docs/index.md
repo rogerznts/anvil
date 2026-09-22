@@ -1,10 +1,13 @@
 # Índice da documentação
 
-Last updated: 2026-09-21T00:00:00Z
+Last updated: 2026-09-22T00:00:00Z
 
 ## Visão geral
 
 - **[Discovery](./discovery/)** — pesquisa, briefings, brainstorming
+  - [gate-sem-criterio-de-parada.md](./discovery/gate-sem-criterio-de-parada.md)
+    — por que um par de gates independentes entra em laço num documento, e o que
+    muda nas skills
 - **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
 
@@ -25,6 +28,9 @@ Nenhuma.
   com `Blocked by` e `Status`.
 - [domain.md](./agents/domain.md) — o que ler antes de explorar, e o vocabulário
   do glossário. Single-context, sob `docs/architecture/`.
+- [verification.md](./agents/verification.md) — o critério de parada que as
+  skills de verificação leem: classe do achado, orçamento de duas rodadas,
+  escopo diff-only da segunda em diante, e a régua própria da prosa.
 
 ### Architecture
 
@@ -51,6 +57,8 @@ Nenhuma.
     — a equipe por papel sai do toolkit; a máquina de agentes fica
   - [adr-0009](./architecture/adr/adr-0009-toolkit-instalado-fica-versionado.md)
     — o toolkit instalado fica versionado; o boot não escreve no `.gitignore`
+  - [adr-0010](./architecture/adr/adr-0010-verificacao-tem-criterio-de-parada.md)
+    — a verificação tem critério de parada, e ele é ausência de P1
 
 ### Project
 

@@ -142,6 +142,14 @@ a partir do perfil que o `anvil-docs` fornece.
 `docs/specs/` sem conhecer esse caminho por dentro — eles leem o perfil. Sem ele,
 publicam no lugar errado e não reclamam.
 
+Confirme que o passo de documentação deixou
+`docs/agents/verification.md` igual a
+`.claude/skills/anvil-docs/templates/verification-anvil.md`. Ausente → copie.
+Idêntico → siga sem perguntar. Divergente → mostre o diff e espere aprovação;
+**nunca sobrescreva** o perfil que o projeto pode ter ajustado. É dele que o
+`anvil-code-review` tira classe, orçamento e escopo diff-only; sem ele, o critério
+que se instala sozinho é "nenhum achado aberto".
+
 ## 7. Stack
 
 Se a varredura encontrou uma stack conhecida — hoje, um `payload.config.ts` —

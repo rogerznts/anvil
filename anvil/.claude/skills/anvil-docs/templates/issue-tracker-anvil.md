@@ -20,16 +20,39 @@ parte do repositório e sobrevivem ao merge.
   a URL. Escrita pelas skills `tea-open-pr` e `tea-open-fast-pr` depois de abrir
   o PR. Ticket retrabalhado em dois PRs tem **duas** linhas, não uma
   substituída — o histórico é o ponto
+- Cada rodada de verificação acrescenta uma linha `Review:` logo abaixo do
+  `Status:`. Formato estável: `round`, `sha`, `scope`, `verdict` e `p1`
+  (`open` ou `none`). Quem conduz o `/anvil-code-review` grava a linha que ele
+  devolve. As classes e o orçamento vêm de `docs/agents/verification.md`
 
 ```markdown
 # 03: Aplicar cupom no total do carrinho
 
 **Blocked by:** 01, 02
 **Status:** resolved
+**Review:** round=1; sha=4f2a91c; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=9c1de07; scope=diff:4f2a91c..9c1de07; verdict=pass; p1=none
 **PR:** https://gitea.exemplo/org/repo/pulls/51
 
 - [ ] Critério de aceite 1
+
+## Comments
+
+- Review round=1 · P1: desconto negativo passa pelo total — comprador paga valor errado.
+- Review round=2 · P2: prova não cobre arredondamento — regressão apareceria no primeiro ciclo.
 ```
+
+`Review:` é **histórico**, não estado: cada rodada acrescenta uma linha, nunca
+substitui. A última linha dá à próxima rodada o número e o fixed point. Sem linha,
+a próxima é `round=1`, com `scope=full`; depois dela, o escopo é o diff desde seu
+`sha`. Depois de `round=2`, uma terceira rodada exige escolha explícita.
+
+O campo guarda o estado da rodada; cada achado P2/P3 acionável fica por extenso
+em `## Comments`, com classe e consequência. Não reduza achados a uma contagem.
+
+P1 reabre o trabalho: grave `verdict=fail`, mude `Status:` de `resolved` para
+`claimed` e corrija. Sem P1, grave `verdict=pass` e mantenha `resolved`. Assim a
+guarda de merge não libera um ticket que a revisão reprovou.
 
 Os tickets são **arquivo**, não issue de servidor, então não existe `#47` para
 fechar. A ligação com o PR é feita nos dois sentidos: o corpo do PR lista os

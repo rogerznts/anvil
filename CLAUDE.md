@@ -67,6 +67,12 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+**Verification has a stopping criterion too, and it isn't "no findings left".** A
+review is instructed to find, so on a long artefact it always finds something.
+Stop when nothing that changes behaviour — or that makes a published contract
+lie — is left open; everything else is a tracker line. Two rounds; the third is a
+declared choice, not momentum. The project profile is `docs/agents/verification.md`.
+
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
 
 ---
