@@ -5,6 +5,7 @@
 **Blocked by:** 03
 
 **Status:** resolved
+**Review:** round=1; sha=065a96b; scope=full; verdict=pass; p1=none
 
 - [x] O modo de camadas produz o mesmo `.omp/`, as mesmas linhas `omp:` e o mesmo `.agents/skills` que o update produziria.
 - [x] O boot chama esse modo e relata o que instalou e por qual sinal.
@@ -24,3 +25,9 @@
 - No relatório do modo, a camada nova sai como "nova", sem o "neste update".
 - Prova: o S1 (`workspace/29-codex-mirror/s1.sh`) passa com 86 checks em `/opt/local/bin/bash` e em `/bin/bash`, 13 deles novos, na seção 7i. Cada caso roda o update e o modo sobre cópias do mesmo projeto e compara `.omp/`, linhas `omp:` e `.agents/skills`: lock com camada numa máquina sem omp, com órfão, colisão e alheio em `.omp/` e com refeito, pendurado do degit, colisão e alheio no espelho; boot típico com omp no `PATH`; sem sinal nenhum; raiz do usuário com a linha `omp:` no lock; e sem lock, que recusa. O dry-run dos dois dá blocos idênticos de espelho e camada. Uma mutação que faz o modo tirar as skills do disco derruba 7 checks.
 - Antes/depois com `workspace/28-reset-classify/capture.sh` (`depois-03`, `depois-04`): a saída do update não mudou em bash 5 nem em bash 3.2. A única diferença é o hash da cópia do script na árvore das fixtures.
+- Review round=1 · os dois eixos passam sem P1. O eixo Spec rodou o S1 de novo, com os 13 checks da 7i passando em bash 5 e em bash 3.2, e repetiu a comparação com o payload real copiado como o degit o deixa e um `omp` falso no `PATH`: `.omp/`, linhas `omp:` e `.agents/skills` iguais aos do update. O eixo também leu a cópia das linhas `omp:` no passo 9 e a recusa sem lock como parte do pedido, e não como escopo a mais.
+- Review round=1 · P3 (Spec): o boot e o cabeçalho do script dizem "Do lock, só as linhas `omp:` mudam", mas o `tr -d '\r'` do `--layers` grava o lock inteiro em LF. Num projeto com lock CRLF, o boot repetido muda todas as linhas do lock, e a frase fica imprecisa. Nenhuma posse se perde, porque o update já grava o lock em LF.
+- Review round=1 · P3 (Spec): a seção "Lock" da spec diz que quem escreve `omp:` é o `reset-install.sh`, e o passo 9 do boot agora também carrega essas linhas ao reescrever o lock. Quem editar o passo 9 lendo só a spec pode tirar a cópia e fazer a camada perder a regra pegajosa num boot repetido sem omp.
+- Review round=1 · P3 (Standards): o teste `CAMADAS` se repete em onze pontos do script, quatro deles em volta da mesma fase de skill, agente e `.gitignore`. Um passo de escrita novo no caminho do update, sem mais um guarda, roda também no boot sem aprovação.
+- Review round=1 · P3 (Standards): `novo_ag="$possui_ag"` no `--layers` não tem leitor, porque tudo o que usa `novo_ag` fica atrás de `CAMADAS -eq 0` ou depois do `exit`. Quem lê supõe que o modo usa o conjunto de agentes.
+- Review round=1 · P3 (Standards): a flag `--layers` vira `CAMADAS`, enquanto `--from`, `--dry-run` e `--unignore` viram `FROM`, `DRY` e `UNIGNORE`. Um grep por `LAYERS` a partir da flag não acha a variável.
