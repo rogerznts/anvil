@@ -4,7 +4,8 @@
 
 **Blocked by:** 05
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=d48a771; scope=full; verdict=fail; p1=open
 
 - [x] A skill fica em `.omp/skills/`, com trava de invocação; o argumento vai para o grill como pedido inicial.
 - [x] Carrega `anvil-grill`, `anvil-to-spec` e `anvil-to-tickets` na mesma janela, sem compactar, e as pausas de cada uma continuam existindo.
@@ -29,3 +30,14 @@
 - Prova: o S2 (`workspace/34-omp-plan/s2.sh`) passa com 21 checks, com o omp 18.2.11 e o `haiku`, em cerca de 1 minuto e 15 segundos. O fixture fica em `/tmp/anvil-34-omp-plan`, com o payload real instalado com o omp no `PATH`. Na conversa Q, num branch com `spec.md` e sem ticket, a skill roda o `stage.sh`, recebe `next: anvil-to-tickets`, propõe o `anvil-to-tickets` e só lê a `anvil-plan`; com "Não.", para sem ler skill nenhuma. Na R, num branch com dois tickets, indica `/clear` e `/skill:anvil-run 003` sem carregar nada. Na P, na `main` com o pedido, carrega `anvil-grill` e `anvil-grilling` e abre a rodada de perguntas sobre o pedido. Depois da confirmação, propõe o `anvil-to-spec` e pergunta, sem ler a skill nem rodar o `new-spec.sh`, sem branch novo e sem nada em `docs/specs`. Com "Sim, pode carregar.", lê `skill://anvil-to-spec` no turno seguinte, e o to-spec para na pausa dos seams. As três vezes são uma sessão só, sem entrada de compactação. Em nenhuma conversa algo é escrito ou commitado antes do sim, e o repositório do anvil fica igual.
 - P2 (prova fraca): o S2 não exercita os desvios, a volta à etapa de origem nem a proposta depois do to-spec e do to-tickets. O sinal de desvio é julgamento do modelo sobre a conversa, e forçá-lo num fixture mediria o roteiro do fixture. Quem ler o S2 como prova dos desvios conclui mais do que ele mostra. A condução até os tickets, com os desvios de verdade, é o ponta a ponta do ticket 10.
 - P2 (prova fraca): o S2 é probabilístico. Das duas rodadas completas, a primeira falhou na R, a correção acima, e a segunda passa nos 21 checks. Uma rodada que passa não mede a taxa.
+- Review round=1 · P1 (Standards): ticket em `issues/` sem `spec.md` dá `next: end`. A pasta do `anvil-wayfinder`, um desvio que a própria skill oferece, tem `map.md` e tickets de decisão em `issues/`, sem `spec.md`, como diz o perfil do tracker. Quem chama `/skill:anvil-plan` de novo depois dele recebe `/clear` e `/skill:anvil-run NNN`, e o supervisor despacha implementers sobre tickets de decisão como se fossem fatias de build.
+- Review round=1 · P1 (Spec): a frase "que o check 15 do `verify` confere", no primeiro comentário, é falsa. O check 15 só lê span em crase fora de bloco cercado, e o caminho `.omp/skills/anvil-plan/stage.sh` só aparece dentro do bloco `bash` da skill. Numa cópia com o script renomeado, o `verify` sai limpo, e a `anvil-plan` quebra no primeiro passo, na sessão do operador. O ticket 08 tem a mesma frase sobre o `frontier.sh`, fora deste diff.
+- Review round=1 · P2 (Standards): a spec arquivada, estado que o ADR-0003 define por "pasta sob specs/archive/", sai como `spec: none` e `next: anvil-grill`, igual a um branch sem spec. No branch de uma spec fechada, o grill abre, e o to-spec reaproveita o número dela, pela regra do perfil de não rodar o `new-spec.sh` num branch de spec.
+- Review round=1 · P2 (Spec): com `next: anvil-grill`, os três casos da skill não cobrem o grill começado e ainda não confirmado, que é onde a conversa mais cresce. A US 55 pede a retomada pela conversa, e nesse caso o modelo improvisa e pode propor o to-spec antes da confirmação.
+- Review round=1 · P2 (Spec): na rodada que passou, o grill rodou sem a `anvil-domain-modeling`, que a `anvil-grill` manda carregar, e o S2 aceitou. Quem ler o S2 como prova do grill inteiro conclui mais do que ele mostra.
+- Review round=1 · P3 (Standards): o `sed` do número do branch e o laço que casa a pasta pelo prefixo são cópia do `frontier.sh`. Uma correção na resolução da pasta precisa ser feita duas vezes.
+- Review round=1 · P3 (Standards): a skill não lê as linhas `spec_md` e `tickets`, só `next`, `spec` e `handoff`. São duas chaves sem consumidor.
+- Review round=1 · P3 (Standards): as chaves do `stage.sh` usam `yes`/`no`, e o `frontier.sh` usa `sim`/`nao`. Os dois scripts da camada falam vocabulários diferentes ao modelo.
+- Review round=1 · P3 (Standards): dois-pontos como conector no meio da frase na skill, como em "Diga isso e pare: um pedido novo…", o que a `anvil-unslop` evita. Só custa leitura.
+- Review round=1 · P3 (Standards): o segundo P2 acima, "Uma rodada que passa não mede a taxa", descreve a fraqueza sem dizer o que quebra, e o perfil pede a consequência na mesma frase.
+- Review round=1 · P3 (Spec): parar diante de um pedido novo quando `next` não é `anvil-grill` contraria "Argumento: o pedido inicial, que vai para o grill". A parada está declarada e evita que o to-spec absorva o pedido na spec do branch. Nada quebra.
