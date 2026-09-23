@@ -158,13 +158,23 @@ done
 # ../../.claude/skills/<nome>. Nele a posse vem da forma: so o symlink nessa forma e
 # nosso, e qualquer outra entrada e do usuario, mesmo com nome de skill do payload.
 ESPELHO="$TO_ABS/.agents/skills"
-existe_espelho() { [ -L "$ESPELHO/$1" ] && [ "$(readlink "$ESPELHO/$1")" = "../../.claude/skills/$1" ]; }
+nosso_espelho() { [ -L "$ESPELHO/$1" ] && [ "$(readlink "$ESPELHO/$1")" = "../../.claude/skills/$1" ]; }
 # Qualquer entrada com o nome, symlink pendurado inclusive
 ocupado_espelho() { [ -e "$ESPELHO/$1" ] || [ -L "$ESPELHO/$1" ]; }
-disco_esp=""
-for e in "$ESPELHO"/*; do
-    ocupado_espelho "$(basename "$e")" && disco_esp="$disco_esp$(basename "$e")"$'\n'
+# A raiz tambem e do usuario quando .agents ou .agents/skills e symlink ou arquivo,
+# como .agents/skills -> ../.claude/skills: o `ln -s` cairia dentro da skill recem-
+# copiada, e o `mkdir -p` abortaria o reset antes da escrita do lock. Entao o
+# espelho inteiro fica intocado.
+raiz_espelho=1
+for c in "$TO_ABS/.agents" "$ESPELHO"; do
+    if [ -L "$c" ] || { [ -e "$c" ] && [ ! -d "$c" ]; }; then raiz_espelho=0; fi
 done
+disco_esp=""
+if [ "$raiz_espelho" -eq 1 ]; then
+    for e in "$ESPELHO"/*; do
+        ocupado_espelho "$(basename "$e")" && disco_esp="$disco_esp$(basename "$e")"$'\n'
+    done
+fi
 
 # --- classificacao ------------------------------------------------------------
 tem() { printf '%s\n' "$1" | grep -qxF -e "$2"; }
@@ -195,26 +205,30 @@ classifica() {
 
 classifica ""    "$novo"    "$possui"    "$disco"    existe_skill
 classifica "_ag" "$novo_ag" "$possui_ag" "$disco_ag" existe_agente
-classifica "_esp" "$novo" "$possui" "$disco_esp" existe_espelho
 
-# O espelho nao segue a regra de colisao do lock: colisao nele e nome de skill do
-# payload ocupado por entrada que nao e o nosso symlink. Ela fica como esta e fica
-# sem symlink, porque o `ln -s` sobre um diretorio criaria o link dentro dele. O nome
-# do payload sem entrada nenhuma ganha o symlink.
-colisoes_esp=""; criados_esp=""
-for x in $novo; do
-    if existe_espelho "$x"; then continue; fi
-    if ocupado_espelho "$x"; then colisoes_esp="$colisoes_esp$x"$'\n'
-    else criados_esp="$criados_esp$x"$'\n'; fi
-done
-# Entrada do usuario com nome que o lock anterior listava nao e orfa, porque nao e o
-# nosso symlink, nem alheia pela regra do lock: entra nos alheios aqui.
-while IFS= read -r x; do
-    [ -n "$x" ] || continue
-    if tem "$possui" "$x" && ! tem "$novo" "$x" && ! existe_espelho "$x"; then
-        alheios_esp="$alheios_esp$x"$'\n'
-    fi
-done <<< "$disco_esp"
+substituidos_esp=""; orfaos_esp=""; alheios_esp=""; colisoes_esp=""; criados_esp=""
+if [ "$raiz_espelho" -eq 1 ]; then
+    classifica "_esp" "$novo" "$possui" "$disco_esp" nosso_espelho
+
+    # O espelho nao segue a regra de colisao do lock: colisao nele e nome de skill do
+    # payload ocupado por entrada que nao e o nosso symlink. Ela fica como esta e fica
+    # sem symlink, porque o `ln -s` sobre um diretorio criaria o link dentro dele. O
+    # nome do payload sem entrada nenhuma ganha o symlink.
+    colisoes_esp=""
+    for x in $novo; do
+        if nosso_espelho "$x"; then continue; fi
+        if ocupado_espelho "$x"; then colisoes_esp="$colisoes_esp$x"$'\n'
+        else criados_esp="$criados_esp$x"$'\n'; fi
+    done
+    # Entrada do usuario com nome que o lock anterior listava nao e orfa, porque nao
+    # e o nosso symlink, nem alheia pela regra do lock: entra nos alheios aqui.
+    while IFS= read -r x; do
+        [ -n "$x" ] || continue
+        if tem "$possui" "$x" && ! tem "$novo" "$x" && ! nosso_espelho "$x"; then
+            alheios_esp="$alheios_esp$x"$'\n'
+        fi
+    done <<< "$disco_esp"
+fi
 
 conta() { printf '%s' "$1" | grep -c . || true; }
 # Skill sai pelo nome, agente pelo caminho: as duas listas dividem o mesmo grupo.
@@ -267,14 +281,18 @@ echo "preservados sempre:"
 for p in ".claude/rules" ".claude/settings.json" ".claude/settings.local.json" "docs" "CLAUDE.md"; do
     [ -e "$TO_ABS/$p" ] && echo "  $p"
 done
-echo "espelho do Codex em .agents/skills, symlinks para .claude/skills:"
-echo "  symlinks criados ($(conta "$criados_esp")):"; espelho "$criados_esp"
-echo "  órfãos, serão REMOVIDOS ($(conta "$orfaos_esp")):"; espelho "$orfaos_esp"
-if [ -n "$colisoes_esp" ]; then
-    echo "  colisões, entrada do usuário com nome de skill do anvil, fica e NÃO ganha symlink ($(conta "$colisoes_esp")):"
-    espelho "$colisoes_esp"
+if [ "$raiz_espelho" -eq 1 ]; then
+    echo "espelho do Codex em .agents/skills, symlinks para .claude/skills:"
+    echo "  symlinks novos ($(conta "$criados_esp")):"; espelho "$criados_esp"
+    echo "  órfãos, serão REMOVIDOS ($(conta "$orfaos_esp")):"; espelho "$orfaos_esp"
+    if [ -n "$colisoes_esp" ]; then
+        echo "  colisões, entrada do usuário com nome de skill do anvil, fica e NÃO ganha symlink ($(conta "$colisoes_esp")):"
+        espelho "$colisoes_esp"
+    fi
+    echo "  não são do anvil, ficam intocados ($(conta "$alheios_esp")):"; espelho "$alheios_esp"
+else
+    echo "espelho do Codex: .agents ou .agents/skills é symlink ou arquivo, fica intocado"
 fi
-echo "  não são do anvil, ficam intocados ($(conta "$alheios_esp")):"; espelho "$alheios_esp"
 
 # --- lockfile -----------------------------------------------------------------
 # Reescrito a cada reset. E dele que o proximo update calcula os orfaos, entao

@@ -101,10 +101,12 @@ usuário escreveu com o nome de um do payload. Ele será sobrescrito e passa a
 constar do lock. Sem lock tudo está fora dele, não há como distinguir, e o
 destaque não aparece.
 
-Depois vem o bloco do espelho do Codex, `.agents/skills`: *symlinks criados* ·
+Depois vem o bloco do espelho do Codex, `.agents/skills`: *symlinks novos* ·
 *órfãos, serão removidos* · *colisões* · *não são do anvil*. Colisão no espelho é
 entrada do usuário com nome de skill do payload. Ao contrário da colisão de skill,
-ela **não** é substituída: fica como está, e aquela skill fica sem symlink.
+ela **não** é substituída: fica como está, e o Codex lê essa entrada, não a skill
+do anvil. Se `.agents` ou `.agents/skills` for symlink ou arquivo, o espelho
+inteiro é do usuário: o bloco diz isso numa linha e nada ali é tocado.
 
 Por último vem o `.gitignore`. **O toolkit instalado fica versionado**, então nada
 é escrito ali. Instalação de uma versão antiga tem um bloco `ANVIL:INSTALLED` que
@@ -114,9 +116,20 @@ bloco sai; o resto do `.gitignore` fica como estava.
 ### 4. Avisar e esperar
 
 Diga numa frase o que será apagado e o que será preservado, **nomeando os
-órfãos** e as **possíveis colisões**, que serão sobrescritas. Colisão no espelho
-não é sobrescrita: nomeie-a como skill que o Codex não vai ver. Não continue com um
+órfãos** e as **possíveis colisões**, que serão sobrescritas. Não continue com um
 "talvez".
+
+Colisão no espelho não é sobrescrita. Antes de executar, compare cada uma com a
+skill instalada, que o dry-run ainda não trocou:
+
+```bash
+diff -r .agents/skills/{nome} .claude/skills/{nome}
+```
+
+Sem diferença, é uma cópia que um payload antigo deixou ali: versões anteriores
+traziam `anvil-browser-qa` e `anvil-next` como diretório real. Diga isso e sugira
+apagá-la antes do passo 5, para o update pôr o symlink no lugar. Com diferença, é
+do usuário: diga que o Codex vai continuar lendo a versão dele.
 
 ### 5. Executar
 
