@@ -188,9 +188,9 @@ puro, sem frontmatter.
   camadas, convenções de pasta, como rodar os testes, fluxos comuns, e as regras
   que o agente deve seguir neste projeto.
 - **`anvil.md`** — sempre. A configuração resolvida: idioma de comunicação
-  (default pt-BR), o comando de verificação, a seção Git, a lista de modelos por
-  papel que o `anvil-arena`, o `anvil-how` e o `anvil-architect` leem, e a seção de
-  instalação, para quem clona o projeto.
+  (default pt-BR), o comando de verificação com o custo medido, a seção Git, a
+  lista de modelos por papel que o `anvil-arena`, o `anvil-how` e o
+  `anvil-architect` leem, e a seção de instalação, para quem clona o projeto.
 - **`frontend.md`** — só se houver código de frontend.
 
 A seção de verificação do `anvil.md` é contrato com o piloto automático, a skill
@@ -291,6 +291,68 @@ lista de modelos ou sem a seção de instalação, proponha acrescentar só o qu
 falta, sem mexer no resto. Para a seção Git ausente, siga a detecção e confirmação
 acima; valor já configurado não se troca. O comando de teste que um boot antigo
 gravou sob outro título é o que a seção de verificação leva.
+
+### O custo da verificação
+
+O comando de verificação vai no `anvil.md` **com o custo medido**. É esse número que
+decide quantas vezes a suíte roda durante um ticket. Um número errado faz rodar a
+suíte inteira a cada conferida, *porque é rápida*, ou pular a verificação,
+*porque é lenta*. Os dois erros vêm do dado, não da disciplina.
+
+**Meça, não estime.** Peça para rodar o comando uma vez: rodar a suíte pode levar
+minutos e mexer em banco de teste. Rode em background e cronometre. Com o tempo
+em mãos, a seção fica assim:
+
+~~~markdown
+## Comando de verificação
+
+```bash
+pnpm test
+```
+
+Custo medido: 3min12s, em 2026-09-23, numa máquina Linux de 16 CPUs.
+
+Quem medir diferente corrige este arquivo no mesmo commit. O critério de quando
+rodar a suíte está em `docs/agents/verification.md`.
+~~~
+
+- **O comando não roda** (falta banco, dependência ou serviço) → grave o comando
+  sem custo, com o motivo numa linha. Número estimado não se grava: é o defeito
+  que esta seção existe para evitar.
+- **Recusado** → grave o comando sem custo e diga que ele ficou sem medição.
+
+**O custo mora só aqui.** O `project.md` diz *como* rodar os testes; quando falar
+de custo, aponta para o `anvil.md`. Número repetido em dois arquivos diverge no
+primeiro que alguém atualizar e esquecer o outro.
+
+Quando o projeto adotar o laço curto do perfil de verificação, a seção passa a ter
+dois comandos, cada um com o seu custo, nos termos do perfil. O bloco `bash`
+continua sendo o `gate`, a suíte inteira: é ele que o piloto automático roda como
+prova. O `laço` entra em prosa, depois do bloco:
+
+~~~markdown
+## Comando de verificação
+
+```bash
+pnpm test && npx tsc --noEmit
+```
+
+- `gate`: o bloco acima. Custo medido: 16min, em 2026-09-23.
+- `laço`: `pnpm test:ticket`. Custo medido: 1min10s, em 2026-09-23.
+~~~
+
+O boot não propõe essa divisão. Ela se adota quando o laço passar de ~2 min, e o
+perfil diz por quê.
+
+**Num `anvil.md` que já existe**, o comando configurado não se troca.
+
+- **Sem custo** → proponha medir e acrescentar, e espere aprovação.
+- **Com custo, e o medido difere** → mostre os dois, com a data de cada um, e
+  espere aprovação para trocar.
+- **Custo repetido fora do `anvil.md`** → procure tempo de teste em `CLAUDE.md` e
+  nas outras rules. Aponte cada ocorrência, com arquivo e linha, e proponha
+  trocá-la por um ponteiro para o `anvil.md`. Não edite sozinho: fora do bloco
+  delimitado, o `CLAUDE.md` é do projeto.
 
 Depois, **sugira** rules adicionais, cada uma com uma linha de evidência do
 código que a justifica, e **espere aprovação**: `coding-standards.md`,
