@@ -8,7 +8,7 @@ se carrega quando você sabe que precisa.
 O teste que decide o que entra aqui: *se a pessoa não abrir a referência, ela
 erra?* Se sim, é regra. Se não, é referência.
 
-## As três ciladas
+## As quatro ciladas
 
 ### 1. Local API ignora access control por padrão
 
@@ -63,6 +63,26 @@ afterChange: [async ({ doc, req, context }) => {
   })
 }]
 ```
+
+### 4. `--no-isolate` com o plugin multi-tenant cria dependência de ordem
+
+Vale para quem usa `@payloadcms/plugin-multi-tenant`. O plugin troca o `access`
+da coleção de tenants e de toda coleção habilitada para tenant **no próprio
+objeto importado**, por uma função assíncrona. Com isolamento, cada arquivo de
+teste recebe módulos limpos. Com `--no-isolate`, o arquivo que importa a config
+muta a coleção que o arquivo seguinte importa, no mesmo worker.
+
+O sintoma é enganoso: a suíte fica verde na primeira rodada, e o ganho de tempo
+parece de graça. Com `--sequence.shuffle`, `access.read` passa a devolver
+`Promise{…}` em vez de `false`. Suíte pequena pode passar sempre, porque cada
+arquivo cai num worker próprio; ela quebra quando crescer além do número de
+workers.
+
+- **O arquivo que falha é a vítima**: ele só importa a coleção. Não o conserte.
+- **Mantenha o isolamento** nos testes que importam a config ou uma coleção.
+- **Para provar que a fragilidade é da flag**, o controle é
+  `--sequence.shuffle` **com** isolamento: sai verde, e a suíte não tinha
+  dependência de ordem antes.
 
 ## Logger
 

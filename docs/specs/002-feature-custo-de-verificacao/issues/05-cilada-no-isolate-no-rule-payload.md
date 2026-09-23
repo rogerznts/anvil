@@ -4,10 +4,20 @@
 
 **Blocked by:** 04
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Reproduziu: a cilada entra no `RULE.md` do `anvil-stack-payload` no formato das outras, com o alcance do veredito do 04, e o título vira "As quatro ciladas".
-- [ ] Nenhum número de projeto é citado na cilada.
-- [ ] Não reproduziu: o `RULE.md` fica intocado e o ticket registra o porquê em `## Comments`.
-- [ ] O `reference/` do `anvil-stack-payload` fica intocado.
-- [ ] O `verify` sai limpo.
+- [x] Reproduziu: a cilada entra no `RULE.md` do `anvil-stack-payload` no formato das outras, com o alcance do veredito do 04, e o título vira "As quatro ciladas".
+- [x] Nenhum número de projeto é citado na cilada.
+- [~] Não reproduziu: o `RULE.md` fica intocado e o ticket registra o porquê em `## Comments`. — não se aplica: o 04 reproduziu.
+- [x] O `reference/` do `anvil-stack-payload` fica intocado.
+- [x] O `verify` sai limpo.
+
+## Comments
+
+- O 04 reproduziu só com o plugin, então a cilada entra com esse alcance: o
+  título dela nomeia o plugin e o primeiro parágrafo diz para quem vale. Os
+  lugares que citavam "três ciladas" foram atualizados: o `README.md`, o exemplo
+  de proposta do passo 7 do `anvil-boot` e o `VENDOR.md`, que agora diz que a
+  quarta não vem do upstream. O ADR-0006 e o `STACK-CONTRACT.md` ficam como
+  estão: o primeiro é histórico, e o segundo usa "três ciladas" como exemplo de
+  princípio, não como contagem da rule.
