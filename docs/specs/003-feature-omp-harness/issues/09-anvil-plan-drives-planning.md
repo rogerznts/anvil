@@ -4,14 +4,28 @@
 
 **Blocked by:** 05
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] A skill fica em `.omp/skills/`, com trava de invocação; o argumento vai para o grill como pedido inicial.
-- [ ] Carrega `anvil-grill`, `anvil-to-spec` e `anvil-to-tickets` na mesma janela, sem compactar, e as pausas de cada uma continuam existindo.
-- [ ] Depois de cada pausa fechada, propõe a próxima etapa ou um desvio; nada é carregado sem sim, e um "não" para sem carregar nada.
-- [ ] Os desvios são `anvil-research`, `anvil-prototype`, `anvil-to-questionnaire`, `anvil-wayfinder`, `anvil-ui` e `anvil-architect`, cada um ligado ao sinal que o justifica; depois do desvio, propõe voltar à etapa de origem.
-- [ ] Chamada de novo, retoma pela conversa e pelo disco: `spec.md` existe leva à sugestão de `to-tickets`; `issues/` com tickets leva ao fim da janela. Nenhum campo de estado é escrito.
-- [ ] No fim, indica `/clear` e depois `/skill:anvil-run NNN`.
-- [ ] Não publica spec nem ticket por conta própria.
-- [ ] Cenário S2 em vários turnos: depois do grill confirmado propõe `to-spec` e não carrega sem sim; com sim, carrega na mesma janela; chamada de novo com `spec.md` no disco retoma na sugestão de `to-tickets`.
-- [ ] A skill entra no lock como `omp:`; o `verify` sai limpo.
+- [x] A skill fica em `.omp/skills/`, com trava de invocação; o argumento vai para o grill como pedido inicial.
+- [x] Carrega `anvil-grill`, `anvil-to-spec` e `anvil-to-tickets` na mesma janela, sem compactar, e as pausas de cada uma continuam existindo.
+- [x] Depois de cada pausa fechada, propõe a próxima etapa ou um desvio; nada é carregado sem sim, e um "não" para sem carregar nada.
+- [x] Os desvios são `anvil-research`, `anvil-prototype`, `anvil-to-questionnaire`, `anvil-wayfinder`, `anvil-ui` e `anvil-architect`, cada um ligado ao sinal que o justifica; depois do desvio, propõe voltar à etapa de origem.
+- [x] Chamada de novo, retoma pela conversa e pelo disco: `spec.md` existe leva à sugestão de `to-tickets`; `issues/` com tickets leva ao fim da janela. Nenhum campo de estado é escrito.
+- [x] No fim, indica `/clear` e depois `/skill:anvil-run NNN`.
+- [x] Não publica spec nem ticket por conta própria.
+- [x] Cenário S2 em vários turnos: depois do grill confirmado propõe `to-spec` e não carrega sem sim; com sim, carrega na mesma janela; chamada de novo com `spec.md` no disco retoma na sugestão de `to-tickets`.
+- [x] A skill entra no lock como `omp:`; o `verify` sai limpo.
+
+## Comments
+
+- A skill é `anvil/.claude/skills/anvil-update/.omp-layer/skills/anvil-plan/SKILL.md`, em pt-BR como as outras peças autorais da camada, com `disable-model-invocation: true` e o `argument-hint` do pedido. Ao lado dela vai o `stage.sh`, que lê o branch e a pasta da spec e devolve a linha `next`. As duas entram no lock como `omp: skills/anvil-plan/SKILL.md` e `omp: skills/anvil-plan/stage.sh`. A skill chama o script pelo caminho instalado, `.omp/skills/anvil-plan/stage.sh`, que o check 15 do `verify` confere.
+- O que o disco decide fica no script, e não na prosa: a spec pelo prefixo numérico do branch, como no perfil do tracker, e o `next`. Sem spec no branch, `anvil-grill`; com a pasta e sem `spec.md`, `anvil-to-spec`; com `spec.md` e sem ticket, `anvil-to-tickets`; com ticket em `issues/`, `end` e a linha `handoff` com `/clear` e `/skill:anvil-run NNN`. O `anvil-to-spec` com a pasta vazia não está na spec: é o caso do `new-spec.sh`, que cria o branch e a pasta antes de a `spec.md` ser escrita, e a queda no meio do to-spec cai nele. O que só a conversa sabe, se o grill já fechou, fica na skill. O script não escreve nada, como manda o ADR-0003 — sem máquina de fases.
+- O script é a primeira coisa da skill, com argumento ou sem. Na primeira rodada do S2, a regra "sem pedido, peça o pedido e pare" estava antes da leitura da linha `next`, e o `haiku`, chamado sem argumento num branch com tickets, pediu o pedido sem rodar o script. Agora a regra só vale com `next: anvil-grill`, e a rodada seguinte passou.
+- A primeira chamada com pedido carrega o grill sem perguntar: chamar a skill com o pedido é o sim do operador para essa etapa, como a US 48 — chamar uma vez e ser conduzido pelo grill — descreve. As outras transições, e toda retomada, esperam o sim.
+- "Sem compactar" é o que a skill controla: nenhuma etapa vai para subagente, e ela não sugere `/compact`, `/handoff` nem sessão nova antes do fim. A compactação automática do omp é do harness, e uma skill não a desliga. Numa conversa longa ela pode acontecer, e aí `/skill:anvil-plan` de novo recupera a etapa pelo disco.
+- Comportamento que a spec não lista: com `next` diferente de `anvil-grill` e um pedido no argumento que não é a spec do branch, a skill diz que o pedido novo começa num branch sem spec e para. Sem isso, um pedido novo chamado no branch de uma spec com tickets recebia o `/skill:anvil-run` da spec errada, e o `new-spec.sh` criaria o branch novo em cima do branch da outra spec.
+- O `stage.sh` usa chaves e nome em inglês (`next`, `spec_md`, `handoff`), pela regra de idioma do `CLAUDE.md` para código, e não o português do `frontier.sh`, que o review do ticket 08 registrou como divergência.
+- Prova: o S1 (`workspace/29-codex-mirror/s1.sh`) passa com 104 checks em `/opt/local/bin/bash` e em `/bin/bash`. A 7j agora cobre a `anvil-plan` junto das outras peças: a skill e o script entram no lock como `omp:` e em `.omp/` iguais aos do payload, a skill tem a trava, e num payload sem as peças o dry-run lista os dois arquivos como órfãos, e a execução os tira. O `dev-link.sh` ligou os dois em `.omp/skills/anvil-plan/` deste repositório.
+- Prova: o S2 (`workspace/34-omp-plan/s2.sh`) passa com 21 checks, com o omp 18.2.11 e o `haiku`, em cerca de 1 minuto e 15 segundos. O fixture fica em `/tmp/anvil-34-omp-plan`, com o payload real instalado com o omp no `PATH`. Na conversa Q, num branch com `spec.md` e sem ticket, a skill roda o `stage.sh`, recebe `next: anvil-to-tickets`, propõe o `anvil-to-tickets` e só lê a `anvil-plan`; com "Não.", para sem ler skill nenhuma. Na R, num branch com dois tickets, indica `/clear` e `/skill:anvil-run 003` sem carregar nada. Na P, na `main` com o pedido, carrega `anvil-grill` e `anvil-grilling` e abre a rodada de perguntas sobre o pedido. Depois da confirmação, propõe o `anvil-to-spec` e pergunta, sem ler a skill nem rodar o `new-spec.sh`, sem branch novo e sem nada em `docs/specs`. Com "Sim, pode carregar.", lê `skill://anvil-to-spec` no turno seguinte, e o to-spec para na pausa dos seams. As três vezes são uma sessão só, sem entrada de compactação. Em nenhuma conversa algo é escrito ou commitado antes do sim, e o repositório do anvil fica igual.
+- P2 (prova fraca): o S2 não exercita os desvios, a volta à etapa de origem nem a proposta depois do to-spec e do to-tickets. O sinal de desvio é julgamento do modelo sobre a conversa, e forçá-lo num fixture mediria o roteiro do fixture. Quem ler o S2 como prova dos desvios conclui mais do que ele mostra. A condução até os tickets, com os desvios de verdade, é o ponta a ponta do ticket 10.
+- P2 (prova fraca): o S2 é probabilístico. Das duas rodadas completas, a primeira falhou na R, a correção acima, e a segunda passa nos 21 checks. Uma rodada que passa não mede a taxa.
