@@ -4,10 +4,10 @@
 
 **Blocked by:** Nenhum — pode começar agora.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Uma função classifica um conjunto a partir de três entradas: o que o payload novo traz, o que o lock diz possuir e o que existe no disco.
-- [ ] Skills e agentes usam essa função; os dois laços antigos saem.
-- [ ] Symlink pendurado continua contando como presente no disco, como hoje para agentes.
-- [ ] Dry-run e execução dos cenários `03-reset-install` e `12-payload-agents` dão saída idêntica à de antes, em bash 5 e em bash 3.2.
-- [ ] O `verify` sai limpo.
+- [x] Uma função classifica um conjunto a partir de três entradas: o que o payload novo traz, o que o lock diz possuir e o que existe no disco.
+- [x] Skills e agentes usam essa função; os dois laços antigos saem.
+- [x] Symlink pendurado continua contando como presente no disco, como hoje para agentes.
+- [x] Dry-run e execução dos cenários `03-reset-install` e `12-payload-agents` dão saída idêntica à de antes, em bash 5 e em bash 3.2.
+- [x] O `verify` sai limpo.

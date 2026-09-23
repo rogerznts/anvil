@@ -134,47 +134,42 @@ if [ -f "$LOCK" ]; then
     possui_ag="$(tr -d '\r' < "$LOCK" | sed -n 's/^agent: *//p')"
 fi
 
-# --- classificacao ------------------------------------------------------------
-substituidos=""; orfaos=""; alheios=""
-for s in $novo;   do [ -d "$SKILLS/$s" ] && substituidos="$substituidos$s"$'\n'; done
-for s in $possui; do
-    printf '%s\n' "$novo" | grep -qx "$s" && continue
-    [ -d "$SKILLS/$s" ] && orfaos="$orfaos$s"$'\n'
+# --- o que esta no disco -----------------------------------------------------
+disco=""
+for d in "$SKILLS"/*/; do
+    [ -d "$d" ] && disco="$disco$(basename "$d")"$'\n'
 done
-if [ -d "$SKILLS" ]; then
-    for d in "$SKILLS"/*/; do
-        [ -d "$d" ] || continue
-        s="$(basename "$d")"
-        printf '%s\n' "$novo"   | grep -qx "$s" && continue
-        printf '%s\n' "$possui" | grep -qx "$s" && continue
-        alheios="$alheios$s"$'\n'
-    done
-fi
-
 # Symlink conta como agente no disco, mesmo pendurado: o [ -f ] segue o link, e um
 # orfao pendurado ficaria no disco sem aparecer em grupo nenhum.
-substituidos_ag=""; orfaos_ag=""; alheios_ag=""
-for a in $novo_ag;   do { [ -f "$AGENTS/$a.md" ] || [ -L "$AGENTS/$a.md" ]; } && substituidos_ag="$substituidos_ag$a"$'\n'; done
-for a in $possui_ag; do
-    printf '%s\n' "$novo_ag" | grep -qxF "$a" && continue
-    { [ -f "$AGENTS/$a.md" ] || [ -L "$AGENTS/$a.md" ]; } && orfaos_ag="$orfaos_ag$a"$'\n'
-done
+disco_ag=""
 for f in "$AGENTS"/*.md; do
-    [ -f "$f" ] || [ -L "$f" ] || continue
-    a="$(basename "$f" .md)"
-    printf '%s\n' "$novo_ag"   | grep -qxF "$a" && continue
-    printf '%s\n' "$possui_ag" | grep -qxF "$a" && continue
-    alheios_ag="$alheios_ag$a"$'\n'
+    { [ -f "$f" ] || [ -L "$f" ]; } && disco_ag="$disco_ag$(basename "$f" .md)"$'\n'
 done
 
+# --- classificacao ------------------------------------------------------------
+tem() { printf '%s\n' "$1" | grep -qxF -e "$2"; }
+
+# classifica <sufixo> <novo> <possui> <disco>
+# Grava substituidos<sufixo>, orfaos<sufixo>, alheios<sufixo> e colisoes<sufixo>.
 # Substituido que o lock nao lista pode ser do usuario com o nome de um do payload:
-# sera sobrescrito, e o relatorio o destaca para o aviso nomea-lo. Sem lock nao ha
-# como distinguir, e nada e destacado.
-colisoes=""; colisoes_ag=""
-if [ -f "$LOCK" ]; then
-    for s in $substituidos;    do printf '%s\n' "$possui"    | grep -qxF "$s" || colisoes="$colisoes$s"$'\n'; done
-    for a in $substituidos_ag; do printf '%s\n' "$possui_ag" | grep -qxF "$a" || colisoes_ag="$colisoes_ag$a"$'\n'; done
-fi
+# sera sobrescrito, e o relatorio o destaca como colisao para o aviso nomea-lo. Sem
+# lock nao ha como distinguir, e nada e destacado.
+classifica() {
+    local novo="$2" possui="$3" disco="$4" x sub="" orf="" alh="" col=""
+    for x in $novo;   do tem "$disco" "$x" && sub="$sub$x"$'\n'; done
+    for x in $possui; do tem "$novo" "$x" || { tem "$disco" "$x" && orf="$orf$x"$'\n'; }; done
+    for x in $disco;  do tem "$novo" "$x" || tem "$possui" "$x" || alh="$alh$x"$'\n'; done
+    if [ -f "$LOCK" ]; then
+        for x in $sub; do tem "$possui" "$x" || col="$col$x"$'\n'; done
+    fi
+    printf -v "substituidos$1" '%s' "$sub"
+    printf -v "orfaos$1" '%s' "$orf"
+    printf -v "alheios$1" '%s' "$alh"
+    printf -v "colisoes$1" '%s' "$col"
+}
+
+classifica ""    "$novo"    "$possui"    "$disco"
+classifica "_ag" "$novo_ag" "$possui_ag" "$disco_ag"
 
 conta() { printf '%s' "$1" | grep -c . || true; }
 # Skill sai pelo nome, agente pelo caminho: as duas listas dividem o mesmo grupo.
