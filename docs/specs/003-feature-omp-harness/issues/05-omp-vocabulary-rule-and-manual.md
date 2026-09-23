@@ -4,11 +4,22 @@
 
 **Blocked by:** 03
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] A rule tem `alwaysApply: true` e só o mapeamento: "Skill tool" e `/anvil-x` dentro de uma skill → ler a skill por `skill://`; "sub-agent" e "Task" → tool `task`, com `scout` quando a skill pede só leitura; `AskUserQuestion` → `ask`.
-- [ ] A `anvil-omp` fica em `.omp/skills/`, com trava de invocação, e diz: o que é a camada, como a detecção decide, os comandos `/skill:anvil-plan`, `/skill:anvil-run` e `/skill:anvil-browser-qa`, o que continua manual no Claude Code e no Codex, os limites — `eval` escapa da guarda, frontier em série, `task` sem modelo por chamada — e como remover a camada à mão.
-- [ ] As duas peças entram no lock como `omp:` e saem como órfãs quando retiradas.
-- [ ] Numa sessão do omp, uma skill vendorizada que manda "Call the Skill tool" ou abrir "sub-agent" é resolvida com `skill://` e `task`.
-- [ ] No Claude Code e no Codex, a lista de skills não muda.
-- [ ] O `verify` sai limpo.
+- [x] A rule tem `alwaysApply: true` e só o mapeamento: "Skill tool" e `/anvil-x` dentro de uma skill → ler a skill por `skill://`; "sub-agent" e "Task" → tool `task`, com `scout` quando a skill pede só leitura; `AskUserQuestion` → `ask`.
+- [x] A `anvil-omp` fica em `.omp/skills/`, com trava de invocação, e diz: o que é a camada, como a detecção decide, os comandos `/skill:anvil-plan`, `/skill:anvil-run` e `/skill:anvil-browser-qa`, o que continua manual no Claude Code e no Codex, os limites — `eval` escapa da guarda, frontier em série, `task` sem modelo por chamada — e como remover a camada à mão.
+- [x] As duas peças entram no lock como `omp:` e saem como órfãs quando retiradas.
+- [x] Numa sessão do omp, uma skill vendorizada que manda "Call the Skill tool" ou abrir "sub-agent" é resolvida com `skill://` e `task`.
+- [x] No Claude Code e no Codex, a lista de skills não muda.
+- [x] O `verify` sai limpo.
+
+## Comments
+
+- A pasta da camada no payload passou de `omp-layer/` a `.omp-layer/`. O Codex acha `SKILL.md` em subpasta de skill, até seis níveis, segue symlink e só pula pasta oculta. Probe com `codex debug prompt-input` no codex-cli 0.155.1: `.agents/skills/x -> ../../.claude/skills/x` com `x/omp-layer/skills/y/SKILL.md` lista `y`, e com `x/.omp-layer/...` não lista. Com a pasta sem o ponto, o espelho `.agents/skills/anvil-update` punha a `anvil-omp` na lista do Codex, e depois poria a `anvil-plan` e a `anvil-run`. O Claude Code 2.1.280 não desce: o init do `claude -p` só lista `x`. A premissa da spec, "a descoberta de skills não é recursiva", estava errada para o Codex. A seção "Onde mora" da spec, a `anvil-update`, o `reset-install.sh` e o `camadas-anvil-omp.md` foram corrigidos. A decisão foi do operador, na conversa do ticket.
+- A rule e o manual estão em pt-BR, como as skills autorais. O manual não cita caminho de peça que ainda não existe, o agente e as skills `anvil-plan` e `anvil-run`, para o `verify` do ticket 06, que confere caminho citado, não acusar antes dos tickets 07 a 09. Os comandos `/skill:anvil-plan` e `/skill:anvil-run` aparecem porque o ticket os pede, e chegam nos tickets 08 e 09, antes do merge da spec.
+- A remoção à mão, no manual, diz junto do passo de apagar os arquivos e as linhas `omp:` que, com `omp` no `PATH` ou `~/.omp/`, o update ou o boot seguinte reinstala a camada como nova. A frase da `anvil-update` passou a apontar para o manual com o mesmo aviso. Fecha o P3 da revisão do ticket 03 sobre essa frase.
+- Prova: o S1 (`workspace/29-codex-mirror/s1.sh`) passa com 93 checks em `/opt/local/bin/bash` e em `/bin/bash`, 7 deles novos. Na 7h: a camada está em pasta oculta, e nenhum `SKILL.md` do payload fica em subpasta de skill fora de pasta oculta, que o Codex listaria; com a pasta renomeada de volta, o `find` do check acha a `anvil-omp`. Na 7j, com a `anvil-update` real: as linhas `omp:` são os arquivos da camada, a rule e o manual estão no lock e em `.omp/`, a rule tem `alwaysApply: true` e o manual a trava; num payload sem as duas peças, o dry-run as lista como órfãs e a execução as tira do `.omp/` e do lock, com as pastas vazias, e o hook fica.
+- Prova: o S2 (`workspace/30-omp-guard/s2.sh`) passa com 16 checks, com o omp 18.2.11 e o `haiku`. 5a: depois de ler a `anvil-grill`, que manda "Call the Skill tool twice", o modelo lê `skill://anvil-grilling` e `skill://anvil-domain-modeling`, sem `task`. 5b: a `anvil-grilling` manda "dispatch a sub-agent to find it", e o modelo abre um `task` com `scout`. 5c: `skill://anvil-omp` resolve para `.omp/skills/anvil-omp/SKILL.md`. 6: o Codex lista a `anvil-update` e nada de dentro dela, e o controle com a pasta sem o ponto lista a `anvil-omp`; o init do Claude Code lista a `anvil-update` e não a `anvil-omp`. Os quatro casos da guarda seguem passando.
+- Médio: a prova não mostra que é a rule que faz a tradução. Controle com a rule tirada de `.omp/rules/`, duas rodadas por caso: o `haiku` resolve "Call the Skill tool" por `skill://` e "sub-agent" por `task` com `scout` do mesmo jeito. O prompt base do omp 18.2.11 já ensina `skill://` e manda pesquisa só de leitura para o `scout`. A rule fica, como a spec pede, e custa cerca de 600 bytes por turno. Num modelo ou numa versão do omp sem esse prompt, é ela que sobra.
+- Médio: o 5b é probabilístico. Na primeira forma do caso, com um fato que o `read` acha listando uma pasta, o `haiku` leu a pasta sozinho em uma de duas rodadas com a rule. O caso agora pede um fato que exige busca, e o `task` apareceu nas três rodadas de ensaio e na do S2. Uma rodada que falhe no 5b pede outra antes de concluir regressão.
+- Leve: o `omp -p` não expande `/skill:<nome>`. O texto chega cru ao modelo, que na primeira tentativa leu `skill://anvil-grill` no lugar da `anvil-grill-me`, oculta pela trava. Os casos do S2 pedem a leitura por `skill://`. Os S2 da `anvil-run` e da `anvil-plan`, nos tickets 08 e 09, vão esbarrar nisso.

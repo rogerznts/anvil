@@ -48,7 +48,7 @@ flowchart TB
 ```
 
 No payload, a camada omp não mora em `.omp/` nem é skill: viaja como material
-dentro da `anvil-update` (por exemplo `anvil/.claude/skills/anvil-update/omp-layer/`).
+dentro da `anvil-update`, em `anvil/.claude/skills/anvil-update/.omp-layer/`.
 O boot e o update a copiam para `.omp/` quando o omp é detectado. O espelho
 `.agents/skills` deixa de vir pronto no payload: o `reset-install.sh` o gera, um
 symlink por linha `skill:` do lock, e remove os órfãos junto. O omp também lê
@@ -69,7 +69,7 @@ flowchart TD
 
     DET{"detecção<br/>command -v omp<br/>OU ~/.omp/ existe<br/>OU lock já tem linha omp:"}
     DET -->|não| N["instala o núcleo<br/>+ gera .agents/skills a partir do lock<br/>+ hook do Claude no settings.json"]
-    DET -->|sim| Y["tudo o que o 'não' instala<br/>+ copia omp-layer/ → .omp/"]
+    DET -->|sim| Y["tudo o que o 'não' instala<br/>+ copia .omp-layer/ → .omp/"]
     Y --> LK["lock ganha omp: rules/anvil-harness.md<br/>omp: hooks/pre/… · agents/anvil-implementer.md<br/>omp: skills/anvil-plan · anvil-run · anvil-omp"]
     LK --> ORF["update seguinte:<br/>omp: no lock que saiu do payload → órfão, remove<br/>omp: que continua → substitui"]
 

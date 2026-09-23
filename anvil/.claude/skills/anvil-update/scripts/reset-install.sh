@@ -12,7 +12,7 @@
 # tem uma linha `skill:` por skill e uma `agent:` por agente.
 # O espelho do Codex, .agents/skills, sai do mesmo lock: um symlink para
 # .claude/skills por linha `skill:`, e o que o lock deixou de listar sai.
-# A camada omp, em .omp/, vem de .claude/skills/anvil-update/omp-layer/ do payload
+# A camada omp, em .omp/, vem de .claude/skills/anvil-update/.omp-layer/ do payload
 # e entra quando há sinal de omp: o binário no PATH, ~/.omp/, ou uma linha `omp:`
 # no lock. A última torna a camada pegajosa: máquina sem omp a mantém. O lock
 # ganha uma linha `omp:` por arquivo, com o caminho relativo a .omp/, e a
@@ -151,8 +151,11 @@ for f in "$FROM_ABS"/.claude/agents/*.md; do
     [ -f "$f" ] && novo_ag="$novo_ag$(basename "$f" .md)"$'\n'
 done
 # A camada omp e uma arvore de arquivos, e o nome de cada um e o caminho relativo
-# a .omp/. Payload sem omp-layer/ e valido, e so nao traz camada.
-CAMADA_OMP="$FROM_ABS/.claude/skills/anvil-update/omp-layer"
+# a .omp/. Payload sem .omp-layer/ e valido, e so nao traz camada. A pasta e oculta
+# porque o Codex acha SKILL.md em subpasta de skill abaixo de .agents/skills, seguindo
+# o symlink da anvil-update, e so pula pasta oculta: sem o ponto, as skills da
+# camada entrariam na lista do Codex.
+CAMADA_OMP="$FROM_ABS/.claude/skills/anvil-update/.omp-layer"
 novo_omp=""
 if [ -d "$CAMADA_OMP" ]; then
     novo_omp="$(cd "$CAMADA_OMP" && find . -type f | sed 's|^\./||' | LC_ALL=C sort)"

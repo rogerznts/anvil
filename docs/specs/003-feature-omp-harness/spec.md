@@ -144,8 +144,10 @@ própria. O desenho do fluxo está em `docs/discovery/camadas-anvil-omp.md`.
 ### Camada omp no payload
 
 - **Onde mora.** Material dentro da `anvil-update`, numa árvore que espelha o
-  `.omp/` do projeto — por exemplo `omp-layer/`. Não é skill: nenhum harness a lista,
-  porque a descoberta de skills não é recursiva.
+  `.omp/` do projeto, em `.omp-layer/`. Não é skill, e nenhum harness a lista: o
+  Claude Code e o omp só descobrem `skills/<nome>/SKILL.md`, e o Codex, que acha
+  `SKILL.md` em subpasta e segue o symlink `.agents/skills/anvil-update`, pula pasta
+  oculta. Sem o ponto, as skills da camada entrariam na lista do Codex.
 - **Conteúdo.** Hook de guarda em `hooks/pre/`, a rule `anvil-harness` em `rules/`,
   o agente `anvil-implementer` em `agents/` e três skills em `skills/`:
   `anvil-plan`, `anvil-run` e `anvil-omp`.
@@ -277,7 +279,8 @@ própria. O desenho do fluxo está em `docs/discovery/camadas-anvil-omp.md`.
 - Manual com trava de invocação: o que é a camada, como a detecção decide, os
   comandos `/skill:anvil-plan`, `/skill:anvil-run` e `/skill:anvil-browser-qa`, o que
   continua manual, os limites, e como remover a camada à mão — apagar os arquivos e
-  as linhas `omp:` do lock no mesmo commit.
+  as linhas `omp:` do lock no mesmo commit, com o aviso de que, com `omp` no `PATH`
+  ou `~/.omp/`, o update seguinte reinstala a camada.
 
 ### Boot e update
 
