@@ -205,7 +205,7 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 
 | skill | para quê | origem |
 |---|---|---|
-| `anvil-stack-payload` | o ofício do Payload em 11 arquivos, mais a `RULE.md` com as três ciladas | payloadcms |
+| `anvil-stack-payload` | o ofício do Payload em 11 arquivos, mais a `RULE.md` com as quatro ciladas | payloadcms |
 | `anvil-bench` | leva quem não programa de uma necessidade até a ferramenta rodando | autoral + `unlazy` |
 
 O bench é autoral, mas carrega material de terceiro embaixo de `unlazy/`: o

@@ -255,8 +255,9 @@ Se a varredura encontrou uma stack conhecida — hoje, um `payload.config.ts` �
 **proponha** a rule dela com uma linha de justificativa, e espere aprovação:
 
 > *Achei `payload.config.ts` com adapter Postgres. Posso escrever
-> `.claude/rules/payload.md` com as três ciladas de Local API, transação e loop
-> de hook, mais a fronteira do que eu posso editar?*
+> `.claude/rules/payload.md` com as quatro ciladas — Local API, transação, loop
+> de hook e `--no-isolate` com o plugin multi-tenant —, mais a fronteira do que
+> eu posso editar?*
 
 A rule sai da skill `anvil-stack-payload`, arquivo `RULE.md`, com os `{{...}}`
 preenchidos pelo que a varredura achou. **Sem** as invariantes do bench — aquelas

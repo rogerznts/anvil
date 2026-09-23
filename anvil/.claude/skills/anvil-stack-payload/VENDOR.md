@@ -31,14 +31,16 @@ cortadas.
 
 Adicionado ao redor, sem tocar no que veio de fora:
 
-- `RULE.md` — as três ciladas e a fronteira de edição. Vira
+- `RULE.md` — as quatro ciladas e a fronteira de edição. Vira
   `.claude/rules/payload.md` no projeto.
 - `bench/` — starter, scripts e invariantes do `/anvil-bench`, herdados do mosk.
 - este arquivo.
 
-`RULE.md` repete as três ciladas que também estão na seção *Security Pitfalls* do
-`SKILL.md`. A duplicação é correta e proposital: a regra existe **porque** a
-referência não vai ser aberta.
+`RULE.md` repete as três primeiras ciladas, que também estão na seção *Security
+Pitfalls* do `SKILL.md`. A duplicação é correta e proposital: a regra existe
+**porque** a referência não vai ser aberta. A quarta, `--no-isolate` com o plugin
+multi-tenant, não está no upstream: saiu de uma reprodução num projeto Payload
+sem customização, registrada na spec 002 do anvil.
 
 ## Ressincronizar
 
