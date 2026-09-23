@@ -184,10 +184,16 @@ própria. O desenho do fluxo está em `docs/discovery/camadas-anvil-omp.md`.
 - **Sai do payload.** O `anvil/.agents/` deixa de existir.
 - **Gerado.** Para cada linha `skill:` do lock novo, um symlink relativo
   `.agents/skills/<nome>` → `../../.claude/skills/<nome>`.
-- **Órfãos.** Symlink cujo nome estava no `skill:` do lock anterior e não está no
-  novo sai. Entrada em `.agents/skills` que não é symlink para `.claude/skills` é
-  alheia e fica; se tiver nome de skill do payload, é colisão e aparece no aviso sem
-  ser substituída.
+- **Posse.** Em `.agents/skills`, symlink com nome de skill do anvil é do anvil,
+  aponte para onde apontar. O degit grava o symlink do payload com o caminho
+  absoluto do cache dele, que some, então a posse não pode depender do alvo.
+  Diretório ou arquivo é do usuário.
+- **Órfãos e refeitos.** O symlink cujo nome estava no `skill:` do lock anterior e
+  não está no novo sai. O symlink com nome de skill do payload que aponta para
+  outro lugar é refeito. O resto é alheio e fica. Um diretório ou arquivo com nome
+  de skill do payload é colisão: aparece no aviso e não é substituído.
+- **Raiz do usuário.** Se `.agents` ou `.agents/skills` for symlink ou arquivo, o
+  espelho inteiro é do usuário e nada ali é tocado.
 - **Sem duplicata no omp.** O omp deduplica skills por caminho real; o symlink
   resolve para o mesmo arquivo de `.claude/skills`.
 

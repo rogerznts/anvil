@@ -11,8 +11,8 @@
 - [x] O payload não traz mais `.agents/`.
 - [x] Depois do update, `.agents/skills` tem exatamente um symlink por linha `skill:` do lock, apontando para a skill em `.claude/skills`.
 - [x] Symlink cujo nome estava no `skill:` do lock anterior e não está no novo é removido.
-- [x] Entrada em `.agents/skills` que não é symlink para `.claude/skills` fica intocada; se tiver nome de skill do payload, aparece como colisão e não é substituída.
-- [x] Sem lock, nada em `.agents/skills` é apagado.
+- [x] Symlink com nome de skill do payload que aponta para outro lugar é refeito. Diretório ou arquivo em `.agents/skills` fica intocado; se tiver nome de skill do payload, aparece como colisão e não é substituído.
+- [x] Sem lock, nada em `.agents/skills` é removido; só o symlink com nome de skill do payload é refeito.
 - [x] O dry-run e o relatório mostram o que muda em `.agents/skills`.
 - [x] O `dev-link.sh` gera `.agents/skills` deste repositório a partir das skills ligadas, e o `--unlink` o desfaz; o link do `anvil-team` não existe mais.
 - [x] Numa sessão do omp com o espelho presente, nenhuma skill aparece duplicada.
@@ -39,3 +39,5 @@
 - Review round=2 · os dois P1 da rodada 1 estão fechados, o da raiz pela correção e o do legado pela orientação do passo 4, e não houve regressão. Nos dois eixos, o S1 passa com 44 checks em bash 5 e em bash 3.2.
 - Review round=2 · P2: a spec diz, sem exceção, "Para cada linha `skill:` do lock novo, um symlink relativo". Não diz que o espelho inteiro fica com o usuário quando `.agents` ou `.agents/skills` é symlink ou arquivo. A regra está no `reset-install.sh` e na `anvil-update`, e quem implementar o modo de camadas do ticket 04 a partir da spec pode deixá-la de fora. Correção: uma linha na seção "Espelho `.agents/skills`" da spec.
 - Review round=2 · P3: a nota da correção diz que os quatro checks da seção 2b falham contra a e19d774. A seção tem cinco checks, e quatro falham. O primeiro, rc=0 com lock novo, passa também na versão antiga. Quem lê pode supor que todos os checks separam as duas versões.
+- Mudança pedida pelo usuário depois da rodada 2: em `.agents/skills`, o symlink é sempre do anvil. Todo symlink com nome de skill do payload é refeito, aponte para onde apontar, e só diretório ou arquivo é do usuário. O motivo é real: no `ballroom-website`, os 45 symlinks do espelho apontam para o caminho absoluto do cache do degit (`~/Library/Caches/degit/.../extract-RWcQQj/.claude/skills/`), que não existe mais. Pela regra anterior, que exigia a forma exata `../../.claude/skills/<nome>`, os 45 viravam colisão e o Codex continuava sem ver skill nenhuma do anvil. A spec, os critérios acima, a `anvil-update` e o `dev-link` foram ajustados. A spec também ganhou a regra da raiz do usuário, que era a observação de gravidade média da rodada 2.
+- Prova: o S1 passa com 50 checks em bash 5 e em bash 3.2. A seção 2a é o caso do degit, com e sem lock, e a seção 5 tem um symlink pendurado de skill ligada. Numa cópia do `ballroom-website` em `/tmp`, o update refaz os 45 symlinks, que passam a ler o `SKILL.md`, e deixa `anvil-browser-qa` e `anvil-next` como colisão.

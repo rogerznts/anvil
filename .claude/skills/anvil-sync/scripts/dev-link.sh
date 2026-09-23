@@ -25,9 +25,12 @@ DEST="$ROOT/.claude/skills"
 AGENTS="$ROOT/anvil/.claude/agents"
 DEST_AGENTS="$ROOT/.claude/agents"
 # .agents/skills e por onde o Codex le as skills. O espelho e um symlink por skill
-# ligada, na forma que o reset-install.sh gera num projeto: so essa forma e nossa.
+# ligada, na forma que o reset-install.sh gera num projeto. Como la, o symlink com
+# nome de skill do payload e nosso, aponte para onde apontar; o symlink na forma
+# gerada tambem, mesmo com nome que saiu do payload. Diretorio e arquivo nunca.
 ESPELHO="$ROOT/.agents/skills"
-nosso_espelho() { [ -L "$ESPELHO/$1" ] && [ "$(readlink "$ESPELHO/$1")" = "../../.claude/skills/$1" ]; }
+na_forma() { [ "$(readlink "$ESPELHO/$1")" = "../../.claude/skills/$1" ]; }
+nosso_espelho() { [ -L "$ESPELHO/$1" ] && { [ -d "$PAYLOAD/$1" ] || na_forma "$1"; }; }
 
 [ -d "$PAYLOAD" ] || { echo "erro: payload nao encontrado em $PAYLOAD" >&2; exit 2; }
 
@@ -157,9 +160,10 @@ done
 
 # --- espelho do Codex ------------------------------------------------------------
 # Gerado a partir do que esta ligado agora em .claude/skills, nao so do conjunto
-# desta execucao: o roster nao desliga o que um --all ligou antes. Symlink nosso
-# cuja skill nao esta mais ligada sai. Entrada em outra forma e do usuario e fica,
-# mesmo com nome de skill: `ln -s` sobre um diretorio criaria o link dentro dele.
+# desta execucao: o roster nao desliga o que um --all ligou antes. Symlink nosso que
+# aponta para outro lugar e refeito, e o de skill que nao esta mais ligada sai.
+# Diretorio ou arquivo fica, mesmo com nome de skill: `ln -s` sobre um diretorio
+# criaria o link dentro dele.
 ligada() {
     printf '%s' "$a_ligar" | grep -qxF -e "$1" && return 0
     [ -d "$PAYLOAD/$1" ] && [ -L "$DEST/$1" ] || return 1
@@ -169,8 +173,8 @@ ligada() {
 esp_criados=0; esp_removidos=0; esp_pulados=""
 for s in $disponiveis; do
     ligada "$s" || continue
-    nosso_espelho "$s" && continue
-    if [ -e "$ESPELHO/$s" ] || [ -L "$ESPELHO/$s" ]; then
+    if [ -L "$ESPELHO/$s" ] && na_forma "$s"; then continue; fi
+    if [ -e "$ESPELHO/$s" ] && [ ! -L "$ESPELHO/$s" ]; then
         esp_pulados="$esp_pulados$s"$'\n'
         continue
     fi
@@ -178,6 +182,7 @@ for s in $disponiveis; do
         echo "espelharia $s"
     else
         mkdir -p "$ESPELHO"
+        rm -f "$ESPELHO/$s"
         ln -s "../../.claude/skills/$s" "$ESPELHO/$s"
     fi
     esp_criados=$((esp_criados + 1))
@@ -197,7 +202,7 @@ echo "$esp_criados symlink(s) $([ "$DRY" -eq 1 ] && echo "seriam criados" || ech
 [ -n "$ausentes" ] && { echo "NO ROSTER MAS FORA DO PAYLOAD — revise a lista:"; printf '%s' "$ausentes" | sed 's/^/  /'; }
 [ -n "$pulados"  ] && { echo "pulados, porque sao diretorio real e nao symlink:"; printf '%s' "$pulados" | sed 's/^/  /'; }
 [ -n "$ag_pulados" ] && { echo "agentes pulados, porque sao arquivo real e nao symlink:"; printf '%s' "$ag_pulados" | sed 's/^/  /'; }
-[ -n "$esp_pulados" ] && { echo "espelho pulado, porque .agents/skills tem entrada que nao e symlink nosso:"; printf '%s' "$esp_pulados" | sed 's/^/  /'; }
+[ -n "$esp_pulados" ] && { echo "espelho pulado, porque .agents/skills tem diretorio ou arquivo com o nome:"; printf '%s' "$esp_pulados" | sed 's/^/  /'; }
 
 # --- aviso: referencia para fora do roster ------------------------------------
 # Nao religa nada. Existe para a lista nao apodrecer em silencio: uma skill

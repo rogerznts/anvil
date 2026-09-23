@@ -17,8 +17,9 @@ mesmo nome de um do payload: é sobrescrito, depois do destaque de colisão no
 dry-run e do aviso do passo 4.
 
 O espelho do Codex, `.agents/skills`, é refeito a partir do lock: um symlink para
-`.claude/skills` por skill do payload. Ali, só o symlink nessa forma é do anvil;
-**qualquer outra entrada é sua e fica intocada**, mesmo com nome de skill do anvil.
+`.claude/skills` por skill do payload. Ali, todo symlink com nome de skill do anvil
+é do anvil e é refeito, aponte para onde apontar. **Diretório ou arquivo é seu e
+fica intocado**, mesmo com nome de skill do anvil.
 
 **Por que reset e não `degit --force`:** o `--force` sobrescreve arquivo a
 arquivo e **nunca apaga**. Uma skill que deixou de existir upstream ficaria no
@@ -102,11 +103,14 @@ constar do lock. Sem lock tudo está fora dele, não há como distinguir, e o
 destaque não aparece.
 
 Depois vem o bloco do espelho do Codex, `.agents/skills`: *symlinks novos* ·
-*órfãos, serão removidos* · *colisões* · *não são do anvil*. Colisão no espelho é
-entrada do usuário com nome de skill do payload. Ao contrário da colisão de skill,
-ela **não** é substituída: fica como está, e o Codex lê essa entrada, não a skill
-do anvil. Se `.agents` ou `.agents/skills` for symlink ou arquivo, o espelho
-inteiro é do usuário: o bloco diz isso numa linha e nada ali é tocado.
+*symlinks refeitos* · *órfãos, serão removidos* · *colisões* · *não são do anvil*.
+Refeito é o symlink com nome de skill do payload que apontava para outro lugar,
+como o link absoluto e pendurado que o degit deixa para o cache dele. Colisão no
+espelho é diretório ou arquivo com nome de skill do payload. Ao contrário da
+colisão de skill, ela **não** é substituída: fica como está, e o Codex lê essa
+entrada, não a skill do anvil. Se `.agents` ou `.agents/skills` for symlink ou
+arquivo, o espelho inteiro é do usuário: o bloco diz isso numa linha e nada ali é
+tocado.
 
 Por último vem o `.gitignore`. **O toolkit instalado fica versionado**, então nada
 é escrito ali. Instalação de uma versão antiga tem um bloco `ANVIL:INSTALLED` que
