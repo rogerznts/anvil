@@ -4,11 +4,12 @@
 
 **Blocked by:** 05
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=c7d6447; scope=full; verdict=fail; p1=open
 
 - [x] O agente fica em `.omp/agents/`, com `autoloadSkills` das três skills, `task` entre as ferramentas e sem `model:`.
 - [x] As três skills carregadas são as vendorizadas, sem mudança.
-- [x] Sessão do omp com `task` → `anvil-implementer` sobre um ticket de fixture termina com o ticket `resolved`, a linha `Review:` gravada no formato do perfil e um commit no branch.
+- [ ] Sessão do omp com `task` → `anvil-implementer` sobre um ticket de fixture termina com o ticket `resolved`, a linha `Review:` gravada no formato do perfil e um commit no branch.
 - [x] Os eixos Standards e Spec rodam como subagentes do implementer, na profundidade 2, sem erro de recursão.
 - [x] O implementer não toca em outro ticket.
 - [x] O agente entra no lock como `omp:`; o `verify` sai limpo.
@@ -26,3 +27,11 @@
 - Prova: o S2 (`workspace/32-omp-implementer/s2.sh`) passa com 16 checks, com o omp 18.2.11 e o `haiku`, em cerca de 4 minutos. O payload real é instalado com o omp no `PATH` num repositório de fixture, com uma spec de dois tickets em bash, e o 02 bloqueado pelo 01. Um turno de `omp -p` despacha o implementer pelo `task` sobre o 01. O script confere que as três skills chegam ao implementer como `skill-prompt` de `.claude/skills/`, iguais às do payload, e que o payload não difere da `main`. O 01 termina `resolved`, com `**Review:** round=1; …; scope=full; verdict=pass; p1=none` na linha logo abaixo do `Status:` e o `sha` num commit do branch. A árvore fica limpa, o branch é o mesmo, a `main` não muda e o `bash test.sh` passa. O 02 fica byte a byte igual, e o 01 é o único arquivo de `docs/specs` no diff. Os dois eixos são filhos do implementer, do agente `task`, sem `task` e sem `spawns`. O `task` devolve o ticket, o `Status` e a última `Review:` do disco.
 - P2 (prova fraca): o S2 é probabilístico. Foram quatro rodadas completas com o `haiku` e `blocking: true`. A primeira passou nos checks de então, mas gravou a `Review:` separada do `Status:` por uma linha em branco, e o check de agora a reprova. A segunda e a terceira falharam, e cada uma motivou uma das instruções acima. A quarta, com as duas instruções no agente, passou nos 16 checks, mas uma rodada só não mede a taxa. Uma falha no S2 pede outra rodada antes de concluir regressão, e o S2 do `anvil-run`, no ticket 08, herda essa variância.
 - P2 (prova fraca): o S2 não exercita o P1. A rodada 2, o `Status: claimed` e a parada na segunda reprovação estão escritos no agente, mas não dá para forçar um P1 de forma determinística, o mesmo limite que a spec registra para o `anvil-run`. Quem ler o S2 como prova do laço de correção conclui mais do que ele mostra.
+- Review round=1 · P1 (Spec): o implementer da rodada final do S2 derrubou o gate sozinho. Colou nos eixos um diff mal escapado (`echo "\$1"`) em vez de passar o comando do diff, os dois eixos devolveram P1, e ele julgou o achado falso positivo e gravou `verdict=pass; p1=none`. É contra a US 36 — os eixos rodam em sessões que não viram a implementação, para que o gate não seja o autor se revisando. O `anvil-run` relê `verdict=pass` do disco e avança, então um P1 real descartado pelo autor chega ao merge com o S2 verde. O S2 não pegou, porque confere o formato da linha e não a coerência com o que os eixos devolveram.
+- Review round=1 · P1 (Standards): o agente manda gravar no `## Comments` só os P2 e P3, e manda a retomada corrigir "os P1 registrados no `## Comments`". Nenhum P1 fica no disco. Um implementer despachado de novo sobre um ticket `claimed` com a rodada 1 reprovada não acha o que corrigir, e depois da segunda reprovação o operador recebe `p1=open` sem o achado.
+- Review round=1 · P2 (Spec): o mesmo achado do P1 de Standards, lido pela US 34 — cada ticket num implementer de contexto novo, para que o ticket seja o estado e não a conversa. A rodada 2 não tem achado para remedir.
+- Review round=1 · P2 (Standards): `Status: resolved` sem linha `Review:` cai em "qualquer outro caso: implemente o ticket", e o `HEAD` anotado vira o fixed point. Um implementer que caiu entre o commit do `resolved` e o registro do review retoma com diff vazio, e a `anvil-code-review` não abre a rodada 1.
+- Review round=1 · P2 (Spec): o `HEAD` anotado como fixed point deixa de fora os commits de uma execução anterior do mesmo ticket, a que parou com pergunta ou caiu. Esses commits entram no branch sem passar pelos eixos.
+- Review round=1 · P3 (Standards): a seção de review do agente reescreve regras do `verification.md` e do `issue-tracker.md`, como a posição da linha e o P1 que leva a `claimed`. Se o perfil mudar, o agente diverge em silêncio.
+- Review round=1 · P3 (Standards): o agente usa dois-pontos como conector no meio da frase, em "Sem P1: `verdict=pass`…" e nos itens do passo 3, o que a `anvil-unslop` evita. Só custa leitura.
+- Review round=1 · P3 (Spec): o `blocking: true` não está no "Frontmatter" da spec. Quem ler só a spec no ticket 08 não sabe que o pai espera o implementer.
