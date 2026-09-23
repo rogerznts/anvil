@@ -12,6 +12,11 @@
 # tem uma linha `skill:` por skill e uma `agent:` por agente.
 # O espelho do Codex, .agents/skills, sai do mesmo lock: um symlink para
 # .claude/skills por linha `skill:`, e o que o lock deixou de listar sai.
+# A camada omp, em .omp/, vem de .claude/skills/anvil-update/omp-layer/ do payload
+# e entra quando há sinal de omp: o binário no PATH, ~/.omp/, ou uma linha `omp:`
+# no lock. A última torna a camada pegajosa: máquina sem omp a mantém. O lock
+# ganha uma linha `omp:` por arquivo, com o caminho relativo a .omp/, e a
+# classificação é a mesma das skills.
 #
 #   reset-install.sh --from <tmp> --to <projeto> [--dry-run]
 #   reset-install.sh --unignore --to <projeto> [--dry-run]
@@ -33,7 +38,7 @@ while [ $# -gt 0 ]; do
         --to)   TO="${2:-}";   shift 2 ;;
         --dry-run) DRY=1; shift ;;
         --unignore) UNIGNORE=1; shift ;;
-        -h|--help) sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '2,28p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
     esac
 done
@@ -126,14 +131,23 @@ novo_ag=""
 for f in "$FROM_ABS"/.claude/agents/*.md; do
     [ -f "$f" ] && novo_ag="$novo_ag$(basename "$f" .md)"$'\n'
 done
+# A camada omp e uma arvore de arquivos, e o nome de cada um e o caminho relativo
+# a .omp/. Payload sem omp-layer/ e valido, e so nao traz camada.
+CAMADA_OMP="$FROM_ABS/.claude/skills/anvil-update/omp-layer"
+novo_omp=""
+if [ -d "$CAMADA_OMP" ]; then
+    novo_omp="$(cd "$CAMADA_OMP" && find . -type f | sed 's|^\./||' | LC_ALL=C sort)"
+fi
 
 # --- o que esta instalacao possui --------------------------------------------
 # Sem lock, nada e considerado nosso: e a leitura segura numa instalacao que
 # veio de antes do lockfile, ou de um degit feito a mao.
-possui=""; possui_ag=""
+possui=""; possui_ag=""; possui_omp=""
 if [ -f "$LOCK" ]; then
     possui="$(tr -d '\r' < "$LOCK" | sed -n 's/^skill: *//p')"
     possui_ag="$(tr -d '\r' < "$LOCK" | sed -n 's/^agent: *//p')"
+    # Caminho absoluto ou com `..` sairia de .omp/ no rm do orfao: nao e da camada.
+    possui_omp="$(tr -d '\r' < "$LOCK" | sed -n 's/^omp: *//p' | awk '!/^\// && !/(^|\/)\.\.(\/|$)/')"
 fi
 
 # --- o que esta no disco -----------------------------------------------------
@@ -165,16 +179,58 @@ ocupado_espelho() { [ -e "$ESPELHO/$1" ] || [ -L "$ESPELHO/$1" ]; }
 # A raiz tambem e do usuario quando .agents ou .agents/skills e symlink ou arquivo,
 # como .agents/skills -> ../.claude/skills: o `ln -s` cairia dentro da skill recem-
 # copiada, e o `mkdir -p` abortaria o reset antes da escrita do lock. Entao o
-# espelho inteiro fica intocado.
+# espelho inteiro fica intocado. A camada omp usa a mesma guarda.
+fora_do_lugar() { [ -L "$1" ] || { [ -e "$1" ] && [ ! -d "$1" ]; }; }
 raiz_espelho=1
 for c in "$TO_ABS/.agents" "$ESPELHO"; do
-    if [ -L "$c" ] || { [ -e "$c" ] && [ ! -d "$c" ]; }; then raiz_espelho=0; fi
+    if fora_do_lugar "$c"; then raiz_espelho=0; fi
 done
 disco_esp=""
 if [ "$raiz_espelho" -eq 1 ]; then
     for e in "$ESPELHO"/*; do
         ocupado_espelho "$(basename "$e")" && disco_esp="$disco_esp$(basename "$e")"$'\n'
     done
+fi
+
+# A camada omp entra com qualquer sinal. A linha `omp:` no lock e o que a torna
+# pegajosa: a ausencia do binario nunca remove nada.
+sinais_omp=""
+if command -v omp >/dev/null 2>&1; then sinais_omp="omp no PATH"; fi
+if [ -n "${HOME:-}" ] && [ -d "$HOME/.omp" ]; then sinais_omp="${sinais_omp:+$sinais_omp, }~/.omp/"; fi
+if [ -n "$possui_omp" ]; then sinais_omp="${sinais_omp:+$sinais_omp, }linha omp: no lock"; fi
+
+OMP="$TO_ABS/.omp"
+# Symlink conta como arquivo da camada, mesmo pendurado, como no agente.
+existe_omp() { [ -f "$OMP/$1" ] || [ -L "$OMP/$1" ]; }
+# A camada inteira e do usuario quando .omp, ou uma pasta no caminho de um arquivo
+# dela, e symlink ou arquivo: escrever ali escreveria fora do projeto, ou abortaria
+# o reset antes do lock. Diretorio no lugar de um arquivo da camada tambem: o cp o
+# encheria por dentro. Grava em raiz_omp o primeiro caminho que impede.
+raiz_omp=""
+confere_raiz_omp() {
+    local f p resto
+    if fora_do_lugar "$OMP"; then raiz_omp=".omp"; return; fi
+    for f in $novo_omp $possui_omp; do
+        p=""; resto="$f"
+        while [ "${resto#*/}" != "$resto" ]; do
+            p="$p${p:+/}${resto%%/*}"; resto="${resto#*/}"
+            if fora_do_lugar "$OMP/$p"; then raiz_omp=".omp/$p"; return; fi
+        done
+    done
+    for f in $novo_omp; do
+        if [ -d "$OMP/$f" ] && [ ! -L "$OMP/$f" ]; then raiz_omp=".omp/$f"; return; fi
+    done
+}
+instala_omp=0
+disco_omp=""
+if [ -n "$sinais_omp" ] && [ -n "$novo_omp$possui_omp" ]; then
+    confere_raiz_omp
+    if [ -z "$raiz_omp" ]; then
+        instala_omp=1
+        if [ -d "$OMP" ]; then
+            disco_omp="$(cd "$OMP" && find . \( -type f -o -type l \) | sed 's|^\./||' | LC_ALL=C sort)"
+        fi
+    fi
 fi
 
 # --- classificacao ------------------------------------------------------------
@@ -238,6 +294,14 @@ if [ "$raiz_espelho" -eq 1 ]; then
     done <<< "$disco_esp"
 fi
 
+substituidos_omp=""; orfaos_omp=""; alheios_omp=""; colisoes_omp=""; criados_omp=""
+if [ "$instala_omp" -eq 1 ]; then
+    classifica "_omp" "$novo_omp" "$possui_omp" "$disco_omp" existe_omp
+    for x in $novo_omp; do
+        if ! existe_omp "$x"; then criados_omp="$criados_omp$x"$'\n'; fi
+    done
+fi
+
 conta() { printf '%s' "$1" | grep -c . || true; }
 # Skill sai pelo nome, agente pelo caminho: as duas listas dividem o mesmo grupo.
 lista() {
@@ -245,6 +309,7 @@ lista() {
     printf '%s' "$2" | sed 's|^\(.*\)$|  .claude/agents/\1.md|'
 }
 espelho() { printf '%s' "$1" | sed 's|^\(.*\)$|    .agents/skills/\1|'; }
+na_camada() { printf '%s' "$1" | sed 's|^\(.*\)$|    .omp/\1|'; }
 
 # O reset instala skills, agentes e lock. Diretivas e perfis sao do projeto e
 # ficam intocados; esta checagem roda da copia NOVA, em $FROM_ABS, para que ate um
@@ -302,6 +367,27 @@ if [ "$raiz_espelho" -eq 1 ]; then
 else
     echo "espelho do Codex: .agents ou .agents/skills é symlink ou arquivo, fica intocado"
 fi
+if [ -z "$sinais_omp" ]; then
+    echo "camada omp: não instalada, nenhum sinal de omp (omp no PATH, ~/.omp/, linha omp: no lock)"
+elif [ -n "$raiz_omp" ]; then
+    if [ -L "$TO_ABS/$raiz_omp" ]; then tipo_omp="symlink"
+    elif [ -d "$TO_ABS/$raiz_omp" ]; then tipo_omp="diretório"
+    else tipo_omp="arquivo"; fi
+    echo "camada omp: $raiz_omp é $tipo_omp, .omp/ fica intocado"
+elif [ "$instala_omp" -eq 0 ]; then
+    echo "camada omp: o payload não traz camada omp, .omp/ fica intocado (sinal: $sinais_omp)"
+else
+    if [ -n "$possui_omp" ]; then estado_omp="mantida"; else estado_omp="nova neste update"; fi
+    echo "camada omp em .omp/, $estado_omp (sinal: $sinais_omp):"
+    echo "  arquivos novos ($(conta "$criados_omp")):"; na_camada "$criados_omp"
+    echo "  substituídos ($(conta "$substituidos_omp")):"; na_camada "$substituidos_omp"
+    if [ -n "$colisoes_omp" ]; then
+        echo "  colisões, arquivo fora do lock com caminho da camada, será SUBSTITUÍDO ($(conta "$colisoes_omp")):"
+        na_camada "$colisoes_omp"
+    fi
+    echo "  órfãos, serão REMOVIDOS ($(conta "$orfaos_omp")):"; na_camada "$orfaos_omp"
+    echo "  não são do anvil, ficam intocados ($(conta "$alheios_omp")):"; na_camada "$alheios_omp"
+fi
 
 # --- lockfile -----------------------------------------------------------------
 # Reescrito a cada reset. E dele que o proximo update calcula os orfaos, entao
@@ -312,6 +398,10 @@ conteudo_lock() {
     echo "installed_at: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
     for s in $novo; do echo "skill: $s"; done
     for a in $novo_ag; do echo "agent: $a"; done
+    # A camada que nao foi tocada, por raiz do usuario, continua no lock: sem a
+    # linha, a camada perderia a posse e a regra pegajosa.
+    if [ "$instala_omp" -eq 1 ]; then omp_lock="$novo_omp"; else omp_lock="$possui_omp"; fi
+    for f in $omp_lock; do echo "omp: $f"; done
 }
 
 if tem_bloco; then
@@ -351,6 +441,21 @@ done
 if [ -n "$criados_esp" ]; then
     mkdir -p "$ESPELHO"
     for x in $criados_esp; do ln -s "../../.claude/skills/$x" "$ESPELHO/$x"; done
+fi
+
+# Camada omp: o orfao sai, e a pasta que ele deixa vazia tambem, ate .omp, que
+# fica. O arquivo da camada e reescrito com rm antes do cp, como o agente.
+if [ "$instala_omp" -eq 1 ]; then
+    for f in $orfaos_omp; do
+        rm -f "${OMP:?}/$f"
+        d="$(dirname "$f")"
+        while [ "$d" != "." ] && rmdir "$OMP/$d" 2>/dev/null; do d="$(dirname "$d")"; done
+    done
+    for f in $novo_omp; do
+        mkdir -p "$OMP/$(dirname "$f")"
+        rm -f "${OMP:?}/$f"
+        cp "$CAMADA_OMP/$f" "$OMP/$f"
+    done
 fi
 
 conteudo_lock > "$LOCK"
