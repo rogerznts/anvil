@@ -98,7 +98,8 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" \
 próprio diretório onde o script vive. Rodar do `$TMP` também garante que a lógica
 de reset é a nova, não a da versão velha. O `--unignore`, que só tira do
 `.gitignore` o bloco de uma instalação antiga, pode rodar da cópia instalada — é o
-que o `/anvil-boot` faz.
+que o `/anvil-boot` faz. O `--layers`, que roda só o espelho do Codex e a camada
+omp, também: é o passo das camadas do boot.
 
 A saída classifica em quatro grupos: *substituídos* · *órfãos, serão removidos* ·
 *não são do anvil, ficam intocados* · *preservados sempre*.

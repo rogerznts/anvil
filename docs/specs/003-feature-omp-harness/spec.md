@@ -177,7 +177,13 @@ própria. O desenho do fluxo está em `docs/discovery/camadas-anvil-omp.md`.
   arquivo em `.omp/` fora do lock, e nunca é tocado. Colisão é arquivo em `.omp/`
   com caminho da camada e fora do lock: aparece no aviso antes de ser substituído.
 - **Só no projeto.** O lock do payload não ganha `omp:`. Quem escreve `omp:` é o
-  `reset-install.sh`, e só quando instala a camada.
+  `reset-install.sh`, e só quando instala a camada ou, com a raiz do usuário,
+  preserva as linhas do lock anterior.
+- **Raiz do usuário.** Se `.omp`, ou uma pasta no caminho de um arquivo da camada,
+  for symlink ou arquivo, ou se um arquivo da camada existir como diretório, a
+  camada inteira é do usuário: nada em `.omp/` é tocado, e o lock novo guarda as
+  linhas `omp:` que o anterior tinha. Sem elas, a camada perderia a posse e a
+  regra pegajosa. O relatório diz qual caminho impediu.
 
 ### Espelho `.agents/skills`
 
