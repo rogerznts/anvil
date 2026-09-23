@@ -4,13 +4,24 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Instalação nova: o `anvil.md` sai com comando, custo medido, data, máquina e a instrução de correção no mesmo commit.
-- [ ] Comando que não roda: fica gravado sem custo, com o motivo.
-- [ ] `anvil.md` existente sem custo: o boot propõe acrescentar e espera aprovação; o comando configurado não muda.
-- [ ] Custo gravado divergente do medido: o boot mostra os dois e a troca espera aprovação.
-- [ ] Custo repetido em `CLAUDE.md` ou em outra rule: o boot aponta e propõe o ponteiro, sem editar sozinho.
-- [ ] O formato de `laço` e `gate` usa os termos do perfil do ticket 01.
-- [ ] Exercitado num projeto descartável em `workspace/`, nos dois casos: instalação nova e projeto adotado com custo repetido.
-- [ ] O `verify` sai limpo.
+- [x] Instalação nova: o `anvil.md` sai com comando, custo medido, data, máquina e a instrução de correção no mesmo commit.
+- [x] Comando que não roda: fica gravado sem custo, com o motivo.
+- [x] `anvil.md` existente sem custo: o boot propõe acrescentar e espera aprovação; o comando configurado não muda.
+- [x] Custo gravado divergente do medido: o boot mostra os dois e a troca espera aprovação.
+- [x] Custo repetido em `CLAUDE.md` ou em outra rule: o boot aponta e propõe o ponteiro, sem editar sozinho.
+- [x] O formato de `laço` e `gate` usa os termos do perfil do ticket 01.
+- [x] Exercitado num projeto descartável em `workspace/`, nos dois casos: instalação nova e projeto adotado com custo repetido.
+- [x] O `verify` sai limpo.
+
+## Comments
+
+- Cenário em `workspace/02-boot-custo/`, fora do git, com a seção seguida à mão (a
+  skill editada só carrega na próxima sessão). **Novo**: `npm test` medido em 2,1s
+  e gravado no `anvil.md` com data, máquina e a instrução de correção.
+  **Adotado**: `anvil.md` com o comando e sem custo → proposta de acrescentar
+  1,8s, comando intocado. A busca por tempo de teste fora do `anvil.md` achou
+  `CLAUDE.md:3` (`~80s`) e `.claude/rules/project.md:3` (`cerca de 2 min`), os
+  dois divergentes do medido: ficam apontados, com proposta de ponteiro, sem
+  edição.
