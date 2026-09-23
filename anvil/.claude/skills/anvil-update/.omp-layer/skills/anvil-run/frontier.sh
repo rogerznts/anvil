@@ -71,7 +71,8 @@ for f in "$dir"/issues/[0-9]*.md; do
     arq[n]="$f"; rot[n]="$p"
     titulo[n]="$(sed -n '1{s/^# *//;s/^[0-9][0-9]*: *//;p;}' "$f")"
     st[n]="$(sed -n 's/^\**Status:\** *//p' "$f" | sed -n '1s/[[:space:]]*$//p')"
-    bl[n]="$(sed -n 's/^\**Blocked by:\** *//p' "$f" | sed -n 1p | grep -oE '[0-9]+' | while read -r x; do echo $((10#$x)); done | tr '\n' ' ')"
+    # So a lista de numeros do comeco da linha: "03, ver ADR-0011" bloqueia pelo 03.
+    bl[n]="$(sed -n 's/^\**Blocked by:\** *//p' "$f" | sed -n '1{s/[^0-9, ].*//;p;}' | grep -oE '[0-9]+' | while read -r x; do echo $((10#$x)); done | tr '\n' ' ')"
     rv="$(grep -E '^\**Review:' "$f")"
     if [ -n "$rv" ]; then
         nrev[n]="$(printf '%s\n' "$rv" | wc -l | tr -d ' ')"
@@ -81,8 +82,8 @@ for f in "$dir"/issues/[0-9]*.md; do
         ult[n]="round=${r:-?}/${v:-?}"
         if [ -n "$r" ] && [ "$r" -ge 2 ] && [ "$v" = fail ]; then
             trav[n]=1
-            # o P1 que travou: as linhas da ultima rodada no ## Comments, no formato do perfil
-            p1[n]="$(sed -n '/^## Comments/,$p' "$f" | grep -E "^- *Review round=$r[^0-9].*P1" | sed 's/^- *//')"
+            # o P1 que travou: as linhas "Review round=N · P1" da ultima rodada no ## Comments
+            p1[n]="$(sed -n '/^## Comments/,$p' "$f" | grep -E "^- *Review round=$r · P1([^0-9]|$)" | sed 's/^- *//')"
             [ -n "${p1[n]}" ] || p1[n]="nenhuma linha 'Review round=$r · P1' no ## Comments"
         fi
     else
@@ -134,7 +135,23 @@ sujos="$(git status --porcelain | wc -l | tr -d ' ')"
 echo "spec: $dir"
 echo "branch: $branch"
 [ "$sujos" = 0 ] && echo "arvore: limpa" || echo "arvore: suja ($sujos caminhos)"
-[ -d "$dir/ui" ] && echo "tela: $dir/ui/ existe" || echo "tela: sem $dir/ui/"
+# Tela: a pasta ui/ da spec, ou uma user story que fala de algo que o usuario ve.
+# A palavra e so o padrao: o supervisor le as linhas historia e pode subir um "nao"
+# para o browser QA quando a historia descreve tela com outras palavras.
+historias="$(sed -n '/^## User Stories/,/^## [^#]/p' "$dir/spec.md" 2>/dev/null | grep -E '^[0-9]+\. ')"
+PALAVRAS_TELA='telas?|páginas?|paginas?|painel|painéis|formulários?|formularios?|interface|navegador|browser|botão|botões|botao|botoes|dashboard|screens?|pages?|ui|frontend|layout'
+cita="$(printf '%s\n' "$historias" | grep -iwE "$PALAVRAS_TELA" | sed -n '1s/^\([0-9]*\)\..*/\1/p')"
+if [ -d "$dir/ui" ]; then
+    echo "tela: sim ($dir/ui/ existe)"
+elif [ -n "$cita" ]; then
+    echo "tela: sim (a user story $cita fala de tela)"
+else
+    echo "tela: nao (sem $dir/ui/, e nenhuma user story usa palavra de tela)"
+fi
+# Com tudo resolvido e sem ui/, as historias vao na saida para o supervisor conferir.
+if [ "$tudo" = sim ] && [ ! -d "$dir/ui" ] && [ -n "$historias" ]; then
+    printf '%s\n' "$historias" | while IFS= read -r l; do echo "historia: $l"; done
+fi
 for n in $ordem; do
     bb=""; for b in ${bl[n]}; do
         if [ -n "${rot[b]:-}" ]; then bb="$bb,${rot[b]}"; else bb="$bb,$b(não existe)"; fi

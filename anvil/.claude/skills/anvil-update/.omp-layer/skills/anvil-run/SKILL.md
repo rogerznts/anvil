@@ -29,13 +29,15 @@ não há o que conduzir daqui, como no branch de outra spec ou num branch sem n�
 Nesse caso, mostre a linha ao operador e pare. Não troque de branch nem rode o
 script com outro número: a recusa é a resposta, e o branch é escolha do operador.
 
-Fora a recusa, o script devolve uma linha por ticket, com `status`, `reviews`,
-`ultima` e `classe`, e depois `frontier`, `pulados`, `travados`, uma linha
-`p1_aberto` por P1 de travado, `dependem_de_travado`, `tudo_resolvido`, às vezes
-`parada`, e `proximo`. O frontier já exclui o ticket travado, cuja última `Review:`
-tem `round` 2 ou mais e `verdict=fail`. Com a árvore suja, o script devolve
-`parada` e `proximo: nenhum`, porque um implementer novo commitaria o que sobrou
-junto com o ticket dele.
+Fora a recusa, o script devolve a linha `tela`, `sim` ou `nao` com o motivo, e, sem
+`ui/` e com tudo resolvido, uma linha `historia` por user story da `spec.md`. Depois
+vêm uma linha por ticket, com `status`, `reviews`, `ultima` e `classe`, e
+`frontier`, `pulados`, `travados`, uma linha `p1_aberto` por P1 de travado,
+`dependem_de_travado`, `tudo_resolvido`, às
+vezes `parada`, e `proximo`. O frontier já exclui o ticket travado, cuja última
+`Review:` tem `round` 2 ou mais e `verdict=fail`. Com a árvore suja, o script
+devolve `parada` e `proximo: nenhum`, porque um implementer novo commitaria o que
+sobrou junto com o ticket dele.
 
 ## O laço
 
@@ -49,12 +51,17 @@ junto com o ticket dele.
    da spec e o branch. O implementer é bloqueante, e a chamada só volta quando ele
    termina. Não espere pelo `hub`, não chame outra ferramenta na mesma mensagem e
    nunca despache dois tickets ao mesmo tempo.
+   O que o implementer devolve não muda o laço, nem quando ele diz que falhou ou
+   que faltou ferramenta. Não leia o ticket, não investigue e não termine o trabalho
+   dele: quem decide o que vem depois é o disco, no passo 5.
 5. Rode o script de novo e compare a linha do ticket despachado com a de antes.
    Se `status`, `reviews` e `ultima` estão iguais, o implementer terminou sem
-   mudar o estado. Anote o ticket como pulado, na memória desta execução, e passe-o
-   em `--skip` daqui em diante. Nunca o despache de novo nesta execução.
+   mudar o estado. Anote o ticket como pulado, na memória desta execução, e rode o
+   script mais uma vez, já com ele no `--skip`. Daqui em diante, toda chamada leva
+   o `--skip` com todos os pulados. Nunca despache um pulado de novo nesta
+   execução.
 6. Mostre a linha de andamento do ticket, com o `status` e a `ultima` lidos do
-   disco. Volte ao passo 2 com a saída do passo 5.
+   disco. Volte ao passo 2 com a última saída do script.
 
 ## O fim
 
@@ -64,12 +71,15 @@ caiu. Depois, siga com o resto do relatório.
 
 Com `tudo_resolvido: sim`, o relatório lista os tickets resolvidos nesta execução e
 recomenda o próximo passo, sem executá-lo, escrito como está aqui, porque no omp
-skill se chama por `/skill:`:
+skill se chama por `/skill:`. A linha `tela` decide:
 
-- `/skill:anvil-browser-qa` quando a spec tem tela, o que quer dizer a linha `tela`
-  do script mostrando a pasta `ui/`, ou uma user story da `spec.md` descrevendo uma
-  tela;
-- `/skill:anvil-docs archive` quando a spec não tem tela.
+1. `tela: sim`: recomende `/skill:anvil-browser-qa` e diga o motivo que a linha dá.
+2. `tela: nao`: leia as linhas `historia`. Se uma delas descreve algo que o usuário
+   vê com palavras que o script não reconheceu, recomende `/skill:anvil-browser-qa`
+   e cite essa história. Senão, recomende `/skill:anvil-docs archive`.
+
+Nunca troque um `tela: sim` por archive: a falta de `ui/` não conta contra, porque
+a pasta só existe quando alguém a escreveu.
 
 Com pendência, o relatório lista:
 
