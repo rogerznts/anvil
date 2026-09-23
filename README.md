@@ -133,6 +133,7 @@ revisado, e a guarda de merge impõe a ordem.
 | `anvil-implement` | constrói a partir do ticket; chama `tdd` e `code-review` por dentro | mattpocock |
 | `anvil-code-review` | revisa o diff em dois eixos independentes — Standards e Spec | mattpocock |
 | `anvil-tdd` | ciclo vermelho-verde que produz teste que se mantém, em seams acordados | mattpocock |
+| `anvil-browser-qa` | gera checklist de browser e conduz testes assistidos ou autônomos, com evidência visual | autoral |
 
 ### Entender antes de mudar
 
@@ -241,14 +242,16 @@ docs/
 │   │   │     **Blocked by:** —
 │   │   │     **Status:** resolved
 │   │   ├── ui/                            fluxo e comportamento desta mudança
+│   │   ├── qa/                            checklist e evidências de browser
 │   │   └── map.md                         anvil-wayfinder, quando usado
 │   └── archive/
 │
-└── prd/  ui/  qa/  project/    ○  reconhecidos, nascem quando houver conteúdo
+├── qa/                         ◆  anvil-browser-qa
+└── prd/  ui/  project/         ○  reconhecidos, nascem quando houver conteúdo
 ```
 
-**●** o `scaffold` cria · **○** nenhuma skill escreve; são para o que você
-escrever à mão
+**●** o `scaffold` cria · **◆** a skill cria no primeiro uso · **○** nasce só
+quando você escrever
 
 **Não há skill que autore PRD.** A spec é a unidade e carrega suas próprias User
 Stories — o `to-spec` pede uma lista *"extremely extensive"*. Camada de épico
