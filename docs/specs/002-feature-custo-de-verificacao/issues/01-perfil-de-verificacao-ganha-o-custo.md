@@ -4,10 +4,10 @@
 
 **Blocked by:** Nenhum — pode começar agora.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] O template do perfil no `anvil-docs` tem a seção do custo, ao lado de classe, orçamento e persistência.
-- [ ] A seção diz: gate por ticket, com o argumento da bissecção; gate em background; rodada antes do merge; sinal de adoção do laço curto (~2 min); forma genérica do laço curto (o barato e transversal roda inteiro, só o caro se seleciona, numa invocação só); a seleção adia e não dispensa o gate.
-- [ ] Nenhum número medido de projeto aparece na seção.
-- [ ] `docs/agents/verification.md` do anvil é idêntico ao template.
-- [ ] O `verify` sai limpo.
+- [x] O template do perfil no `anvil-docs` tem a seção do custo, ao lado de classe, orçamento e persistência.
+- [x] A seção diz: gate por ticket, com o argumento da bissecção; gate em background; rodada antes do merge; sinal de adoção do laço curto (~2 min); forma genérica do laço curto (o barato e transversal roda inteiro, só o caro se seleciona, numa invocação só); a seleção adia e não dispensa o gate.
+- [x] Nenhum número medido de projeto aparece na seção.
+- [x] `docs/agents/verification.md` do anvil é idêntico ao template.
+- [x] O `verify` sai limpo.
