@@ -60,19 +60,20 @@ docs/
 │   │   ├── map.md                 anvil-wayfinder, quando usado
 │   │   ├── ui/                    fluxos e comportamento desta mudança
 │   │   ├── architecture/          ADRs e modelos desta mudança
-│   │   └── discovery/             pesquisa desta mudança
+│   │   ├── discovery/             pesquisa desta mudança
+│   │   └── qa/                    checklist e evidências (anvil-browser-qa)
 │   └── archive/                   specs concluídas
 │
 ├── prd/                        ○  escopo de produto
 ├── ui/                         ○  design system e fluxos duráveis
-├── qa/                         ○  estratégia de teste
+├── qa/                         ◆  checklist e evidências (anvil-browser-qa)
 └── project/                    ○  plano e atualizações datadas
 ```
 
-**●** o `scaffold` cria · **○** reconhecido, mas **nasce só quando algo for
-escrito ali**
+**●** o `scaffold` cria · **◆** uma skill cria no primeiro uso · **○**
+reconhecido, mas nasce só quando algo for escrito ali.
 
-Os quatro com `○` não têm skill que escreva neles. Pasta vazia com README
+Os três domínios com `○` não têm skill que escreva neles. Pasta vazia com README
 prometendo um autor que não existe ensina quem lê a ignorar a árvore inteira —
 então eles não nascem antes de ter conteúdo. Continuam canônicos: o
 `validate.sh docs-paths` não reclama deles quando aparecem.
@@ -90,7 +91,8 @@ Duas camadas espelhadas: **base**, que é a verdade do projeto hoje, e
 | `specs/{id}/issues/` | `anvil-to-tickets` |
 | `specs/{id}/ui/` | `anvil-grill`. Fluxo de usuário, comportamento de interface e wireframe são decisão que vira artefato — a mesma natureza de um ADR. Quando a pergunta só se responde vendo rodar, o `anvil-prototype` gera as variantes, você escolhe, e **a decisão volta para o documento**; o protótipo em si é descartável e vive fora da main |
 | `agents/issue-tracker.md` | `anvil-setup` |
-| `prd/` · `ui/` · `qa/` · `project/` | **ninguém.** São para o que você escrever à mão |
+| `qa/` e `specs/{id}/qa/` | `anvil-browser-qa`, com checklist e evidências de testes no navegador |
+| `prd/` · `ui/` · `project/` | **ninguém.** São para o que você escrever à mão |
 
 **Nenhuma skill autora PRD.** O modelo é o das skills de fluxo: a spec é a
 unidade e carrega suas próprias User Stories. Se você quiser uma camada de épico
