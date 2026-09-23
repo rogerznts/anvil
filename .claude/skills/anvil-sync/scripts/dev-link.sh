@@ -10,7 +10,8 @@
 # Isto nao e o caminho de um projeto. La e o degit. Isto existe porque este
 # repositorio E a fonte.
 #
-#   dev-link.sh [--dry-run]     liga o roster de fluxo e os agentes
+#   dev-link.sh [--dry-run]     liga o roster de fluxo e os agentes, e espelha as
+#                               skills ligadas em .agents/skills
 #   dev-link.sh --all           liga o payload inteiro
 #   dev-link.sh --unlink        remove os symlinks, e somente eles
 #
@@ -23,6 +24,10 @@ PAYLOAD="$ROOT/anvil/.claude/skills"
 DEST="$ROOT/.claude/skills"
 AGENTS="$ROOT/anvil/.claude/agents"
 DEST_AGENTS="$ROOT/.claude/agents"
+# .agents/skills e por onde o Codex le as skills. O espelho e um symlink por skill
+# ligada, na forma que o reset-install.sh gera num projeto: so essa forma e nossa.
+ESPELHO="$ROOT/.agents/skills"
+nosso_espelho() { [ -L "$ESPELHO/$1" ] && [ "$(readlink "$ESPELHO/$1")" = "../../.claude/skills/$1" ]; }
 
 [ -d "$PAYLOAD" ] || { echo "erro: payload nao encontrado em $PAYLOAD" >&2; exit 2; }
 
@@ -72,7 +77,7 @@ while [ $# -gt 0 ]; do
         --all)     MODO="all";    shift ;;
         --unlink)  MODO="unlink"; shift ;;
         --dry-run) DRY=1;         shift ;;
-        -h|--help) sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
     esac
 done
@@ -94,6 +99,11 @@ if [ "$MODO" = "unlink" ]; then
         if [ "$DRY" -eq 1 ]; then echo "removeria $(basename "$l")"; else rm -f "$l"; fi
         n=$((n + 1))
     done
+    for l in "$ESPELHO"/*; do
+        nosso_espelho "$(basename "$l")" || continue
+        if [ "$DRY" -eq 1 ]; then echo "removeria .agents/skills/$(basename "$l")"; else rm -f "$l"; fi
+        n=$((n + 1))
+    done
     echo "$n symlink(s) $([ "$DRY" -eq 1 ] && echo "a remover" || echo "removido(s)")."
     exit 0
 fi
@@ -102,7 +112,7 @@ fi
 
 # --- ligar --------------------------------------------------------------------
 mkdir -p "$DEST"
-ligados=0; ausentes=""; pulados=""
+ligados=0; ausentes=""; pulados=""; a_ligar=""
 for s in $conjunto; do
     if [ ! -d "$PAYLOAD/$s" ]; then
         ausentes="$ausentes$s"$'\n'   # roster envelheceu: a skill saiu do payload
@@ -119,7 +129,7 @@ for s in $conjunto; do
         rm -f "$alvo"
         ln -s "../../anvil/.claude/skills/$s" "$alvo"
     fi
-    ligados=$((ligados + 1))
+    ligados=$((ligados + 1)); a_ligar="$a_ligar$s"$'\n'
 done
 
 # --- agentes -------------------------------------------------------------------
@@ -145,12 +155,49 @@ for f in "$AGENTS"/*.md; do
     ag_ligados=$((ag_ligados + 1))
 done
 
+# --- espelho do Codex ------------------------------------------------------------
+# Gerado a partir do que esta ligado agora em .claude/skills, nao so do conjunto
+# desta execucao: o roster nao desliga o que um --all ligou antes. Symlink nosso
+# cuja skill nao esta mais ligada sai. Entrada em outra forma e do usuario e fica,
+# mesmo com nome de skill: `ln -s` sobre um diretorio criaria o link dentro dele.
+ligada() {
+    printf '%s' "$a_ligar" | grep -qxF -e "$1" && return 0
+    [ -d "$PAYLOAD/$1" ] && [ -L "$DEST/$1" ] || return 1
+    case "$(readlink "$DEST/$1")" in *anvil/.claude/skills/*) return 0 ;; esac
+    return 1
+}
+esp_criados=0; esp_removidos=0; esp_pulados=""
+for s in $disponiveis; do
+    ligada "$s" || continue
+    nosso_espelho "$s" && continue
+    if [ -e "$ESPELHO/$s" ] || [ -L "$ESPELHO/$s" ]; then
+        esp_pulados="$esp_pulados$s"$'\n'
+        continue
+    fi
+    if [ "$DRY" -eq 1 ]; then
+        echo "espelharia $s"
+    else
+        mkdir -p "$ESPELHO"
+        ln -s "../../.claude/skills/$s" "$ESPELHO/$s"
+    fi
+    esp_criados=$((esp_criados + 1))
+done
+for l in "$ESPELHO"/*; do
+    s="$(basename "$l")"
+    nosso_espelho "$s" || continue
+    ligada "$s" && continue
+    if [ "$DRY" -eq 1 ]; then echo "removeria do espelho $s"; else rm -f "$l"; fi
+    esp_removidos=$((esp_removidos + 1))
+done
+
 echo
 echo "$ligados de $(conta "$disponiveis") skills do payload $([ "$DRY" -eq 1 ] && echo "seriam ligadas" || echo "ligadas")."
 echo "$ag_ligados de $ag_total agentes do payload $([ "$DRY" -eq 1 ] && echo "seriam ligados" || echo "ligados")."
+echo "$esp_criados symlink(s) $([ "$DRY" -eq 1 ] && echo "seriam criados" || echo "criados") e $esp_removidos $([ "$DRY" -eq 1 ] && echo "seriam removidos" || echo "removidos") em .agents/skills."
 [ -n "$ausentes" ] && { echo "NO ROSTER MAS FORA DO PAYLOAD — revise a lista:"; printf '%s' "$ausentes" | sed 's/^/  /'; }
 [ -n "$pulados"  ] && { echo "pulados, porque sao diretorio real e nao symlink:"; printf '%s' "$pulados" | sed 's/^/  /'; }
 [ -n "$ag_pulados" ] && { echo "agentes pulados, porque sao arquivo real e nao symlink:"; printf '%s' "$ag_pulados" | sed 's/^/  /'; }
+[ -n "$esp_pulados" ] && { echo "espelho pulado, porque .agents/skills tem entrada que nao e symlink nosso:"; printf '%s' "$esp_pulados" | sed 's/^/  /'; }
 
 # --- aviso: referencia para fora do roster ------------------------------------
 # Nao religa nada. Existe para a lista nao apodrecer em silencio: uma skill

@@ -16,3 +16,7 @@ workspace/
 
 # .claude/agents/ — symlinks para os agentes do payload, pelo mesmo dev-link.
 .claude/agents/*
+
+# .agents/skills/ — espelho do Codex: symlinks para .claude/skills, um por skill
+# ligada, gerados pelo mesmo dev-link.
+.agents/skills/*

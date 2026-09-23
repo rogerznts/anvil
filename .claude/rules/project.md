@@ -19,6 +19,7 @@ Confundir as duas coisas é o erro caro daqui.
 | `anvil/` | **o payload — a fonte.** É o que o `npx degit` copia para um projeto |
 | `.claude/skills/anvil-*` | **symlinks** para `anvil/.claude/skills/*`. Editar a skill instalada **é** editar o payload |
 | `.claude/agents/*.md` | **symlinks** para `anvil/.claude/agents/*.md`, do mesmo jeito |
+| `.agents/skills/*` | o espelho do Codex: **symlinks** para `.claude/skills/*`, um por skill ligada. Fora do git |
 | `.claude/skills/anvil-sync/` | a ferramenta de manutenção. É do repositório e **não vai no degit** |
 | `anvil-skills.yaml` | o manifesto de curadoria. Também não vai no degit |
 | `references/` — upstream vendorizado | submodule com pin, listado em `sources:` no manifesto. De onde vem o que é vendorizado: skills e, no caso do `unlazy`, material de terceiro dentro do `anvil-bench`. **O pin é a base do merge 3-way** |
