@@ -4,7 +4,8 @@
 
 **Blocked by:** 01
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=e19d774; scope=full; verdict=fail; p1=open
 
 - [x] O payload não traz mais `.agents/`.
 - [x] Depois do update, `.agents/skills` tem exatamente um symlink por linha `skill:` do lock, apontando para a skill em `.claude/skills`.
@@ -24,3 +25,9 @@
 - Neste repositório o `.agents/` saiu do git e o `.agents/skills/*` entrou no `.gitignore`, como `.claude/skills/*`: o espelho agora é derivado pelo `dev-link`. O espelho versionado apontava para o payload inteiro e expunha ao omp e ao Codex a `anvil-update`, que a regra do projeto mantém desligada aqui. Também trazia cópias reais de `anvil-browser-qa` e `anvil-next`.
 - Fecha o P3 da rodada 2 do ticket 01: o laço que monta `disco_ag` chama `existe_agente`, e a regra "symlink conta como agente" fica num lugar só.
 - Lacuna até o ticket 04: um projeto novo, instalado só pelo `npx degit`, fica sem `.agents/skills` até o primeiro update, porque o degit não roda o `reset-install.sh`. O modo de camadas do boot, no ticket 04, fecha essa lacuna.
+- Review round=1 · P1 (Standards e Spec): o reset confere a forma de cada entrada de `.agents/skills`, mas não a do próprio `.agents/skills`. Com `.agents/skills -> ../.claude/skills`, que é a forma comum de expor skills ao Codex, o `ln -s` cai dentro da skill recém-copiada e deixa um link cíclico versionado em `.claude/skills/<s>/<s>`. Com `.agents` como arquivo, ou com `.agents/skills` como link pendurado, o `mkdir -p` aborta depois da troca das skills e antes da escrita do lock, e o próximo update calcula tudo contra um lock velho. O dry-run não mostra nenhum dos três casos.
+- Review round=1 · P1 (Spec): o payload anterior entregava `anvil-browser-qa` e `anvil-next` como diretórios reais em `.agents/skills`. Todo projeto instalado por ele fica com essas duas cópias marcadas como colisão, que nunca é substituída, e o Codex continua lendo a cópia congelada depois de cada update. A spec e este ticket mandam não substituir a entrada que não é symlink, então a correção pede uma decisão.
+- Review round=1 · P3: o predicado se chama `existe_espelho`, mas testa posse e não existência: devolve falso para uma entrada que existe. Quem ler `if existe_espelho` entende o contrário do que acontece, e no `dev-link` o mesmo teste se chama `nosso_espelho`.
+- Review round=1 · P3: das saídas de `classifica "_esp"`, o `substituidos_esp` nunca é lido e o `colisoes_esp` é sobrescrito, e os alheios dependem de um laço de remendo. Uma mudança na regra de colisão de `classifica` altera o espelho em parte e sem aviso.
+- Review round=1 · P3: o dry-run diz "(dry-run: nada foi alterado)" e logo abaixo "symlinks criados (N)", no passado. Quem lê pode achar que o espelho já foi escrito.
+- Review round=1 · P3: o passo 4 da `anvil-update` manda nomear a colisão do espelho como "skill que o Codex não vai ver". O Codex vê, sim, uma skill com esse nome: a entrada do usuário, e não a do anvil. O aviso engana o operador sobre o que o Codex carrega.
