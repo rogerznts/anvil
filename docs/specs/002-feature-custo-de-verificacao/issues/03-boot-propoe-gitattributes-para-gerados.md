@@ -4,12 +4,22 @@
 
 **Blocked by:** Nenhum — pode começar agora.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] O boot lista os gerados achados, com tamanho e proporção do diff.
-- [ ] A proposta espera aprovação; um `.gitattributes` existente é mesclado, nunca sobrescrito.
-- [ ] Sem achado relevante, o boot não propõe nada.
-- [ ] O boot explica que o arquivo continua versionado e como vê-lo com `git diff --text`.
-- [ ] O `anvil-code-review` não muda.
-- [ ] Exercitado num projeto descartável em `workspace/` com um snapshot grande: o `git diff` esconde o gerado e mostra o arquivo escrito à mão.
-- [ ] O `verify` sai limpo.
+- [x] O boot lista os gerados achados, com tamanho e proporção do diff.
+- [x] A proposta espera aprovação; um `.gitattributes` existente é mesclado, nunca sobrescrito.
+- [x] Sem achado relevante, o boot não propõe nada.
+- [x] O boot explica que o arquivo continua versionado e como vê-lo com `git diff --text`.
+- [x] O `anvil-code-review` não muda.
+- [x] Exercitado num projeto descartável em `workspace/` com um snapshot grande: o `git diff` esconde o gerado e mostra o arquivo escrito à mão.
+- [x] O `verify` sai limpo.
+
+## Comments
+
+- Cenário em `workspace/03-boot-gerados/`, fora do git: dois commits com
+  migration `.ts` e snapshot `.json` de ~3 mil chaves, e um `.gitattributes`
+  prévio do projeto. A medição do boot deu os dois snapshots com 100% das linhas
+  mudadas. A linha proposta entrou por mescla, e a linha do projeto ficou. Depois
+  dela, o diff do último commit caiu de 9.304 linhas para 783 bytes, com o `.ts`
+  da migration e o `src/app.ts` visíveis e o `.json` como `Binary files differ`.
+  `git diff --text` ainda mostra o snapshot inteiro.
