@@ -135,12 +135,18 @@ if [ -f "$LOCK" ]; then
 fi
 
 # --- o que esta no disco -----------------------------------------------------
+# A lista e o que o glob acha, um nome por linha, e da os alheios. Substituido e
+# orfao saem do teste por nome, que o sistema de arquivos responde: num volume que
+# nao diferencia caixa, `Foo` no disco existe como `foo`, e a lista nao o acharia.
+existe_skill() { [ -d "$SKILLS/$1" ]; }
+# Symlink conta como agente no disco, mesmo pendurado: o [ -f ] segue o link, e um
+# orfao pendurado ficaria no disco sem aparecer em grupo nenhum.
+existe_agente() { [ -f "$AGENTS/$1.md" ] || [ -L "$AGENTS/$1.md" ]; }
+
 disco=""
 for d in "$SKILLS"/*/; do
     [ -d "$d" ] && disco="$disco$(basename "$d")"$'\n'
 done
-# Symlink conta como agente no disco, mesmo pendurado: o [ -f ] segue o link, e um
-# orfao pendurado ficaria no disco sem aparecer em grupo nenhum.
 disco_ag=""
 for f in "$AGENTS"/*.md; do
     { [ -f "$f" ] || [ -L "$f" ]; } && disco_ag="$disco_ag$(basename "$f" .md)"$'\n'
@@ -149,16 +155,21 @@ done
 # --- classificacao ------------------------------------------------------------
 tem() { printf '%s\n' "$1" | grep -qxF -e "$2"; }
 
-# classifica <sufixo> <novo> <possui> <disco>
+# classifica <sufixo> <novo> <possui> <disco> <existe>
 # Grava substituidos<sufixo>, orfaos<sufixo>, alheios<sufixo> e colisoes<sufixo>.
+# <existe> e a funcao que testa um nome no disco.
 # Substituido que o lock nao lista pode ser do usuario com o nome de um do payload:
 # sera sobrescrito, e o relatorio o destaca como colisao para o aviso nomea-lo. Sem
-# lock nao ha como distinguir, e nada e destacado.
+# $LOCK nao ha como distinguir, e nada e destacado.
 classifica() {
-    local novo="$2" possui="$3" disco="$4" x sub="" orf="" alh="" col=""
-    for x in $novo;   do tem "$disco" "$x" && sub="$sub$x"$'\n'; done
-    for x in $possui; do tem "$novo" "$x" || { tem "$disco" "$x" && orf="$orf$x"$'\n'; }; done
-    for x in $disco;  do tem "$novo" "$x" || tem "$possui" "$x" || alh="$alh$x"$'\n'; done
+    local novo="$2" possui="$3" disco="$4" existe="$5" x sub="" orf="" alh="" col=""
+    for x in $novo;   do "$existe" "$x" && sub="$sub$x"$'\n'; done
+    for x in $possui; do tem "$novo" "$x" || { "$existe" "$x" && orf="$orf$x"$'\n'; }; done
+    # Linha a linha, sem dividir nem expandir: nome do usuario pode ter espaco ou *.
+    while IFS= read -r x; do
+        [ -n "$x" ] || continue
+        tem "$novo" "$x" || tem "$possui" "$x" || alh="$alh$x"$'\n'
+    done <<< "$disco"
     if [ -f "$LOCK" ]; then
         for x in $sub; do tem "$possui" "$x" || col="$col$x"$'\n'; done
     fi
@@ -168,8 +179,8 @@ classifica() {
     printf -v "colisoes$1" '%s' "$col"
 }
 
-classifica ""    "$novo"    "$possui"    "$disco"
-classifica "_ag" "$novo_ag" "$possui_ag" "$disco_ag"
+classifica ""    "$novo"    "$possui"    "$disco"    existe_skill
+classifica "_ag" "$novo_ag" "$possui_ag" "$disco_ag" existe_agente
 
 conta() { printf '%s' "$1" | grep -c . || true; }
 # Skill sai pelo nome, agente pelo caminho: as duas listas dividem o mesmo grupo.
