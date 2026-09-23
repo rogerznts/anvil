@@ -4,16 +4,29 @@
 
 **Blocked by:** 07
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] A skill fica em `.omp/skills/`, com trava de invocação.
-- [ ] Sem argumento, resolve a spec pelo prefixo numérico do branch atual; fora do branch da spec, recusa e diz qual é o branch.
-- [ ] Frontier: `Status:` diferente de `resolved`, todos os `Blocked by` resolvidos e não travado. Travado é o ticket cuja última linha `Review:` tem `round` 2 ou mais e `verdict=fail`.
-- [ ] Despacha em série, sempre o menor número do frontier, e relê o disco depois de cada implementer.
-- [ ] Implementer que terminou sem mudar o estado do ticket não é repetido na mesma execução.
-- [ ] Nunca abre a terceira rodada, nunca dispara browser QA, archive ou PR.
-- [ ] Mostra o andamento a cada ticket.
-- [ ] Relatório final: com tudo resolvido, recomenda `/skill:anvil-browser-qa` quando a spec tem tela — existe `ui/` na pasta da spec ou uma user story descreve tela — e `/anvil-docs archive` quando não tem; com pendências, lista os travados com o P1 aberto e os que dependem deles.
-- [ ] Rodar de novo depois de uma queda retoma pelo disco.
-- [ ] Cenário S2: spec de fixture com três tickets e uma aresta despachada na ordem certa; ticket com `Review: round=2 … verdict=fail` pulado e o dependente listado; recusa fora do branch; recomendação com e sem `ui/`.
-- [ ] A skill entra no lock como `omp:`; o `verify` sai limpo.
+- [x] A skill fica em `.omp/skills/`, com trava de invocação.
+- [x] Sem argumento, resolve a spec pelo prefixo numérico do branch atual; fora do branch da spec, recusa e diz qual é o branch.
+- [x] Frontier: `Status:` diferente de `resolved`, todos os `Blocked by` resolvidos e não travado. Travado é o ticket cuja última linha `Review:` tem `round` 2 ou mais e `verdict=fail`.
+- [x] Despacha em série, sempre o menor número do frontier, e relê o disco depois de cada implementer.
+- [x] Implementer que terminou sem mudar o estado do ticket não é repetido na mesma execução.
+- [x] Nunca abre a terceira rodada, nunca dispara browser QA, archive ou PR.
+- [x] Mostra o andamento a cada ticket.
+- [x] Relatório final: com tudo resolvido, recomenda `/skill:anvil-browser-qa` quando a spec tem tela — existe `ui/` na pasta da spec ou uma user story descreve tela — e `/anvil-docs archive` quando não tem; com pendências, lista os travados com o P1 aberto e os que dependem deles.
+- [x] Rodar de novo depois de uma queda retoma pelo disco.
+- [x] Cenário S2: spec de fixture com três tickets e uma aresta despachada na ordem certa; ticket com `Review: round=2 … verdict=fail` pulado e o dependente listado; recusa fora do branch; recomendação com e sem `ui/`.
+- [x] A skill entra no lock como `omp:`; o `verify` sai limpo.
+
+## Comments
+
+- A skill é `anvil/.claude/skills/anvil-update/.omp-layer/skills/anvil-run/SKILL.md`, em pt-BR como as outras peças autorais da camada, com `disable-model-invocation: true`. Ao lado dela vai o `frontier.sh`, que lê o disco e devolve o estado da spec. As duas entram no lock como `omp: skills/anvil-run/SKILL.md` e `omp: skills/anvil-run/frontier.sh`. A skill chama o script pelo caminho instalado, `.omp/skills/anvil-run/frontier.sh`, que o check 15 do `verify` confere.
+- O que dá para calcular fica no script, e não na prosa: o branch e a pasta da spec, a recusa com o nome do branch da spec, o frontier, os travados, os P1 abertos deles, os dependentes transitivos, a linha `tela` e o `proximo`. O supervisor só despacha o `proximo` e para quando ele é `nenhum`. As rodadas do S2 mostraram por quê. Enquanto a decisão era da prosa, o `haiku` seguiu com a árvore suja e escreveu "P1: open" sem o achado. Com a decisão no script, as duas coisas saíram certas.
+- O "estado" que decide se um implementer é repetido são os campos `status`, `reviews` e `ultima` da linha do ticket, ou seja, o `Status:` e as `Review:`. Um implementer que parou com pergunta no `## Comments`, sem mudar o `Status:`, conta como sem mudança e vai para o `--skip`. Contar o arquivo inteiro faria esse ticket ser despachado de novo a cada volta.
+- Comportamento que a spec não lista: com a árvore suja e algo no frontier, o script devolve `parada` e `proximo: nenhum`, porque o implementer seguinte commitaria o que sobrou junto com o ticket dele. É o caso de uma sessão que caiu no meio de um implementer. O relatório mostra o `git status --short` e deixa a decisão com o operador.
+- Divergência da US 43 — sem tela, o próximo passo recomendado é o `/anvil-docs archive` — e do critério do relatório final: a skill recomenda `/skill:anvil-docs archive`. No omp, skill só se chama por `/skill:<nome>`, e a própria spec já escreve `/skill:anvil-browser-qa`. Escolha do operador nesta sessão. A spec não foi editada.
+- O implementer é bloqueante (`blocking: true`, do ticket 07), então a chamada do `task` só volta quando ele termina. A skill manda não esperar pelo `hub` e nunca despachar dois tickets ao mesmo tempo.
+- Prova: o S1 (`workspace/29-codex-mirror/s1.sh`) passa com 104 checks em `/opt/local/bin/bash` e em `/bin/bash`. A 7j agora cobre a `anvil-run` junto da rule, do manual e do agente: a skill e o script entram no lock como `omp:` e em `.omp/` iguais aos do payload, a skill tem a trava, e num payload sem as peças o dry-run lista os dois arquivos como órfãos, e a execução os tira.
+- Prova: o S2 (`workspace/33-omp-run/s2.sh`) passa com 26 checks, com o omp 18.2.11 e o `haiku`, em cerca de 10 minutos. Instala o payload real num fixture em `/tmp`, com uma spec de seis tickets: 01 livre, 02 bloqueado pelo 03, 03 livre, 04 travado com `round=2 … verdict=fail` e um P1 no `## Comments`, 05 bloqueado pelo 04, 06 livre. Sem argumento, o supervisor despacha 01, 03, 02 e 06, cada um uma vez, um item por chamada, e relê o `frontier.sh` antes do primeiro despacho e depois de cada um. O 06 volta sem mudar o estado e vai para o `--skip`. O relatório traz o P1 do 04 por extenso, o 05 como dependente e o 06 como pulado. Uma segunda execução só tenta o 06. Com a árvore suja, nada é despachado. As specs 002 e 003, resolvidas, recomendam `/skill:anvil-docs archive` sem `ui/` e `/skill:anvil-browser-qa` com `ui/`. Da `main`, `001` é recusado com o nome `feature/001-run`. Em nenhum cenário o supervisor troca de branch, commita, lê `anvil-docs` ou `anvil-browser-qa` nem roda merge, push ou PR. O repositório do anvil fica igual.
+- P2 (prova fraca): o S2 mede o supervisor com um implementer de mentira. Um hook `pre` do fixture, no `tool_call` do `task`, roda um script que resolve o ticket ou só comenta o 06, e o agente `anvil-implementer` do fixture só tem `read` e devolve "stub: feito". Com o agente stub rodando o script pelo `bash`, o `haiku` saiu do roteiro duas vezes e implementou o ticket por conta própria. A cadeia com o implementer de verdade, e os eixos na profundidade 2 sob um supervisor, é o S2 do ticket 07 e o ponta a ponta do ticket 10. Quem ler este S2 como prova da cadeia inteira conclui mais do que ele mostra.
+- P2 (prova fraca): o S2 é probabilístico. Das cinco rodadas completas, só a quinta passa nos 26 checks, e as outras motivaram mudanças. Na primeira, o fixture estava dentro de `workspace/`, o omp carregou o `CLAUDE.md` do anvil, e o `haiku` fez `cd` para a raiz do anvil. O stub mexeu nos tickets 08, 09 e 10 deste repositório, sem commit. Eles foram restaurados, e o fixture foi para `/tmp`. Na mesma rodada, o supervisor trocou de branch depois da recusa e seguiu com a árvore suja. Na segunda, o stub respondeu sozinho à pergunta do 06 e o resolveu. Na terceira, o relatório não trouxe o P1 e recomendou `/skill:anvil-docs archive`. Na quarta, o stub implementou o 01. Uma rodada que passa não mede a taxa.
