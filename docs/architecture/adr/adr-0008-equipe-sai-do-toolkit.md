@@ -3,6 +3,7 @@
 - Status: aceito
 - Data: 2026-09-21
 - Substitui o [ADR-0007](./adr-0007-equipe-por-papel-sobre-agent-teams.md)
+- Revisto em parte pelo [ADR-0011](./adr-0011-omp-como-harness-com-camada-propria.md): a orquestração volta, só na camada omp
 
 ## Contexto
 

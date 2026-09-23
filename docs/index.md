@@ -8,12 +8,16 @@ Last updated: 2026-09-22T00:00:00Z
   - [gate-sem-criterio-de-parada.md](./discovery/gate-sem-criterio-de-parada.md)
     — por que um par de gates independentes entra em laço num documento, e o que
     muda nas skills
+  - [adaptar-omp-ao-anvil.md](./discovery/adaptar-omp-ao-anvil.md) — proposta
+    de integração do anvil com o omp, antes do grill
+  - [camadas-anvil-omp.md](./discovery/camadas-anvil-omp.md) — desenho em
+    mermaid das camadas, da instalação, da execução e da guarda de merge
 - **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
 
 ## Specs ativas
 
-Nenhuma.
+- [003 — omp como harness, com camada própria](./specs/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, especificada, sem tickets
 
 ## Specs arquivadas
 
@@ -59,6 +63,8 @@ Nenhuma.
     — o toolkit instalado fica versionado; o boot não escreve no `.gitignore`
   - [adr-0010](./architecture/adr/adr-0010-verificacao-tem-criterio-de-parada.md)
     — a verificação tem critério de parada, e ele é ausência de P1
+  - [adr-0011](./architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md)
+    — o omp é harness de primeira classe, com camada própria; a orquestração volta só nela
 
 ### Project
 
