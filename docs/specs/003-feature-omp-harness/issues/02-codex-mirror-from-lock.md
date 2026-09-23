@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=e19d774; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=d9942fe; scope=diff:e19d774..d9942fe; verdict=pass; p1=none
 
 - [x] O payload não traz mais `.agents/`.
 - [x] Depois do update, `.agents/skills` tem exatamente um symlink por linha `skill:` do lock, apontando para a skill em `.claude/skills`.
@@ -35,3 +36,6 @@
 - Decisão do usuário sobre o P1 do legado: a regra fica, e nenhuma entrada real é substituída. No passo 4 da `anvil-update`, cada colisão do espelho é comparada com `diff -r` contra a skill instalada. Se forem idênticas, é cópia de payload antigo: o operador a apaga, e o update põe o symlink no lugar. A seção 2c do S1 cobre esse caminho.
 - P3 de nome, rodada 1: o predicado virou `nosso_espelho`, o mesmo nome do `dev-link`. P3 do dry-run: o grupo agora se chama "symlinks novos". P3 do aviso: o texto diz que o Codex lê a entrada do usuário. O P3 das saídas de `classifica "_esp"` fica como acompanhamento: o `substituidos_esp` não é lido e o `colisoes_esp` é recalculado, porque a colisão do espelho vem da forma da entrada e não do lock.
 - Prova depois da correção: o S1 passa em bash 5 e em bash 3.2, com 44 checks cada, e o `verify` sai limpo nos dois. A captura `depois-02b` difere da `depois-02` só no rótulo "symlinks novos". O `12-run.out` continua idêntico ao `antes-02`, e bash 5 e bash 3.2 dão a mesma saída.
+- Review round=2 · os dois P1 da rodada 1 estão fechados, o da raiz pela correção e o do legado pela orientação do passo 4, e não houve regressão. Nos dois eixos, o S1 passa com 44 checks em bash 5 e em bash 3.2.
+- Review round=2 · P2: a spec diz, sem exceção, "Para cada linha `skill:` do lock novo, um symlink relativo". Não diz que o espelho inteiro fica com o usuário quando `.agents` ou `.agents/skills` é symlink ou arquivo. A regra está no `reset-install.sh` e na `anvil-update`, e quem implementar o modo de camadas do ticket 04 a partir da spec pode deixá-la de fora. Correção: uma linha na seção "Espelho `.agents/skills`" da spec.
+- Review round=2 · P3: a nota da correção diz que os quatro checks da seção 2b falham contra a e19d774. A seção tem cinco checks, e quatro falham. O primeiro, rc=0 com lock novo, passa também na versão antiga. Quem lê pode supor que todos os checks separam as duas versões.
