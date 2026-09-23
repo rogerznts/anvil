@@ -4,15 +4,25 @@
 
 **Blocked by:** 05
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] O agente fica em `.omp/agents/`, com `autoloadSkills` das três skills, `task` entre as ferramentas e sem `model:`.
-- [ ] As três skills carregadas são as vendorizadas, sem mudança.
-- [ ] Sessão do omp com `task` → `anvil-implementer` sobre um ticket de fixture termina com o ticket `resolved`, a linha `Review:` gravada no formato do perfil e um commit no branch.
-- [ ] Os eixos Standards e Spec rodam como subagentes do implementer, na profundidade 2, sem erro de recursão.
-- [ ] O implementer não toca em outro ticket.
-- [ ] O agente entra no lock como `omp:`; o `verify` sai limpo.
+- [x] O agente fica em `.omp/agents/`, com `autoloadSkills` das três skills, `task` entre as ferramentas e sem `model:`.
+- [x] As três skills carregadas são as vendorizadas, sem mudança.
+- [x] Sessão do omp com `task` → `anvil-implementer` sobre um ticket de fixture termina com o ticket `resolved`, a linha `Review:` gravada no formato do perfil e um commit no branch.
+- [x] Os eixos Standards e Spec rodam como subagentes do implementer, na profundidade 2, sem erro de recursão.
+- [x] O implementer não toca em outro ticket.
+- [x] O agente entra no lock como `omp:`; o `verify` sai limpo.
 
 ## Comments
 
 - Se o limite de profundidade não se comportar como a documentação do omp diz, é aqui que aparece, e a decisão volta para a spec antes do ticket 08.
+- O limite de profundidade se comportou como a documentação do omp 18.2.11 diz. Os dois eixos nascem na profundidade 2 com `spawns` vazio e sem `task` entre as ferramentas, e terminam pelo `yield` sem erro. A decisão não precisa voltar para a spec antes do ticket 08.
+- O agente é `anvil/.claude/skills/anvil-update/.omp-layer/agents/anvil-implementer.md`, em pt-BR como as outras peças autorais da camada, com o frontmatter em YAML válido e a `description` entre aspas. `tools` é lista explícita: `read, grep, glob, find, lsp, bash, edit, write, task`. Fica sem `eval`, que escapa da guarda de merge, e sem `ask`, porque não há operador na sessão filha. O omp acrescenta `yield` e `hub` sozinho. No fixture, sem servidor de linguagem, o `lsp` não aparece entre as ferramentas do implementer, e ele roda igual.
+- O frontmatter ganhou `blocking: true`, que a spec não lista. O `async.enabled` do omp vem ligado por padrão, e com ele o `task` devolve na hora e o implementer roda em segundo plano. No `omp -p` a sessão principal termina e leva o filho junto: na primeira rodada, o implementer abortou com "Request was aborted" antes do primeiro turno. Com o prompt mandando esperar pelo `hub`, o `haiku` desistiu depois de duas esperas. Com `blocking: true` o pai espera o implementer, e é isso que o `anvil-run` precisa fazer: despachar, esperar, reler o disco.
+- Os eixos, filhos do implementer, herdam o `async` e rodam em segundo plano. O agente manda esperar os dois pelo `hub` antes de agregar, e na rodada final do S2 o implementer fez três `wait` e dois `jobs` até receber os dois.
+- O agente preenche o que o operador faria no fluxo manual. O fixed point da rodada 1 é o `HEAD` anotado antes de mexer em qualquer coisa. Pergunta que o repositório não responde vai para o `## Comments`, e o implementer para sem marcar `resolved`. O que estiver errado na spec também vai para o `## Comments`, porque a spec só muda com decisão do operador. Ticket bloqueado, ou travado com `round` 2 e `verdict=fail`, sai sem mudança nenhuma. O agente devolve `ticket`, `status` e `review`, lidos do disco.
+- Duas instruções entraram depois de rodadas do S2 que falharam. Numa, o implementer gravou `Review: …` sem o negrito, depois da lista de critérios. O agente agora mostra o topo do ticket depois da rodada 1. Na outra, os eixos saíram no agente `reviewer` do omp, que tem schema de saída próprio e modelo `@slow`. O `yield` de um eixo foi recusado uma vez pelo schema, e o relatório virou o do `reviewer`. O agente agora pede o `task` e diz por quê.
+- Prova: o S1 (`workspace/29-codex-mirror/s1.sh`) passa com 104 checks em `/opt/local/bin/bash` e em `/bin/bash`, 1 deles novo. A 7j agora cobre o agente junto da rule e do manual: ele entra no lock como `omp:` e em `.omp/agents/` igual ao do payload. Um check novo lê o frontmatter com YAML estrito e confere o `name`, a lista exata do `autoloadSkills`, o `task` no `tools` e a ausência de `model`. Num payload sem as três peças, o dry-run as lista como órfãs, e a execução tira as três do `.omp/` e do lock, junto com as pastas vazias.
+- Prova: o S2 (`workspace/32-omp-implementer/s2.sh`) passa com 16 checks, com o omp 18.2.11 e o `haiku`, em cerca de 4 minutos. O payload real é instalado com o omp no `PATH` num repositório de fixture, com uma spec de dois tickets em bash, e o 02 bloqueado pelo 01. Um turno de `omp -p` despacha o implementer pelo `task` sobre o 01. O script confere que as três skills chegam ao implementer como `skill-prompt` de `.claude/skills/`, iguais às do payload, e que o payload não difere da `main`. O 01 termina `resolved`, com `**Review:** round=1; …; scope=full; verdict=pass; p1=none` na linha logo abaixo do `Status:` e o `sha` num commit do branch. A árvore fica limpa, o branch é o mesmo, a `main` não muda e o `bash test.sh` passa. O 02 fica byte a byte igual, e o 01 é o único arquivo de `docs/specs` no diff. Os dois eixos são filhos do implementer, do agente `task`, sem `task` e sem `spawns`. O `task` devolve o ticket, o `Status` e a última `Review:` do disco.
+- P2 (prova fraca): o S2 é probabilístico. Foram quatro rodadas completas com o `haiku` e `blocking: true`. A primeira passou nos checks de então, mas gravou a `Review:` separada do `Status:` por uma linha em branco, e o check de agora a reprova. A segunda e a terceira falharam, e cada uma motivou uma das instruções acima. A quarta, com as duas instruções no agente, passou nos 16 checks, mas uma rodada só não mede a taxa. Uma falha no S2 pede outra rodada antes de concluir regressão, e o S2 do `anvil-run`, no ticket 08, herda essa variância.
+- P2 (prova fraca): o S2 não exercita o P1. A rodada 2, o `Status: claimed` e a parada na segunda reprovação estão escritos no agente, mas não dá para forçar um P1 de forma determinística, o mesmo limite que a spec registra para o `anvil-run`. Quem ler o S2 como prova do laço de correção conclui mais do que ele mostra.
