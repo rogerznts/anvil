@@ -5,6 +5,7 @@
 **Blocked by:** 01
 
 **Status:** resolved
+**Review:** round=1; sha=389e0a3; scope=full; verdict=pass; p1=none
 
 - [x] A detecção instala a camada quando qualquer sinal está presente: binário `omp` no `PATH`, `~/.omp/` existente, ou linha `omp:` no lock atual.
 - [x] Sem nenhum sinal, o projeto não ganha `.omp/` nem linha `omp:`.
@@ -32,3 +33,11 @@
 - Prova: o S1 (`workspace/29-codex-mirror/s1.sh`) passa com 73 checks em `/opt/local/bin/bash` e em `/bin/bash`, 23 deles novos, na seção 7. O S2 (`workspace/30-omp-guard/s2.sh`) instala o payload real num repositório de fixture e roda um turno de `omp -p --mode json` por caso, com o omp 18.2.11. Os quatro casos passam, e o motivo devolvido pelo tool é a saída de erro do script, com cabeçalho, ticket aberto e rodapé.
 - Antes/depois com `workspace/28-reset-classify/capture.sh` (`antes-03`, `depois-03`), em bash 5 e bash 3.2: nenhuma linha antiga sumiu. A única linha nova é a da camada nas fixtures sem `omp-layer/`, e o resto da diferença é o hash dos `.out` e da cópia do script na árvore das fixtures. O `12-run.out` saiu idêntico, e bash 5 e bash 3.2 dão a mesma saída.
 - Fica para o ticket 04: o caso do S1 "modo de camadas chamado pelo boot produz o mesmo resultado que o update". O modo ainda não existe.
+- Review round=1 · os dois eixos passam sem P1. Nos dois, o S1 passa com 73 checks em bash 5 e em bash 3.2, e os `.jsonl` do S2 mostram os quatro casos.
+- Review round=1 · P2 (Spec): a spec diz "Quem escreve `omp:` é o `reset-install.sh`, e só quando instala a camada" e não tem, para `.omp/`, a regra da raiz do usuário que tem para o espelho. O código grava as linhas `omp:` que o lock tinha quando a raiz é do usuário. O ticket 04, que monta o modo de camadas a partir da spec, pode sair sem a guarda de raiz ou apagar essas linhas, e a camada perde a regra pegajosa. Correção: uma linha na seção "Lock" da spec, como no P2 da rodada 2 do ticket 02.
+- Review round=1 · P3 (Spec): com payload sem `omp-layer/` e lock com linhas `omp:`, o relatório diz "mantida" numa execução que remove todos os arquivos da camada como órfãos e tira as linhas do lock. O operador lê "mantida" num update que retira a camada.
+- Review round=1 · P3 (Spec): os alheios saem de um `find` recursivo em `.omp/`. Num projeto com plugin do omp, que mora em `.omp/plugins/node_modules`, o dry-run lista milhares de linhas e esconde os órfãos e as colisões no meio delas.
+- Review round=1 · P3 (Spec): a frase da `anvil-update` sobre tirar a camada adianta o manual `anvil-omp` do ticket 05 e está incompleta. Numa máquina com omp no `PATH` ou com `~/.omp/`, o update seguinte reinstala a camada como nova, e quem segue a frase acha que a remoção é definitiva.
+- Review round=1 · P3 (Standards): o hook mistura identificadores em português e em inglês, e `GUARDA` e `guarda` diferem só na caixa. Só custa leitura: quem editar pode trocar um pelo outro sem erro de tipo.
+- Review round=1 · P3 (Standards): o hook usa `spawnSync` sem `timeout`. Um `validate.sh` travado congela o event loop do omp, e não só aquela chamada do `bash`. Com `timeout`, o resultado seria o mesmo, porque `status` nulo deixa passar.
+- Review round=1 · P3 (Standards): a linha final `pronto.` não conta os órfãos da camada. No caso 7d, sai "0 órfão(s) removido(s)" logo depois de um arquivo de `.omp/` ter sido apagado. A listagem acima está certa, e os órfãos do espelho já ficavam fora dessa conta.
