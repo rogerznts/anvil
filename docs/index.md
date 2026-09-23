@@ -17,7 +17,7 @@ Last updated: 2026-09-22T00:00:00Z
 
 ## Specs ativas
 
-- [003 — omp como harness, com camada própria](./specs/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, especificada, sem tickets
+- [003 — omp como harness, com camada própria](./specs/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, 10 tickets
 
 ## Specs arquivadas
 
