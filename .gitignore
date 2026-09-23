@@ -20,3 +20,7 @@ workspace/
 # .agents/skills/ — espelho do Codex: symlinks para .claude/skills, um por skill
 # ligada, gerados pelo mesmo dev-link.
 .agents/skills/*
+
+# .omp/ — a camada omp do payload: symlinks para anvil/.claude/skills/anvil-update/.omp-layer,
+# um por arquivo, ligados pelo mesmo dev-link.
+.omp/

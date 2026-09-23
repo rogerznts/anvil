@@ -4,9 +4,17 @@
 
 **Blocked by:** 03
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] O `dev-link.sh` liga cada arquivo da camada no `.omp/` deste repositório, e o `--unlink` desfaz sem tocar em arquivo do `.omp/` que não veio da camada.
-- [ ] O `verify` confere, na camada: nome do frontmatter igual ao do arquivo ou da pasta; todo caminho citado existe; toda skill em `autoloadSkills` existe no payload e não tem trava de invocação.
-- [ ] Cada checagem falha num fixture quebrado de propósito e passa no payload real.
-- [ ] O `verify` sai limpo neste repositório.
+- [x] O `dev-link.sh` liga cada arquivo da camada no `.omp/` deste repositório, e o `--unlink` desfaz sem tocar em arquivo do `.omp/` que não veio da camada.
+- [x] O `verify` confere, na camada: nome do frontmatter igual ao do arquivo ou da pasta; todo caminho citado existe; toda skill em `autoloadSkills` existe no payload e não tem trava de invocação.
+- [x] Cada checagem falha num fixture quebrado de propósito e passa no payload real.
+- [x] O `verify` sai limpo neste repositório.
+
+## Comments
+
+- O `dev-link.sh` liga um symlink relativo por arquivo da `.omp-layer/`, no mesmo caminho em `.omp/`, no roster e no `--all`. É nosso o symlink que aponta para dentro da camada. Arquivo real no caminho de um arquivo da camada fica e sai no relatório como pulado. O symlink nosso para um arquivo que saiu da camada é removido, e as pastas que ficam vazias saem junto, até `.omp`, que fica, como no `reset-install.sh`. O `--unlink` só remove symlink nosso. O `.omp/` entrou no `.gitignore`, e a tabela "Fonte e derivado" do `project.md` ganhou a linha dele.
+- O `verify` ganhou três checks. O 14 confere o `name:`: a skill pela pasta e o agente pelo arquivo, os dois reprovados sem `name:`, porque o omp descarta agente sem nome e acha skill pelo nome. A rule, que o omp nomeia pelo arquivo, passa sem `name:` e só reprova com um `name:` diferente. O 15 confere o caminho citado que o anvil instala: `.omp/…` contra a camada e `.claude/skills/…`, `.claude/agents/…` e `.claude/anvil.lock` contra o payload. O resto de `.claude/`, como `settings.json` e `rules/`, o boot gera no projeto e fica de fora. Em `.md` vale o span em crase fora de bloco cercado, como no check 10. Em `.ts`, o literal de string, que é onde o hook guarda o caminho do `guard-spec-merge.sh`: se o script mudar de lugar, o hook deixa passar tudo em silêncio. O 16 confere o `autoloadSkills` do agente da camada, em lista ou em CSV: a skill existe, no payload ou na camada, e não tem trava, com o mesmo `tem_trava` do check 13. O omp ignora sem aviso o nome que não acha. O `awk` que lê o `name:` virou a função `nome_fm`, usada pelos checks 9 e 14.
+- Prova: o S3 (`workspace/31-omp-verify/s3.sh`) passa com 16 checks. O verify roda em 13 cópias do repositório. Passa no payload real e numa camada bem-feita, com dois agentes, `autoloadSkills` em lista e em CSV e a rule com o `name:` certo. Falha num fixture por caso, com a linha esperada no check dele e nenhuma falha nos outros checks. No 14: skill com nome divergente e sem nome, agente com nome divergente e sem nome, rule com nome divergente. No 15: span `.omp/` inexistente no manual, o `GUARDA` do hook apontando para um script que não existe, e um agente citando uma skill que não existe. No 16: skill ausente, `anvil-omp` com trava, da camada, e `anvil-next` com trava, do payload.
+- Prova: o S1 (`workspace/29-codex-mirror/s1.sh`) passa com 103 checks em `/opt/local/bin/bash` e em `/bin/bash`, 10 deles novos. Na seção 8, o `dev-link.sh` num fixture com arquivo, arquivo real no caminho da camada e symlink para fora, todos do usuário, e com dois symlinks nossos para arquivos que saíram da camada. Os checks cobrem o dry-run, a ligação, o pulado, a remoção com poda, a segunda execução idêntica e o `--unlink`. A 8a confere este repositório: `.omp/` fora do git e cada arquivo da camada ligado.
+- P2 (fora do ticket, anterior a ele): o `verify` morre com SIGTRAP (rc 133) no check 3 quando roda em `/bin/bash`, o bash 3.2 do macOS. O `vendor-sync.sh` do HEAD, antes deste ticket, morre igual. Quem não tem bash novo no `PATH` não tem `verify`, e os checks da camada nem chegam a rodar. Por isso o S3 roda só com o bash do `PATH`. O check 15 usava um `case` dentro de `<(…)`, que o bash 3.2 não aceita, e isso foi corrigido: o `bash -n` do `/bin/bash` passa no script.

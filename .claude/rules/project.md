@@ -20,6 +20,7 @@ Confundir as duas coisas é o erro caro daqui.
 | `.claude/skills/anvil-*` | **symlinks** para `anvil/.claude/skills/*`. Editar a skill instalada **é** editar o payload |
 | `.claude/agents/*.md` | **symlinks** para `anvil/.claude/agents/*.md`, do mesmo jeito |
 | `.agents/skills/*` | o espelho do Codex: **symlinks** para `.claude/skills/*`, um por skill ligada. Fora do git |
+| `.omp/` | a camada omp: **symlinks** para `anvil/.claude/skills/anvil-update/.omp-layer/`, um por arquivo. Fora do git |
 | `.claude/skills/anvil-sync/` | a ferramenta de manutenção. É do repositório e **não vai no degit** |
 | `anvil-skills.yaml` | o manifesto de curadoria. Também não vai no degit |
 | `references/` — upstream vendorizado | submodule com pin, listado em `sources:` no manifesto. De onde vem o que é vendorizado: skills e, no caso do `unlazy`, material de terceiro dentro do `anvil-bench`. **O pin é a base do merge 3-way** |
@@ -34,9 +35,9 @@ bash .claude/skills/anvil-sync/scripts/dev-link.sh
 ```
 
 Das skills, só o roster de fluxo é ligado, não o payload inteiro — `--all` liga
-tudo, `--unlink` desfaz. Os agentes do payload são ligados todos. Uma skill ou um
-agente ligado agora **só aparece na próxima sessão**, e editá-lo não muda a cópia
-que já está carregada nesta.
+tudo, `--unlink` desfaz. Os agentes do payload e os arquivos da camada omp são
+ligados todos. Uma skill ou um agente ligado agora **só aparece na próxima
+sessão**, e editá-lo não muda a cópia que já está carregada nesta.
 
 ## Nunca rode `/anvil-update` aqui
 
