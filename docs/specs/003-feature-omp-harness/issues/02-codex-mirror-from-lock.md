@@ -4,7 +4,7 @@
 
 **Blocked by:** 01
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=e19d774; scope=full; verdict=fail; p1=open
 
 - [x] O payload não traz mais `.agents/`.
@@ -31,3 +31,7 @@
 - Review round=1 · P3: das saídas de `classifica "_esp"`, o `substituidos_esp` nunca é lido e o `colisoes_esp` é sobrescrito, e os alheios dependem de um laço de remendo. Uma mudança na regra de colisão de `classifica` altera o espelho em parte e sem aviso.
 - Review round=1 · P3: o dry-run diz "(dry-run: nada foi alterado)" e logo abaixo "symlinks criados (N)", no passado. Quem lê pode achar que o espelho já foi escrito.
 - Review round=1 · P3: o passo 4 da `anvil-update` manda nomear a colisão do espelho como "skill que o Codex não vai ver". O Codex vê, sim, uma skill com esse nome: a entrada do usuário, e não a do anvil. O aviso engana o operador sobre o que o Codex carrega.
+- Correção do P1 da raiz: antes de qualquer escrita, o reset confere `.agents` e `.agents/skills`. Se um dos dois é symlink ou arquivo, o espelho inteiro fica com o usuário: nada é classificado nem escrito ali, e o relatório diz isso numa linha. A seção 2b do S1 cobre três casos: `.agents/skills -> ../.claude/skills`, `.agents` como arquivo e `.agents/skills` pendurado. Nos três, o update sai com rc=0, grava o lock novo e não planta link dentro de skill. Contra a e19d774, os quatro checks da seção falham.
+- Decisão do usuário sobre o P1 do legado: a regra fica, e nenhuma entrada real é substituída. No passo 4 da `anvil-update`, cada colisão do espelho é comparada com `diff -r` contra a skill instalada. Se forem idênticas, é cópia de payload antigo: o operador a apaga, e o update põe o symlink no lugar. A seção 2c do S1 cobre esse caminho.
+- P3 de nome, rodada 1: o predicado virou `nosso_espelho`, o mesmo nome do `dev-link`. P3 do dry-run: o grupo agora se chama "symlinks novos". P3 do aviso: o texto diz que o Codex lê a entrada do usuário. O P3 das saídas de `classifica "_esp"` fica como acompanhamento: o `substituidos_esp` não é lido e o `colisoes_esp` é recalculado, porque a colisão do espelho vem da forma da entrada e não do lock.
+- Prova depois da correção: o S1 passa em bash 5 e em bash 3.2, com 44 checks cada, e o `verify` sai limpo nos dois. A captura `depois-02b` difere da `depois-02` só no rótulo "symlinks novos". O `12-run.out` continua idêntico ao `antes-02`, e bash 5 e bash 3.2 dão a mesma saída.
