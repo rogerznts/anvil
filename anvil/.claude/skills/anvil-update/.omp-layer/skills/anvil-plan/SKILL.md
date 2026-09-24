@@ -19,26 +19,31 @@ discutiu. Não abra subagente para uma etapa, não compacte e não sugira `/comp
 ## Onde o planejamento está
 
 Comece sempre por aqui, com argumento ou sem, antes de dizer qualquer coisa ao
-operador. No diretório em que a sessão está, que é a raiz do projeto, rode sem
-`cd`:
+operador. O script é o `.omp/skills/anvil-plan/stage.sh`. No diretório em que a
+sessão está, que é a raiz do projeto, rode sem `cd`:
 
 ```bash
 bash .omp/skills/anvil-plan/stage.sh
 ```
 
-O script lê o branch e a pasta da spec e devolve a linha `next`. A etapa não fica
-gravada em lugar nenhum. Ela sai do disco, pelo script, e desta conversa. O que
-fazer depende da linha `next`:
+O script lê o branch e a pasta da spec e devolve as linhas `spec`, `next`,
+`reason` e `do`. A etapa não fica gravada em lugar nenhum. Ela sai do disco, pelo
+script, e desta conversa. A linha `do` diz o que fazer, e ela vale sobre o que
+parecer óbvio na conversa. Em detalhe, pela linha `next`:
 
-- `next: end`: os tickets existem. Vá para o fim.
-- `next: anvil-to-tickets`: a `spec.md` existe e não há ticket. Diga ao operador
-  qual é a spec, pela linha `spec`, e proponha `anvil-to-tickets`, como na seção
-  seguinte.
-- `next: anvil-to-spec`: a pasta da spec existe e a `spec.md` ainda não foi
-  escrita. Diga qual é a spec e proponha `anvil-to-spec`.
+- `next: end`: os tickets de implementação existem. Vá para o fim.
+- `next: none`: a spec deste branch está arquivada. Diga isso ao operador e pare,
+  porque um planejamento novo começa num branch sem spec.
+- `next: anvil-to-tickets`, `next: anvil-to-spec` ou `next: anvil-wayfinder`: é uma
+  retomada. Diga ao operador qual é a spec e o motivo, pelas linhas `spec` e
+  `reason`, e proponha a skill do `next`, como na seção seguinte. Nesta vez, não
+  leia a skill proposta, nem a spec, nem os tickets. A proposta termina a vez, e a
+  skill só é carregada depois do sim.
 - `next: anvil-grill`: não há spec no branch, e a conversa decide.
-  - Se nesta conversa o operador já confirmou o entendimento do grill, proponha
-    `anvil-to-spec`.
+  - Se o grill já rodou nesta conversa e o operador confirmou o entendimento,
+    proponha `anvil-to-spec`.
+  - Se o grill começou nesta conversa e o operador ainda não confirmou o
+    entendimento, siga o grill do ponto em que ele parou, sem proposta.
   - Se veio um pedido no argumento e o grill ainda não rodou nesta conversa,
     carregue `anvil-grill` já e dê a ele o pedido como ponto de partida. Chamar a
     skill com o pedido é o sim do operador para o grill.
@@ -46,8 +51,8 @@ fazer depende da linha `next`:
     pare.
 
 Com `next` diferente de `anvil-grill`, um pedido no argumento que não é a spec que
-o script achou é um pedido novo. Diga isso e pare: um pedido novo começa num
-branch sem spec, e trocar de branch é escolha do operador.
+o script achou é um pedido novo. Diga isso ao operador e pare. Um pedido novo
+começa num branch sem spec, e trocar de branch é escolha dele.
 
 ## A proposta
 
