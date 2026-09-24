@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=f9ca28b; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=6dd8298; scope=diff:f9ca28b..6dd8298; verdict=pass; p1=none
 
 - [x] Referências `ADR-NNNN` saem antes da leitura: "03, ver ADR-0011" bloqueia só pelo 03.
 - [x] `01, 02` e `01,02` bloqueiam pelos dois, como hoje.
@@ -29,3 +30,4 @@
 - Review round=1 · P3 (Standards): a tabela da spec liga o `blocked_by` entre aspas à `class=unreadable_blockers`, e o script também põe aspas num ticket `resolved` ou `locked` de linha ilegível — quem tomar as aspas por sinal da classe lê como pendente um ticket resolvido.
 - Review round=1 · P3 (Spec): aspas dentro do `Blocked by` não são escapadas no `blocked_by="…"` — com `01 "x" class=frontier` a linha `ticket` sai com dois `class=`; o ticket segue fora do frontier, só a leitura da linha fica ambígua.
 - Review round=1 · P3 (Spec): ilegível que cita um travado não entra no `depend_on_locked`, porque não tem bloqueador lido — o relatório o mostra só como ilegível, com o texto no `blocked_by`, e nenhuma decisão muda.
+- Review round=2 · P3 (Standards): o comentário do `read_blockers` diz que o item com ADR sai "se sobrar so um ver ou see" e fecha com "Qualquer outra coisa da unreadable=1", e o "ADR-0011" sozinho, que o código, a spec e este ticket deixam sem bloqueador, parece ilegível para quem lê só o comentário — quem mexer na gramática parte de uma regra errada.
