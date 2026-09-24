@@ -68,19 +68,21 @@ done
 
 # Le o valor da primeira linha Blocked by em blocker_list, os numeros sem zeros a
 # esquerda. Vazio ou "Nenhum"/"None" e sem bloqueador. Cada item entre virgulas e
-# um numero; o item que cita um ADR-NNNN sai inteiro, se nao sobrar digito nele:
-# "03, ver ADR-0011" bloqueia pelo 03. Qualquer outra coisa da unreadable=1.
+# um numero. O item que cita um ADR-NNNN perde a citacao e sai se sobrar so um
+# "ver" ou "see": "03, ver ADR-0011" bloqueia pelo 03, e "Escrever o ADR-0012",
+# que pode ser o titulo de um ticket, e ilegivel. Qualquer outra coisa da
+# unreadable=1.
 read_blockers() {
     local rest="$1," item
     blocker_list=""; unreadable=""
     case "$1" in ""|[Nn][Ee][Nn][Hh][Uu][Mm]*|[Nn][Oo][Nn][Ee]*) return ;; esac
     while [ -n "$rest" ]; do
         item="${rest%%,*}"; rest="${rest#*,}"
-        case "$item" in *ADR-[0-9]*)
-            item="$(printf '%s' "$item" | sed 's/ADR-[0-9][0-9]*//g')"
-            case "$item" in *[0-9]*) ;; *) continue ;; esac ;;
-        esac
         item="${item#"${item%%[![:space:]]*}"}"; item="${item%"${item##*[![:space:]]}"}"
+        case "$item" in *ADR-[0-9]*)
+            item="$(printf '%s' "$item" | sed 's/ADR-[0-9][0-9]*//g;s/^[[:space:]]*//;s/[[:space:]]*$//')"
+            case "$item" in ""|[Vv][Ee][Rr]|[Ss][Ee][Ee]) continue ;; esac ;;
+        esac
         case "$item" in ""|*[!0-9]*) blocker_list=""; unreadable=1; return ;; esac
         blocker_list="$blocker_list $((10#$item))"
     done

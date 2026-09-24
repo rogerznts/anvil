@@ -152,7 +152,8 @@ O operador continua chamando os mesmos comandos. O que muda:
 ### `frontier.sh`
 
 - **Leitura do `Blocked by`, na dúvida bloqueia.** Da primeira linha `Blocked by`,
-  saem as referências `ADR-NNNN`. O resto tem de casar com uma lista de números
+  sai o item, entre vírgulas, que só cita um `ADR-NNNN`, sozinho ou depois de "ver"
+  ou "see". O resto tem de casar com uma lista de números
   separados por vírgula, com espaço opcional. Linha vazia, ausente, ou que começa
   por "Nenhum" ou "None", sem distinguir maiúsculas, é "sem bloqueador": são as
   formas da 003 e do template da `anvil-to-tickets`. Qualquer outra coisa faz o
