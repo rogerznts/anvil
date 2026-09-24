@@ -169,9 +169,13 @@ echo "branch: $branch"
 # Tela: a pasta ui/ da spec, ou uma user story que fala de algo que o usuario ve.
 # A palavra e so o padrao: o supervisor le as linhas story e pode subir um "no"
 # para o browser QA quando a historia descreve tela com outras palavras.
+# A comparacao e do perl, em UTF-8 fixo, sem caixa e so com palavra inteira: o grep
+# segue o locale, e em LC_ALL=C nao iguala "PÁGINA" a "página" e ve "painel" em
+# "painelão". LC_ALL=C no perl so evita o aviso de locale ausente.
 stories="$(sed -n '/^## User Stories/,/^## [^#]/p' "$dir/spec.md" 2>/dev/null | grep -E '^[0-9]+\. ')"
 SCREEN_WORDS='telas?|páginas?|paginas?|painel|painéis|formulários?|formularios?|interface|navegador|browser|botão|botões|botao|botoes|dashboard|screens?|pages?|ui|frontend|layout'
-screen_story="$(printf '%s\n' "$stories" | grep -iwE "$SCREEN_WORDS" | sed -n '1s/^\([0-9]*\)\..*/\1/p')"
+screen_story="$(printf '%s\n' "$stories" | LC_ALL=C perl -CSDA -ne '
+    BEGIN { $words = shift } if (/\b(?:$words)\b/i) { print /^(\d+)\./; exit }' "$SCREEN_WORDS")"
 if [ -d "$dir/ui" ]; then
     echo "screen: yes ($dir/ui/ existe)"
 elif [ -n "$screen_story" ]; then

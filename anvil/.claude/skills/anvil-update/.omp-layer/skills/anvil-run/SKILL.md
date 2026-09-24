@@ -77,9 +77,10 @@ recomenda o próximo passo, sem executá-lo, escrito como está aqui, porque no 
 skill se chama por `/skill:`. A linha `screen` decide:
 
 1. `screen: yes`: recomende `/skill:anvil-browser-qa` e diga o motivo que a linha dá.
-2. `screen: no`: leia as linhas `story`. Se uma delas descreve uma tela que abre
-   no navegador, como uma página, um formulário ou um painel, com palavras que o
-   script não reconheceu, recomende `/skill:anvil-browser-qa` e cite essa história.
+2. `screen: no`: leia as linhas `story`. Se uma delas descreve algo que abre no
+   navegador com palavras que o script não reconhece, como um gráfico que o usuário
+   filtra, um mapa clicável ou cards que se arrastam entre colunas, recomende
+   `/skill:anvil-browser-qa` e cite essa história.
    Saída de terminal, stdout, stderr, código de saída, arquivo, log e API não são
    tela, porque o browser QA precisa de algo que abra no navegador. Senão,
    recomende `/skill:anvil-docs archive`.
