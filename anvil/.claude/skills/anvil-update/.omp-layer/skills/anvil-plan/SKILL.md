@@ -32,9 +32,10 @@ script, e desta conversa. A linha `do` diz o que fazer, e ela vale sobre o que
 parecer óbvio na conversa. Em detalhe, pela linha `next`:
 
 - `next: refused`: o projeto não tem o perfil `docs/specs` do tracker, e o
-  condutor não sabe onde a spec mora. Mostre ao operador o motivo da linha
-  `reason` e pare, sem carregar nada. Vale também com um pedido no argumento: o
-  grill não é carregado.
+  condutor não sabe onde a spec mora. Mostre ao operador a linha `reason` e pare.
+  Não carregue nada, nem o grill quando veio um pedido no argumento, e não
+  ofereça fazer o trabalho por outro caminho: o fluxo segue à mão, como a linha
+  diz.
 - `next: end`: os tickets de implementação existem. Vá para o fim.
 - `next: none`: a spec deste branch está arquivada. Diga isso ao operador e pare,
   porque um planejamento novo começa num branch sem spec.

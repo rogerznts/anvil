@@ -32,7 +32,7 @@ emit() {  # <next> <reason>: o do diz o que a skill faz com o next
         anvil-grill) echo "do: sem spec no disco, a conversa decide; siga a regra de next: anvil-grill da skill" ;;
         end)         echo "do: mostre a linha handoff ao operador, sem executá-la, e não carregue nada" ;;
         none)        echo "do: diga ao operador que a spec deste branch está arquivada e pare, sem carregar nada" ;;
-        refused)     echo "do: diga ao operador o motivo da linha reason e pare, sem carregar nada, nem o grill quando veio um pedido" ;;
+        refused)     echo "do: mostre ao operador a linha reason e pare, sem carregar nada, nem o grill quando veio um pedido, e sem oferecer outro caminho" ;;
         *)           echo "do: proponha $1 ao operador e termine a vez; carregue a skill só depois do sim, numa vez seguinte" ;;
     esac
 }
