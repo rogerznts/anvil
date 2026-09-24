@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-22T00:00:00Z
+Last updated: 2026-09-24T02:31:03Z
 
 ## Visão geral
 
@@ -17,10 +17,11 @@ Last updated: 2026-09-22T00:00:00Z
 
 ## Specs ativas
 
-- [003 — omp como harness, com camada própria](./specs/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, 10 tickets
+Nenhuma.
 
 ## Specs arquivadas
 
+- [003 — omp como harness, com camada própria](./specs/archive/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, 10 tickets
 - [001 — Equipe e destilação](./specs/archive/001-feature-team-distill-sentrux/spec.md) — `feature/001-team-distill-sentrux`, 12 tickets
 
 ## Conteúdo por domínio
@@ -38,10 +39,11 @@ Last updated: 2026-09-22T00:00:00Z
 
 ### Architecture
 
-- [context.md](./architecture/context.md) — o glossário: curadoria, referências e
-  tickets, com os termos a evitar.
+- [context.md](./architecture/context.md) — o glossário: curadoria, referências,
+  tickets e harness, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
-  impõe, como o estado é lido do disco, e a herança do mosk.
+  impõe, como o estado é lido do disco, os três harnesses e a camada omp, e a
+  herança do mosk.
 - **ADRs**
   - [adr-0001](./architecture/adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md)
     — skills vendorizadas seguem o padrão original; o anvil impõe só o caminho em `docs/`
@@ -68,6 +70,8 @@ Last updated: 2026-09-22T00:00:00Z
 
 ### Project
 
+- [acompanhamento.md](./project/acompanhamento.md) — achados P2/P3 de specs
+  fechadas que viraram linha de acompanhamento, com origem e consequência.
 - [plan.md](./project/plan.md) — o roster de skills, as fases, a verificação e o
   corte do core do mosk.
 

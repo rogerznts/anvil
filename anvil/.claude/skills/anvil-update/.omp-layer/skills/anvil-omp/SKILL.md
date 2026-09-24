@@ -77,6 +77,12 @@ espelho `.agents/skills` e não tem guarda.
   e as listas `runners`, `how-critics` e `cross-judge` do `.claude/rules/anvil.md`
   não têm efeito no omp. Para outro modelo, use `task.agentModelOverrides` na
   configuração do omp.
+- Os condutores só leem o perfil `docs/specs`. O `anvil-plan` e o `anvil-run`
+  acham a spec pelo prefixo numérico do branch `{tipo}/{NNN}-{nome}` e leem
+  `docs/specs/{NNN}-*/`. Com outro perfil do `anvil-setup` (GitHub, GitLab,
+  markdown local), o `anvil-run` recusa sempre, e o `anvil-plan`, chamado de novo,
+  volta ao grill porque não acha a spec publicada. Nesse caso o fluxo segue à mão,
+  como no Claude Code.
 
 ## Como remover a camada à mão
 

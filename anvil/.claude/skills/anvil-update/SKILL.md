@@ -27,12 +27,14 @@ A **camada omp**, em `.omp/`, entra quando há sinal de omp: o binário `omp` no
 vem de `anvil-update/.omp-layer/` no payload, uma pasta oculta porque o Codex acha
 `SKILL.md` em subpasta de skill e só pula pasta oculta. Nesta versão ela traz o hook
 da guarda de merge em `.omp/hooks/pre/`, a rule `anvil-harness` em `.omp/rules/`,
-que traduz o vocabulário do Claude Code nas skills, e o manual `anvil-omp` em
-`.omp/skills/`. Os seus arquivos em `.omp/` — `config.yml`, agentes, rules,
-skills — ficam intocados. Para tirar a camada, siga o manual, em
-`.omp/skills/anvil-omp/SKILL.md`: apagar os arquivos e as linhas `omp:` do lock no
-mesmo commit não basta numa máquina com `omp` no `PATH` ou com `~/.omp/`, porque o
-update seguinte reinstala a camada.
+que traduz o vocabulário do Claude Code nas skills, o agente `anvil-implementer` em
+`.omp/agents/`, que implementa um ticket e roda o review, e três skills em
+`.omp/skills/`: os condutores `anvil-plan` e `anvil-run`, que encadeiam o fluxo e
+despacham o implementer, e o manual `anvil-omp`. Os seus arquivos em `.omp/` —
+`config.yml`, agentes, rules, skills — ficam intocados. Para tirar a camada, siga o
+manual, em `.omp/skills/anvil-omp/SKILL.md`: apagar os arquivos e as linhas `omp:`
+do lock no mesmo commit não basta numa máquina com `omp` no `PATH` ou com
+`~/.omp/`, porque o update seguinte reinstala a camada.
 
 **Por que reset e não `degit --force`:** o `--force` sobrescreve arquivo a
 arquivo e **nunca apaga**. Uma skill que deixou de existir upstream ficaria no
