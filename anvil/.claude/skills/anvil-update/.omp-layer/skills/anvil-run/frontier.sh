@@ -109,8 +109,11 @@ for f in "$dir"/issues/[0-9]*.md; do
         last[n]="round=${round:-?}/${verdict:-?}"
         if [ -n "$round" ] && [ "$round" -ge 2 ] && [ "$verdict" = fail ]; then
             is_locked[n]=1
-            # o P1 que travou: as linhas "Review round=N · P1" da ultima rodada no ## Comments
-            open_p1[n]="$(sed -n '/^## Comments/,$p' "$f" | grep -E "^- *Review round=$round · P1([^0-9]|$)" | sed 's/^- *//')"
+            # o P1 que travou: as linhas "Review round=N ·" da ultima rodada no ## Comments
+            # com P1 em posicao de classe, palavra inteira seguida de " (" ou ":", em
+            # qualquer ponto depois do ponto medio. "P2 (Standards) e P1 (Spec)" conta;
+            # "prova fraca do P1 anterior" nao. LC_ALL=C: a mesma leitura em qualquer locale.
+            open_p1[n]="$(sed -n '/^## Comments/,$p' "$f" | LC_ALL=C grep -E "^- *Review round=$round · (.*[^[:alnum:]_])?P1( \(|:)" | sed 's/^- *//')"
             [ -n "${open_p1[n]}" ] || open_p1[n]="nenhuma linha 'Review round=$round · P1' no ## Comments"
         fi
     else
