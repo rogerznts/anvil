@@ -121,6 +121,37 @@ revisado, e a guarda de merge impõe a ordem.
 
 ---
 
+## Três harnesses, e só o omp conduz
+
+O anvil roda no Claude Code, no Codex e no omp. As skills são as mesmas nos três.
+Só no omp o fluxo é conduzido, porque ele tem `task`, agentes próprios e sessões
+filhas que nascem sem a conversa do pai — ver
+[adr-0011](docs/architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md).
+
+**Como a camada chega.** O `/anvil-boot` e o `/anvil-update` procuram o omp: o
+binário no `PATH`, o diretório `~/.omp/` ou uma linha `omp:` no `anvil.lock`.
+Qualquer um basta, e a camada omp entra em `.omp/` sem pergunta. Ela é versionada
+como o resto, e a linha `omp:` a mantém no update de quem não tem omp. O mesmo
+passo mantém `.agents/skills`, por onde o Codex lê as skills: um symlink para
+`.claude/skills/<nome>` por skill do lock.
+
+**O que o omp ganha.** Lá, skill se chama por `/skill:<nome>`, e o boot é
+`/skill:anvil-boot`.
+
+| | |
+|---|---|
+| `/skill:anvil-plan <pedido>` | conduz grill, to-spec e to-tickets na mesma janela. Entre uma etapa e outra propõe a próxima ou um desvio, como research ou prototype, e só carrega com o seu sim |
+| `/skill:anvil-run [NNN]` | implementa a spec ticket a ticket, em série, cada um num `anvil-implementer` de contexto novo, com o review em dois eixos. Termina com relatório e próximo passo, e nunca faz QA, archive ou PR |
+| `/skill:anvil-omp` | o manual da camada: detecção, limites e como removê-la |
+| guarda de merge | um hook em `.omp/hooks/pre/` chama o mesmo `guard-spec-merge.sh` do Claude Code |
+
+**O que segue manual.** No Claude Code e no Codex, a lista de skills é a de sempre
+e nenhum desses comandos existe. O fluxo é `/anvil-grill`, `/anvil-to-spec`,
+`/anvil-to-tickets` e uma sessão de `/anvil-implement` por ticket. O Claude Code
+tem a guarda pelo hook do `.claude/settings.json`, e o Codex não tem guarda.
+
+---
+
 ## As skills
 
 ### Fluxo principal — da ideia ao merge

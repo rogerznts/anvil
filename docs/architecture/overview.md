@@ -31,6 +31,20 @@ com adaptação registrada — ver
       bench · ui · distill · tea-* (4)
 ```
 
+## Harnesses
+
+O payload é lido por três harnesses: Claude Code, Codex e omp. As skills são as
+mesmas nos três, e o Claude Code é a referência. O que só um harness lê vem numa
+**camada de harness**, instalada pelo boot e pelo update quando o harness é
+detectado e mantida depois pela linha `omp:` do `anvil.lock`. Hoje há uma, a
+camada omp, em `.omp/`: a guarda de merge como hook do omp, a rule que traduz o
+vocabulário do Claude Code, o agente `anvil-implementer`, os condutores
+`anvil-plan` e `anvil-run` e o manual `anvil-omp`. Só no omp o fluxo é conduzido;
+no Claude Code e no Codex ele segue manual. O Codex lê as skills pelo espelho
+`.agents/skills`, que o mesmo passo mantém. Ver
+[adr-0011](./adr/adr-0011-omp-como-harness-com-camada-propria.md) e os termos em
+[context.md](./context.md).
+
 ## O que o anvil impõe, e só isso
 
 Uma coisa: **onde o arquivo é salvo dentro de `docs/`**. O conteúdo é

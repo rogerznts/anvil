@@ -8,9 +8,10 @@ description: "Bootstrap: prepara um projeto para o anvil — injeta as diretivas
 Prepara um projeto para o anvil. Roda uma vez; repetir é seguro, porque cada
 passo é idempotente e nada é sobrescrito sem aviso.
 
-**Nada é escrito sem aprovação**, exceto o bloco delimitado do `CLAUDE.md` e a
-árvore vazia de `docs/`. Todo o resto — rules, perfil de tracker, rule de stack,
-hook — é proposto e espera confirmação.
+**Nada é escrito sem aprovação**, exceto o bloco delimitado do `CLAUDE.md`, a
+árvore vazia de `docs/` e as camadas de harness do passo 11, que só param diante
+de colisão. Todo o resto — rules, perfil de tracker, rule de stack, hook — é
+proposto e espera confirmação.
 
 ## 1. Vindo do mosk?
 
@@ -195,7 +196,8 @@ Diga ao usuário que a guarda está ativa e o que ela bloqueia.
 ## 9. Conferir o `anvil.lock`
 
 O payload traz `.claude/anvil.lock` pronto. É dele que o `/anvil-update` calcula
-os órfãos. O lock tem uma linha `skill:` por skill e uma `agent:` por agente.
+os órfãos. O lock tem uma linha `skill:` por skill e uma `agent:` por agente, e,
+com a camada omp instalada, uma `omp:` por arquivo dela.
 Confira se algum
 item do lock falta no disco:
 
@@ -226,6 +228,7 @@ sem ter sido perguntado. Os que não vieram do anvil entram em `USER_SKILLS` e
 ```bash
 USER_SKILLS="minha-skill outra-skill"   # skills que não vieram do anvil; vazio se nenhuma
 USER_AGENTS="meu-agente"                # agentes que não vieram do anvil, sem o .md; vazio se nenhum
+OMP_LINES="$(sed -n '/^omp:/p' .claude/anvil.lock 2>/dev/null | tr -d '\r')"
 { echo "# anvil.lock — o que esta instalacao possui."
   echo "# Derivado do payload. Nao edite a mao."
   ls .claude/skills | while read -r s; do
@@ -234,8 +237,12 @@ USER_AGENTS="meu-agente"                # agentes que não vieram do anvil, sem 
   ls .claude/agents 2>/dev/null | sed -n 's/\.md$//p' | while read -r a; do
     case " $USER_AGENTS " in *" $a "*) ;; *) echo "agent: $a" ;; esac
   done
+  printf '%s\n' "$OMP_LINES" | sed '/^$/d'
 } > .claude/anvil.lock
 ```
+
+As linhas `omp:` passam para o lock novo como estavam: são elas que mantêm a
+camada omp num update rodado sem omp, e quem as confere é o passo 11.
 
 **Sem lock, o update não limpa órfão nenhum** — ele não tem como distinguir o que
 o anvil instalou do que você escreveu, e o lado seguro é não apagar nada.
@@ -297,7 +304,36 @@ do projeto, e tirar as linhas faz as skills instaladas aparecerem no `git status
   escreveu. Avise que ela continua ignorando o toolkit e a skill que ele escrever
   ali, e que tirá-la é decisão dele.
 
-## 11. Índice e relatório
+## 11. Camadas de harness
+
+O omp e o Codex leem o que o anvil instala fora de `.claude/`: a camada omp em
+`.omp/` e o espelho do Codex em `.agents/skills`. Quem os instala é o modo de
+camadas do `reset-install.sh`, o mesmo código do `/anvil-update`, rodando da
+cópia instalada:
+
+```bash
+bash .claude/skills/anvil-update/scripts/reset-install.sh --layers --dry-run --to .
+bash .claude/skills/anvil-update/scripts/reset-install.sh --layers --to .
+```
+
+Rode o dry-run e, logo depois, o modo, **sem perguntar**. A camada omp só entra
+com sinal de omp — o binário `omp` no `PATH`, o diretório `~/.omp/` ou uma linha
+`omp:` no lock —, e projeto sem sinal nenhum não ganha `.omp/`. A exceção é a
+colisão da camada: arquivo do projeto em `.omp/`, fora do lock, com o caminho de
+um arquivo da camada. Ele **será substituído**. Com colisão no dry-run, nomeie o
+arquivo e espere aprovação.
+
+O modo lê as linhas `skill:` do lock, por isso vem depois do passo 9. Do lock, só
+as linhas `omp:` mudam; skills, agentes e `.gitignore` ficam como estão.
+
+Relate o que o modo relatou: a camada omp nova, mantida ou não instalada, e o
+sinal que decidiu; o que entrou em `.omp/` e em `.agents/skills`; e as colisões do
+espelho, que ficam como estão e o Codex continua lendo.
+
+O hook do Claude do passo 8 fica registrado com ou sem camada omp: num time misto,
+quem usa Claude Code continua protegido por ele.
+
+## 12. Índice e relatório
 
 Chame o verbo `index` do `anvil-docs`.
 

@@ -581,14 +581,19 @@ PYEOF
             { echo "   FALHA $n: invocable no manifesto, mas o frontmatter ainda trava"; falhas=$((falhas+1)); }
     done < <(manifest_rows)
 
+    # O name: do frontmatter, lido so dentro do frontmatter. Vazio quando nao ha.
+    nome_fm() {  # <arquivo>
+        awk '{ sub(/[ \t\r]+$/, "") } NR == 1 { if ($0 != "---") exit; next } $0 == "---" { exit }
+             sub(/^name: */, "") { print; exit }' "$1" | tr -d "\"'"
+    }
+
     # O Claude Code acha o agente pelo name:, e o lock e o bloco o acham pelo nome
     # do arquivo. Os dois tem de ser o mesmo.
     echo "9. name: do agente bate com o nome do arquivo"
     for f in "$AGENTS"/*.md; do
         [ -f "$f" ] || continue
         n="$(basename "$f" .md)"
-        fm="$(awk '{ sub(/[ \t\r]+$/, "") } NR == 1 { if ($0 != "---") exit; next } $0 == "---" { exit }
-                   sub(/^name: */, "") { print; exit }' "$f" | tr -d "\"'")"
+        fm="$(nome_fm "$f")"
         [ "$n" = "$fm" ] || { echo "   FALHA agents/$n.md: frontmatter diz '$fm'"; falhas=$((falhas+1)); }
     done
 
@@ -686,6 +691,87 @@ PYEOF
                 echo "   FALHA agents/$(basename "$f"): $t tem trava de invocacao"; falhas=$((falhas+1))
             fi
         done < <(spans_of "$f" '/?anvil-[a-z0-9-]+' | sed 's|^/||' | sort -u)
+    done
+
+    # A camada omp (spec 003) viaja dentro da anvil-update, numa pasta oculta, e o
+    # update a instala em .omp/ do projeto. Os checks de skill e de agente acima nao
+    # descem ate ela.
+    local camada="$PAYLOAD/anvil-update/.omp-layer" p sk
+
+    # O omp descarta agente sem name: e acha skill pelo name:. A rule ele nomeia pelo
+    # arquivo: sem name: ela esta certa, e um name: diferente so engana quem le.
+    echo "14. name: da camada omp bate com o arquivo ou a pasta"
+    for f in "$camada"/skills/*/SKILL.md "$camada"/agents/*.md "$camada"/rules/*.md; do
+        [ -f "$f" ] || continue
+        case "$f" in
+            */SKILL.md) n="$(basename "$(dirname "$f")")" ;;
+            *)          n="$(basename "$f" .md)" ;;
+        esac
+        fm="$(nome_fm "$f")"
+        case "$f" in "$camada"/rules/*) [ -n "$fm" ] || continue ;; esac
+        [ "$n" = "$fm" ] || { echo "   FALHA .omp-layer/${f#"$camada"/}: frontmatter diz '$fm'"; falhas=$((falhas+1)); }
+    done
+
+    # Caminho citado que o anvil instala: a propria camada em .omp/, e o que o payload
+    # poe em .claude/ — skills, agentes e o lock. O resto de .claude/, como
+    # settings.json e rules/, o boot gera no projeto e nao tem par no payload. Em .md
+    # vale o span em crase fora de bloco cercado, como no check 10. Em .ts, o literal
+    # de string, que e onde o hook guarda o caminho do script que chama: se o script
+    # mudar de lugar, o hook deixa passar tudo em silencio.
+    CAMADA_PATH_RE='\.omp/[^*{<]*|\.claude/(skills|agents)/[^*{<]*|\.claude/anvil\.lock'
+    citados_of() {  # <arquivo>
+        case "$1" in
+            *.ts) python3 - "$1" "$CAMADA_PATH_RE" <<'PYEOF'
+import re, sys
+for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
+    for m in re.finditer(r'(["\'`])((?:\\.|(?!\1).)*)\1', line):
+        if re.fullmatch(sys.argv[2], m.group(2)):
+            print(m.group(2))
+PYEOF
+                ;;
+            *) spans_of "$1" "$CAMADA_PATH_RE" ;;
+        esac
+    }
+    echo "15. caminho citado pela camada omp existe no payload"
+    while IFS= read -r f; do
+        while IFS= read -r t; do
+            [ -n "$t" ] || continue
+            case "$t" in .omp/*) p="$camada/${t#.omp/}" ;; *) p="$ROOT/anvil/$t" ;; esac
+            [ -e "$p" ] || { echo "   FALHA .omp-layer/${f#"$camada"/} -> $t"; falhas=$((falhas+1)); }
+        done < <(citados_of "$f")
+    done < <(find "$camada" -type f \( -name '*.md' -o -name '*.ts' \) 2>/dev/null)
+
+    # O omp injeta no agente as skills do autoloadSkills e ignora em silencio o nome
+    # que nao acha. Mesma checagem do 13, com a lista do frontmatter no lugar dos
+    # spans: a skill existe, no payload ou na camada, e nao tem trava de invocacao.
+    autoload_of() {  # <agente.md>
+        python3 - "$1" <<'PYEOF'
+import re, sys, yaml
+t = open(sys.argv[1], encoding='utf-8', errors='replace').read()
+m = re.match(r'---\s*\n(.*?)---\s*\n?', t, re.S)
+try:
+    d = yaml.safe_load(m.group(1)) if m else None
+except yaml.YAMLError:
+    d = None
+v = d.get('autoloadSkills') if isinstance(d, dict) else None
+if isinstance(v, str):
+    v = v.split(',')
+for s in v or []:
+    print(str(s).strip())
+PYEOF
+    }
+    echo "16. skill em autoloadSkills de agente da camada existe e não tem trava"
+    for f in "$camada"/agents/*.md; do
+        [ -f "$f" ] || continue
+        while IFS= read -r t; do
+            [ -n "$t" ] || continue
+            sk="$PAYLOAD/$t/SKILL.md"; [ -f "$sk" ] || sk="$camada/skills/$t/SKILL.md"
+            if [ ! -f "$sk" ]; then
+                echo "   FALHA .omp-layer/agents/$(basename "$f"): $t nao existe no payload"; falhas=$((falhas+1))
+            elif tem_trava "$sk"; then
+                echo "   FALHA .omp-layer/agents/$(basename "$f"): $t tem trava de invocacao"; falhas=$((falhas+1))
+            fi
+        done < <(autoload_of "$f")
     done
 
     echo

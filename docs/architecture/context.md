@@ -1,7 +1,7 @@
 # anvil
 
-Toolkit de skills para Claude Code, curadorizado a partir de repositórios
-upstream e distribuído a projetos por cópia.
+Toolkit de skills para agentes de código — Claude Code, Codex e omp —, curadorizado a
+partir de repositórios upstream e distribuído a projetos por cópia.
 
 ## Language
 
@@ -32,6 +32,24 @@ _Avoid_: lock, bloqueio
 **Lock**:
 O registro do que uma instalação do anvil possui, de onde saem os órfãos.
 _Avoid_: manifesto, lockfile de dependência
+
+### Harness
+
+**Harness**:
+O programa que executa o agente e lê o payload: Claude Code, Codex ou omp. O
+Claude Code é a referência. Só o omp automatiza o fluxo; nos outros ele é manual.
+_Avoid_: runtime, executor, cliente
+
+**Camada de harness**:
+A parte do payload que só um harness lê, instalada no projeto quando esse harness
+é detectado e mantida depois, mesmo que a máquina seguinte não o tenha.
+_Avoid_: adapter, plugin, integração
+
+**Condutor**:
+Skill da camada omp que encadeia as skills do fluxo por conta do operador,
+parando em cada pausa humana: `anvil-plan` no planejamento, `anvil-run` na
+implementação.
+_Avoid_: orquestrador, pipeline, flow
 
 ### Referências
 

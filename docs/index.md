@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-22T00:00:00Z
+Last updated: 2026-09-24T02:31:03Z
 
 ## Visão geral
 
@@ -8,6 +8,10 @@ Last updated: 2026-09-22T00:00:00Z
   - [gate-sem-criterio-de-parada.md](./discovery/gate-sem-criterio-de-parada.md)
     — por que um par de gates independentes entra em laço num documento, e o que
     muda nas skills
+  - [adaptar-omp-ao-anvil.md](./discovery/adaptar-omp-ao-anvil.md) — proposta
+    de integração do anvil com o omp, antes do grill
+  - [camadas-anvil-omp.md](./discovery/camadas-anvil-omp.md) — desenho em
+    mermaid das camadas, da instalação, da execução e da guarda de merge
 - **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
 
@@ -17,6 +21,7 @@ Nenhuma.
 
 ## Specs arquivadas
 
+- [003 — omp como harness, com camada própria](./specs/archive/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, 10 tickets
 - [001 — Equipe e destilação](./specs/archive/001-feature-team-distill-sentrux/spec.md) — `feature/001-team-distill-sentrux`, 12 tickets
 
 ## Conteúdo por domínio
@@ -34,10 +39,11 @@ Nenhuma.
 
 ### Architecture
 
-- [context.md](./architecture/context.md) — o glossário: curadoria, referências e
-  tickets, com os termos a evitar.
+- [context.md](./architecture/context.md) — o glossário: curadoria, referências,
+  tickets e harness, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
-  impõe, como o estado é lido do disco, e a herança do mosk.
+  impõe, como o estado é lido do disco, os três harnesses e a camada omp, e a
+  herança do mosk.
 - **ADRs**
   - [adr-0001](./architecture/adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md)
     — skills vendorizadas seguem o padrão original; o anvil impõe só o caminho em `docs/`
@@ -59,9 +65,13 @@ Nenhuma.
     — o toolkit instalado fica versionado; o boot não escreve no `.gitignore`
   - [adr-0010](./architecture/adr/adr-0010-verificacao-tem-criterio-de-parada.md)
     — a verificação tem critério de parada, e ele é ausência de P1
+  - [adr-0011](./architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md)
+    — o omp é harness de primeira classe, com camada própria; a orquestração volta só nela
 
 ### Project
 
+- [acompanhamento.md](./project/acompanhamento.md) — achados P2/P3 de specs
+  fechadas que viraram linha de acompanhamento, com origem e consequência.
 - [plan.md](./project/plan.md) — o roster de skills, as fases, a verificação e o
   corte do core do mosk.
 

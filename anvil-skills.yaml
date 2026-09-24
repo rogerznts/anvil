@@ -218,6 +218,9 @@ skills:
 #   anvil-browser-qa · anvil-distill · anvil-next
 #   tea-commit · tea-open-pr · tea-open-fast-pr · tea-prune-branches
 #
+# Camada omp, autoral e sem upstream, dentro da anvil-update em .omp-layer/:
+#   skills anvil-plan · anvil-run · anvil-omp · agente anvil-implementer
+#
 # O anvil-bench é autoral E tem entrada no sync: o SKILL.md e o GATE.md são
 # nossos (protegidos por `keep`), e o material do unlazy embaixo de unlazy/ vem
 # do upstream pelo merge 3-way como qualquer outra cópia.

@@ -16,14 +16,35 @@ você tenha escrito**. A ressalva é a skill ou o agente seu, fora do lock, com 
 mesmo nome de um do payload: é sobrescrito, depois do destaque de colisão no
 dry-run e do aviso do passo 4.
 
+O espelho do Codex, `.agents/skills`, é refeito a partir do lock: um symlink para
+`.claude/skills` por skill do payload. Ali, todo symlink com nome de skill do anvil
+é do anvil e é refeito, aponte para onde apontar. **Diretório ou arquivo é seu e
+fica intocado**, mesmo com nome de skill do anvil.
+
+A **camada omp**, em `.omp/`, entra quando há sinal de omp: o binário `omp` no
+`PATH`, o diretório `~/.omp/` ou uma linha `omp:` no lock. Qualquer um basta, e o
+último torna a camada pegajosa: um update rodado numa máquina sem omp a mantém. Ela
+vem de `anvil-update/.omp-layer/` no payload, uma pasta oculta porque o Codex acha
+`SKILL.md` em subpasta de skill e só pula pasta oculta. Nesta versão ela traz o hook
+da guarda de merge em `.omp/hooks/pre/`, a rule `anvil-harness` em `.omp/rules/`,
+que traduz o vocabulário do Claude Code nas skills, o agente `anvil-implementer` em
+`.omp/agents/`, que implementa um ticket e roda o review, e três skills em
+`.omp/skills/`: os condutores `anvil-plan` e `anvil-run`, que encadeiam o fluxo e
+despacham o implementer, e o manual `anvil-omp`. Os seus arquivos em `.omp/` —
+`config.yml`, agentes, rules, skills — ficam intocados. Para tirar a camada, siga o
+manual, em `.omp/skills/anvil-omp/SKILL.md`: apagar os arquivos e as linhas `omp:`
+do lock no mesmo commit não basta numa máquina com `omp` no `PATH` ou com
+`~/.omp/`, porque o update seguinte reinstala a camada.
+
 **Por que reset e não `degit --force`:** o `--force` sobrescreve arquivo a
 arquivo e **nunca apaga**. Uma skill que deixou de existir upstream ficaria no
 disco para sempre, e os agentes continuariam encontrando e tentando usar.
 Atualizar sem reset acumula o entulho de todas as versões anteriores.
 
 **Como os órfãos são calculados:** pelo `.claude/anvil.lock`, que lista o que
-esta instalação possui, com uma linha `skill:` por skill e uma `agent:` por
-agente. É o que substitui a detecção por prefixo do mosk — um lockfile diz a
+esta instalação possui, com uma linha `skill:` por skill, uma `agent:` por
+agente e uma `omp:` por arquivo da camada omp, com o caminho relativo a `.omp/`.
+É o que substitui a detecção por prefixo do mosk — um lockfile diz a
 verdade, um prefixo adivinha, e adivinha errado justamente nas skills que não
 seguem o padrão de nome, como as `tea-*`.
 
@@ -84,7 +105,8 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" \
 próprio diretório onde o script vive. Rodar do `$TMP` também garante que a lógica
 de reset é a nova, não a da versão velha. O `--unignore`, que só tira do
 `.gitignore` o bloco de uma instalação antiga, pode rodar da cópia instalada — é o
-que o `/anvil-boot` faz.
+que o `/anvil-boot` faz. O `--layers`, que roda só o espelho do Codex e a camada
+omp, também: é o passo das camadas do boot.
 
 A saída classifica em quatro grupos: *substituídos* · *órfãos, serão removidos* ·
 *não são do anvil, ficam intocados* · *preservados sempre*.
@@ -97,6 +119,26 @@ usuário escreveu com o nome de um do payload. Ele será sobrescrito e passa a
 constar do lock. Sem lock tudo está fora dele, não há como distinguir, e o
 destaque não aparece.
 
+Depois vem o bloco do espelho do Codex, `.agents/skills`: *symlinks novos* ·
+*symlinks refeitos* · *órfãos, serão removidos* · *colisões* · *não são do anvil*.
+Refeito é o symlink com nome de skill do payload que apontava para outro lugar,
+como o link absoluto e pendurado que o degit deixa para o cache dele. Colisão no
+espelho é diretório ou arquivo com nome de skill do payload. Ao contrário da
+colisão de skill, ela **não** é substituída: fica como está, e o Codex lê essa
+entrada, não a skill do anvil. Se `.agents` ou `.agents/skills` for symlink ou
+arquivo, o espelho inteiro é do usuário: o bloco diz isso numa linha e nada ali é
+tocado.
+
+Depois vem o bloco da camada omp, que começa pelo que decidiu: *nova neste
+update* ou *mantida*, com os sinais achados, ou *não instalada*, sem sinal
+nenhum. Os grupos são os das skills, com o caminho em `.omp/`: *arquivos novos* ·
+*substituídos* · *colisões* · *órfãos, serão removidos* · *não são do anvil*.
+Colisão aqui é arquivo seu com o caminho de um arquivo da camada e fora do lock:
+**será substituído**. Se `.omp`, ou uma pasta no caminho da camada, for symlink ou
+arquivo, ou se um arquivo da camada for diretório no seu projeto, a camada inteira
+é sua: o bloco diz qual caminho impediu, nada em `.omp/` é tocado e as linhas
+`omp:` do lock ficam como estavam.
+
 Por último vem o `.gitignore`. **O toolkit instalado fica versionado**, então nada
 é escrito ali. Instalação de uma versão antiga tem um bloco `ANVIL:INSTALLED` que
 ignorava as skills e os agentes: o reset o **remove**, e o dry-run avisa. Só o
@@ -105,8 +147,20 @@ bloco sai; o resto do `.gitignore` fica como estava.
 ### 4. Avisar e esperar
 
 Diga numa frase o que será apagado e o que será preservado, **nomeando os
-órfãos** e as **possíveis colisões**, que serão sobrescritas. Não continue com um
-"talvez".
+órfãos** e as **possíveis colisões**, de skill, de agente e da camada omp, que
+serão sobrescritas. Não continue com um "talvez".
+
+Colisão no espelho não é sobrescrita. Antes de executar, compare cada uma com a
+skill instalada, que o dry-run ainda não trocou:
+
+```bash
+diff -r .agents/skills/{nome} .claude/skills/{nome}
+```
+
+Sem diferença, é uma cópia que um payload antigo deixou ali: versões anteriores
+traziam `anvil-browser-qa` e `anvil-next` como diretório real. Diga isso e sugira
+apagá-la antes do passo 5, para o update pôr o symlink no lugar. Com diferença, é
+do usuário: diga que o Codex vai continuar lendo a versão dele.
 
 ### 5. Executar
 
@@ -116,17 +170,20 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP" -
 
 ### 6. Relatar
 
-- órfãos removidos, **por nome**
+- órfãos removidos, **por nome**, inclusive os da camada omp
+- a camada omp: nova, mantida ou não instalada, e o sinal que decidiu
 - o que mudou localmente: `git status --short` e `git diff --stat`
 - o que há de novo no toolkit
 - o que ficou no disco para você decidir
 - `.gitignore`: o bloco `ANVIL:INSTALLED` removido, se havia um; diga que as
   skills e os agentes instalados passam a aparecer no `git status`
 - **o que o update não toca e pode ter ficado para trás.** O reset troca
-  `.claude/skills/` e `.claude/agents/`, e só. O bloco `ANVIL:DIRECTIVES` do
-  `CLAUDE.md` e os perfis em `docs/agents/` são escritos pelo `/anvil-boot`, então
-  uma versão nova do toolkit pode trazer diretiva ou perfil que este projeto ainda
-  não tem. Confira os dois e, se algum acusar, **sugira rodar `/anvil-boot`**:
+  `.claude/skills/`, `.claude/agents/`, o espelho `.agents/skills/` e os arquivos
+  da camada em `.omp/`, e só. O
+  bloco `ANVIL:DIRECTIVES` do `CLAUDE.md` e os perfis em `docs/agents/` são
+  escritos pelo `/anvil-boot`, então uma versão nova do toolkit pode trazer
+  diretiva ou perfil que este projeto ainda não tem. Confira os dois e, se algum
+  acusar, **sugira rodar `/anvil-boot`**:
 
   ```bash
   awk '/ANVIL:DIRECTIVES:START/{f=1;next} /ANVIL:DIRECTIVES:END/{f=0} f' CLAUDE.md |
