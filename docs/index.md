@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-24T02:31:03Z
+Last updated: 2026-09-24T16:17:02Z
 
 ## Visão geral
 
@@ -17,7 +17,7 @@ Last updated: 2026-09-24T02:31:03Z
 
 ## Specs ativas
 
-Nenhuma.
+- [004 — Robustez e isolamento da camada omp](./specs/004-extension-omp-layer-hardening/spec.md) — `extension/004-omp-layer-hardening`, especificado
 
 ## Specs arquivadas
 
