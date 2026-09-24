@@ -4,7 +4,7 @@
 
 **Blocked by:** 02, 04, 06, 08, 09
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 - [ ] Cenário ponta a ponta em `workspace/` roda do degit ao relatório da `anvil-run`, com a camada instalada pelo boot e a guarda bloqueando um merge prematuro.
 - [ ] O mesmo projeto aberto no Claude Code mostra a mesma lista de skills de antes da spec.
