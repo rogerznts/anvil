@@ -36,9 +36,11 @@ vêm uma linha por ticket, com `status`, `reviews`, `last`, `blocked_by` e `clas
 `frontier`, `skipped`, `locked`, uma linha `open_p1` por P1 de travado,
 `depend_on_locked`, `all_resolved`, às
 vezes `halt`, e `next`. O frontier já exclui o ticket travado, cuja última
-`Review:` tem `round` 2 ou mais e `verdict=fail`. Com a árvore suja, o script
-devolve `halt` e `next: none`, porque um implementer novo commitaria o que
-sobrou junto com o ticket dele.
+`Review:` tem `round` 2 ou mais e `verdict=fail`, e o de bloqueio ilegível,
+`class=unreadable_blockers`, cujo `Blocked by` não é uma lista de números: nele,
+`blocked_by` traz entre aspas o texto da linha como está no arquivo. Com a árvore
+suja, o script devolve `halt` e `next: none`, porque um implementer novo commitaria
+o que sobrou junto com o ticket dele.
 
 ## O laço
 
@@ -91,6 +93,9 @@ Com pendência, o relatório lista:
 - os travados, cada um com o texto das linhas `open_p1` dele, por extenso. A
   terceira rodada é escolha do operador;
 - os que dependem de um travado, da linha `depend_on_locked`;
+- os de bloqueio ilegível, `class=unreadable_blockers`, cada um com o texto do
+  `blocked_by`. O operador corrige a linha para uma lista de números, como `01, 02`,
+  e roda a skill de novo;
 - os pulados, que terminaram sem mudar o estado, e o motivo que o implementer deu.
   Rodar a skill de novo tenta de novo;
 - os que ainda esperam por outro ticket, com a lista da `class` deles.

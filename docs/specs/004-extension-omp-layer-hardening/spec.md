@@ -181,7 +181,7 @@ O operador continua chamando os mesmos comandos. O que muda:
   | `arvore:` | `tree:` | `clean` ou `dirty (N)` |
   | `tela:` | `screen:` | `yes` ou `no`, com o motivo |
   | `historia:` | `story:` | a user story |
-  | linha `ticket` | linha `ticket` | campos `status`, `reviews`, `last`, `blocked_by`, `class` |
+  | linha `ticket` | linha `ticket` | campos `status`, `reviews`, `last`, `blocked_by` e `class`; com `class=unreadable_blockers`, o `blocked_by` é o texto original da linha, entre aspas |
   | classes | classes | `resolved`, `locked`, `waiting:NN,NN`, `skipped`, `frontier`, `unreadable_blockers` |
   | `frontier:` | `frontier:` | números |
   | `pulados:` | `skipped:` | números |

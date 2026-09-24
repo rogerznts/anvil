@@ -13,8 +13,10 @@
 #
 # Frontier: ticket com Status: diferente de resolved, com todos os Blocked by
 # resolvidos e nao travado. Travado (locked): a ultima linha Review: tem round 2 ou
-# mais e verdict=fail. Com a arvore suja, o next e none e sai uma linha "halt:":
-# o implementer seguinte commitaria o que sobrou junto com o ticket dele.
+# mais e verdict=fail. Bloqueio ilegivel (unreadable_blockers): o Blocked by nao e
+# uma lista de numeros, e na duvida o ticket fica fora. Com a arvore suja, o next e
+# none e sai uma linha "halt:": o implementer seguinte commitaria o que sobrou
+# junto com o ticket dele.
 set -u
 
 refuse() { echo "refusal: $1"; exit 2; }
@@ -64,6 +66,26 @@ for d in docs/specs/[0-9]*/; do
 done
 [ -n "$dir" ] || refuse "não há pasta docs/specs/$arg-*/ neste branch. Spec arquivada não tem o que conduzir."
 
+# Le o valor da primeira linha Blocked by em blocker_list, os numeros sem zeros a
+# esquerda. Vazio ou "Nenhum"/"None" e sem bloqueador. Cada item entre virgulas e
+# um numero; o item que cita um ADR-NNNN sai inteiro, se nao sobrar digito nele:
+# "03, ver ADR-0011" bloqueia pelo 03. Qualquer outra coisa da unreadable=1.
+read_blockers() {
+    local rest="$1," item
+    blocker_list=""; unreadable=""
+    case "$1" in ""|[Nn][Ee][Nn][Hh][Uu][Mm]*|[Nn][Oo][Nn][Ee]*) return ;; esac
+    while [ -n "$rest" ]; do
+        item="${rest%%,*}"; rest="${rest#*,}"
+        case "$item" in *ADR-[0-9]*)
+            item="$(printf '%s' "$item" | sed 's/ADR-[0-9][0-9]*//g')"
+            case "$item" in *[0-9]*) ;; *) continue ;; esac ;;
+        esac
+        item="${item#"${item%%[![:space:]]*}"}"; item="${item%"${item##*[![:space:]]}"}"
+        case "$item" in ""|*[!0-9]*) blocker_list=""; unreadable=1; return ;; esac
+        blocker_list="$blocker_list $((10#$item))"
+    done
+}
+
 # --- tickets ------------------------------------------------------------------
 # Indexados pelo numero, sem zeros a esquerda: o Blocked by cita 07 ou 7.
 order=""
@@ -73,8 +95,9 @@ for f in "$dir"/issues/[0-9]*.md; do
     file[n]="$f"; label[n]="$p"
     title[n]="$(sed -n '1{s/^# *//;s/^[0-9][0-9]*: *//;p;}' "$f")"
     status[n]="$(sed -n 's/^\**Status:\** *//p' "$f" | sed -n '1s/[[:space:]]*$//p')"
-    # So a lista de numeros do comeco da linha: "03, ver ADR-0011" bloqueia pelo 03.
-    blockers[n]="$(sed -n 's/^\**Blocked by:\** *//p' "$f" | sed -n '1{s/[^0-9, ].*//;p;}' | grep -oE '[0-9]+' | while read -r x; do echo $((10#$x)); done | tr '\n' ' ')"
+    blocked_raw[n]="$(sed -n 's/^\**Blocked by:\** *//p' "$f" | sed -n '1s/[[:space:]]*$//p')"
+    read_blockers "${blocked_raw[n]}"
+    blockers[n]="$blocker_list"; is_unreadable[n]="$unreadable"
     review_lines="$(grep -E '^\**Review:' "$f")"
     if [ -n "$review_lines" ]; then
         reviews[n]="$(printf '%s\n' "$review_lines" | wc -l | tr -d ' ')"
@@ -107,6 +130,7 @@ for n in $order; do
     is_resolved "$n" || all_resolved=no
     if is_resolved "$n"; then class[n]=resolved
     elif [ -n "${is_locked[n]:-}" ]; then class[n]=locked; locked="$locked $n"
+    elif [ -n "${is_unreadable[n]}" ]; then class[n]=unreadable_blockers
     else
         missing=""
         for b in ${blockers[n]}; do is_resolved "$b" || missing="$missing,${label[b]:-$b}"; done
@@ -158,6 +182,8 @@ for n in $order; do
     blocked_by=""; for b in ${blockers[n]}; do
         if [ -n "${label[b]:-}" ]; then blocked_by="$blocked_by,${label[b]}"; else blocked_by="$blocked_by,$b(não existe)"; fi
     done
+    # Ilegivel: o valor do Blocked by como esta no arquivo, entre aspas.
+    [ -n "${is_unreadable[n]}" ] && blocked_by="\"${blocked_raw[n]}\""
     echo "ticket ${label[n]} status=${status[n]:-?} reviews=${reviews[n]} last=${last[n]} blocked_by=$(or_dash "${blocked_by#,}") class=${class[n]} — ${title[n]}"
 done
 echo "frontier: $(or_dash "$(labels "$frontier")")"
