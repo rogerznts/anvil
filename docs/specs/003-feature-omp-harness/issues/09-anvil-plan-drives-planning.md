@@ -4,9 +4,10 @@
 
 **Blocked by:** 05
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=d48a771; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=4281b21; scope=diff:d48a771..4281b21; verdict=fail; p1=open
+**Review:** round=3; sha=2478a8c; scope=diff:4281b21..2478a8c; verdict=pass; p1=none
 
 - [x] A skill fica em `.omp/skills/`, com trava de invocação; o argumento vai para o grill como pedido inicial.
 - [x] Carrega `anvil-grill`, `anvil-to-spec` e `anvil-to-tickets` na mesma janela, sem compactar, e as pausas de cada uma continuam existindo.
@@ -56,3 +57,6 @@
 - Review round=2 · P3 (Standards): o que fazer com cada `next` está no `case` do `do`, no `stage.sh`, e nos itens da skill. Mudar uma etapa pede editar os dois, e a skill fica com instrução dupla se eles divergirem.
 - Review round=2 · P3 (Standards): o `reason` que vai ao operador escreve "decisão(ões) aberta(s)" e "ticket(s)". Só custa leitura.
 - A rodada 2 reprovou, e pelo perfil de verificação a verificação para aqui. A terceira rodada é escolha do operador. A frase do P1 acima descrevia a segunda rodada completa do S2, cujo `out/` foi sobrescrito pelas seguintes. Na rodada guardada, o grill leu `anvil-grill`, `anvil-grilling` e `anvil-domain-modeling`.
+- Review round=3 · rodada aberta por escolha do operador, só sobre o P1 da rodada 2 e a nota acima. O P1 fecha nos dois eixos. Com o referente declarado, a frase sobre a `anvil-domain-modeling` deixa de ser falsa e passa a não verificável aqui, porque o `out/` da segunda rodada completa não existe mais. O resto da nota confere: o `s2.sh` apaga o `out/` a cada rodada completa (`rm -rf "$O" "$X"`, linha 55), a rodada guardada é a última, com a skill instalada igual à versionada, e o `out/P/1.jsonl` tem os três `read`, de `skill://anvil-grill`, `skill://anvil-grilling` e `skill://anvil-domain-modeling`. O P2 da rodada 1, de que o S2 não confere essa leitura, continua valendo.
+- Review round=3 · P3 (Spec): a frase sobre a `anvil-domain-modeling` segue sem ressalva no lugar onde está, e só a nota do fim dos Comments diz a que rodada ela se refere. Quem parar ali ainda conclui que a rodada guardada pulou a skill. Só custa leitura, porque a nota vem na mesma seção.
+- Review round=3 · P3 (Standards): "sobrescrito pelas seguintes" está no plural, mas pela contagem de três rodadas depois da correção só veio uma depois da segunda. Custa uma leitura atenta de quem conta as rodadas.
