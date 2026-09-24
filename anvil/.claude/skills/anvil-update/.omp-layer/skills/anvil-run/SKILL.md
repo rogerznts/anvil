@@ -17,7 +17,8 @@ execução.
 
 ## Ler o estado
 
-No diretório em que a sessão está, que é a raiz do projeto, rode sem `cd`:
+O script é o `.omp/skills/anvil-run/frontier.sh`. No diretório em que a sessão
+está, que é a raiz do projeto, rode sem `cd`:
 
 ```bash
 bash .omp/skills/anvil-run/frontier.sh [NNN] [--skip "NN NN"]
@@ -74,9 +75,12 @@ recomenda o próximo passo, sem executá-lo, escrito como está aqui, porque no 
 skill se chama por `/skill:`. A linha `tela` decide:
 
 1. `tela: sim`: recomende `/skill:anvil-browser-qa` e diga o motivo que a linha dá.
-2. `tela: nao`: leia as linhas `historia`. Se uma delas descreve algo que o usuário
-   vê com palavras que o script não reconheceu, recomende `/skill:anvil-browser-qa`
-   e cite essa história. Senão, recomende `/skill:anvil-docs archive`.
+2. `tela: nao`: leia as linhas `historia`. Se uma delas descreve uma tela que abre
+   no navegador, como uma página, um formulário ou um painel, com palavras que o
+   script não reconheceu, recomende `/skill:anvil-browser-qa` e cite essa história.
+   Saída de terminal, stdout, stderr, código de saída, arquivo, log e API não são
+   tela, porque o browser QA precisa de algo que abra no navegador. Senão,
+   recomende `/skill:anvil-docs archive`.
 
 Nunca troque um `tela: sim` por archive: a falta de `ui/` não conta contra, porque
 a pasta só existe quando alguém a escreveu.
