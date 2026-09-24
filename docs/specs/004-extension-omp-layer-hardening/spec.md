@@ -71,7 +71,7 @@ O operador continua chamando os mesmos comandos. O que muda:
 4. Como operador, quero que `Blocked by: 01, 02` e `Blocked by: 01,02` sigam funcionando como hoje, para que os tickets já escritos não mudem de classe.
 5. Como operador, quero que "01 e 02", "01 (a), 02 (b)", "`05`" e "01; 05" deixem o ticket fora do frontier como bloqueio ilegível, para que um formato inesperado nunca solte o ticket.
 6. Como operador, quero que um bloqueador que cita um ticket inexistente continue aparecendo como "não existe" na linha do ticket, para que eu veja o erro de digitação.
-7. Como operador, quero que um ticket sem linha `Blocked by` continue livre, para que a ausência da linha não vire bloqueio.
+7. Como operador, quero que um ticket sem linha `Blocked by`, ou com a linha dizendo que não há bloqueador ("Nenhum — pode começar agora.", "None (can start immediately)"), continue livre, para que os tickets da 003 e o template da `anvil-to-tickets` não virem bloqueio ilegível.
 
 ### O P1 do travado sempre aparece
 
@@ -153,8 +153,10 @@ O operador continua chamando os mesmos comandos. O que muda:
 
 - **Leitura do `Blocked by`, na dúvida bloqueia.** Da primeira linha `Blocked by`,
   saem as referências `ADR-NNNN`. O resto tem de casar com uma lista de números
-  separados por vírgula, com espaço opcional. Linha vazia ou ausente é "sem
-  bloqueador". Qualquer outra coisa faz o ticket ganhar a classe de bloqueio
+  separados por vírgula, com espaço opcional. Linha vazia, ausente, ou que começa
+  por "Nenhum" ou "None", sem distinguir maiúsculas, é "sem bloqueador": são as
+  formas da 003 e do template da `anvil-to-tickets`. Qualquer outra coisa faz o
+  ticket ganhar a classe de bloqueio
   ilegível, que nunca entra no frontier nem no próximo, e a linha do ticket traz o
   texto original do `Blocked by`. Um ticket que depende de um ticket de bloqueio
   ilegível espera por ele como espera por qualquer bloqueador aberto.
