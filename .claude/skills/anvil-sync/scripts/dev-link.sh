@@ -10,7 +10,9 @@
 # Isto nao e o caminho de um projeto. La e o degit. Isto existe porque este
 # repositorio E a fonte.
 #
-#   dev-link.sh [--dry-run]     liga o roster de fluxo e os agentes
+#   dev-link.sh [--dry-run]     liga o roster de fluxo e os agentes, espelha as
+#                               skills ligadas em .agents/skills, e liga a camada
+#                               omp em .omp/
 #   dev-link.sh --all           liga o payload inteiro
 #   dev-link.sh --unlink        remove os symlinks, e somente eles
 #
@@ -23,6 +25,30 @@ PAYLOAD="$ROOT/anvil/.claude/skills"
 DEST="$ROOT/.claude/skills"
 AGENTS="$ROOT/anvil/.claude/agents"
 DEST_AGENTS="$ROOT/.claude/agents"
+# .agents/skills e por onde o Codex le as skills. O espelho e um symlink por skill
+# ligada, na forma que o reset-install.sh gera num projeto. Como la, o symlink com
+# nome de skill do payload e nosso, aponte para onde apontar; o symlink na forma
+# gerada tambem, mesmo com nome que saiu do payload. Diretorio e arquivo nunca.
+ESPELHO="$ROOT/.agents/skills"
+na_forma() { [ "$(readlink "$ESPELHO/$1")" = "../../.claude/skills/$1" ]; }
+nosso_espelho() { [ -L "$ESPELHO/$1" ] && { [ -d "$PAYLOAD/$1" ] || na_forma "$1"; }; }
+# A camada omp viaja no payload dentro da anvil-update, e num projeto o update a
+# instala em .omp/. Aqui cada arquivo dela vira um symlink em .omp/, e editar a
+# camada instalada e editar o payload. Nosso e o symlink que aponta para dentro da
+# camada; o resto de .omp/ e de quem mantem o repositorio.
+CAMADA="$PAYLOAD/anvil-update/.omp-layer"
+OMP="$ROOT/.omp"
+da_camada() {
+    [ -L "$1" ] || return 1
+    case "$(readlink "$1")" in *anvil/.claude/skills/anvil-update/.omp-layer/*) return 0 ;; esac
+    return 1
+}
+# tira as pastas que a remocao deixou vazias, ate .omp, que fica
+poda() {
+    local d; d="$(dirname "$1")"
+    while [ "$d" != "$OMP" ] && rmdir "$d" 2>/dev/null; do d="$(dirname "$d")"; done
+}
+nossos_omp() { [ -d "$OMP" ] && find "$OMP" -type l | while IFS= read -r l; do da_camada "$l" && echo "$l"; done; return 0; }
 
 [ -d "$PAYLOAD" ] || { echo "erro: payload nao encontrado em $PAYLOAD" >&2; exit 2; }
 
@@ -62,6 +88,8 @@ anvil-principles
 anvil-prototype
 anvil-unslop
 anvil-writing-for-agents
+anvil-browser-qa
+anvil-next
 tea-commit"
 
 MODO="roster"; DRY=0
@@ -70,7 +98,7 @@ while [ $# -gt 0 ]; do
         --all)     MODO="all";    shift ;;
         --unlink)  MODO="unlink"; shift ;;
         --dry-run) DRY=1;         shift ;;
-        -h|--help) sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
     esac
 done
@@ -92,6 +120,18 @@ if [ "$MODO" = "unlink" ]; then
         if [ "$DRY" -eq 1 ]; then echo "removeria $(basename "$l")"; else rm -f "$l"; fi
         n=$((n + 1))
     done
+    for l in "$ESPELHO"/*; do
+        nosso_espelho "$(basename "$l")" || continue
+        if [ "$DRY" -eq 1 ]; then echo "removeria .agents/skills/$(basename "$l")"; else rm -f "$l"; fi
+        n=$((n + 1))
+    done
+    # coletados antes: a poda some com pasta que o find ainda nao percorreu
+    omp_links="$(nossos_omp)"
+    while IFS= read -r l; do
+        [ -n "$l" ] || continue
+        if [ "$DRY" -eq 1 ]; then echo "removeria ${l#"$ROOT"/}"; else rm -f "$l"; poda "$l"; fi
+        n=$((n + 1))
+    done <<< "$omp_links"
     echo "$n symlink(s) $([ "$DRY" -eq 1 ] && echo "a remover" || echo "removido(s)")."
     exit 0
 fi
@@ -100,7 +140,7 @@ fi
 
 # --- ligar --------------------------------------------------------------------
 mkdir -p "$DEST"
-ligados=0; ausentes=""; pulados=""
+ligados=0; ausentes=""; pulados=""; a_ligar=""
 for s in $conjunto; do
     if [ ! -d "$PAYLOAD/$s" ]; then
         ausentes="$ausentes$s"$'\n'   # roster envelheceu: a skill saiu do payload
@@ -117,7 +157,7 @@ for s in $conjunto; do
         rm -f "$alvo"
         ln -s "../../anvil/.claude/skills/$s" "$alvo"
     fi
-    ligados=$((ligados + 1))
+    ligados=$((ligados + 1)); a_ligar="$a_ligar$s"$'\n'
 done
 
 # --- agentes -------------------------------------------------------------------
@@ -143,12 +183,88 @@ for f in "$AGENTS"/*.md; do
     ag_ligados=$((ag_ligados + 1))
 done
 
+# --- espelho do Codex ------------------------------------------------------------
+# Gerado a partir do que esta ligado agora em .claude/skills, nao so do conjunto
+# desta execucao: o roster nao desliga o que um --all ligou antes. Symlink nosso que
+# aponta para outro lugar e refeito, e o de skill que nao esta mais ligada sai.
+# Diretorio ou arquivo fica, mesmo com nome de skill: `ln -s` sobre um diretorio
+# criaria o link dentro dele.
+ligada() {
+    printf '%s' "$a_ligar" | grep -qxF -e "$1" && return 0
+    [ -d "$PAYLOAD/$1" ] && [ -L "$DEST/$1" ] || return 1
+    case "$(readlink "$DEST/$1")" in *anvil/.claude/skills/*) return 0 ;; esac
+    return 1
+}
+esp_criados=0; esp_removidos=0; esp_pulados=""
+for s in $disponiveis; do
+    ligada "$s" || continue
+    if [ -L "$ESPELHO/$s" ] && na_forma "$s"; then continue; fi
+    if [ -e "$ESPELHO/$s" ] && [ ! -L "$ESPELHO/$s" ]; then
+        esp_pulados="$esp_pulados$s"$'\n'
+        continue
+    fi
+    if [ "$DRY" -eq 1 ]; then
+        echo "espelharia $s"
+    else
+        mkdir -p "$ESPELHO"
+        rm -f "$ESPELHO/$s"
+        ln -s "../../.claude/skills/$s" "$ESPELHO/$s"
+    fi
+    esp_criados=$((esp_criados + 1))
+done
+for l in "$ESPELHO"/*; do
+    s="$(basename "$l")"
+    nosso_espelho "$s" || continue
+    ligada "$s" && continue
+    if [ "$DRY" -eq 1 ]; then echo "removeria do espelho $s"; else rm -f "$l"; fi
+    esp_removidos=$((esp_removidos + 1))
+done
+
+# --- camada omp ---------------------------------------------------------------
+# Um symlink por arquivo da camada, no mesmo caminho relativo em .omp/. Arquivo real
+# no caminho fica, e o arquivo sai do relatorio como pulado. O symlink nosso para um
+# arquivo que saiu da camada sai, com as pastas que ficarem vazias.
+omp_ligados=0; omp_removidos=0; omp_pulados=""
+if [ -d "$CAMADA" ]; then
+    while IFS= read -r r; do
+        alvo="$OMP/$r"
+        if [ -e "$alvo" ] && [ ! -L "$alvo" ]; then
+            omp_pulados="$omp_pulados.omp/$r"$'\n'
+            continue
+        fi
+        # um ../ por nivel de .omp/<r> ate a raiz
+        rel="$(printf '%s' ".omp/$r" | sed 's|[^/]*/|../|g; s|[^/]*$||')anvil/.claude/skills/anvil-update/.omp-layer/$r"
+        if [ "$DRY" -eq 1 ]; then
+            echo "ligaria .omp/$r"
+        else
+            if ! mkdir -p "$(dirname "$alvo")" 2>/dev/null; then
+                omp_pulados="$omp_pulados.omp/$r"$'\n'   # pasta do caminho e arquivo real
+                continue
+            fi
+            rm -f "$alvo"
+            ln -s "$rel" "$alvo"
+        fi
+        omp_ligados=$((omp_ligados + 1))
+    done < <(cd "$CAMADA" && find . -type f | sed 's|^\./||' | LC_ALL=C sort)
+fi
+omp_links="$(nossos_omp)"
+while IFS= read -r l; do
+    [ -n "$l" ] || continue
+    [ -f "$CAMADA/${l#"$OMP"/}" ] && continue
+    if [ "$DRY" -eq 1 ]; then echo "removeria ${l#"$ROOT"/}"; else rm -f "$l"; poda "$l"; fi
+    omp_removidos=$((omp_removidos + 1))
+done <<< "$omp_links"
+
 echo
 echo "$ligados de $(conta "$disponiveis") skills do payload $([ "$DRY" -eq 1 ] && echo "seriam ligadas" || echo "ligadas")."
 echo "$ag_ligados de $ag_total agentes do payload $([ "$DRY" -eq 1 ] && echo "seriam ligados" || echo "ligados")."
+echo "$esp_criados symlink(s) $([ "$DRY" -eq 1 ] && echo "seriam criados" || echo "criados") e $esp_removidos $([ "$DRY" -eq 1 ] && echo "seriam removidos" || echo "removidos") em .agents/skills."
+echo "$omp_ligados arquivo(s) da camada omp $([ "$DRY" -eq 1 ] && echo "seriam ligados" || echo "ligados") e $omp_removidos symlink(s) $([ "$DRY" -eq 1 ] && echo "seriam removidos" || echo "removidos") em .omp/."
 [ -n "$ausentes" ] && { echo "NO ROSTER MAS FORA DO PAYLOAD — revise a lista:"; printf '%s' "$ausentes" | sed 's/^/  /'; }
 [ -n "$pulados"  ] && { echo "pulados, porque sao diretorio real e nao symlink:"; printf '%s' "$pulados" | sed 's/^/  /'; }
 [ -n "$ag_pulados" ] && { echo "agentes pulados, porque sao arquivo real e nao symlink:"; printf '%s' "$ag_pulados" | sed 's/^/  /'; }
+[ -n "$esp_pulados" ] && { echo "espelho pulado, porque .agents/skills tem diretorio ou arquivo com o nome:"; printf '%s' "$esp_pulados" | sed 's/^/  /'; }
+[ -n "$omp_pulados" ] && { echo "camada omp pulada, porque .omp/ tem arquivo real no caminho:"; printf '%s' "$omp_pulados" | sed 's/^/  /'; }
 
 # --- aviso: referencia para fora do roster ------------------------------------
 # Nao religa nada. Existe para a lista nao apodrecer em silencio: uma skill
@@ -169,4 +285,4 @@ done
 [ -n "$penduradas" ] && { echo; echo "referencias para fora do roster (nao religadas):"; printf '%s' "$penduradas" | sed 's/^/  /'; }
 
 echo
-echo "as skills e os agentes so aparecem na PROXIMA sessao do Claude Code."
+echo "as skills, os agentes e a camada omp so aparecem na PROXIMA sessao do Claude Code e do omp."
