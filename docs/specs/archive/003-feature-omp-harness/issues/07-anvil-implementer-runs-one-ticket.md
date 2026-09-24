@@ -7,6 +7,7 @@
 **Status:** resolved
 **Review:** round=1; sha=c7d6447; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=f98ba11; scope=diff:c7d6447..f98ba11; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/4
 
 - [x] O agente fica em `.omp/agents/`, com `autoloadSkills` das três skills, `task` entre as ferramentas e sem `model:`.
 - [x] As três skills carregadas são as vendorizadas, sem mudança.

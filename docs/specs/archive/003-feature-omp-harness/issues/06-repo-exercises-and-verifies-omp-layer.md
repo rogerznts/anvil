@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=c002fb5; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/4
 
 - [x] O `dev-link.sh` liga cada arquivo da camada no `.omp/` deste repositório, e o `--unlink` desfaz sem tocar em arquivo do `.omp/` que não veio da camada.
 - [x] O `verify` confere, na camada: nome do frontmatter igual ao do arquivo ou da pasta; todo caminho citado existe; toda skill em `autoloadSkills` existe no payload e não tem trava de invocação.

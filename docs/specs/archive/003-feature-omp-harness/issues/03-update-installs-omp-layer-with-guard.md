@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=389e0a3; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/4
 
 - [x] A detecção instala a camada quando qualquer sinal está presente: binário `omp` no `PATH`, `~/.omp/` existente, ou linha `omp:` no lock atual.
 - [x] Sem nenhum sinal, o projeto não ganha `.omp/` nem linha `omp:`.

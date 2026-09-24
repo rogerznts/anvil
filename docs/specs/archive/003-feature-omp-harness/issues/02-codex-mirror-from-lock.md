@@ -7,6 +7,7 @@
 **Status:** resolved
 **Review:** round=1; sha=e19d774; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=d9942fe; scope=diff:e19d774..d9942fe; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/4
 
 - [x] O payload não traz mais `.agents/`.
 - [x] Depois do update, `.agents/skills` tem exatamente um symlink por linha `skill:` do lock, apontando para a skill em `.claude/skills`.

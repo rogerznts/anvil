@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=065a96b; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/4
 
 - [x] O modo de camadas produz o mesmo `.omp/`, as mesmas linhas `omp:` e o mesmo `.agents/skills` que o update produziria.
 - [x] O boot chama esse modo e relata o que instalou e por qual sinal.

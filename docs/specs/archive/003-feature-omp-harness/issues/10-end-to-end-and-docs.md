@@ -7,6 +7,7 @@
 **Status:** resolved
 **Review:** round=1; sha=ff5da46; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=95e2d39; scope=diff:ff5da46..95e2d39; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/4
 
 - [x] Cenário ponta a ponta em `workspace/` roda do degit ao relatório da `anvil-run`, com a camada instalada pelo boot e a guarda bloqueando um merge prematuro.
 - [x] O mesmo projeto aberto no Claude Code mostra a mesma lista de skills de antes da spec.

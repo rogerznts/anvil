@@ -7,6 +7,7 @@
 **Status:** resolved
 **Review:** round=1; sha=89e2755; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=830ea33; scope=diff:89e2755..830ea33; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/4
 
 - [x] Uma função classifica um conjunto a partir de três entradas: o que o payload novo traz, o que o lock diz possuir e o que existe no disco.
 - [x] Skills e agentes usam essa função; os dois laços antigos saem.

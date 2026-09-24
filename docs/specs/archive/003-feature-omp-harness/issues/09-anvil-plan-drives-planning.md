@@ -8,6 +8,7 @@
 **Review:** round=1; sha=d48a771; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=4281b21; scope=diff:d48a771..4281b21; verdict=fail; p1=open
 **Review:** round=3; sha=2478a8c; scope=diff:4281b21..2478a8c; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/4
 
 - [x] A skill fica em `.omp/skills/`, com trava de invocação; o argumento vai para o grill como pedido inicial.
 - [x] Carrega `anvil-grill`, `anvil-to-spec` e `anvil-to-tickets` na mesma janela, sem compactar, e as pausas de cada uma continuam existindo.

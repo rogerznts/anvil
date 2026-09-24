@@ -7,6 +7,7 @@
 **Status:** resolved
 **Review:** round=1; sha=f436599; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=fbdbc8d; scope=diff:f436599..fbdbc8d; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/4
 
 - [x] A skill fica em `.omp/skills/`, com trava de invocação.
 - [x] Sem argumento, resolve a spec pelo prefixo numérico do branch atual; fora do branch da spec, recusa e diz qual é o branch.

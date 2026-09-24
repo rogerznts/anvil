@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=b17503a; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/4
 
 - [x] A rule tem `alwaysApply: true` e só o mapeamento: "Skill tool" e `/anvil-x` dentro de uma skill → ler a skill por `skill://`; "sub-agent" e "Task" → tool `task`, com `scout` quando a skill pede só leitura; `AskUserQuestion` → `ask`.
 - [x] A `anvil-omp` fica em `.omp/skills/`, com trava de invocação, e diz: o que é a camada, como a detecção decide, os comandos `/skill:anvil-plan`, `/skill:anvil-run` e `/skill:anvil-browser-qa`, o que continua manual no Claude Code e no Codex, os limites — `eval` escapa da guarda, frontier em série, `task` sem modelo por chamada — e como remover a camada à mão.
