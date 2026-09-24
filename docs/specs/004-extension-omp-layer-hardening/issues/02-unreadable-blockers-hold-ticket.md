@@ -4,7 +4,7 @@
 
 **Blocked by:** 01
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=f9ca28b; scope=full; verdict=fail; p1=open
 
 - [x] Referências `ADR-NNNN` saem antes da leitura: "03, ver ADR-0011" bloqueia só pelo 03.
@@ -19,9 +19,9 @@
 ## Comments
 
 - Contrato: no ticket de bloqueio ilegível, o campo `blocked_by` traz o valor da linha entre aspas, `blocked_by="01 e 02"`, em vez de uma chave nova. A tabela da spec, a `anvil-run/SKILL.md` e o comentário do `frontier.sh` dizem o mesmo, no mesmo commit.
-- Leitura do ADR: a spec diz que o `ADR-NNNN` sai e o resto tem de ser lista de números, mas em "03, ver ADR-0011" o resto é "03, ver ", que não é lista. O script lê o `Blocked by` item a item, entre vírgulas, e tira o item que cita um ADR quando, sem o ADR, não sobra dígito nele. "03 (ver ADR-0011)" sobra "03 (ver )" e dá bloqueio ilegível: na dúvida, bloqueia. Uma linha só com "ver ADR-0011" fica sem bloqueador.
+- Leitura do ADR: a spec dizia que o `ADR-NNNN` sai e o resto tem de ser lista de números, mas em "03, ver ADR-0011" o resto é "03, ver ", que não é lista. O script lê o `Blocked by` item a item, entre vírgulas, e tira o item que só cita um ADR, sozinho ou depois de "ver" ou "see". "03 (ver ADR-0011)" e "Escrever o ADR-0012" dão bloqueio ilegível: na dúvida, bloqueia. Uma linha só com "ADR-0011" fica sem bloqueador. A regra da spec foi reescrita assim no c348158, a correção do P1 da rodada 1.
 - Precedência: `resolved` e `locked` vêm antes de `unreadable_blockers`. Um ticket resolvido com `Blocked by` ilegível segue `resolved`, e o `blocked_by` dele sai entre aspas do mesmo jeito.
-- Fixture: `/tmp/anvil-004-01/fx.sh`, com `/usr/bin/grep`. Os casos da 003 comparam com o `frontier.sh` e o `stage.sh` do c2111a5 (o 01) e saem iguais. Os casos novos comparam com a saída escrita à mão, nos dois bash: spec 012, com 17 tickets nos formatos das US 1–7 (ilegíveis, dependente de ilegível, ADR, `01, 02`, `01,02`, linha vazia, sem linha, "Nenhum", "None", caixa alta e baixa, inexistente); a mesma spec com todo o frontier no `--skip` (`next: none` com ilegíveis abertos); e a spec 013, em que o único aberto é ilegível sobre bloqueadores resolvidos. Antes da mudança, 3 falhas: o script soltava os ilegíveis pelo prefixo numérico, e o "`01`" saía sem bloqueador. Depois, `fixture: 0 falha(s)`. A spec 012 dá a mesma saída com `LC_ALL=C` nos dois bash.
+- Fixture: `/tmp/anvil-004-01/fx.sh`, com `/usr/bin/grep`. Os casos da 003 comparam com o `frontier.sh` e o `stage.sh` do c2111a5 (o 01) e saem iguais. Os casos novos comparam com a saída escrita à mão, nos dois bash: spec 012, com 21 tickets nos formatos das US 1–7 (ilegíveis, dependente de ilegível, ADR com "ver", "see", sozinho, entre parênteses e como título, `01, 02`, `01,02`, linha vazia, sem linha, "Nenhum", "None", caixa alta e baixa, inexistente); a mesma spec com todo o frontier no `--skip` (`next: none` com ilegíveis abertos); e a spec 013, em que o único aberto é ilegível sobre bloqueadores resolvidos. Antes da mudança, 3 falhas: o script soltava os ilegíveis pelo prefixo numérico, e o "`01`" saía sem bloqueador. Os casos do P1 da rodada 1 deram 2 falhas antes da correção. Depois, `fixture: 0 falha(s)`. A spec 012 dá a mesma saída com `LC_ALL=C` nos dois bash.
 - `vendor-sync.sh verify`: `verify: limpo`.
 - Review round=1 · P1 (Spec): o `read_blockers` descarta inteiro o item que cita um `ADR-NNNN` quando não sobra dígito, mesmo que sobre texto — "Escrever o ADR-0012" solta o ticket para o frontier e vira `next`, e em "02, ver ADR-0011 e o ticket de cache" o "ticket de cache" some, contra a US 1 (nunca despachar em cima de um bloqueador que o script não viu).
 - Review round=1 · P3 (Standards): o pipeline `sed` do `blocked_raw[n]` repete o do `status[n]`, só com outro campo — uma mudança na gramática da linha de campo tem de ser feita nos dois.
