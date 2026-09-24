@@ -33,9 +33,9 @@ parecer óbvio na conversa. Em detalhe, pela linha `next`:
 
 - `next: refused`: o projeto não tem o perfil `docs/specs` do tracker, e o
   condutor não sabe onde a spec mora. Mostre ao operador a linha `reason` e pare.
-  Não carregue nada, nem o grill quando veio um pedido no argumento, e não
-  ofereça fazer o trabalho por outro caminho: o fluxo segue à mão, como a linha
-  diz.
+  Não carregue nada, nem o grill quando veio um pedido no argumento, e não se
+  ofereça para fazer o trabalho por conta própria: o fluxo segue à mão, como a
+  linha diz.
 - `next: end`: os tickets de implementação existem. Vá para o fim.
 - `next: none`: a spec deste branch está arquivada. Diga isso ao operador e pare,
   porque um planejamento novo começa num branch sem spec.
