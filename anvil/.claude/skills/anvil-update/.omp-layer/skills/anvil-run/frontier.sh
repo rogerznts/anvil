@@ -21,6 +21,22 @@ set -u
 
 refuse() { echo "refusal: $1"; exit 2; }
 
+# Perfil do tracker: so o do anvil, cujo titulo nomeia docs/specs, guarda spec e
+# tickets onde este script le. Com outro perfil do anvil-setup (GitHub, GitLab,
+# markdown local) ou sem o arquivo, ecoa o motivo da recusa; com o docs/specs, nada.
+# O mesmo texto sai no stage.sh da anvil-plan.
+tracker_refusal() {
+    local profile=docs/agents/issue-tracker.md title
+    if [ ! -f "$profile" ]; then
+        echo "não há $profile, o perfil do tracker, e os condutores só funcionam com o perfil docs/specs do anvil. Rode /skill:anvil-setup para escrevê-lo."
+        return
+    fi
+    title="$(sed -n '/^# /{s/^# *//;p;q;}' "$profile")"
+    case "$title" in *docs/specs*) return ;; esac
+    title="${title#Issue tracker: }"
+    echo "o perfil do tracker em $profile é '${title:-sem título}', e os condutores só funcionam com o perfil docs/specs do anvil. O fluxo segue à mão, uma skill por vez, como no Claude Code."
+}
+
 arg=""; skip=""
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -35,6 +51,8 @@ esac
 
 root="$(git rev-parse --show-toplevel 2>/dev/null)" || refuse "fora de um repositório git"
 cd "$root" || exit 1
+reason="$(tracker_refusal)"
+[ -z "$reason" ] || refuse "$reason"
 
 branch="$(git branch --show-current)"
 num_of() { printf '%s\n' "$1" | sed -n 's|^[^/]*/\([0-9][0-9]*\)-.*|\1|p'; }

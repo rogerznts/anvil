@@ -26,7 +26,8 @@ bash .omp/skills/anvil-run/frontier.sh [NNN] [--skip "NN NN"]
 
 Passe o número da spec se o operador passou. `--skip` leva os tickets que você anotou
 como pulados nesta execução, explicados abaixo. O script sai com `refusal:` quando
-não há o que conduzir daqui, como no branch de outra spec ou num branch sem número.
+não há o que conduzir daqui, como no branch de outra spec, num branch sem número ou
+num projeto sem o perfil `docs/specs` do tracker.
 Nesse caso, mostre a linha ao operador e pare. Não troque de branch nem rode o
 script com outro número: a recusa é a resposta, e o branch é escolha do operador.
 

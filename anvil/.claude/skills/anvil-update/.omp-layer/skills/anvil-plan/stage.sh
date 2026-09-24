@@ -11,6 +11,7 @@
 # etapa que o disco aponta e retomada, e retomada se propoe, nunca se carrega: o
 # do diz isso ao modelo, porque na prosa o haiku carregou a etapa sem o sim.
 #
+#   perfil do tracker ausente ou outro          -> refused
 #   sem spec no branch                          -> anvil-grill
 #   spec do branch em docs/specs/archive/       -> none
 #   sem spec.md, map.md com decisao aberta      -> anvil-wayfinder
@@ -31,8 +32,25 @@ emit() {  # <next> <reason>: o do diz o que a skill faz com o next
         anvil-grill) echo "do: sem spec no disco, a conversa decide; siga a regra de next: anvil-grill da skill" ;;
         end)         echo "do: mostre a linha handoff ao operador, sem executá-la, e não carregue nada" ;;
         none)        echo "do: diga ao operador que a spec deste branch está arquivada e pare, sem carregar nada" ;;
+        refused)     echo "do: diga ao operador o motivo da linha reason e pare, sem carregar nada, nem o grill quando veio um pedido" ;;
         *)           echo "do: proponha $1 ao operador e termine a vez; carregue a skill só depois do sim, numa vez seguinte" ;;
     esac
+}
+
+# Perfil do tracker: so o do anvil, cujo titulo nomeia docs/specs, guarda spec e
+# tickets onde este script le. Com outro perfil do anvil-setup (GitHub, GitLab,
+# markdown local) ou sem o arquivo, ecoa o motivo da recusa; com o docs/specs, nada.
+# O mesmo texto sai no frontier.sh da anvil-run.
+tracker_refusal() {
+    local profile=docs/agents/issue-tracker.md title
+    if [ ! -f "$profile" ]; then
+        echo "não há $profile, o perfil do tracker, e os condutores só funcionam com o perfil docs/specs do anvil. Rode /skill:anvil-setup para escrevê-lo."
+        return
+    fi
+    title="$(sed -n '/^# /{s/^# *//;p;q;}' "$profile")"
+    case "$title" in *docs/specs*) return ;; esac
+    title="${title#Issue tracker: }"
+    echo "o perfil do tracker em $profile é '${title:-sem título}', e os condutores só funcionam com o perfil docs/specs do anvil. O fluxo segue à mão, uma skill por vez, como no Claude Code."
 }
 
 root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
@@ -41,6 +59,8 @@ root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
     exit 0
 }
 cd "$root" || exit 1
+reason="$(tracker_refusal)"
+if [ -n "$reason" ]; then emit refused "$reason"; exit 0; fi
 
 branch="$(git branch --show-current)"
 num="$(printf '%s\n' "$branch" | sed -n 's|^[^/]*/\([0-9][0-9]*\)-.*|\1|p')"
