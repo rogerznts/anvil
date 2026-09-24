@@ -4,8 +4,9 @@
 
 **Blocked by:** 05
 
-**Status:** resolved
+**Status:** claimed
 **Review:** round=1; sha=d48a771; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=4281b21; scope=diff:d48a771..4281b21; verdict=fail; p1=open
 
 - [x] A skill fica em `.omp/skills/`, com trava de invocação; o argumento vai para o grill como pedido inicial.
 - [x] Carrega `anvil-grill`, `anvil-to-spec` e `anvil-to-tickets` na mesma janela, sem compactar, e as pausas de cada uma continuam existindo.
@@ -47,3 +48,11 @@
 - Prova da correção: o S1 passa com 104 checks em `/opt/local/bin/bash` e em `/bin/bash`. O S2 ganhou as conversas W, num branch com o `map.md` e uma decisão aberta, que propõe o `anvil-wayfinder` sem carregar nada nem citar o `anvil-run`, e A, no branch de uma spec arquivada, que diz que ela está arquivada e para sem abrir o grill. Passa com 26 checks, entre um minuto e meio e dois minutos e meio. Depois da correção, foram três rodadas completas: a primeira falhou na Q, com a etapa carregada sem o sim, e as duas seguintes passam, a última já com a redação final da skill.
 - Os P2 e P3 da rodada 1 que não foram corrigidos ficam como estão. A `anvil-domain-modeling` também não foi lida na rodada que passou. O `stage.sh` repete do `frontier.sh` a leitura do número do branch e da pasta, porque o check 3 do `verify` não deixa um caminho relativo cruzar a fronteira de uma skill para a outra.
 - P2 (prova fraca), com a consequência que faltava ao P2 do S2 probabilístico. Quem ler uma rodada verde como taxa de acerto do `haiku` confia mais na condução do que ela mostrou, e uma falha no S2 pede outra rodada antes de concluir regressão.
+- Review round=2 · os dois P1 da rodada 1 estão fechados. O eixo Standards conferiu 17 estados do `stage.sh` em bash 5.2 e 3.2, com saída idêntica, o mapa do wayfinder com decisão aberta dando `anvil-wayfinder` e só o ticket sem `Type:` levando ao `end`. O eixo Spec conferiu, numa cópia com o script renomeado, que o check 15 falha com o caminho do `stage.sh`, e conferiu os 26 checks e as conversas Q, W, A e P no run guardado. O P2 da spec arquivada, o do grill começado e os P3 de chaves, `yes`/`no`, dois-pontos e consequência também fecham.
+- Review round=2 · P1 (Spec): a frase "A `anvil-domain-modeling` também não foi lida na rodada que passou" é desmentida pela única rodada verde guardada. No `out/P/1.jsonl` há um `read` de `skill://anvil-domain-modeling` depois do `anvil-grilling`. Quem lê o ticket conclui que o grill no omp pulou a domain-modeling duas vezes e pode mudar a skill para corrigir um defeito que a evidência não mostra. O P2 da rodada 1 continua valendo, porque o S2 não confere essa leitura.
+- Review round=2 · P3 (Spec): o critério "`issues/` com tickets leva ao fim da janela" segue marcado, mas agora ticket de implementação sem `spec.md` dá `anvil-to-spec`, e `spec.md` só com decisões dá `anvil-to-tickets`. É o refinamento que o P1 de Standards pediu, está declarado aqui, e o fluxo grill, to-spec e to-tickets não chega a esse estado. Custa uma leitura atenta de quem compara a spec com o ticket.
+- Review round=2 · P3 (Spec): o check 15 confere o span da linha que nomeia o script, e não o comando dentro do bloco `bash`. Um erro de digitação só no comando passaria no `verify`.
+- Review round=2 · P3 (Standards): a correção pôs identificadores em português no `stage.sh` (`saida`, `pasta_de`, `arq`, `abertas`) ao lado de `root`, `dir`, `tickets` e `branch`, contra a regra de idioma do `CLAUDE.md` que o próprio ticket cita. Só custa leitura, porque o modelo não vê esses nomes.
+- Review round=2 · P3 (Standards): o que fazer com cada `next` está no `case` do `do`, no `stage.sh`, e nos itens da skill. Mudar uma etapa pede editar os dois, e a skill fica com instrução dupla se eles divergirem.
+- Review round=2 · P3 (Standards): o `reason` que vai ao operador escreve "decisão(ões) aberta(s)" e "ticket(s)". Só custa leitura.
+- A rodada 2 reprovou, e pelo perfil de verificação a verificação para aqui. A terceira rodada é escolha do operador. A frase do P1 acima descrevia a segunda rodada completa do S2, cujo `out/` foi sobrescrito pelas seguintes. Na rodada guardada, o grill leu `anvil-grill`, `anvil-grilling` e `anvil-domain-modeling`.
