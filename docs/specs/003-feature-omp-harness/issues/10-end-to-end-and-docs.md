@@ -4,7 +4,8 @@
 
 **Blocked by:** 02, 04, 06, 08, 09
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=ff5da46; scope=full; verdict=fail; p1=open
 
 - [x] Cenário ponta a ponta em `workspace/` roda do degit ao relatório da `anvil-run`, com a camada instalada pelo boot e a guarda bloqueando um merge prematuro.
 - [x] O mesmo projeto aberto no Claude Code mostra a mesma lista de skills de antes da spec.
@@ -34,3 +35,10 @@
 - P2 (prova fraca): o ponta a ponta é probabilístico, e só a rodada 2 passa inteira. A rodada 1 falhou no relatório da `anvil-run`, o defeito acima. Quem ler uma rodada verde como taxa de acerto confia mais na condução do que ela mostrou, e uma falha numa rodada futura pede outra antes de concluir regressão.
 - P2 (prova fraca): os sinais dos desvios estão explícitos na fala do operador, que diz que ninguém sabe o formato e que a decisão é de quem não está na conversa. O cenário prova que a `anvil-plan` reconhece um sinal claro, propõe, espera o sim e volta à etapa de origem. Não prova que ela acha um sinal sutil numa conversa longa, e quem ler assim espera um desvio que o modelo pode não propor.
 - P2 (prova fraca): dos seis desvios, rodaram o `anvil-research` e o `anvil-to-questionnaire`, os dois a partir do grill. `anvil-prototype`, `anvil-wayfinder`, `anvil-ui` e `anvil-architect` não rodaram, e nenhum desvio saiu do to-spec ou do to-tickets. O mecanismo de proposta e volta é o mesmo texto da skill para os seis, mas a skill carregada em cada um é outra, e um desvio que não volta à etapa de origem só aparece no uso.
+- Review round=1 · P1 (Spec): a frase "com o omp 18.2.11 e o `sonnet`", na prova da rodada 2, é falsa. Em todo turno das duas rodadas, a primeira chamada a `anthropic/claude-sonnet-4-0` voltou 404 `not_found_error`, e o omp trocou por `retry_fallback_applied` para `openai-codex/gpt-5.6-sol`, de onde vêm todas as mensagens úteis do supervisor, da plan, dos implementers e dos eixos. Quem lê o ticket atribui ao `sonnet` a condução e a correção 261f72d, e quem roda o `e2e.sh` com o padrão `MODELO=sonnet`, sem o fallback, recebe 404 em todo turno.
+- Review round=1 · P2 (Spec): o requisito do operador, pelo P2 do ticket 09, e as US 51 e 52 — desvio proposto pelo sinal e volta à etapa de origem — estão parciais, como o P2 acima já declara: rodaram 2 dos 6 desvios, os dois saídos do grill. Um desvio saído do to-spec ou do to-tickets que não volta à etapa de origem só aparece no uso.
+- Review round=1 · P3 (Spec): na `anvil-run`, os exemplos "página, formulário, painel" do item `tela: nao` são palavras que o `PALAVRAS_TELA` do `frontier.sh` já reconhece, então nunca aparecem num `tela: nao`, e o supervisor fica sem exemplo do caso que deveria subir. Só custa leitura.
+- Review round=1 · P3 (Standards): README, `overview.md`, manual `anvil-omp` e `.claude/rules/project.md` descrevem cada um a detecção e a composição da camada. A próxima mudança na camada pede editar quatro textos, e um pode ficar para trás.
+- Review round=1 · P3 (Standards): os comentários da prova da rodada 2 juntam várias ideias numa frase só, como a sequência de desvios da `anvil-plan`, o que a `anvil-unslop` evita. Quem audita a prova relê o parágrafo para separar o proposto do carregado.
+- Review round=1 · P3 (Standards): no `check.sh`, o `LAYER` aponta para a árvore de trabalho do anvil, e não para o `repo-head` da rodada. Uma edição futura na camada faz a evidência antiga reprovar sem ter mudado, um falso negativo.
+- Review round=1 · P3 (Standards): a base do projeto `antes` do Claude Code, be2f7de, está só em `out/base-antes-da-spec`, que nenhum script escreve nem confere. Conferida à mão pelo eixo, a afirmação se sustenta, mas rodar de novo com outra base passaria a seção 6 sem aviso.
