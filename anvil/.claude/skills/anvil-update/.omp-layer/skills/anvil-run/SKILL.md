@@ -29,9 +29,9 @@ primeira rodada do script, e o modo vale para a execução inteira:
 - `isolation: misconfigured`: a isolação está ligada, mas fora do modo branch, e o
   omp vai integrar o trabalho sem commit. Antes do primeiro despacho, diga isso ao
   operador e aponte a configuração do omp, que precisa de
-  `task.isolation.merge: branch`, como o `/skill:anvil-omp` explica. Depois,
-  despache como em `on`, com `isolated: true`: a árvore suja que o omp deixa para o
-  laço no `halt`.
+  `task.isolation.merge: branch`, como o `/skill:anvil-omp` explica. O aviso não é
+  uma parada: na mesma mensagem, despache como em `on`, com `isolated: true`. A
+  árvore suja que o omp deixa para o laço no `halt`.
 
 O laço é o mesmo nos três.
 
@@ -52,8 +52,8 @@ Nesse caso, mostre a linha ao operador e pare. Não troque de branch nem rode o
 script com outro número: a recusa é a resposta, e o branch é escolha do operador.
 
 Fora a recusa, o script devolve a linha `isolation`, lida acima, a linha `screen`,
-`yes` ou `no` com o motivo, e, sem
-`ui/` e com tudo resolvido, uma linha `story` por user story da `spec.md`. Depois
+`yes` ou `no` com o motivo, e, sem `ui/` e com tudo resolvido, uma linha `story`
+por user story da `spec.md`. Depois
 vêm uma linha por ticket, com `status`, `reviews`, `last`, `blocked_by` e `class`, e
 `frontier`, `skipped`, `locked`, uma linha `open_p1` por P1 de travado,
 `depend_on_locked`, `all_resolved`, às
@@ -61,8 +61,10 @@ vezes `halt`, e `next`. O frontier já exclui o ticket travado, cuja última
 `Review:` tem `round` 2 ou mais e `verdict=fail`, e o de bloqueio ilegível,
 `class=unreadable_blockers`, cujo `Blocked by` não é uma lista de números: nele,
 `blocked_by` traz entre aspas o texto da linha como está no arquivo. Com a árvore
-suja, o script devolve `halt` e `next: none`, porque um implementer novo commitaria
-o que sobrou junto com o ticket dele.
+suja, o script devolve `halt` e `next: none` quando há ticket a despachar, porque um
+implementer novo commitaria o que sobrou junto com o ticket dele, e também quando
+tudo está resolvido, porque o próximo passo da spec partiria do que está fora de
+commit.
 
 ## O laço
 
@@ -75,9 +77,8 @@ o que sobrou junto com o ticket dele.
    `anvil-implementer` e o `task` é o caminho do ticket. Com `isolation: on` ou
    `misconfigured`, o item leva também `isolated: true`, em todo despacho. No
    `context`, diga a pasta da spec e o branch. O implementer é bloqueante, e a
-   chamada só volta quando ele
-   termina. Não espere pelo `hub`, não chame outra ferramenta na mesma mensagem e
-   nunca despache dois tickets ao mesmo tempo.
+   chamada só volta quando ele termina. Não espere pelo `hub`, não chame outra
+   ferramenta na mesma mensagem e nunca despache dois tickets ao mesmo tempo.
    O que o implementer devolve não muda o laço, nem quando ele diz que falhou ou
    que faltou ferramenta. Não leia o ticket, não investigue e não termine o trabalho
    dele: quem decide o que vem depois é o disco, no passo 5.
@@ -93,24 +94,25 @@ o que sobrou junto com o ticket dele.
 
 ## O fim
 
-O relatório abre com uma linha que diz o modo da execução, lido da linha
-`isolation`, em todo fim, também com `halt`: `modo: com isolação` com `on`,
-`modo: sem isolação` com `off`, e, com `misconfigured`,
-`modo: com isolação, fora do modo branch`, seguido da configuração que falta,
-`task.isolation.merge: branch`.
+Sem `halt`, o relatório abre com uma linha que diz o modo da execução, lido da
+linha `isolation`: `modo: com isolação` com `on`, `modo: sem isolação` com `off`,
+e, com `misconfigured`, `modo: com isolação, fora do modo branch`, seguido da
+configuração que falta, `task.isolation.merge: branch`.
 
-Com `halt`, o relatório segue por ela: mostre o `git status --short` e diga como
-sair, como a linha diz. A saída é do operador: ele guarda o que sobrou com
-`git stash -u`, ou faz um commit dele, e roda a skill de novo. Você não sai da
-parada: não rode `git stash`, não commite e não limpe a árvore. O que sobrou pode
-ser do operador ou de um implementer que caiu. Com `isolation: misconfigured`, um
-`halt` que aparece depois de um despacho vem do omp, que integrou o trabalho sem
-commit: diga isso e aponte de novo `task.isolation.merge: branch`, como o
-`/skill:anvil-omp` explica. Depois, siga com o resto do relatório.
+Com `halt`, a primeira linha do relatório é o texto da linha `halt`, depois de
+`halt: `, copiado como está: ele já diz o modo, a configuração que falta e como
+sair. Depois, mostre o `git status --short`. A saída é do operador: você não
+roda `git stash`, não commita e não limpa a árvore, porque o que sobrou pode ser
+do operador ou de um implementer que caiu. Depois, siga com o resto do relatório.
 
-Com `all_resolved: yes`, o relatório lista os tickets resolvidos nesta execução e
-recomenda o próximo passo, sem executá-lo, escrito como está aqui, porque no omp
-skill se chama por `/skill:`. A linha `screen` decide:
+Com `all_resolved: yes` e `halt`, o relatório lista os tickets resolvidos nesta
+execução e, no lugar do próximo passo, diz o que a linha `halt` diz: a execução
+seguinte, com a árvore limpa, recomenda o próximo passo. O relatório não diz qual
+é, nem como passo para depois da parada.
+
+Com `all_resolved: yes` sem `halt`, o relatório lista os tickets resolvidos nesta
+execução e recomenda um só próximo passo, sem executá-lo, escrito como está aqui,
+porque no omp skill se chama por `/skill:`. A linha `screen` decide:
 
 1. `screen: yes`: recomende `/skill:anvil-browser-qa` e diga o motivo que a linha dá.
 2. `screen: no`: leia as linhas `story`. Se uma delas descreve algo que abre no
@@ -145,6 +147,7 @@ Com pendência, o relatório lista:
 - Guardar, commitar ou descartar o que está fora de commit: `git stash`,
   `git commit`, `git checkout`, `git restore`, `git reset` ou `git clean`.
 - Trocar de branch, criar branch ou rodar o script em outro repositório.
+- Recomendar o próximo passo da spec com `halt`.
 - Chamar o `task` para outra coisa que não despachar o `next` a um
   `anvil-implementer`.
 

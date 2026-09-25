@@ -203,7 +203,12 @@ O operador continua chamando os mesmos comandos. O que muda:
   frase de que o fluxo segue à mão. Arquivo ausente dá `refusal` sugerindo o
   `/anvil-setup`.
 - **Parada.** A linha `halt` passa a dizer como sair dela, com `git stash` ou com
-  um commit do operador.
+  um commit do operador. Ela abre com o modo da execução, e com
+  `misconfigured` também com a configuração que falta,
+  `task.isolation.merge: branch`. A `anvil-run` abre o relatório com essa linha
+  copiada como está. Decisão do operador depois das rodadas 14 a 19 do S2 do
+  ticket 08: no caminho da parada, o haiku abria o relatório pela parada e
+  deixava de fora a linha do modo que a skill pedia.
 - **Isolação.** Na raiz do projeto, o script roda
   `omp config get task.isolation.enabled` e, com `true`, também
   `omp config get task.isolation.merge`, e escreve a linha `isolation`: `on` com

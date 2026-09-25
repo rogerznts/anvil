@@ -14,9 +14,13 @@
 # Frontier: ticket com Status: diferente de resolved, com todos os Blocked by
 # resolvidos e nao travado. Travado (locked): a ultima linha Review: tem round 2 ou
 # mais e verdict=fail. Bloqueio ilegivel (unreadable_blockers): o Blocked by nao e
-# uma lista de numeros, e na duvida o ticket fica fora. Com a arvore suja, o next e
-# none e sai uma linha "halt:": o implementer seguinte commitaria o que sobrou
-# junto com o ticket dele. A linha diz como sair: git stash -u ou um commit.
+# uma lista de numeros, e na duvida o ticket fica fora. Com a arvore suja e um next,
+# o next e none e sai uma linha "halt:": o implementer seguinte commitaria o que
+# sobrou junto com o ticket dele. Com a arvore suja e tudo resolvido, tambem: o
+# proximo passo da spec partiria do que esta fora de commit, como o trabalho que
+# a isolacao em modo patch integra sem commit. A linha abre com o modo da execucao
+# e, fora do modo branch, com a configuracao que falta, e diz como sair: git stash
+# -u ou um commit. O supervisor abre o relatorio com ela, como esta.
 #
 # Isolacao: a linha "isolation:" diz o modo da execucao, lido da configuracao do
 # omp com omp config get, na raiz do projeto, porque o omp le o .omp/config.yml do
@@ -191,6 +195,7 @@ echo "spec: $dir"
 echo "branch: $branch"
 [ "$dirty" = 0 ] && echo "tree: clean" || echo "tree: dirty ($dirty)"
 iso_enabled="$(omp config get task.isolation.enabled 2>/dev/null)" || iso_enabled=""
+iso_mode="execução sem isolação"
 if [ -z "$iso_enabled" ]; then
     echo "isolation: off (task.isolation.enabled não foi lido pelo omp config get)"
 elif [ "$iso_enabled" != true ]; then
@@ -199,8 +204,10 @@ else
     iso_merge="$(omp config get task.isolation.merge 2>/dev/null)" || iso_merge=""
     if [ "$iso_merge" = branch ]; then
         echo "isolation: on (task.isolation.enabled: true, task.isolation.merge: branch)"
+        iso_mode="execução com isolação"
     else
         echo "isolation: misconfigured (task.isolation.enabled: true, task.isolation.merge: ${iso_merge:-não lido}; o trabalho isolado só volta como commits com task.isolation.merge: branch)"
+        iso_mode="execução com isolação fora do modo branch, que integra o trabalho sem commit: falta task.isolation.merge: branch"
     fi
 fi
 # Tela: a pasta ui/ da spec, ou uma user story que fala de algo que o usuario ve.
@@ -240,8 +247,14 @@ for n in $locked; do
 done
 echo "depend_on_locked: $(or_dash "$(labels "$dependents")")"
 echo "all_resolved: $all_resolved"
-if [ -n "$next" ] && [ "$dirty" != 0 ]; then
-    echo "halt: a árvore tem $dirty caminhos fora de commit, e um implementer novo os commitaria junto. A saída é do operador: guardá-los com git stash -u, ou fazer um commit dele, e rodar a skill de novo."
+if [ "$dirty" != 0 ]; then
+    halt_why="" halt_then=""
+    if [ -n "$next" ]; then halt_why="um implementer novo os commitaria junto"
+    elif [ "$all_resolved" = yes ]; then
+        halt_why="o próximo passo da spec partiria deles"
+        halt_then=", que recomenda o próximo passo com a árvore limpa"
+    fi
+    [ -z "$halt_why" ] || echo "halt: $iso_mode. A árvore tem $dirty caminhos fora de commit, e $halt_why. A saída é do operador: guardá-los com git stash -u, ou fazer um commit dele, e rodar a skill de novo$halt_then."
     next=""
 fi
 echo "next: $([ -n "$next" ] && echo "${file[next]}" || echo none)"
