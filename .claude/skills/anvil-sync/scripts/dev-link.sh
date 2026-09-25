@@ -54,9 +54,12 @@ nossos_omp() { [ -d "$OMP" ] && find "$OMP" -type l | while IFS= read -r l; do d
 
 # --- o roster ------------------------------------------------------------------
 # Da ideia ao commit, mais as skills que essas invocam de verdade. Nao e o
-# payload inteiro: UI, stack e bench nao tem o que fazer neste repositorio e so
-# competiriam por atencao — o bench, cuja description dispara em "long or
-# multi-part task", chegaria a se auto-invocar dentro do implement.
+# payload inteiro: UI, stack, bench e as duas de seguranca nao tem o que fazer
+# neste repositorio e so competiriam por atencao — o bench, cuja description
+# dispara em "long or multi-part task", chegaria a se auto-invocar dentro do
+# implement. `anvil-security-map`/`anvil-security-probe` mapeiam e testam a
+# superficie de ataque de um app (rotas, Local API, banco local) — este
+# repositorio e o toolkit fonte, nao um app com superficie para mapear.
 #
 # `anvil-update` fica de fora DE PROPOSITO: rodar o update aqui baixaria o
 # payload publicado por cima do payload fonte. Nao estar instalado e a trava.

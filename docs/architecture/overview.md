@@ -27,8 +27,8 @@ com adaptação registrada — ver
 │  anvil-stack-payload: RULE · reference/ · security/ · bench/ │
 │  contrato de 7 capacidades                                 │
 └───────────────────────────────────────────────────────────┘
-      apoiadas por 10 skills autorais: docs · boot · update ·
-      bench · ui · distill · tea-* (4)
+      apoiadas por 12 skills autorais: docs · boot · update ·
+      bench · ui · distill · security-* (2) · tea-* (4)
 ```
 
 ## Harnesses

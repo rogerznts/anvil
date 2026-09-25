@@ -250,7 +250,7 @@ Idêntico → siga sem perguntar. Divergente → mostre o diff e espere aprovaç
 `anvil-code-review` tira classe, orçamento e escopo diff-only; sem ele, o critério
 que se instala sozinho é "nenhum achado aberto".
 
-## 7. Stack
+## 7. Stack e segurança
 
 Se a varredura encontrou uma stack conhecida — hoje, um `payload.config.ts` —
 **proponha** a rule dela com uma linha de justificativa, e espere aprovação:
@@ -263,6 +263,18 @@ Se a varredura encontrou uma stack conhecida — hoje, um `payload.config.ts` �
 A rule sai da skill `anvil-stack-payload`, arquivo `RULE.md`, com os `{{...}}`
 preenchidos pelo que a varredura achou. **Sem** as invariantes do bench — aquelas
 são decisão de produto do `/anvil-bench` e não valem para projeto comum.
+
+Na mesma detecção, **sugira** rodar `/anvil-security-map`, numa linha dizendo a
+stack e se ela tem checklist:
+
+> *A stack é Payload, que tem checklist de segurança
+> (`anvil-stack-payload/security/CHECKLIST.md`). Quer rodar
+> `/anvil-security-map` para mapear a superfície de ataque?*
+
+Stack detectada sem checklist: diga isso na mesma linha — o map ainda cobre a
+parte genérica. **Espere aprovação**, independente da rule. Recusada, siga o
+boot sem chamar o map e sem gravar nada em `docs/security/`. Aceita, chame a
+Skill tool com **anvil-security-map**.
 
 ## 8. Guarda de merge
 
