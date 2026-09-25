@@ -62,9 +62,10 @@ mostra.
 
 Com a isolação de tarefas do omp ligada, o `/skill:anvil-run` despacha cada
 implementer com `isolated: true`. Ele trabalha numa cópia isolada do checkout, e o
-omp traz os commits dele para o branch da spec. O `anvil-run` reconhece a isolação
-pelo campo `isolated` do `task`, que o omp só oferece com a isolação ligada e fora
-do modo plan, e o relatório abre dizendo se a execução rodou com ou sem ela.
+omp traz os commits dele para o branch da spec. O `anvil-run` não adivinha o modo:
+o `frontier.sh` lê a configuração com `omp config get task.isolation.enabled` e
+`omp config get task.isolation.merge`, na raiz do projeto, e devolve a linha
+`isolation`. O relatório abre dizendo se a execução rodou com ou sem isolação.
 
 Para ligar, escreva no `config.yml` da pasta `.omp/` do projeto, ou no
 `~/.omp/agent/config.yml` para todos os projetos:
@@ -79,8 +80,10 @@ task:
 O `merge: branch` é obrigatório. No modo branch, o omp commita o trabalho num
 branch `omp/task/<id>` e faz cherry-pick dos commits no branch da spec, um commit
 por passo, como sem isolação. O padrão do omp é `patch`, que aplica a mudança sem
-commit: a árvore fica suja, o `anvil-run` para com `halt` e o relatório aponta esta
-configuração.
+commit. Com a isolação ligada no modo patch, o `anvil-run` avisa antes do primeiro
+despacho e aponta esta configuração. Ele despacha mesmo assim, e a árvore suja que
+o omp deixa o para com `halt`. Para conferir o que o omp lê, rode os dois
+`omp config get` acima na raiz do projeto.
 
 A isolação muda a retomada. Sem ela, um implementer que cai deixa a sobra na árvore
 da spec, e o `anvil-run` para com `halt` antes do próximo despacho, até você

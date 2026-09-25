@@ -192,6 +192,7 @@ O operador continua chamando os mesmos comandos. O que muda:
   | `tudo_resolvido:` | `all_resolved:` | `yes` ou `no` |
   | `parada:` | `halt:` | motivo |
   | `proximo:` | `next:` | caminho do ticket ou `none` |
+  | — | `isolation:` | `on`, `off` ou `misconfigured`, com o que o `omp config get` leu |
   | — | `ready:` | quantos tickets estão no frontier, para a medição do paralelo |
 
   O `--skip` e o argumento da spec não mudam. Os identificadores internos passam
@@ -203,6 +204,13 @@ O operador continua chamando os mesmos comandos. O que muda:
   `/anvil-setup`.
 - **Parada.** A linha `halt` passa a dizer como sair dela, com `git stash` ou com
   um commit do operador.
+- **Isolação.** Na raiz do projeto, o script roda
+  `omp config get task.isolation.enabled` e, com `true`, também
+  `omp config get task.isolation.merge`, e escreve a linha `isolation`: `on` com
+  `true` e `branch`; `misconfigured` com `true` e outro merge; `off` com qualquer
+  outro valor ou sem resposta do omp. O omp lê o `.omp/config.yml` do diretório em
+  que roda, e não sobe até a raiz, por isso o script roda o comando depois do `cd`
+  para a raiz.
 
 ### `stage.sh`
 
@@ -218,9 +226,23 @@ O operador continua chamando os mesmos comandos. O que muda:
 - O item `screen: no` troca os exemplos por descrições que o script não
   reconhece: gráfico que o usuário filtra, mapa clicável, cards que se arrastam
   entre colunas.
-- **Modo de isolação.** O supervisor olha se o `task` dele oferece o campo
-  `isolated`. Com o campo, todo despacho sai com `isolated: true`. Sem ele, o laço
-  segue como na 003. O relatório abre dizendo o modo.
+- **Modo de isolação.** O supervisor lê o modo da linha `isolation` do
+  `frontier.sh`. Com `on`, todo despacho sai com `isolated: true`. Com `off`, o
+  laço segue como na 003. Com `misconfigured`, o supervisor diz ao operador, antes
+  de despachar, que a isolação está fora do modo branch e aponta
+  `task.isolation.merge: branch`; os despachos saem com `isolated: true`, e a
+  parada por árvore suja continua como rede de segurança. O relatório abre dizendo
+  o modo lido.
+
+  _Nota (decisão do operador, durante o ticket 08):_ a primeira versão desta
+  decisão mandava o supervisor olhar se o `task` oferece o campo `isolated`, que o
+  omp só põe no schema com a isolação ligada. Na prática, isso depende de o modelo
+  raciocinar sobre a própria definição do tool. Em sondas com `--thinking off`, o
+  `claude-haiku-4-5` e o `claude-sonnet-4-6` erraram o modo nos dois sentidos. Com
+  `--thinking low`, o haiku acertou as sondas curtas, mas no S2 inteiro errou o
+  modo no A2 da rodada 7; na rodada 6, com `off` fora dos cenários de isolação,
+  errou no A. O `omp config get` lê a mesma configuração que liga o campo, fora do
+  modo plan, e não depende do modelo.
 - **Paralelo.** Argumento opcional de paralelo, com N de 2 em diante. Com
   isolação, cada leva é uma chamada do `task` com até N itens, um por ticket do
   frontier, na ordem do script. Depois da leva, o script roda de novo, e cada
@@ -237,8 +259,9 @@ O operador continua chamando os mesmos comandos. O que muda:
   modo branch da isolação: ele commita num branch próprio da tarefa e faz o
   cherry-pick no branch de origem. O supervisor continua sem commitar e sem fazer
   merge.
-- O modo patch não serve, porque aplica a mudança sem commit. Ele deixa a árvore
-  suja, e a parada de sempre pega isso. O manual `anvil-omp` diz qual modo a
+- O modo patch não serve, porque aplica a mudança sem commit. O `anvil-run` avisa
+  antes de despachar, pela linha `isolation: misconfigured`, e a árvore suja que o
+  patch deixa é pega pela parada de sempre. O manual `anvil-omp` diz qual modo a
   isolação precisa.
 - Conflito no cherry-pick não tem tratamento próprio. Se o ticket não mudou de
   estado no branch da spec, ele é pulado. Se a árvore ficou suja, o laço para. Os

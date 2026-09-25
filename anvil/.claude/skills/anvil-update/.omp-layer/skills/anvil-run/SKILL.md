@@ -17,22 +17,23 @@ execução.
 
 ## Isolação
 
-A primeira coisa que você escreve nesta execução, antes de rodar o script, é a linha
-`task aceita: <propriedades>`, com as propriedades que um item de `tasks` aceita,
-copiadas da definição do tool `task` que você recebeu, como `agent`, `task`, `name`
-e as outras. Você já tem essa definição: ela não se consulta por ferramenta nem por
-subagente.
+O modo da execução vem da linha `isolation` do script, e não de você: o script lê a
+configuração do omp com `omp config get` e escreve o resultado. Use a linha da
+primeira rodada do script, e o modo vale para a execução inteira:
 
-O omp só põe `isolated` nessa definição quando a isolação de tarefas está ligada na
-configuração dele. Por isso a propriedade basta, e não há outra coisa a conferir:
+- `isolation: on`: com isolação. Todo despacho sai com `isolated: true`, o
+  implementer trabalha numa cópia isolada do checkout, e o omp traz os commits dele
+  para o branch da spec;
+- `isolation: off`: sem isolação. O item não leva `isolated`, e o implementer
+  trabalha na árvore da spec, como na 003;
+- `isolation: misconfigured`: a isolação está ligada, mas fora do modo branch, e o
+  omp vai integrar o trabalho sem commit. Antes do primeiro despacho, diga isso ao
+  operador e aponte a configuração do omp, que precisa de
+  `task.isolation.merge: branch`, como o `/skill:anvil-omp` explica. Depois,
+  despache como em `on`, com `isolated: true`: a árvore suja que o omp deixa para o
+  laço no `halt`.
 
-- `isolated` está na linha: escreva `modo: com isolação`. Todo despacho sai com
-  `isolated: true`, o implementer trabalha numa cópia isolada do checkout, e o omp
-  traz os commits dele para o branch da spec;
-- `isolated` não está na linha: escreva `modo: sem isolação`. O item não leva
-  `isolated`, e o implementer trabalha na árvore da spec.
-
-O modo vale para a execução inteira, e o laço é o mesmo nos dois.
+O laço é o mesmo nos três.
 
 ## Ler o estado
 
@@ -50,7 +51,8 @@ num projeto sem o perfil `docs/specs` do tracker.
 Nesse caso, mostre a linha ao operador e pare. Não troque de branch nem rode o
 script com outro número: a recusa é a resposta, e o branch é escolha do operador.
 
-Fora a recusa, o script devolve a linha `screen`, `yes` ou `no` com o motivo, e, sem
+Fora a recusa, o script devolve a linha `isolation`, lida acima, a linha `screen`,
+`yes` ou `no` com o motivo, e, sem
 `ui/` e com tudo resolvido, uma linha `story` por user story da `spec.md`. Depois
 vêm uma linha por ticket, com `status`, `reviews`, `last`, `blocked_by` e `class`, e
 `frontier`, `skipped`, `locked`, uma linha `open_p1` por P1 de travado,
@@ -70,9 +72,10 @@ o que sobrou junto com o ticket dele.
 3. Mostre ao operador uma linha de andamento: o ticket que vai sair e quantos já
    estão resolvidos.
 4. Despache o `next` com o `task`, numa chamada com um item só: `agent` é
-   `anvil-implementer` e o `task` é o caminho do ticket. Com `modo: com isolação`,
-   o item leva também `isolated: true`, em todo despacho. No `context`, diga a pasta
-   da spec e o branch. O implementer é bloqueante, e a chamada só volta quando ele
+   `anvil-implementer` e o `task` é o caminho do ticket. Com `isolation: on` ou
+   `misconfigured`, o item leva também `isolated: true`, em todo despacho. No
+   `context`, diga a pasta da spec e o branch. O implementer é bloqueante, e a
+   chamada só volta quando ele
    termina. Não espere pelo `hub`, não chame outra ferramenta na mesma mensagem e
    nunca despache dois tickets ao mesmo tempo.
    O que o implementer devolve não muda o laço, nem quando ele diz que falhou ou
@@ -90,19 +93,20 @@ o que sobrou junto com o ticket dele.
 
 ## O fim
 
-O relatório abre com uma linha que diz o modo da execução: com isolação ou sem
-isolação.
+O relatório abre com uma linha que diz o modo da execução, lido da linha
+`isolation`, em todo fim, também com `halt`: `modo: com isolação` com `on`,
+`modo: sem isolação` com `off`, e, com `misconfigured`,
+`modo: com isolação, fora do modo branch`, seguido da configuração que falta,
+`task.isolation.merge: branch`.
 
 Com `halt`, o relatório segue por ela: mostre o `git status --short` e diga como
 sair, como a linha diz. A saída é do operador: ele guarda o que sobrou com
 `git stash -u`, ou faz um commit dele, e roda a skill de novo. Você não sai da
 parada: não rode `git stash`, não commite e não limpe a árvore. O que sobrou pode
-ser do operador ou de um implementer que caiu. Com `modo: com isolação`, um `halt`
-que aparece depois de um despacho sempre vem do omp, porque o script só despacha
-com a árvore limpa: o omp integrou o trabalho sem commit, e a isolação está no
-modo patch. Diga isso e aponte a configuração do omp, que precisa de
-`task.isolation.merge: branch`, como o `/skill:anvil-omp` explica. Depois, siga
-com o resto do relatório.
+ser do operador ou de um implementer que caiu. Com `isolation: misconfigured`, um
+`halt` que aparece depois de um despacho vem do omp, que integrou o trabalho sem
+commit: diga isso e aponte de novo `task.isolation.merge: branch`, como o
+`/skill:anvil-omp` explica. Depois, siga com o resto do relatório.
 
 Com `all_resolved: yes`, o relatório lista os tickets resolvidos nesta execução e
 recomenda o próximo passo, sem executá-lo, escrito como está aqui, porque no omp

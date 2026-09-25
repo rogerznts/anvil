@@ -17,6 +17,12 @@
 # uma lista de numeros, e na duvida o ticket fica fora. Com a arvore suja, o next e
 # none e sai uma linha "halt:": o implementer seguinte commitaria o que sobrou
 # junto com o ticket dele. A linha diz como sair: git stash -u ou um commit.
+#
+# Isolacao: a linha "isolation:" diz o modo da execucao, lido da configuracao do
+# omp com omp config get, na raiz do projeto, porque o omp le o .omp/config.yml do
+# diretorio em que roda. on: task.isolation.enabled true e task.isolation.merge
+# branch. misconfigured: ligada com outro merge, que integra sem commit. off: o
+# resto, inclusive sem resposta do omp.
 set -u
 
 refuse() { echo "refusal: $1"; exit 2; }
@@ -184,6 +190,19 @@ dirty="$(git status --porcelain | wc -l | tr -d ' ')"
 echo "spec: $dir"
 echo "branch: $branch"
 [ "$dirty" = 0 ] && echo "tree: clean" || echo "tree: dirty ($dirty)"
+iso_enabled="$(omp config get task.isolation.enabled 2>/dev/null)" || iso_enabled=""
+if [ -z "$iso_enabled" ]; then
+    echo "isolation: off (task.isolation.enabled não foi lido pelo omp config get)"
+elif [ "$iso_enabled" != true ]; then
+    echo "isolation: off (task.isolation.enabled: $iso_enabled)"
+else
+    iso_merge="$(omp config get task.isolation.merge 2>/dev/null)" || iso_merge=""
+    if [ "$iso_merge" = branch ]; then
+        echo "isolation: on (task.isolation.enabled: true, task.isolation.merge: branch)"
+    else
+        echo "isolation: misconfigured (task.isolation.enabled: true, task.isolation.merge: ${iso_merge:-não lido}; o trabalho isolado só volta como commits com task.isolation.merge: branch)"
+    fi
+fi
 # Tela: a pasta ui/ da spec, ou uma user story que fala de algo que o usuario ve.
 # A palavra e so o padrao: o supervisor le as linhas story e pode subir um "no"
 # para o browser QA quando a historia descreve tela com outras palavras.
