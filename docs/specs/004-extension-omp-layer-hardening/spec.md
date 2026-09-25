@@ -173,10 +173,10 @@ O operador continua chamando os mesmos comandos. O que muda:
   `perl -CSD` dá 1.
 
   _Nota (decisão do operador, durante o ticket 11):_ uma palavra da lista muda. O
-  `interface` sozinho só conta como tela com `web`, `gráfica`, `visual` ou `do
-  usuário` depois. No ponta a ponta, a user story "manter a regra separada da
-  interface executável" deu `screen: yes`, e a `anvil-run` recomendou o browser QA
-  para um comando de terminal.
+  `interface` (ou `interfaces`) sozinho só conta como tela com `web`, `gráfica`,
+  `visual`, `do usuário` ou `de usuário` depois. No ponta a ponta, a user story
+  "manter a regra separada da interface executável" deu `screen: yes`, e a
+  `anvil-run` recomendou o browser QA para um comando de terminal.
 - **Chaves de saída.** O contrato passa a ser este, com o valor humano em pt-BR
   depois da chave quando há motivo:
 
