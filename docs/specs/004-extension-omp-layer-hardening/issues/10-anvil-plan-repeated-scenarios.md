@@ -4,11 +4,24 @@
 
 **Blocked by:** 01, 05
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Oito cenários, cada um com um roteiro de operador cuja fala carrega o sinal do desvio: `anvil-research`, `anvil-prototype`, `anvil-to-questionnaire`, `anvil-wayfinder`, `anvil-ui` e `anvil-architect` saindo do grill, um desvio saindo do to-spec e um saindo do to-tickets.
-- [ ] Três rodadas por cenário, com o modelo padrão do ponta a ponta da 003; as sessões ficam guardadas.
-- [ ] Conferência por código sobre as sessões: nenhuma skill de etapa ou de desvio é lida sem a proposta no turno anterior e o sim do operador. Vale nas 24 rodadas.
-- [ ] Reportados por cenário: rodadas com o desvio certo proposto, rodadas com a volta à etapa de origem proposta, e o pass^3 de cada um.
-- [ ] Cada rodada registra o modelo que respondeu; rodada com modelo diferente do pedido não conta e é refeita.
-- [ ] O resultado vai para o `## Comments` com número de rodadas, quantas passaram em cada medida e o modelo.
+- [x] Oito cenários, cada um com um roteiro de operador cuja fala carrega o sinal do desvio: `anvil-research`, `anvil-prototype`, `anvil-to-questionnaire`, `anvil-wayfinder`, `anvil-ui` e `anvil-architect` saindo do grill, um desvio saindo do to-spec e um saindo do to-tickets.
+- [x] Três rodadas por cenário, com o modelo padrão do ponta a ponta da 003; as sessões ficam guardadas.
+- [x] Conferência por código sobre as sessões: nenhuma skill de etapa ou de desvio é lida sem a proposta no turno anterior e o sim do operador. Vale nas 24 rodadas.
+- [x] Reportados por cenário: rodadas com o desvio certo proposto, rodadas com a volta à etapa de origem proposta, e o pass^3 de cada um.
+- [x] Cada rodada registra o modelo que respondeu; rodada com modelo diferente do pedido não conta e é refeita.
+- [x] O resultado vai para o `## Comments` com número de rodadas, quantas passaram em cada medida e o modelo.
+
+## Comments
+
+- O conjunto é `workspace/36-omp-plan-desvios/runs.py`, fora do git como os outros cenários. `runs.py run` monta um projeto de fixture em `/tmp` com a camada instalada pelo `reset-install.sh` e roda cada rodada num projeto e numa sessão próprios, com o roteiro do operador; `runs.py check` faz a conferência sobre as sessões gravadas em `out/<cenário>/<rodada>/` (`N.jsonl`, `N.msg`, `N.fatos`, `N.model`, `sess/`). O roteiro só reage ao fim da vez anterior: com o desvio nomeado e uma pergunta, manda o sim; sem isso, a rodada acaba ali e conta como desvio não proposto.
+- Os cenários: `grill-research`, `grill-prototype`, `grill-questionnaire`, `grill-wayfinder`, `grill-ui` e `grill-architect` saem do grill, com o sinal na resposta às perguntas da primeira rodada. `spec-architect` sai do to-spec, com o sinal ("a forma dos módulos está em aberto…") na checagem dos seams. `tickets-questionnaire` sai do to-tickets, numa spec já escrita, com o sinal ("quem decide é o Paulo, da operação…") no quiz da quebra. Depois da carga do desvio, o operador diz que ele terminou, com a conclusão, e o conjunto mede se a vez seguinte propõe voltar à etapa de origem pelo nome.
+- Invariante: toda leitura de `skill://` de etapa ou de desvio tem, no fim da vez anterior, a skill nomeada e uma pergunta, sem a carga, e o sim do operador na mensagem da vez; a exceção é o grill da primeira chamada com pedido. Medido: o desvio do cenário nomeado com pergunta no fim da vez do sinal, e não carregado nela; a volta: um fim de vez, entre a carga do desvio e a carga seguinte, nomeia a etapa de origem e pergunta. pass^3 com n = k = 3 rodadas é o estimador do τ-bench: 1 só com as três certas. Modelo: o de cada vez vem das mensagens do assistente sem erro; com outro modelo, a rodada é refeita até duas vezes.
+- Modelo pedido: `openai-codex/gpt-5.6-sol`, `--thinking off`, o do `workspace/35-omp-e2e/e2e.sh`. As ferramentas são as do ponta a ponta menos o `hub`, que o omp 18.3.0 recusa em `--tools`.
+- Série 1 (`anvil-plan` de `6d92fa1`, com o `task` nas ferramentas): 24 rodadas, todas com o modelo pedido na primeira tentativa. Invariante 23/24: no `grill-prototype/3`, o sinal ("Só vendo as transições rodarem eu consigo decidir") fez o condutor carregar a `anvil-prototype` na mesma vez, sem proposta, e montar o protótipo. Desvio certo 23/24 e volta 23/24, as duas falhas nessa rodada. A primeira conferência deu o desvio como proposto nessa rodada, porque "coletor.prototype.html" casava com o nome; a medida passou a exigir palavra inteira e que o desvio não tenha sido carregado na vez do sinal. Evidência em `out-r1/`.
+- Correção na `anvil-plan` (`fabe986`), seção Desvios: "O sinal nunca é o sim, nem quando o operador diz que só decide vendo rodar, pesquisando ou perguntando a alguém. A fala dele descreve a necessidade. Quem nomeia o desvio é a proposta, e só a resposta a ela carrega a skill."
+- Série 2 (camada de `fabe986`, com o `task`, 8 rodadas ao mesmo tempo): abortada depois de 7h34m. 20 das 24 rodadas morreram com `rc=1` por "Deadline exceeded" (1800 s por vez), depois de o stream do openai-codex travar ("SSE stream stalled"); várias na vez 1, com o grill abrindo subagente do `task` para ler o repositório. Evidência em `out-r2-abortada/`.
+- Decisão do operador depois da série 2: as rodadas rodam sem o `task` nas ferramentas, e o grill e os desvios trabalham na sessão principal. Com isso, as ferramentas diferem das do ponta a ponta da 003 também no `task`, e a série 3 muda a skill e as ferramentas ao mesmo tempo em relação à série 1: o efeito da correção sozinha não fica isolado.
+- Série 3 (camada de `fabe986`, sem o `task`, 4 rodadas ao mesmo tempo, 13 min): 24 rodadas, todas com `openai-codex/gpt-5.6-sol` na primeira tentativa e `rc=0`. Invariante 24/24. Desvio certo e volta à origem, 3/3 em todos os oito cenários, pass^3 1 nas duas medidas em todos. Em toda rodada, a única carga fora da primeira vez foi a da skill proposta, na vez do sim: o desvio na vez 3 dos cenários do grill, o to-spec na vez 3 e o architect na 5 do `spec-architect`, o to-tickets na vez 2 e o questionnaire na 4 do `tickets-questionnaire`. Saída do `check` em `workspace/36-omp-plan-desvios/check.out`; as sessões em `out/`.
+- `vendor-sync.sh verify`: `verify: limpo` em `/opt/local/bin/bash` e `/bin/bash`, com saídas idênticas.
