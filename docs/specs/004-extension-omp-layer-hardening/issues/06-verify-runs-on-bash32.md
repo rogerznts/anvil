@@ -5,6 +5,7 @@
 **Blocked by:** Nenhum — pode começar agora.
 
 **Status:** resolved
+**Review:** round=1; sha=eaed598; scope=full; verdict=pass; p1=none
 
 - [x] A causa da queda está isolada e escrita no `## Comments`, com o menor caso que a reproduz.
 - [x] A correção é mínima e não muda o resultado de nenhum check.
@@ -19,3 +20,8 @@
 - Resultado igual, medido em `/tmp/anvil-004-06/equiv.sh`: o script do `HEAD` anterior (b1ccc0a) em `/opt/local/bin/bash` 5.2.15 contra o novo em `/opt/local/bin/bash` e em `/bin/bash` 3.2.57, numa cópia do repositório real e numa cópia quebrada de propósito (um link que não resolve, um `../anvil-implement/SKILL.md` que sai da skill, um `../../fora.md` que cai nos dois checks e um link quebrado dentro de bloco cercado, que os dois ignoram). As três saídas, com o rc, batem byte a byte nos dois casos. A cópia quebrada sai `verify: 4 falha(s)` e rc 1.
 - `verify` neste repositório: `/bin/bash` e `/opt/local/bin/bash` saem com rc 0 e `verify: limpo`, e o `diff` das duas saídas é vazio. Com `ulimit -n 256`, o bash 3.2 também sai limpo, sem erro de fd.
 - S3 (`workspace/31-omp-verify/s3.sh`): antes da correção, `BASH_BIN=/bin/bash` dava SIGTRAP nos 13 casos e `S3: 14 falha(s)`. Depois, `S3: tudo passou` com `/bin/bash` e com `/opt/local/bin/bash`. O relatório dos dois só difere na última linha, que nomeia o bash, e a saída do verify de cada caso (`fx/*.out` e `fx/*.rc`) dá `diff -r` vazio entre os dois. O cabeçalho do `s3.sh`, que dizia que o verify morria sob o bash 3.2, foi atualizado; o `workspace/` fica fora do git.
+- Review round=1 · P3 (Standards): os checks 2 e 3 repetem o mesmo esqueleto de laço sobre `links_of`, e a correção entrou duas vezes; a próxima mudança na leitura dos links precisa de duas edições iguais, e esquecer uma volta a vazar metade dos fds.
+- Review round=1 · P3 (Standards): o `cmd_verify` fica com duas formas de laço aninhado, `<<<` nos checks 2 e 3 e `< <(...)` nos 10, 11, 13, 15 e 16, e o comentário fala só dos checks 2 e 3; um check novo que percorra o payload copiado do check 15 volta a derrubar o bash 3.2, e nada no script avisa que a regra vale para qualquer laço de dentro sobre muitos arquivos.
+- Review round=1 · P3 (Standards): o comentário fica acima do `echo "2. …"` e o `<<<` do check 3, 20 linhas abaixo, não tem ponteiro para ele; quem lê o check 3 sozinho não vê o motivo e pode uniformizar a linha de volta para `< <(...)`.
+- Review round=1 · P3 (Spec): o check 15 (o eixo escreveu "check 13"; a linha citada, 746, é do check 15) ainda abre uma process substitution por arquivo da camada (`done < <(citados_of "$f")`); se a camada passar de uns 240 arquivos, o bash 3.2 volta a cair ou a imprimir `limpo` sem checar. Hoje, com 6 arquivos, nada quebra.
+- Review round=1 · P3 (Spec): o `## Comments` diz "conta 240 de 300" no menor caso com `ulimit -n 256`, e o eixo mediu `n=241`; a diferença vem dos fds herdados do ambiente e não muda nenhuma conclusão.
