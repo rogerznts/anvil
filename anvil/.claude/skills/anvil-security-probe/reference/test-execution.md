@@ -12,6 +12,13 @@ que não escreve (regra completa em
 [database-protection.md](database-protection.md)). O que muda aqui é **o
 que** testar, não **se** pode escrever.
 
+Isto vale em toda execução, inclusive quando o probe já rodou antes contra
+este mesmo repositório: um item citado nos **Itens do mapa** de um
+`SEC-#` existente roda de novo do mesmo jeito, sem tratamento especial
+aqui — o resultado (positivo ou negativo) é o que decide fechar, reabrir
+ou manter aquele `SEC-#`
+([findings-and-fix-spec.md](findings-and-fix-spec.md), seção 6).
+
 ## Ferramentas: só as que `profile.md` já achou presentes
 
 A tabela "Ferramentas de segurança" que a trava 4 mostrou é a mesma que vale
