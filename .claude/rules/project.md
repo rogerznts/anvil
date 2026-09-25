@@ -66,7 +66,7 @@ Skill autoral — `anvil-boot`, `anvil-update`, `anvil-docs`, `anvil-ui`,
 `unlazy`, que vem de upstream com pin e registro no manifesto, e segue a regra de
 skill vendorizada. As duas de segurança são exceção ao padrão comum de skill
 autoral: destiladas de referências externas (a ideia, não o texto), com um
-`SOURCES.md` registrando de onde veio cada uma — ver adr-0012.
+`SOURCES.md` registrando de onde veio cada uma — ver adr-0013.
 
 ## Como se verifica
 

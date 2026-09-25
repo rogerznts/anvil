@@ -8,7 +8,7 @@
 
 Cada item do checklist diz o que olhar, como reconhecer no código ou na config, qual teste o probe aplica (ou "só leitura"), e o precedente: advisory confirmado ou doc oficial. Cobertura mínima, conforme a spec: collections e rotas REST/GraphQL geradas, Local API e `overrideAccess`, access control por campo, auth (`maxLoginAttempts`, `lockTime`, reset de senha), GraphQL (complexidade, introspection, playground), `csrf` e `cors`, upload (`mimeTypes`, `allowRestrictedFileTypes`, `pasteURL`, `skipSafeFetch`), multi-tenant (`useTenantAccess`), a camada Next.js (Server Actions, Route Handlers, middleware/proxy) e versões mínimas contra advisories.
 
-Referências: `docs/discovery/seguranca-map-probe.md` e o adr-0012.
+Referências: `docs/discovery/seguranca-map-probe.md` e o adr-0013.
 
 - [x] O checklist de segurança existe dentro do `anvil-stack-payload` e cobre todos os temas listados acima
 - [x] Todo item cita um precedente; só advisories confirmados por leitura direta entram (os cinco não confirmados da pesquisa ficam de fora)

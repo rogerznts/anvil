@@ -40,10 +40,13 @@ detectado e mantida depois pela linha `omp:` do `anvil.lock`. Hoje há uma, a
 camada omp, em `.omp/`: a guarda de merge como hook do omp, a rule que traduz o
 vocabulário do Claude Code, o agente `anvil-implementer`, os condutores
 `anvil-plan` e `anvil-run` e o manual `anvil-omp`. Só no omp o fluxo é conduzido;
-no Claude Code e no Codex ele segue manual. O Codex lê as skills pelo espelho
-`.agents/skills`, que o mesmo passo mantém. Ver
-[adr-0011](./adr/adr-0011-omp-como-harness-com-camada-propria.md) e os termos em
-[context.md](./context.md).
+no Claude Code e no Codex ele segue manual. A `anvil-run` despacha os tickets em
+série e, sob pedido e com a isolação do omp no modo branch, em paralelo, em levas
+de tickets do frontier. O Codex lê as skills pelo espelho `.agents/skills`, que o
+mesmo passo mantém. Ver
+[adr-0011](./adr/adr-0011-omp-como-harness-com-camada-propria.md),
+[adr-0012](./adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md) e os termos
+em [context.md](./context.md).
 
 ## O que o anvil impõe, e só isso
 

@@ -5,7 +5,7 @@ description: "Mapeia a superfície de ataque de um projeto: detecta a stack, car
 
 # Mapa de superfície de ataque
 
-Esta skill é autoral (adr-0012 — as skills de segurança são autorais,
+Esta skill é autoral (adr-0013 — as skills de segurança são autorais,
 destiladas das referências, listadas em [SOURCES.md](SOURCES.md)). Ela **só
 lê** o repositório: nenhuma requisição ao app do projeto, nenhum servidor
 subido, nenhuma conexão a banco. Quem executa é o `/anvil-security-probe`,

@@ -32,7 +32,7 @@ SQLite (GHSA-v49j-62m6-pgrr, 2026-09-22), IDOR entre collections
 ## Solution
 
 Duas skills autorais, conforme o
-[adr-0012](../../../architecture/adr/adr-0012-skills-de-seguranca-sao-autorais.md) —
+[adr-0013](../../../architecture/adr/adr-0013-skills-de-seguranca-sao-autorais.md) —
 as skills de segurança são autorais, destiladas das referências:
 
 - **`anvil-security-map`** analisa o repositório, detecta a stack, lê o checklist
@@ -219,7 +219,7 @@ camada própria. O `anvil-stack-payload` é a primeira stack com checklist.
 - **Duas skills autorais no payload**: `anvil-security-map` e
   `anvil-security-probe`. Fora do `anvil-skills.yaml`. Cada uma com `SOURCES.md`.
   Das referências entra a ideia, não o texto; o que vem de onde está no
-  adr-0012.
+  adr-0013.
 - **Contrato com a stack.** A sétima capacidade é um checklist de segurança
   dentro da skill da stack, carregado só pelo map. Cada item diz o que olhar,
   como reconhecer no código ou na config, qual teste o probe aplica, e o
@@ -313,7 +313,7 @@ camada própria. O `anvil-stack-payload` é a primeira stack com checklist.
   2026-09-22. A consulta de advisories do map cobre o intervalo entre um
   advisory novo e o checklist, e aponta a lacuna; o checklist continua citando
   precedente por item para que a atualização seja localizável. A atualização
-  segue manual (custo aceito no adr-0012), mas passa a partir de sinal do uso.
+  segue manual (custo aceito no adr-0013), mas passa a partir de sinal do uso.
 - Cinco advisories citados na pesquisa não foram confirmados por leitura direta.
   O checklist só usa os confirmados.
 - O agente de revisão de segurança do harness não é do anvil e não vai no degit;

@@ -56,7 +56,7 @@
   consequência se não for revertida: a contagem certa é a sete, como
   `STACK-CONTRACT.md` já dizia.
 - Review round=1 · Standards · P3, sem ação: a ressalva sobre
-  `SOURCES.md`/adr-0012 aparece tanto no `README.md` quanto no
+  `SOURCES.md`/adr-0013 aparece tanto no `README.md` quanto no
   `.claude/rules/project.md` (Duplicated Code) — mesmo padrão que o
   parágrafo do `anvil-bench` já usa nos dois arquivos, cada um por público
   diferente (README é a porta pública, `project.md` é a regra interna).

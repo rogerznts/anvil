@@ -5,7 +5,7 @@ description: "Antes de qualquer teste contra o app, confere cinco travas em orde
 
 # Travas, execução e achados
 
-Esta skill é autoral (adr-0012 — as skills de segurança são autorais,
+Esta skill é autoral (adr-0013 — as skills de segurança são autorais,
 destiladas das referências, listadas em [SOURCES.md](SOURCES.md)). Ela é a
 metade que **executa** contra o ambiente de desenvolvimento local — a outra
 metade, que só lê o repositório, é o `/anvil-security-map`.
@@ -47,7 +47,7 @@ resolve, está em `reference/target-discovery.md`. Um único host fora disso
 **Nenhum argumento, flag ou pedido no meio da conversa muda esse resultado.**
 Esta skill não define nem lê nenhuma flag de override — não existe "modo"
 que libere um alvo remoto. Se o usuário pedir para mirar outro host, recuse
-e explique que é o desenho da skill (adr-0012), não uma configuração que
+e explique que é o desenho da skill (adr-0013), não uma configuração que
 falta ligar.
 
 Passou → siga para a trava 3.

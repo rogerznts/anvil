@@ -151,4 +151,4 @@ o **desenho**:
   (reproduzir antes de reportar); o `fp-check` da Trail of Bits.
 
 Decidido: autoral, destilando as ideias destas referências. Ver o
-[adr-0012](../architecture/adr/adr-0012-skills-de-seguranca-sao-autorais.md).
+[adr-0013](../architecture/adr/adr-0013-skills-de-seguranca-sao-autorais.md).

@@ -10,7 +10,7 @@ O map detecta a stack pelo que existe no repositório, carrega o checklist da sk
 
 `profile.md`: stack, se há checklist, ferramentas de segurança presentes e ausentes, alvo local descoberto, banco. `map.md`: itens por categoria do OWASP Top 10:2025 e, em API, do API Security Top 10:2023; cada item com id estável, arquivo:linha verificado e o teste que o probe aplica ou "só leitura". No Payload, cada collection aparece com as rotas geradas e as `access` definidas ou ausentes.
 
-A skill é autoral (adr-0012) e traz `SOURCES.md` com a origem de cada ideia.
+A skill é autoral (adr-0013) e traz `SOURCES.md` com a origem de cada ideia.
 
 - [x] Num projeto Payload descartável em `workspace/` com um route handler que chama a Local API com `user` e sem `overrideAccess: false`, o mapa lista essa falha com arquivo:linha correto
 - [x] Numa stack sem checklist, o mapa sai com a parte genérica e diz explicitamente que a parte específica ficou de fora
@@ -24,7 +24,7 @@ A skill é autoral (adr-0012) e traz `SOURCES.md` com a origem de cada ideia.
   palavra por palavra o "como reconhecer" do item 1 do checklist do Payload,
   e `reference/generic-checks.md` citava "o item 2 do checklist do Payload"
   por número — a skill agnóstica não deveria carregar conhecimento nem
-  numeração de uma stack específica (adr-0012). Corrigido no mesmo commit:
+  numeração de uma stack específica (adr-0013). Corrigido no mesmo commit:
   o passo 5 agora é uma regra agnóstica ("uma linha por ocorrência"), e a
   referência ao Payload em `generic-checks.md` não cita mais número de item.
 - Review round=1 · Standards · P2: `command -v zap`/`graphql-cop` não bate

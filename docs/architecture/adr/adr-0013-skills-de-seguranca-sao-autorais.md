@@ -1,4 +1,4 @@
-# ADR-0012 — As skills de segurança são autorais, destiladas das referências
+# ADR-0013 — As skills de segurança são autorais, destiladas das referências
 
 - Status: aceito
 - Data: 2026-09-24

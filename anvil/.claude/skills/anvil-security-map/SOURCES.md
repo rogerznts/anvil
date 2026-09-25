@@ -1,6 +1,6 @@
 # SOURCES
 
-Skill autoral (`adr-0012` do anvil — as skills de segurança são autorais,
+Skill autoral (`adr-0013` do anvil — as skills de segurança são autorais,
 destiladas das referências). Desta lista entra a **ideia**, nunca o texto:
 nenhuma frase de fonte CC-BY-SA-4.0 entra aqui, nem parafraseada de perto.
 Nome e id de categoria (`A01`, `API1`, …) são citados como taxonomia pública,
@@ -29,5 +29,5 @@ adversarial do `claude-security-audit`, e o `fp-check` da Trail of Bits.
 ## Atualização
 
 Manual — esta skill está fora do `anvil-skills.yaml`, sem pin nem sync
-automático (adr-0012). Atualiza quando uma referência mudar de ideia ou uma
+automático (adr-0013). Atualiza quando uma referência mudar de ideia ou uma
 edição nova do OWASP Top 10/API Security Top 10 sair.
