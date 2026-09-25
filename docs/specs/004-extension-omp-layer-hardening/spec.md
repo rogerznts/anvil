@@ -194,6 +194,7 @@ O operador continua chamando os mesmos comandos. O que muda:
   | `proximo:` | `next:` | caminho do ticket ou `none` |
   | — | `isolation:` | `on`, `off` ou `misconfigured`, com o que o `omp config get` leu |
   | — | `ready:` | quantos tickets estão no frontier, para a medição do paralelo |
+  | — | `frontier_files:` | os caminhos dos tickets do frontier, na ordem da linha `frontier`, para a leva do paralelo |
 
   O `--skip` e o argumento da spec não mudam. Os identificadores internos passam
   para o inglês.
@@ -253,7 +254,11 @@ O operador continua chamando os mesmos comandos. O que muda:
   frontier, na ordem do script. Depois da leva, o script roda de novo, e cada
   ticket da leva passa pela comparação de antes e depois da 003: estado igual é
   pulado. Sem isolação, o pedido de paralelo é recusado na primeira linha de
-  andamento, com o motivo, e a execução segue em série.
+  andamento, com o motivo, e a execução segue em série. Com `misconfigured`,
+  também: o modo patch integra sem commit, e a leva misturaria o trabalho de
+  vários tickets fora de commit antes da parada. Os caminhos da leva vêm da linha
+  `frontier_files`, porque a linha `ticket` não traz o arquivo. Decisões do
+  operador durante o ticket 09.
 - **Medição.** O relatório final traz a linha `ready` de cada rodada.
 - A regra "nunca despachar dois tickets ao mesmo tempo" passa a valer só para o
   modo sem isolação.
@@ -273,6 +278,7 @@ O operador continua chamando os mesmos comandos. O que muda:
   dois casos já existem na 003.
 - O comportamento do omp no conflito foi lido na documentação do omp 18.2.11, não
   observado. O primeiro ticket do paralelo confere na prática e registra o que viu.
+  Conferido no ticket 09, com o omp 18.3.0: o ADR-0012 registra o resultado.
 
 ### Manual `anvil-omp`
 

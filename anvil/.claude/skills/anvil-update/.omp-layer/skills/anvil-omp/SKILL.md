@@ -46,11 +46,12 @@ camada inteira fica com você e nada em `.omp/` é tocado.
 - `/skill:anvil-plan <pedido>` conduz o planejamento na mesma janela: grill, spec e
   tickets. Entre uma etapa e outra propõe a próxima, ou um desvio como research ou
   prototype, e só carrega com o seu sim. No fim, indica `/clear` e o `anvil-run`.
-- `/skill:anvil-run [NNN]` implementa a spec ticket a ticket, em série, cada ticket
-  num implementer de contexto novo, com o review em dois eixos. Sem número, usa o
-  do branch atual, e fora do branch da spec se recusa. Para quando tudo está
-  resolvido ou quando o que sobra está travado, e diz o próximo passo. Rodar de novo
-  retoma pelo que está no disco.
+- `/skill:anvil-run [NNN] [--parallel N]` implementa a spec ticket a ticket, cada
+  ticket num implementer de contexto novo, com o review em dois eixos. Em série
+  por padrão; com `--parallel N` e a isolação no modo branch, em levas de até N
+  tickets do frontier. Sem número, usa o do branch atual, e fora do branch da spec
+  se recusa. Para quando tudo está resolvido ou quando o que sobra está travado, e
+  diz o próximo passo. Rodar de novo retoma pelo que está no disco.
 - `/skill:anvil-browser-qa` faz o QA de browser. O `anvil-run` o recomenda quando a
   spec tem tela e nunca o dispara, assim como nunca dispara archive nem PR.
 
@@ -95,7 +96,14 @@ repositório depois da integração; apague-os com `git branch -D` quando não
 precisar mais deles.
 
 O paralelo depende da isolação: só com ela dois implementers rodam ao mesmo tempo
-sem dividir a mesma árvore. Hoje o `anvil-run` segue em série nos dois modos.
+sem dividir a mesma árvore. Com `--parallel N` e a linha `isolation: on`, o
+`anvil-run` despacha até N tickets do frontier numa chamada do `task`, e o omp
+integra o trabalho de cada um quando ele termina. Se o cherry-pick de um deles
+conflita, o omp o desfaz e deixa o trabalho no `omp/task/<id>`: o ticket volta sem
+mudar de estado, sai como pulado, e a execução seguinte o despacha de novo. Sem
+isolação, ou fora do modo branch, o `anvil-run` recusa o paralelo e segue em
+série. O relatório traz quantos tickets estavam prontos a cada rodada, na linha
+`ready por rodada`, para você medir se o paralelo compensa.
 
 ## O que continua manual no Claude Code e no Codex
 
@@ -110,8 +118,8 @@ espelho `.agents/skills` e não tem guarda.
 - O `eval` escapa da guarda. O hook só intercepta o tool `bash`, e um `git merge`
   disparado de dentro do `eval` passa sem conferência. O que se digita no terminal
   também.
-- O frontier é em série. O `anvil-run` implementa um ticket por vez, mesmo quando
-  dois tickets não dependem um do outro.
+- O frontier é em série sem isolação. O paralelo existe sob pedido,
+  `--parallel N`, e só com a isolação no modo branch.
 - O `task` não escolhe modelo por chamada. O implementer herda o modelo da sessão,
   e as listas `runners`, `how-critics` e `cross-judge` do `.claude/rules/anvil.md`
   não têm efeito no omp. Para outro modelo, use `task.agentModelOverrides` na

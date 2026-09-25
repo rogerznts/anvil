@@ -22,6 +22,10 @@
 # e, fora do modo branch, com a configuracao que falta, e diz como sair: git stash
 # -u ou um commit. O supervisor abre o relatorio com ela, como esta.
 #
+# ready: quantos tickets estao no frontier, para medir se o paralelo compensa.
+# frontier_files: os caminhos dos tickets do frontier, na ordem da linha frontier,
+# para a leva do paralelo; sem halt, o next e o primeiro deles.
+#
 # Isolacao: a linha "isolation:" diz o modo da execucao, lido da configuracao do
 # omp com omp config get, na raiz do projeto, porque o omp le o .omp/config.yml do
 # diretorio em que roda. on: task.isolation.enabled true e task.isolation.merge
@@ -240,6 +244,9 @@ for n in $order; do
     echo "ticket ${label[n]} status=${status[n]:-?} reviews=${reviews[n]} last=${last[n]} blocked_by=$(or_dash "${blocked_by#,}") class=${class[n]} — ${title[n]}"
 done
 echo "frontier: $(or_dash "$(labels "$frontier")")"
+files=""; for n in $frontier; do files="$files ${file[n]}"; done
+echo "ready: $(set -- $frontier; echo $#)"
+echo "frontier_files: $(or_dash "${files# }")"
 echo "skipped: $(or_dash "$(labels "$skipped")")"
 echo "locked: $(or_dash "$(labels "$locked")")"
 for n in $locked; do

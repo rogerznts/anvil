@@ -67,6 +67,8 @@ Last updated: 2026-09-24T16:17:02Z
     — a verificação tem critério de parada, e ele é ausência de P1
   - [adr-0011](./architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md)
     — o omp é harness de primeira classe, com camada própria; a orquestração volta só nela
+  - [adr-0012](./architecture/adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md)
+    — o frontier roda em paralelo sob pedido, só com a isolação do omp no modo branch
 
 ### Project
 

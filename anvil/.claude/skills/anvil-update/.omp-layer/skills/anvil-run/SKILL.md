@@ -1,7 +1,7 @@
 ---
 name: anvil-run
-description: Implementa uma spec do anvil ticket a ticket, no omp. A sessão vira supervisor, lê o frontier do disco, despacha um anvil-implementer por ticket, em série, e termina com um relatório e o próximo passo.
-argument-hint: "número da spec, opcional; sem ele, o do branch atual"
+description: Implementa uma spec do anvil ticket a ticket, no omp. A sessão vira supervisor, lê o frontier do disco, despacha um anvil-implementer por ticket, em série ou, sob pedido e com isolação, em levas, e termina com um relatório e o próximo passo.
+argument-hint: "número da spec, opcional; sem ele, o do branch atual. --parallel N, opcional: até N tickets ao mesmo tempo, com isolação"
 disable-model-invocation: true
 ---
 
@@ -12,8 +12,8 @@ ticket. Você é o supervisor. Quem implementa é o agente `anvil-implementer`, 
 ticket, cada um num contexto novo. Você não edita arquivo, não commita e não mexe
 em ticket. O estado é o disco, e não esta conversa nem o que o implementer disse.
 
-O argumento, se veio, é o número da spec. Não pergunte nada ao operador durante a
-execução.
+Os argumentos, se vieram, são o número da spec e o pedido de paralelo,
+`--parallel N`. Não pergunte nada ao operador durante a execução.
 
 ## Isolação
 
@@ -35,6 +35,23 @@ primeira rodada do script, e o modo vale para a execução inteira:
 
 O laço é o mesmo nos três.
 
+## Paralelo
+
+Sem `--parallel N`, a execução é em série: cada despacho leva um ticket.
+
+Com `--parallel N`, N de 2 em diante, e `isolation: on`, cada despacho é uma leva
+de até N tickets do frontier numa chamada só do `task`, como o passo 4 do laço
+diz. Cada implementer trabalha na cópia isolada dele e faz o próprio review, como
+em série.
+
+Nos outros casos, recuse o paralelo na primeira linha de andamento, com o motivo,
+e siga em série:
+
+- `isolation: off`: sem isolação, dois implementers dividiriam a árvore da spec;
+- `isolation: misconfigured`: fora do modo branch, o omp integra sem commit, e a
+  leva misturaria o trabalho de vários tickets fora de commit;
+- N menor que 2, ou que não é um número.
+
 ## Ler o estado
 
 O script é o `.omp/skills/anvil-run/frontier.sh`. No diretório em que a sessão
@@ -53,44 +70,48 @@ script com outro número: a recusa é a resposta, e o branch é escolha do opera
 
 Fora a recusa, o script devolve a linha `isolation`, lida acima, a linha `screen`,
 `yes` ou `no` com o motivo, e, sem `ui/` e com tudo resolvido, uma linha `story`
-por user story da `spec.md`. Depois
-vêm uma linha por ticket, com `status`, `reviews`, `last`, `blocked_by` e `class`, e
-`frontier`, `skipped`, `locked`, uma linha `open_p1` por P1 de travado,
-`depend_on_locked`, `all_resolved`, às
-vezes `halt`, e `next`. O frontier já exclui o ticket travado, cuja última
-`Review:` tem `round` 2 ou mais e `verdict=fail`, e o de bloqueio ilegível,
-`class=unreadable_blockers`, cujo `Blocked by` não é uma lista de números: nele,
-`blocked_by` traz entre aspas o texto da linha como está no arquivo. Com a árvore
-suja, o script devolve `halt` e `next: none` quando há ticket a despachar, porque um
-implementer novo commitaria o que sobrou junto com o ticket dele, e também quando
-tudo está resolvido, porque o próximo passo da spec partiria do que está fora de
-commit.
+por user story da `spec.md`. Depois vêm uma linha por ticket, com `status`,
+`reviews`, `last`, `blocked_by` e `class`, e `frontier`, `ready`, com quantos
+tickets estão no frontier, `frontier_files`, com os caminhos deles na mesma ordem,
+`skipped`, `locked`, uma linha `open_p1` por P1 de travado, `depend_on_locked`,
+`all_resolved`, às vezes `halt`, e `next`. O frontier já exclui o ticket travado,
+cuja última `Review:` tem `round` 2 ou mais e `verdict=fail`, e o de bloqueio
+ilegível, `class=unreadable_blockers`, cujo `Blocked by` não é uma lista de
+números: nele, `blocked_by` traz entre aspas o texto da linha como está no
+arquivo. Com a árvore suja, o script devolve `halt` e `next: none` quando há
+ticket a despachar, porque um implementer novo commitaria o que sobrou junto com o
+ticket dele, e também quando tudo está resolvido, porque o próximo passo da spec
+partiria do que está fora de commit.
 
 ## O laço
 
 1. Rode o script.
 2. Se `next` é `none`, vá para o fim. É a única condição de parada do laço, e
    quem a decide é o script.
-3. Mostre ao operador uma linha de andamento: o ticket que vai sair e quantos já
-   estão resolvidos.
-4. Despache o `next` com o `task`, numa chamada com um item só: `agent` é
-   `anvil-implementer` e o `task` é o caminho do ticket. Com `isolation: on` ou
-   `misconfigured`, o item leva também `isolated: true`, em todo despacho. No
-   `context`, diga a pasta da spec e o branch. O implementer é bloqueante, e a
-   chamada só volta quando ele termina. Não espere pelo `hub`, não chame outra
-   ferramenta na mesma mensagem e nunca despache dois tickets ao mesmo tempo.
-   O que o implementer devolve não muda o laço, nem quando ele diz que falhou ou
-   que faltou ferramenta. Não leia o ticket, não investigue e não termine o trabalho
+3. Anote o valor da linha `ready` desta rodada, para o relatório. Mostre ao
+   operador uma linha de andamento: os tickets que vão sair e quantos já estão
+   resolvidos.
+4. Despache com o `task`, numa chamada só. Em série, ela tem um item, o `next`.
+   Numa leva, um item por caminho da linha `frontier_files`, na ordem dela, até N
+   itens; o primeiro é o `next`. Em cada item, `agent` é `anvil-implementer` e o
+   `task` é o caminho do ticket. Com `isolation: on` ou `misconfigured`, todo item
+   leva também `isolated: true`. No `context`, diga a pasta da spec e o branch. O
+   implementer é bloqueante, e a chamada só volta quando todos os itens terminam.
+   Não espere pelo `hub`, não chame outra ferramenta na mesma mensagem e nunca
+   faça duas chamadas do `task` ao mesmo tempo. Sem isolação, nunca despache dois
+   tickets ao mesmo tempo. O que o implementer devolve não muda o laço, nem quando
+   ele diz que falhou, que faltou ferramenta, ou quando o omp diz que não integrou
+   o trabalho dele. Não leia o ticket, não investigue e não termine o trabalho
    dele: quem decide o que vem depois é o disco, no passo 5.
-5. Rode o script de novo e compare a linha do ticket despachado com a de antes.
-   Se `status`, `reviews` e `last` estão iguais, o implementer terminou sem
-   mudar o estado. Anote o ticket como pulado, na memória desta execução, e rode o
-   script mais uma vez, já com ele no `--skip`. Daqui em diante, toda chamada leva
-   o `--skip` com todos os pulados. Nunca despache um pulado de novo nesta
-   execução, nem quando o implementer caiu, abortou ou devolveu erro: quem tenta de
-   novo é a próxima execução.
-6. Mostre a linha de andamento do ticket, com o `status` e a `last` lidos do
-   disco. Volte ao passo 2 com a última saída do script.
+5. Rode o script de novo e compare a linha de cada ticket despachado com a de
+   antes. Se `status`, `reviews` e `last` estão iguais, o implementer terminou sem
+   mudar o estado. Anote o ticket como pulado, na memória desta execução, e, com
+   algum pulado novo, rode o script mais uma vez, já com ele no `--skip`. Daqui em
+   diante, toda chamada leva o `--skip` com todos os pulados. Nunca despache um
+   pulado de novo nesta execução, nem quando o implementer caiu, abortou ou
+   devolveu erro: quem tenta de novo é a próxima execução.
+6. Mostre a linha de andamento de cada ticket despachado, com o `status` e a
+   `last` lidos do disco. Volte ao passo 2 com a última saída do script.
 
 ## O fim
 
@@ -104,6 +125,10 @@ Com `halt`, a primeira linha do relatório é o texto da linha `halt`, depois de
 sair. Depois, mostre o `git status --short`. A saída é do operador: você não
 roda `git stash`, não commita e não limpa a árvore, porque o que sobrou pode ser
 do operador ou de um implementer que caiu. Depois, siga com o resto do relatório.
+
+Todo relatório, com `halt` ou sem, traz a medição: os valores de `ready` que você
+anotou no passo 3, um por rodada, na ordem, como `ready por rodada: 3, 2, 1`. Sem
+nenhum despacho, `ready por rodada: nenhuma`.
 
 Com `all_resolved: yes` e `halt`, o relatório lista os tickets resolvidos nesta
 execução e, no lugar do próximo passo, diz o que a linha `halt` diz: a execução
@@ -148,7 +173,7 @@ Com pendência, o relatório lista:
   `git commit`, `git checkout`, `git restore`, `git reset` ou `git clean`.
 - Trocar de branch, criar branch ou rodar o script em outro repositório.
 - Recomendar o próximo passo da spec com `halt`.
-- Chamar o `task` para outra coisa que não despachar o `next` a um
+- Chamar o `task` para outra coisa que não despachar o `next`, ou a leva, a
   `anvil-implementer`.
 
 ## Retomada
@@ -161,3 +186,9 @@ Sem isolação, um implementer que caiu deixa a árvore suja, e o script para co
 `halt` até o operador decidir. Com isolação, o que ele deixou não chega ao branch da
 spec: o ticket fica com o estado de antes, sai como pulado nesta execução, e a
 seguinte o despacha de novo.
+
+Numa leva, o omp integra o trabalho de cada implementer quando ele termina. Se o
+cherry-pick conflita, o omp o desfaz, a árvore fica como estava, e o trabalho fica
+no branch `omp/task/<id>`: o ticket não muda de estado, sai como pulado nesta
+execução, e a seguinte o despacha de novo. Se a árvore ficar suja, o script para
+com `halt`.
