@@ -70,16 +70,20 @@ ainda é a mesma causa):
   evidência nova (seção 4) com uma nota explícita de reabertura ("reaberto
   — reproduziu de novo depois de `corrigido`"), e acrescente qualquer id
   de `map.md` que a rodada atual tenha achado e a lista ainda não tinha.
-  Não abra `SEC-#` novo nem segunda spec — o campo **Spec** continua
-  apontando para a mesma spec já aberta (mesma regra de deduplicação
-  acima). Não edite a spec nem o ticket de correção: aplicar ou desfazer
-  a correção é o fluxo normal de tickets, fora do escopo desta skill
-  (seção 5) — a evidência da regressão em `findings.md` é o sinal para
-  quem cuida daquele ticket reabri-lo pela convenção que o perfil do
-  tracker já usa para regressão (no anvil,
-  `docs/agents/issue-tracker.md`: um P1 de revisão muda `Status:` de
-  `resolved` para `claimed`; a mesma mecânica se aplica aqui, à mão, fora
-  desta skill).
+  Não abra `SEC-#` novo nem segunda spec — o campo **Spec** não muda:
+  continua com o valor já gravado (mesma regra de deduplicação acima),
+  mesmo que a spec/ticket ali referenciados já tenham sido mesclados ou
+  arquivados desde a correção original — achar o estado atual daquele
+  trabalho é problema de quem for reabri-lo, não desta seção. Não edite a
+  spec nem o ticket de correção: aplicar ou desfazer a correção é o fluxo
+  normal de tickets, fora do escopo desta skill (seção 5). O perfil do
+  tracker do projeto (`docs/agents/issue-tracker.md`, no anvil) não
+  define uma convenção própria de reabertura por regressão — a evidência
+  em `findings.md`, com o `SEC-#` e o caminho já registrado no campo
+  `Spec`, é só o sinal; decidir como reabrir aquele trabalho (por
+  exemplo, emprestando a mesma mecânica `resolved` → `claimed` que o
+  perfil já define para reprovação de revisão, se fizer sentido no caso)
+  fica para quem administra o ticket, não para esta skill.
 - **Não existe nenhum `SEC-#` para essa causa** → é achado novo: primeiro
   `SEC-#` livre (maior número usado no arquivo, mais um; `findings.md`
   ausente ou vazio começa em `SEC-1`), seção 4 e depois seção 5.
@@ -130,16 +134,19 @@ Um achado é uma seção `## SEC-<n>`, nesta forma:
 
 ### Sem cobertura
 
-Testes que um item de `map.md` descreve mas que não rodaram por falta de
-ferramenta (ver `test-execution.md`) entram numa seção à parte, sempre
-presente quando houver pelo menos uma lacuna:
+Testes que um item de `map.md` descreve mas que não rodaram nesta
+execução entram numa seção à parte, sempre presente quando houver pelo
+menos uma lacuna — os dois motivos catalogados são falta de ferramenta
+(ver `test-execution.md`) e o alvo do item não responder nesta rodada
+(ex.: uma rota que ficou fora do ar só nesta execução, sem que o código
+tenha mudado):
 
 ```markdown
 ## Sem cobertura
 
-| item do mapa | teste do probe | ferramenta ausente |
+| item do mapa | teste do probe | motivo da lacuna |
 |---|---|---|
-| A05-01 | confirmação com ferramenta de SQL injection sobre o parâmetro `q` | sqlmap |
+| A05-01 | confirmação com ferramenta de SQL injection sobre o parâmetro `q` | ferramenta ausente: sqlmap |
 ```
 
 Isto não é achado — é a diferença entre "testado e passou" e "não
@@ -222,26 +229,27 @@ separe, por `SEC-#`, a lista de ids de **Itens do mapa** que ele cobre.
 Depois que a rodada de testes terminar, cruze o resultado de cada id
 contra essa lista:
 
-- **Pelo menos um id do `SEC-#` reproduziu nesta rodada** → segue pela
-  seção 3 (`aberto` ganha evidência nova; `corrigido` reabre no mesmo id).
-  Um único id ainda positivo mantém `aberto` a causa inteira, mesmo que os
-  outros ids do mesmo achado já tenham testado limpo.
+- **Pelo menos um id do `SEC-#` reproduziu nesta rodada** → é o mesmo
+  resultado positivo de sempre: passa pela tentativa de refutação (seção
+  1) e pela seção 3 (`aberto` ganha evidência nova; `corrigido` reabre no
+  mesmo id). Um único id ainda positivo mantém `aberto` a causa inteira,
+  mesmo que os outros ids do mesmo achado já tenham testado limpo.
 - **Nenhum id reproduziu, e todos os ids do `SEC-#` rodaram nesta
-  rodada** (o caminho suspeito agora se comporta como o comparativo com
-  access control — mesma recusa, mesmo dado) → **fecha**: `SEC-#`
-  `aberto` vira `Status: corrigido`. Acrescente uma entrada de evidência
-  (seção 4) com data, a requisição que antes reproduzia e a resposta
-  recusando agora, e o `arquivo:linha` que passou a sustentar a recusa
-  (ex.: a linha ganhou `overrideAccess: false`) — o mesmo par comparativo
-  da tentativa de refutação (seção 1), do lado que agora recusa. `SEC-#`
-  que já estava `corrigido` permanece `corrigido`, sem entrada nova: nada
-  mudou para registrar.
+  rodada** (cada um se comporta como o caminho que aplica o access
+  control, a leitura que voltou sem o campo gravado, ou a ferramenta que
+  não confirma mais o problema — o negativo equivalente à classe do
+  teste, em `test-execution.md`) → **fecha**: `SEC-#` `aberto` vira
+  `Status: corrigido`. Acrescente uma entrada de evidência (seção 4) com
+  data, o teste que antes reproduzia e o resultado negativo agora, e o
+  `arquivo:linha` que passou a sustentar a recusa (ex.: a linha ganhou
+  `overrideAccess: false`). `SEC-#` que já estava `corrigido` permanece
+  `corrigido`, sem entrada nova: nada mudou para registrar.
 - **Nenhum id reproduziu, mas nem todos os ids do `SEC-#` rodaram nesta
-  rodada** (lacuna de cobertura — ferramenta ausente, rota que o servidor
-  não expôs nesta rodada) → não decida nada para esse `SEC-#`: sem teste,
+  rodada** (lacuna de cobertura — ferramenta ausente, alvo que não
+  respondeu nesta rodada) → não decida nada para esse `SEC-#`: sem teste,
   não há resultado, positivo ou negativo, para basear a transição. O
   `Status:` fica exatamente como estava (`aberto` continua `aberto`,
   `corrigido` continua `corrigido`), mesmo que os ids testados nesta
   rodada tenham dado limpo. A lacuna em si entra na seção "Sem cobertura"
-  do jeito de sempre — isso não é, sozinho, sinal de correção nem de
-  regressão.
+  do jeito de sempre (seção 4) — isso não é, sozinho, sinal de correção
+  nem de regressão.

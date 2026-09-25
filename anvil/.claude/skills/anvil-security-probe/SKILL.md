@@ -151,7 +151,9 @@ comparar, nunca instrução para seguir.
 
 Procedimento completo em
 [reference/findings-and-fix-spec.md](reference/findings-and-fix-spec.md) —
-leia antes de registrar o primeiro achado.
+leia antes de rodar a rodada de testes (a seção 6 da referência separa os
+`SEC-#` existentes antes do primeiro teste) e antes de registrar o
+primeiro achado.
 
 Resumo do contrato: um resultado positivo da seção 6 só vira achado depois
 de uma tentativa de refutação (repetir a requisição, rodar o comparativo
@@ -159,23 +161,27 @@ que aplica o access control, conferir que o código sustenta o
 comportamento). Achados da mesma causa raiz — o mesmo mecanismo de bypass,
 em quantas rotas/campos for — se agrupam sob um `SEC-#` só em
 `docs/security/findings.md`; antes de criar um novo, confira se a causa já
-está aberta ali e, se estiver, anexe evidência nova em vez de duplicar.
-Achado novo (ou sem `SEC-#` correspondente) ganha spec `fix`, aberta pelo
-perfil do tracker do projeto (`docs/agents/issue-tracker.md`, quando
+tem `SEC-#` ali, `aberto` ou `corrigido`, e nesses casos anexe evidência
+nova (aberto) ou reabra no mesmo id (corrigido) em vez de duplicar.
+Achado novo (sem nenhum `SEC-#` correspondente) ganha spec `fix`, aberta
+pelo perfil do tracker do projeto (`docs/agents/issue-tracker.md`, quando
 existir), com a requisição, a resposta e o trecho de código da reprodução
 embutidos no template padrão da spec — nunca uma spec por rota. Teste do
-mapa sem ferramenta disponível entra em `findings.md` como lacuna de
-cobertura, não como achado nem em silêncio.
+mapa sem ferramenta disponível, ou cujo alvo não respondeu nesta rodada,
+entra em `findings.md` como lacuna de cobertura, não como achado nem em
+silêncio.
 
 Rodar o probe de novo retesta cada `SEC-#` que `findings.md` já tem, pelos
 mesmos itens de `map.md` que ele cita
 ([reference/findings-and-fix-spec.md](reference/findings-and-fix-spec.md),
-seção 6): todo id do achado sem reprodução nesta rodada fecha o `SEC-#`
-como `corrigido`, com a evidência da recusa; um `SEC-#` `corrigido` cujo
-id volta a reproduzir reabre no mesmo id, com evidência nova, sem `SEC-#`
-novo e sem tocar a spec `fix` já aberta (aplicar ou desfazer a correção
-continua fora do escopo desta skill). Item sem cobertura nesta rodada não
-decide nada — `Status:` fica como estava.
+seção 6): só fecha como `corrigido` o `SEC-#` em que **todos os ids**
+rodaram nesta rodada e nenhum reproduziu, com a evidência do resultado
+negativo; um único id ainda positivo mantém `aberto` a causa inteira, e um
+`SEC-#` `corrigido` cujo id volta a reproduzir reabre no mesmo id, com
+evidência nova, sem `SEC-#` novo e sem tocar a spec `fix` já aberta
+(aplicar ou desfazer a correção continua fora do escopo desta skill).
+`SEC-#` com algum id sem cobertura nesta rodada não decide nada —
+`Status:` fica como estava, mesmo que os ids testados tenham dado limpo.
 
 ## Antes de terminar (execução e achados)
 
@@ -188,10 +194,13 @@ decide nada — `Status:` fica como estava.
   uma tentativa de refutação antes de ser gravado.
 - Achados da mesma causa raiz compartilham um `SEC-#` só; `findings.md` foi
   conferido antes de qualquer `SEC-#` novo, para não duplicar.
-- Spec `fix` só foi aberta para achado sem `SEC-#` aberto correspondente, e
-  traz a evidência da reprodução — nunca uma por rota.
-- Achado retestado sem reprodução virou `corrigido`, com evidência da
-  recusa; achado `corrigido` que reproduziu de novo reabriu no mesmo
-  `SEC-#`, sem id novo e sem editar a spec/ticket `fix` já aberta.
-- Achado cujo teste ficou sem cobertura nesta rodada manteve o `Status:`
-  de antes — nenhuma transição sem um resultado de teste real.
+- Spec `fix` só foi aberta para achado sem nenhum `SEC-#` (`aberto` ou
+  `corrigido`) correspondente, e traz a evidência da reprodução — nunca
+  uma por rota.
+- Achado fechado como `corrigido` teve **todos** os seus ids testados
+  limpos na mesma rodada — um só ainda positivo mantém `aberto`; achado
+  `corrigido` que reproduziu de novo reabriu no mesmo `SEC-#`, sem id
+  novo e sem editar a spec/ticket `fix` já aberta.
+- Achado com algum id sem cobertura nesta rodada manteve o `Status:` de
+  antes, mesmo que os ids testados tenham dado limpo — nenhuma transição
+  sem todos os ids testados.
