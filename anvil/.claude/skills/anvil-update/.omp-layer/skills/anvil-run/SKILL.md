@@ -88,7 +88,8 @@ partiria do que está fora de commit.
 1. Rode o script.
 2. Se `next` é `none`, vá para o fim. É a única condição de parada do laço, e
    quem a decide é o script.
-3. Anote o valor da linha `ready` desta rodada, para o relatório. Mostre ao
+3. Anote o valor da linha `ready` desta rodada, para o relatório: só a leitura que
+   vem antes de um despacho conta, e a releitura do passo 5 não. Mostre ao
    operador uma linha de andamento: os tickets que vão sair e quantos já estão
    resolvidos.
 4. Despache com o `task`, numa chamada só. Em série, ela tem um item, o `next`.
@@ -98,11 +99,12 @@ partiria do que está fora de commit.
    leva também `isolated: true`. No `context`, diga a pasta da spec e o branch. O
    implementer é bloqueante, e a chamada só volta quando todos os itens terminam.
    Não espere pelo `hub`, não chame outra ferramenta na mesma mensagem e nunca
-   faça duas chamadas do `task` ao mesmo tempo. Sem isolação, nunca despache dois
-   tickets ao mesmo tempo. O que o implementer devolve não muda o laço, nem quando
-   ele diz que falhou, que faltou ferramenta, ou quando o omp diz que não integrou
-   o trabalho dele. Não leia o ticket, não investigue e não termine o trabalho
-   dele: quem decide o que vem depois é o disco, no passo 5.
+   faça duas chamadas do `task` ao mesmo tempo. Fora de `isolation: on`, nunca
+   despache dois tickets ao mesmo tempo, como a seção Paralelo diz. O que o
+   implementer devolve não muda o laço, nem quando ele diz que falhou, que faltou
+   ferramenta, ou quando o omp diz que não integrou o trabalho dele. Não leia o
+   ticket, não investigue e não termine o trabalho dele: quem decide o que vem
+   depois é o disco, no passo 5.
 5. Rode o script de novo e compare a linha de cada ticket despachado com a de
    antes. Se `status`, `reviews` e `last` estão iguais, o implementer terminou sem
    mudar o estado. Anote o ticket como pulado, na memória desta execução, e, com
@@ -151,7 +153,8 @@ porque no omp skill se chama por `/skill:`. A linha `screen` decide:
 Nunca troque um `screen: yes` por archive: a falta de `ui/` não conta contra, porque
 a pasta só existe quando alguém a escreveu.
 
-Com pendência, o relatório lista:
+Com pendência, o relatório não recomenda próximo passo, nem archive nem browser
+QA: a spec ainda não terminou. Ele lista:
 
 - os resolvidos nesta execução;
 - os travados, cada um com o texto das linhas `open_p1` dele, por extenso. A
@@ -163,8 +166,8 @@ Com pendência, o relatório lista:
 - os pulados, que terminaram sem mudar o estado, e o motivo que o implementer deu.
   Rodar a skill de novo tenta de novo. O pulado cujo trabalho o omp não integrou,
   com "Branch merge failed" no resultado do `task`, leva também o nome do branch
-  `omp/task/<id>` e o aviso de que os commits dele anteriores ao conflito já estão
-  no branch da spec;
+  `omp/task/<id>` e, se houver, o aviso de que os commits dele anteriores ao
+  conflito já estão no branch da spec;
 - os que ainda esperam por outro ticket, com a lista da `class` deles.
 
 ## Nunca
@@ -192,7 +195,7 @@ seguinte o despacha de novo.
 
 Numa leva, o omp integra cada implementer quando ele termina, com o cherry-pick dos
 commits dele, um por vez. Se um commit conflita, o omp desfaz só esse e para ali:
-os commits anteriores do ticket já estão no branch da spec, e o trabalho inteiro
-fica no branch `omp/task/<id>`. O ticket não muda de estado e sai como pulado, e a
-execução seguinte o despacha sobre o que já entrou. Se a árvore ficar suja, o
-script para com `halt`.
+os commits anteriores do ticket, se houver, já estão no branch da spec, e o
+trabalho inteiro fica no branch `omp/task/<id>`. O ticket não muda de estado e sai
+como pulado, e a execução seguinte o despacha sobre o que já entrou. Se a árvore
+ficar suja, o script para com `halt`.

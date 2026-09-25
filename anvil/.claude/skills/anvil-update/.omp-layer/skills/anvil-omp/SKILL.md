@@ -91,19 +91,19 @@ da spec, e o `anvil-run` para com `halt` antes do próximo despacho, até você
 decidir: `git stash -u` guarda a sobra, um commit seu a mantém, e rodar a skill de
 novo retoma. Com ela, a sobra de um implementer que cai ou desiste não chega ao
 branch da spec. O omp a deixa no branch `omp/task/<id>` dele, o ticket fica como
-estava, e a execução seguinte o despacha de novo. Os branches `omp/task/*` ficam no
-repositório depois da integração; apague-os com `git branch -D` quando não
-precisar mais deles.
+estava, e a execução seguinte o despacha de novo. Os branches `omp/task/*` podem
+ficar no repositório depois da integração, e o de um trabalho não integrado fica
+sempre; apague-os com `git branch -D` quando não precisar mais deles.
 
 O paralelo depende da isolação: só com ela dois implementers rodam ao mesmo tempo
 sem dividir a mesma árvore. Com `--parallel N` e a linha `isolation: on`, o
 `anvil-run` despacha até N tickets do frontier numa chamada do `task`, e o omp
 integra o trabalho de cada um quando ele termina, com o cherry-pick dos commits
 dele, um por vez. Se um commit conflita, o omp desfaz só esse e para ali: os
-commits anteriores daquele ticket ficam no branch da spec, e o trabalho inteiro
-fica no `omp/task/<id>`. O ticket volta sem mudar de estado e sai como pulado, o
-relatório nomeia o branch, e a execução seguinte o despacha sobre o que já entrou.
-Antes dela, você pode desfazer esses commits ou deixá-los. Sem
+commits anteriores daquele ticket, se houver, ficam no branch da spec, e o
+trabalho inteiro fica no `omp/task/<id>`. O ticket volta sem mudar de estado e sai
+como pulado, o relatório nomeia o branch, e a execução seguinte o despacha sobre o
+que já entrou. Antes dela, você pode desfazer esses commits ou deixá-los. Sem
 isolação, ou fora do modo branch, o `anvil-run` recusa o paralelo e segue em
 série. O relatório traz quantos tickets estavam prontos a cada rodada, na linha
 `ready por rodada`, para você medir se o paralelo compensa.

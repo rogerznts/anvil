@@ -66,10 +66,11 @@ série.
 **O conflito não tem tratamento próprio.** Depois da leva, o script roda de novo,
 e cada ticket passa pela comparação de antes e depois da 003. O ticket cujo
 cherry-pick conflitou não muda de estado e sai como pulado nesta execução. O
-relatório nomeia o branch `omp/task/<id>` dele e avisa que os commits anteriores
-ao conflito já estão no branch da spec. A execução seguinte o despacha de novo,
-sobre o branch da spec, que já tem o trabalho do ticket que entrou e esses
-commits. Se a árvore ficar suja, a parada de sempre, o `halt`, pega.
+relatório nomeia o branch `omp/task/<id>` dele e, se houver, avisa que os commits
+anteriores ao conflito já estão no branch da spec; quando o primeiro commit é o
+que conflita, nada entra, como na primeira sonda. A execução seguinte o despacha
+de novo, sobre o branch da spec, que já tem o trabalho do ticket que entrou e
+esses commits. Se a árvore ficar suja, a parada de sempre, o `halt`, pega.
 
 **O relatório mede.** O `frontier.sh` emite `ready:`, com quantos tickets estão no
 frontier, e a `anvil-run` põe no relatório o `ready` de cada rodada, para o
@@ -100,9 +101,9 @@ diz quanto paralelo havia para aproveitar.
 **Contra.** Tickets que se cruzam nos arquivos conflitam, e o segundo espera a
 próxima execução: numa spec de *tracer bullets* encadeados, o paralelo rende pouco,
 e o `ready` mostra isso. Do ticket que conflitou, os commits anteriores ao
-conflito ficam no branch da spec sem o ticket resolvido, e o implementer seguinte
-parte deles; reaplicar o `omp/task/<id>` à mão os duplicaria. O branch fica no
-repositório com o trabalho inteiro, e os commits da leva entram no branch da spec
-na ordem em que os implementers terminam. O `sha` que o implementer grava na linha
-`Review:` é o do workspace isolado, e o cherry-pick pode trocá-lo, como o ticket 08
-registrou.
+conflito, se houver, ficam no branch da spec sem o ticket resolvido, e o
+implementer seguinte parte deles; reaplicar o `omp/task/<id>` à mão os
+duplicaria. O branch fica no repositório com o trabalho inteiro, e os commits da
+leva entram no branch da spec na ordem em que os implementers terminam. O `sha`
+que o implementer grava na linha `Review:` é o do workspace isolado, e o
+cherry-pick pode trocá-lo, como o ticket 08 registrou.
