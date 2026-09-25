@@ -221,7 +221,9 @@ fi
 # segue o locale, e em LC_ALL=C nao iguala "PÁGINA" a "página" e ve "painel" em
 # "painelão". LC_ALL=C no perl so evita o aviso de locale ausente.
 stories="$(sed -n '/^## User Stories/,/^## [^#]/p' "$dir/spec.md" 2>/dev/null | grep -E '^[0-9]+\. ')"
-SCREEN_WORDS='telas?|páginas?|paginas?|painel|painéis|formulários?|formularios?|interface|navegador|browser|botão|botões|botao|botoes|dashboard|screens?|pages?|ui|frontend|layout'
+# "interface" so conta com o que diz que ela abre na tela: "interface executável" ou
+# "de linha de comando" nao e tela (falso positivo no ponta a ponta da spec 004).
+SCREEN_WORDS='telas?|páginas?|paginas?|painel|painéis|formulários?|formularios?|interfaces? (?:web|gráficas?|graficas?|visual|visuais)|navegador|browser|botão|botões|botao|botoes|dashboard|screens?|pages?|ui|frontend|layout'
 screen_story="$(printf '%s\n' "$stories" | LC_ALL=C perl -CSDA -ne '
     BEGIN { $words = shift } if (/\b(?:$words)\b/i) { print /^(\d+)\./; exit }' "$SCREEN_WORDS")"
 if [ -d "$dir/ui" ]; then

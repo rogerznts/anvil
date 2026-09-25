@@ -17,12 +17,6 @@ a A11 da spec 003. Fica a parte do antigo A9 que a spec deixou de fora.
   antes disso decidir como spec e ticket aparecem em cada um, o que é decisão de
   grill. Não há projeto usando outro perfil com omp. Enquanto ninguém mexer, quem
   usa outro perfil no omp não tem condução.
-- **A13 · "interface" dá falso positivo de tela.** Ticket 11 da spec 004, ponta a
-  ponta. A lista de palavras de tela do `frontier.sh` tem `interface`, e a US 8 da
-  spec do ponta a ponta ("manter a regra separada da interface executável") saiu
-  `screen: yes`: a `anvil-run` recomendou o browser QA para um comando de terminal.
-  A spec 004 fixou que a lista não muda. Enquanto ninguém mexer, spec sem tela que
-  diga "interface" recebe o browser QA no lugar do archive.
 - **A14 · a `anvil-to-tickets` escreve o título no `Blocked by`.** Ticket 11 da
   spec 004, ponta a ponta. O ticket 02 saiu com
   `Blocked by: 01: Contar severidades de 0 a 3 em arquivo válido`, o formato que o
