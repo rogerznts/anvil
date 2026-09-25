@@ -8,6 +8,7 @@
 **Review:** round=1; sha=d2eeede; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=4b948e2; scope=diff:d2eeede..4b948e2; verdict=pass; p1=none
 **Review:** round=3; sha=260ed19; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] A `anvil-run` aceita um argumento de paralelo com N de 2 em diante.
 - [x] Com isolação, cada leva é uma chamada do `task` com até N itens, um por ticket do frontier, na ordem do script; o script roda de novo depois da leva, e cada ticket passa pela comparação de antes e depois da 003.

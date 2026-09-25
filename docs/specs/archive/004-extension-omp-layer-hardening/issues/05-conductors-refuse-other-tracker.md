@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=3e49a81; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] O `frontier.sh` lê o título de `docs/agents/issue-tracker.md` antes de resolver a spec: outro perfil dá `refusal` com o nome do perfil achado e a frase do fluxo à mão; arquivo ausente dá `refusal` sugerindo o `/anvil-setup`.
 - [x] O `stage.sh` faz a mesma leitura antes de tudo e sai com `next: refused`, o motivo em `reason` e um `do` que manda dizer o motivo e parar sem carregar nada.

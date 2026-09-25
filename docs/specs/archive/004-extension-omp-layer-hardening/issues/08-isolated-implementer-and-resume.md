@@ -7,6 +7,7 @@
 **Status:** resolved
 **Review:** round=1; sha=4e004f3; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=d5c375c; scope=diff:4e004f3..d5c375c; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] O modo sai da configuração do omp, lida pelo `frontier.sh` com `omp config get task.isolation.enabled` e `task.isolation.merge` na linha `isolation`: com `on` (`true` e `branch`), todo despacho sai com `isolated: true`; com `off`, o laço é o da 003; com `misconfigured` (`true` e outro merge), a `anvil-run` diz isso antes de despachar, apontando `task.isolation.merge: branch`, e a parada por árvore suja continua como rede de segurança.
 - [x] O relatório abre dizendo se a execução rodou com ou sem isolação.

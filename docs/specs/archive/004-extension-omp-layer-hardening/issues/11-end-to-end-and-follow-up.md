@@ -8,6 +8,7 @@
 **Review:** round=1; sha=6705312; scope=full; verdict=pass; p1=none
 **Review:** round=2; sha=3031b55; scope=diff:6705312..3031b55; verdict=pass; p1=none
 **Review:** round=3; sha=260ed19; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] O ponta a ponta da 003 (`workspace/35-omp-e2e/`) roda do degit ao relatório da `anvil-run` com o payload deste branch, e o `check.sh` passa, ajustado só para as chaves novas.
 - [x] As linhas A1 a A11 saem de `docs/project/acompanhamento.md`, e fica uma linha para o adaptador de tracker, com origem nesta spec.

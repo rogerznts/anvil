@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=adce159; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] Conta toda linha da última rodada que começa por `Review round=N ·` e tem `P1` em posição de classe, seguido de espaço e parêntese ou de dois-pontos, em qualquer ponto depois do ponto médio.
 - [x] "Review round=2 · P2 (Standards): prova fraca do P1 anterior" não conta.

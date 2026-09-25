@@ -7,6 +7,7 @@
 **Status:** resolved
 **Review:** round=1; sha=93839fa; scope=full; verdict=pass; p1=none
 **Review:** round=3; sha=260ed19; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] Oito cenários, cada um com um roteiro de operador cuja fala carrega o sinal do desvio: `anvil-research`, `anvil-prototype`, `anvil-to-questionnaire`, `anvil-wayfinder`, `anvil-ui` e `anvil-architect` saindo do grill, um desvio saindo do to-spec e um saindo do to-tickets.
 - [x] Três rodadas por cenário, com o modelo padrão do ponta a ponta da 003; as sessões ficam guardadas.

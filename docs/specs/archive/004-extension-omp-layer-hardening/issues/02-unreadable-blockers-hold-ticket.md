@@ -7,6 +7,7 @@
 **Status:** resolved
 **Review:** round=1; sha=f9ca28b; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=6dd8298; scope=diff:f9ca28b..6dd8298; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] Referências `ADR-NNNN` saem antes da leitura: "03, ver ADR-0011" bloqueia só pelo 03.
 - [x] `01, 02` e `01,02` bloqueiam pelos dois, como hoje.

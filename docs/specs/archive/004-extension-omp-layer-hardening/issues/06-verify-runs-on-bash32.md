@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=eaed598; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] A causa da queda está isolada e escrita no `## Comments`, com o menor caso que a reproduz.
 - [x] A correção é mínima e não muda o resultado de nenhum check.

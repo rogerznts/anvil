@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=dc84d02; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] O check 15 extrai dos blocos cercados dos arquivos da camada os caminhos que casam com o padrão de caminho da camada e confere cada um contra o payload, com a mesma mensagem de falha da prosa.
 - [x] A conferência da prosa continua igual.

@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=0e6eb02; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] A comparação da lista de palavras de tela é feita com `perl` em modo Unicode, sem distinguir maiúsculas e só com palavra inteira; a lista não muda.
 - [x] "PÁGINA", "BOTÃO" e "PAINÉIS" numa user story dão `screen: yes` em `LC_ALL=C` e em UTF-8, nos dois bash.

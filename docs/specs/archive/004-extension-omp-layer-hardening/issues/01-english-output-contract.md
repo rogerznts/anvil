@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=c2111a5; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/5
 
 - [x] O `frontier.sh` emite `refusal`, `tree`, `screen`, `story`, a linha `ticket` com `status`, `reviews`, `last`, `blocked_by` e `class`, `skipped`, `locked`, `open_p1`, `depend_on_locked`, `all_resolved`, `halt` e `next`, e as classes `resolved`, `locked`, `waiting:NN`, `skipped` e `frontier`. Nenhuma chave antiga continua.
 - [x] Os motivos depois das chaves seguem em pt-BR.
