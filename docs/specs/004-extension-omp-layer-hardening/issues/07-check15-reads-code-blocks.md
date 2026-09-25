@@ -5,6 +5,7 @@
 **Blocked by:** Nenhum — pode começar agora.
 
 **Status:** resolved
+**Review:** round=1; sha=dc84d02; scope=full; verdict=pass; p1=none
 
 - [x] O check 15 extrai dos blocos cercados dos arquivos da camada os caminhos que casam com o padrão de caminho da camada e confere cada um contra o payload, com a mesma mensagem de falha da prosa.
 - [x] A conferência da prosa continua igual.
@@ -20,3 +21,9 @@
 - Prosa igual, medido em `/tmp/anvil-004-07/equiv.sh`: o script de `e23158a` rodou em cada caso do S3 e a saída foi comparada com a do script novo. Os 13 casos que já existiam, incluindo o `real` e os três do check 15 pela prosa e pelo `.ts` (`15-md`, `15-ts`, `15-agente`), batem byte a byte, com o rc. Só o `15-bloco` difere, pela linha FALHA nova e pelo `verify: 1 falha(s)`.
 - `verify` neste repositório: `/opt/local/bin/bash` e `/bin/bash` saem com rc 0 e `verify: limpo`, e o `diff` das duas saídas é vazio.
 - `frontier.sh`, `stage.sh` e as skills da camada não mudaram, e por isso o fixture golden e os S2 não rodaram.
+- Review round=1 · P3 (Spec): o tokenizador do bloco não parte a linha em `>`, `<` nem `=`, e a palavra com prefixo não casa inteira com a regex: `cat >.omp/x/typo.sh`, `--file=.omp/x/typo.sh` e `./.omp/x/typo.sh` ficam de fora; um comando futuro escrito numa dessas formas escapa da conferência sem aviso. Hoje nenhum bloco da camada tem essa forma.
+- Review round=1 · P3 (Spec): pontuação no fim da palavra do bloco (`.omp/x.sh,`) entra no caminho e reprova; é falso positivo ruidoso, não silencioso, e não afeta o payload atual.
+- Review round=1 · P3 (Standards): o modo do `spans_of` chega como string solta (`sys.argv[3] == 'blocos'`), e qualquer outro valor cai sem aviso no modo só-prosa; uma chamada futura com `bloco` ou `Blocos` sai `verify: limpo` sem conferir os blocos.
+- Review round=1 · P3 (Standards): o par `re.fullmatch(sys.argv[2], t)` / `print(t)` se repete no ramo do bloco, no da prosa e no do `.ts` do `citados_of`; mudar a regra de emissão pede uma edição em cada ramo, e esquecer um faz bloco e prosa aceitarem caminhos diferentes sem que o S3 aponte.
+- Review round=1 · P3 (Standards): o tokenizador do bloco não parte em `<>=,` nem tira a pontuação final; `.omp/a>out` e `.omp/skills/x.` saem como palavra e reprovam em falso, e `--f=.omp/x` e `2>.omp/log` ficam de fora sem aviso. Nenhuma linha de bloco da camada real tem essas formas.
+- Review round=1 · P3 (Standards): o cabeçalho do `spans_of` ainda justifica pular o bloco cercado com "que e exemplo", e o parágrafo novo abre a exceção sem dizer por que, na camada, o bloco é comando; quem ler só o cabeçalho pode achar que o modo `blocos` contradiz o contrato e removê-lo.
