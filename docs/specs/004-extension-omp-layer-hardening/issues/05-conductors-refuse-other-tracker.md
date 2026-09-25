@@ -5,6 +5,7 @@
 **Blocked by:** 01
 
 **Status:** resolved
+**Review:** round=1; sha=3e49a81; scope=full; verdict=pass; p1=none
 
 - [x] O `frontier.sh` lê o título de `docs/agents/issue-tracker.md` antes de resolver a spec: outro perfil dá `refusal` com o nome do perfil achado e a frase do fluxo à mão; arquivo ausente dá `refusal` sugerindo o `/anvil-setup`.
 - [x] O `stage.sh` faz a mesma leitura antes de tudo e sai com `next: refused`, o motivo em `reason` e um `do` que manda dizer o motivo e parar sem carregar nada.
@@ -23,3 +24,9 @@
 - S2 da `anvil-run` (`workspace/33-omp-run/s2.sh`, haiku, `claude-haiku-4-5`): cenário novo T, a spec 006 com um ticket pronto e o perfil GitHub. Confere que o `frontier.sh` recusou pelo perfil GitHub, que nenhum `task` saiu, que HEAD, árvore e branch não mudaram e que o fim cita GitHub e `docs/specs`. O T passou nas três rodadas. O S2 inteiro deu 1 falha na rodada 1, no C3, em que o haiku recomendou o archive para a história dos cards. Na rodada 2 deu 3 falhas no A: o 06 foi despachado duas vezes seguidas, sem reler o frontier entre elas. Na rodada 3 deu `S2: tudo passou`. O C3 e o A rodam num projeto com o perfil `docs/specs`, em que a saída do script não mudou, como mostram o fixture e as 480 comparações.
 - A camada com outro perfil: o `reset-install.sh` ficou fora do diff. Um script descartável montou um repositório com o perfil GitHub em `docs/agents/issue-tracker.md` e rodou o `reset-install.sh --from anvil`: saiu `camada omp em .omp/, nova neste update (sinal: omp no PATH, ~/.omp/)`, com 8 linhas `omp:` no lock e com `.omp/hooks/pre/guard-spec-merge.ts`, `.omp/rules/anvil-harness.md` e as três skills instaladas.
 - `vendor-sync.sh verify`: `verify: limpo`, depois de cada commit.
+- Review round=1 · P2 (Spec): o `do` do `refused` e o item da `anvil-plan` proíbem se oferecer para fazer o trabalho, o que a spec não pede ("um `do` que manda dizer o motivo ao operador e parar sem carregar nada"), e nenhuma conferência do S2 G mede isso; na rodada 3 o haiku ofereceu implementar o `conta.sh` mesmo assim — o contrato promete uma proibição sem prova de efeito, e o operador que responder "sim" na vez seguinte ganha código fora do fluxo à mão.
+- Review round=1 · P3 (Spec): o parágrafo da `anvil-plan` sobre o pedido novo com `next` diferente de `anvil-grill` também alcança o `next: refused` — o modelo pode somar à recusa um "pedido novo começa num branch sem spec", que não é o motivo; o S2 G não mostrou isso.
+- Review round=1 · P3 (Spec): o `stage.sh` lê o perfil depois de achar a raiz do git, e não "antes de tudo" — fora de um repositório git, a `anvil-plan` com pedido ainda vai para o grill; o caso é marginal e a ordem está declarada acima.
+- Review round=1 · P3 (Spec): a `anvil-plan` diz que o script devolve as linhas `spec`, `next`, `reason` e `do`, e no `refused` não saem `spec:` nem `branch:` — a skill descreve uma saída que esse ramo não tem, embora o item `next: refused` só use o `reason`.
+- Review round=1 · P3 (Standards): a mesma observação da linha `spec` ausente: o `refused` é o único ramo do `stage.sh` sem `spec:` e `branch:`, que saem até no caso de fora do git — quem lê a skill espera a linha `spec` sempre e não a encontra.
+- Review round=1 · P3 (Standards): a `tracker_refusal` está copiada igual em `frontier.sh` e `stage.sh` — mudar o título aceito ou o texto num só faz os dois condutores recusarem de forma diferente, e só o fixture em `/tmp`, fora do git, pegaria.
