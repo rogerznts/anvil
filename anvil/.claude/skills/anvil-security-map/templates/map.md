@@ -11,7 +11,8 @@ seguem `reference/categories.md` da skill.
 
 {{- fim se}}
 
-{{- se a consulta de advisories não foi feita, total ou parcialmente}}
+{{- se alguma fonte de advisory deveria ter respondido e falhou por rede —
+  "não se aplica" (sem stack, ou checklist sem repositório) não entra aqui}}
 
 > Consulta de advisories (OSV.dev/GitHub Security Advisories) incompleta —
 > ver `profile.md` para o motivo. Achados de dependência abaixo, se houver,

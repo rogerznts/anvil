@@ -85,7 +85,10 @@ Um template, dois chamadores:
 - [ ] `security/CHECKLIST.md` — opcional, sétima capacidade: o que olhar em
       segurança naquela tecnologia, com precedente por item (advisory
       confirmado por leitura direta, ou doc oficial). Só o
-      `/anvil-security-map` carrega
+      `/anvil-security-map` carrega. Uma linha "Repositório GitHub:" perto do
+      topo, opcional, dá ao map o repositório para consultar os GitHub
+      Security Advisories da stack; sem essa linha, o map só consulta o
+      OSV.dev
 - [ ] `bench/starter/` versionado, copiado sem regenerar
 - [ ] `bench/{env,infra,deploy}.sh` idempotentes, com `--help` e `--dry-run`
 - [ ] `bench/INVARIANTS.md` com o que é decisão de produto do bench

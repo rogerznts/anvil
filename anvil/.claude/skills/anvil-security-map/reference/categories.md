@@ -47,7 +47,9 @@ ordene os achados por arquivo e depois por linha, e numere nessa ordem. Rodar
 o map de novo sem mudar o código produz os mesmos ids; mudar o código pode
 renumerar os achados daquela categoria — é o custo de um id derivado da
 posição, aceito porque o rastreamento permanente é o `SEC-#` do probe em
-`findings.md`, não este id.
+`findings.md`, não este id. Empate de arquivo:linha entre achados de
+advisory (mais de um advisory na mesma dependência) desempata pelo id do
+advisory — regra em `reference/advisory-lookup.md`, resultado *a*.
 
 ## Achado → categoria
 

@@ -9,7 +9,7 @@ não como o texto descritivo que cada projeto publica sob sua licença.
 | De | Licença | O que entrou aqui |
 |---|---|---|
 | [ghostsecurity/skills](https://github.com/ghostsecurity/skills) | Apache-2.0 | a ideia do `repo-context`: entender stack, entrypoints e dependências do repositório antes de apontar risco — passo 1 desta skill |
-| [trailofbits/skills](https://github.com/trailofbits/skills) | CC-BY-SA-4.0 — só a ideia, texto nunca copiado | `audit-context-building`: separar o que é do framework do que é do projeto antes de classificar um achado |
+| [trailofbits/skills](https://github.com/trailofbits/skills) | CC-BY-SA-4.0 — só a ideia, texto nunca copiado | `audit-context-building`: separar o que é do framework do que é do projeto antes de classificar um achado; `variant-analysis`: achar a mesma causa raiz em mais de um lugar — aqui, restrita a comparar o mecanismo de um advisory publicado contra o código do projeto (`reference/advisory-lookup.md`, resultado *b*), não a variant analysis mais ampla que o probe aplica sobre achado próprio |
 | `claude-security`, de `anthropics/claude-plugins-official` | própria (não lida por completo) | o formato de saída: inventário e mapa organizados por categoria — aqui, sem o painel verificador nem o `.jsonl`/`.sarif` que o original grava ao lado do Markdown, porque este map nunca executa nada; `arquivo:linha` estável faz o papel de identificador verificável |
 | [OWASP Top 10:2025](https://owasp.org/Top10/2025/) | CC-BY-SA-4.0 — só estrutura e ids | as dez categorias (`A01`–`A10`) que organizam `map.md` |
 | [OWASP API Security Top 10:2023](https://owasp.org/API-Security/editions/2023/en/0x00-header/) | CC-BY-SA-4.0 — só estrutura e ids | as dez categorias de API (`API1`–`API10`), usadas na superfície REST/GraphQL do Payload |
@@ -24,8 +24,7 @@ não como o texto descritivo que cada projeto publica sob sua licença.
 
 Fora daqui, porque alimentam o `anvil-security-probe`, não este map: o
 `validate`/`proxy` do Ghost (reproduzir contra o app rodando), o validador
-adversarial do `claude-security-audit`, `variant-analysis`/`fp-check` da
-Trail of Bits.
+adversarial do `claude-security-audit`, e o `fp-check` da Trail of Bits.
 
 ## Atualização
 

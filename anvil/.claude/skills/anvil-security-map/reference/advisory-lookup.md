@@ -7,12 +7,13 @@ jeito que o probe trata a resposta do alvo como dado.
 
 ## 1. Pacotes a consultar
 
-Todas as dependências diretas de `package.json`, com a versão resolvida do
-lockfile (`package-lock.json`, `pnpm-lock.yaml` ou `yarn.lock` — a mesma
-leitura do passo 1 do `SKILL.md`, agora aplicada a todo `dependencies`, não só
-ao framework). Dependência sem lockfile no repositório fica de fora da
-consulta; registre em `profile.md` que a versão exata não foi determinada
-para aquele pacote, sem adivinhar.
+Todo pacote listado em `dependencies` de `package.json` (não
+`devDependencies` — ferramenta de build não é superfície do app), com a
+versão resolvida do lockfile (`package-lock.json`, `pnpm-lock.yaml` ou
+`yarn.lock` — a mesma leitura do passo 1 do `SKILL.md`, agora aplicada a
+todo `dependencies`, não só ao framework). Dependência sem lockfile no
+repositório fica de fora da consulta; registre em `profile.md` que a versão
+exata não foi determinada para aquele pacote, sem adivinhar.
 
 ## 2. Fonte 1 — OSV.dev
 
@@ -56,19 +57,15 @@ fonte — registre e siga com o que já tiver (checklist, parte genérica, e a
 fonte 1 se ela respondeu).
 
 Ao contrário do OSV.dev, este endpoint devolve **todos** os advisories do
-repositório, sem filtrar por pacote nem versão — o filtro é seu:
-
-- **Pacote instalado:** descarte todo advisory cujo `vulnerabilities[].package.name`
-  não seja nenhuma das dependências diretas do passo 1 (um repositório de
-  stack costuma publicar pacotes que o projeto não usa — plugin, adapter
-  alternativo).
-- **Faixa de versão:** `vulnerable_version_range` é texto livre, não sempre
-  sintaxe semver estrita (`">= 3.0.0, < 3.88.0"`, `"< 3.90.0, < 4.0.0-canary.34"`).
-  Ignore qualquer trecho separado por vírgula que mencione `canary` — é uma
-  linha de release diferente da instalada. Do que sobrar, a versão instalada
-  precisa satisfazer todo limite (`>=`/`>`/`<=`/`<`) para o advisory se
-  aplicar. `patched_versions` segue o mesmo formato; ignore a parte `canary`
-  e use a menor versão que sobrar como "versão que corrige".
+repositório, sem filtrar por pacote nem versão. O único filtro **nesta
+etapa**, antes do passo 4, é por pacote: descarte todo advisory cujo
+`vulnerabilities[].package.name` não seja nenhum dos pacotes consultados no
+passo 1 desta referência (um repositório de stack costuma publicar pacotes
+que o projeto não usa — plugin, adapter alternativo). **Não filtre por
+versão aqui** — a faixa de versão decide qual das três seções do passo 4 um
+advisory produz (a versão que fecha o resultado *a* não descarta o
+advisory dos resultados *b*/*c*, que valem mesmo com a versão já corrigida).
+A lógica de faixa de versão está no resultado *a*, abaixo.
 
 ## 4. Três resultados
 
@@ -86,6 +83,22 @@ Chain Failures** (`reference/categories.md`), com:
   quando só o OSV.dev respondeu).
 - **teste do probe:** "só leitura — comparação de versão; upgrade do pacote
   resolve, não há teste ativo do probe para isto".
+
+**Faixa de versão da fonte 2** (a fonte 1 já vem filtrada, passo 2):
+`vulnerable_version_range` é texto livre, não sempre sintaxe semver estrita
+(`">= 3.0.0, < 3.88.0"`, `"< 3.90.0, < 4.0.0-canary.34"`). Um texto separado
+por vírgula pode descrever mais de uma linha de release em paralelo — por
+exemplo, uma linha estável e uma de pré-lançamento (`-canary.N`, `-beta.N`,
+`-rc.N`) corrigidas em versões diferentes. Mantenha só os trechos cuja marca
+de pré-lançamento bate com a da versão instalada (as duas sem marca, ou a
+mesma marca) — não uma lista fixa de nomes; qualquer marca que não bata com
+a da instalada pertence a outra linha. Do que sobrar, a instalada precisa
+satisfazer todo limite (`>=`/`>`/`<=`/`<`) para o advisory se aplicar. Se
+filtrar por marca não deixar nenhum trecho (o texto não caiu em nenhuma
+linha reconhecida) **não trate como satisfeito por vacuidade** — avalie
+contra o texto inteiro sem filtrar; ambiguidade não vira "afetado" por
+omissão. `patched_versions` segue o mesmo formato e a mesma regra; a "versão
+que corrige" é a menor que sobrar depois do filtro.
 
 O mesmo advisory (mesmo id GHSA, ou mesmo CVE em `aliases`/`cve_id`)
 aparecendo nas duas fontes é **uma linha só** — cite as duas no precedente.

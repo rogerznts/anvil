@@ -52,7 +52,9 @@ procedimento completo em `reference/advisory-lookup.md` da skill.
   {{consultada com sucesso | não se aplica — checklist da stack não declara
   repositório, ou nenhuma stack detectada | não foi possível: <motivo>}}
 
-{{- se alguma das duas fontes não foi consultada}}
+{{- se alguma das duas fontes deveria ter respondido e não respondeu (falha
+  de rede) — "não se aplica" não conta, é esperado sem stack ou sem
+  repositório declarado}}
 
 Consulta externa incompleta: os achados de dependência em `map.md` refletem
 só a(s) fonte(s) que respondeu(ram); o resto do mapa (checklist, parte
