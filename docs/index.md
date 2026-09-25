@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-24T02:31:03Z
+Last updated: 2026-09-25T19:05:58Z
 
 ## Visão geral
 
@@ -21,6 +21,7 @@ Nenhuma.
 
 ## Specs arquivadas
 
+- [004 — Robustez e isolamento da camada omp](./specs/archive/004-extension-omp-layer-hardening/spec.md) — `extension/004-omp-layer-hardening`, 11 tickets
 - [003 — omp como harness, com camada própria](./specs/archive/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, 10 tickets
 - [001 — Equipe e destilação](./specs/archive/001-feature-team-distill-sentrux/spec.md) — `feature/001-team-distill-sentrux`, 12 tickets
 
@@ -67,6 +68,8 @@ Nenhuma.
     — a verificação tem critério de parada, e ele é ausência de P1
   - [adr-0011](./architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md)
     — o omp é harness de primeira classe, com camada própria; a orquestração volta só nela
+  - [adr-0012](./architecture/adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md)
+    — o frontier roda em paralelo sob pedido, só com a isolação do omp no modo branch
 
 ### Project
 

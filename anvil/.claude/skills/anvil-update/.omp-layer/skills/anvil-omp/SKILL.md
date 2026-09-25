@@ -1,6 +1,6 @@
 ---
 name: anvil-omp
-description: Manual da camada omp do anvil. O que ela instala em .omp/, como a detecção decide, os comandos, os limites e como removê-la.
+description: Manual da camada omp do anvil. O que ela instala em .omp/, como a detecção decide, os comandos, a isolação, os limites e como removê-la.
 argument-hint: "pergunta opcional sobre a camada"
 disable-model-invocation: true
 ---
@@ -46,17 +46,67 @@ camada inteira fica com você e nada em `.omp/` é tocado.
 - `/skill:anvil-plan <pedido>` conduz o planejamento na mesma janela: grill, spec e
   tickets. Entre uma etapa e outra propõe a próxima, ou um desvio como research ou
   prototype, e só carrega com o seu sim. No fim, indica `/clear` e o `anvil-run`.
-- `/skill:anvil-run [NNN]` implementa a spec ticket a ticket, em série, cada ticket
-  num implementer de contexto novo, com o review em dois eixos. Sem número, usa o
-  do branch atual, e fora do branch da spec se recusa. Para quando tudo está
-  resolvido ou quando o que sobra está travado, e diz o próximo passo. Rodar de novo
-  retoma pelo que está no disco.
+- `/skill:anvil-run [NNN] [--parallel N]` implementa a spec ticket a ticket, cada
+  ticket num implementer de contexto novo, com o review em dois eixos. Em série
+  por padrão; com `--parallel N` e a isolação no modo branch, em levas de até N
+  tickets do frontier. Sem número, usa o do branch atual, e fora do branch da spec
+  se recusa. Para quando tudo está resolvido ou quando o que sobra está travado, e
+  diz o próximo passo. Rodar de novo retoma pelo que está no disco.
 - `/skill:anvil-browser-qa` faz o QA de browser. O `anvil-run` o recomenda quando a
   spec tem tela e nunca o dispara, assim como nunca dispara archive nem PR.
 
 A guarda de merge age sozinha: `git merge` de spec com ticket aberto ou sem archive,
 e `tea pr create` sem archive, são bloqueados com o mesmo motivo que o Claude Code
 mostra.
+
+## Isolação
+
+Com a isolação de tarefas do omp ligada, o `/skill:anvil-run` despacha cada
+implementer com `isolated: true`. Ele trabalha numa cópia isolada do checkout, e o
+omp traz os commits dele para o branch da spec. O `anvil-run` não adivinha o modo:
+o `frontier.sh` lê a configuração com `omp config get task.isolation.enabled` e
+`omp config get task.isolation.merge`, na raiz do projeto, e devolve a linha
+`isolation`. O relatório abre dizendo se a execução rodou com ou sem isolação.
+
+Para ligar, escreva no `config.yml` da pasta `.omp/` do projeto, ou no
+`~/.omp/agent/config.yml` para todos os projetos:
+
+```yaml
+task:
+  isolation:
+    enabled: true
+    merge: branch
+```
+
+O `merge: branch` é obrigatório. No modo branch, o omp commita o trabalho num
+branch `omp/task/<id>` e faz cherry-pick dos commits no branch da spec, um commit
+por passo, como sem isolação. O padrão do omp é `patch`, que aplica a mudança sem
+commit. Com a isolação ligada no modo patch, o `anvil-run` avisa antes do primeiro
+despacho e aponta esta configuração. Ele despacha mesmo assim, e a árvore suja que
+o omp deixa o para com `halt`. Para conferir o que o omp lê, rode os dois
+`omp config get` acima na raiz do projeto.
+
+A isolação muda a retomada. Sem ela, um implementer que cai deixa a sobra na árvore
+da spec, e o `anvil-run` para com `halt` antes do próximo despacho, até você
+decidir: `git stash -u` guarda a sobra, um commit seu a mantém, e rodar a skill de
+novo retoma. Com ela, a sobra de um implementer que cai ou desiste não chega ao
+branch da spec. O omp a deixa no branch `omp/task/<id>` dele, o ticket fica como
+estava, e a execução seguinte o despacha de novo. Os branches `omp/task/*` podem
+ficar no repositório depois da integração, e o de um trabalho não integrado fica
+sempre; apague-os com `git branch -D` quando não precisar mais deles.
+
+O paralelo depende da isolação: só com ela dois implementers rodam ao mesmo tempo
+sem dividir a mesma árvore. Com `--parallel N` e a linha `isolation: on`, o
+`anvil-run` despacha até N tickets do frontier numa chamada do `task`, e o omp
+integra o trabalho de cada um quando ele termina, com o cherry-pick dos commits
+dele, um por vez. Se um commit conflita, o omp desfaz só esse e para ali: os
+commits anteriores daquele ticket, se houver, ficam no branch da spec, e o
+trabalho inteiro fica no `omp/task/<id>`. O ticket volta sem mudar de estado e sai
+como pulado, o relatório nomeia o branch, e a execução seguinte o despacha sobre o
+que já entrou. Antes dela, você pode desfazer esses commits ou deixá-los. Sem
+isolação, ou fora do modo branch, o `anvil-run` recusa o paralelo e segue em
+série. O relatório traz quantos tickets estavam prontos a cada rodada, na linha
+`ready por rodada`, para você medir se o paralelo compensa.
 
 ## O que continua manual no Claude Code e no Codex
 
@@ -71,18 +121,20 @@ espelho `.agents/skills` e não tem guarda.
 - O `eval` escapa da guarda. O hook só intercepta o tool `bash`, e um `git merge`
   disparado de dentro do `eval` passa sem conferência. O que se digita no terminal
   também.
-- O frontier é em série. O `anvil-run` implementa um ticket por vez, mesmo quando
-  dois tickets não dependem um do outro.
+- O frontier é em série sem isolação. O paralelo existe sob pedido,
+  `--parallel N`, e só com a isolação no modo branch.
 - O `task` não escolhe modelo por chamada. O implementer herda o modelo da sessão,
   e as listas `runners`, `how-critics` e `cross-judge` do `.claude/rules/anvil.md`
   não têm efeito no omp. Para outro modelo, use `task.agentModelOverrides` na
   configuração do omp.
-- Os condutores só leem o perfil `docs/specs`. O `anvil-plan` e o `anvil-run`
+- Os condutores recusam fora do perfil `docs/specs`. O `anvil-plan` e o `anvil-run`
   acham a spec pelo prefixo numérico do branch `{tipo}/{NNN}-{nome}` e leem
-  `docs/specs/{NNN}-*/`. Com outro perfil do `anvil-setup` (GitHub, GitLab,
-  markdown local), o `anvil-run` recusa sempre, e o `anvil-plan`, chamado de novo,
-  volta ao grill porque não acha a spec publicada. Nesse caso o fluxo segue à mão,
-  como no Claude Code.
+  `docs/specs/{NNN}-*/`. Antes disso, leem o título de
+  `docs/agents/issue-tracker.md`. Com outro perfil do `anvil-setup` (GitHub, GitLab,
+  markdown local), os dois recusam com o nome do perfil achado, e o fluxo segue à
+  mão, como no Claude Code. Sem o arquivo, recusam e sugerem o
+  `/skill:anvil-setup`. A camada continua instalada com qualquer perfil, com a
+  guarda de merge e a rule.
 
 ## Como remover a camada à mão
 

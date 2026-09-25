@@ -31,6 +31,11 @@ O script lê o branch e a pasta da spec e devolve as linhas `spec`, `next`,
 script, e desta conversa. A linha `do` diz o que fazer, e ela vale sobre o que
 parecer óbvio na conversa. Em detalhe, pela linha `next`:
 
+- `next: refused`: o projeto não tem o perfil `docs/specs` do tracker, e o
+  condutor não sabe onde a spec mora. Mostre ao operador a linha `reason` e pare.
+  Não carregue nada, nem o grill quando veio um pedido no argumento, e não se
+  ofereça para fazer o trabalho por conta própria: o fluxo segue à mão, como a
+  linha diz.
 - `next: end`: os tickets de implementação existem. Vá para o fim.
 - `next: none`: a spec deste branch está arquivada. Diga isso ao operador e pare,
   porque um planejamento novo começa num branch sem spec.
@@ -96,6 +101,10 @@ script dela e não comece o trabalho dela antes da resposta. A resposta decide:
 Um sinal que aparece no meio do grill trava uma pergunta. Proponha o desvio no fim
 da rodada, ao lado das perguntas que não dependem dele. O desvio só é carregado com
 o sim, como uma etapa.
+
+O sinal nunca é o sim, nem quando o operador diz que só decide vendo rodar,
+pesquisando ou perguntando a alguém. A fala dele descreve a necessidade. Quem
+nomeia o desvio é a proposta, e só a resposta a ela carrega a skill.
 
 Quando o desvio termina, proponha voltar à etapa de onde saiu, pelo nome dela. Com
 o sim, siga a skill dessa etapa do ponto em que ela parou.
