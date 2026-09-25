@@ -4,8 +4,9 @@
 
 **Blocked by:** 01
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=4e004f3; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=d5c375c; scope=diff:4e004f3..d5c375c; verdict=pass; p1=none
 
 - [x] O modo sai da configuração do omp, lida pelo `frontier.sh` com `omp config get task.isolation.enabled` e `task.isolation.merge` na linha `isolation`: com `on` (`true` e `branch`), todo despacho sai com `isolated: true`; com `off`, o laço é o da 003; com `misconfigured` (`true` e outro merge), a `anvil-run` diz isso antes de despachar, apontando `task.isolation.merge: branch`, e a parada por árvore suja continua como rede de segurança.
 - [x] O relatório abre dizendo se a execução rodou com ou sem isolação.
@@ -47,3 +48,13 @@
 - Fixture `/tmp/anvil-004-01/fx.sh`: a saída esperada de `f-arvore-suja` (`off`), `f-isolacao-patch-suja` e `f-isolacao-patch-ultimo` (`misconfigured`) foi reescrita à mão, e entrou o caso G novo `f-isolacao-branch-suja` (`on`, árvore suja). Rodada red antes do script: o `f-arvore-suja` falhou; os casos seguintes não valem como red, porque o script foi editado durante a rodada. Depois: `fixture: 0 falha(s)` (56 casos, `/opt/local/bin/bash` 5.2.15 e `/bin/bash` 3.2.57, `LC_ALL=pt_BR.UTF-8` e `C`).
 - S2 rodada 20 (`claude-haiku-4-5`, `--thinking low`, sem fallback, cenários A, A2, E, B, C, C2, C3, D, T, I, I2, P e P2): `S2: tudo passou`.
 - `vendor-sync.sh verify`: `verify: limpo` em `/opt/local/bin/bash` e `/bin/bash`, saídas idênticas.
+- Review round=2 · o P1 da rodada 1 fechou nos dois eixos: o `frontier.sh` dá `halt` com a árvore suja e tudo resolvido, a linha abre com o modo, e o texto citado aqui bate com o que o script emite. Nenhuma regressão na árvore suja com pendência sem `next` (pulado, travado, esperando), que segue sem parada, como na 003.
+- Review round=2 · P2 (Spec): a decisão **Parada** da spec registra o texto da linha, mas não o gatilho novo, e a parada com `all_resolved: yes` vale também em `isolation: off`, onde nenhuma user story a pede (a US 30 fala de parar o despacho; a US 33, do modo patch). Quem implementar o paralelo relê a spec sem esse caso e pode tirá-lo, e o operador com arquivo solto numa spec terminada deixa de receber o archive sem uma linha de spec que diga por quê.
+- Review round=2 · P3 (Spec): o check do P2 no `s2.sh` usa `COM_ISO`, que casa `isolated`, e não exige `! abre "$SEM_ISO"` como o A e o I exigem. Um relatório que só repita `isolated: true` passa como "abre dizendo o modo", uma prova frouxa justamente do critério que motivou a correção.
+- Review round=2 · P3 (Spec): na `anvil-run`, "ele já diz o modo, a configuração que falta e como sair" é falso com `on` e `off`, em que não falta configuração, e o modelo procura no texto algo que não existe.
+- Review round=2 · P3 (Standards): o vocabulário do modo agora está em quatro lugares, os três da `anvil-run` e o `iso_mode` do `frontier.sh`, com nomes diferentes ("execução com isolação" × "modo: com isolação"). Uma chave renomeada pede quatro edições, e o operador lê dois nomes para o mesmo modo, conforme haja parada ou não. A correção piorou o P3 de repetição da rodada 1.
+- Review round=2 · P3 (Standards): com `isolation: on`, a linha `halt` diz na mesma frase "execução com isolação" e "um implementer novo os commitaria junto", o que a isolação impede. A parada e a saída estão certas, mas o motivo lido é falso nesse modo. Vem do P3 da rodada 1 e ficou mais visível.
+- Review round=2 · P3 (Standards): a `anvil-run/SKILL.md` ainda quebra curto nas l.50, 56 e 59, e o registro acima dá a quebra irregular como refeita. O próximo diff sai ruidoso.
+- Review round=2 · P3 (Standards): `halt_why` e `halt_then` são fragmentos de frase concatenados num `echo` de 232 colunas, e um quarto caso de parada tende a quebrar a gramática da linha. Sem defeito hoje: o fixture cobre os quatro casos.
+- Review round=2 · P3 (Standards): o contrato "a linha abre com o modo e o supervisor a copia como está" está escrito em três arquivos (cabeçalho do `frontier.sh`, `anvil-run/SKILL.md`, decisão **Parada** da spec), e mudar o formato pede três edições.
+- Review round=2 · P3 (Standards): a decisão **Parada** da spec cita "rodadas 14 a 19 do S2 do ticket 08" sem glosa, e o `s2.sh` fica fora do git. Quem lê a spec não descobre o que o S2 mede.
