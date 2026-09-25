@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-25T21:10:43Z
+Last updated: 2026-09-25T21:44:25Z
 
 ## Visão geral
 
@@ -20,10 +20,11 @@ Last updated: 2026-09-25T21:10:43Z
 
 ## Specs ativas
 
-- [005 — Mapa de superfície de ataque e teste local com spec de correção](./specs/005-feature-security-map-probe/spec.md) — `feature/adjust-code-review`, pronto para arquivar, 7/7 tickets
+Nenhuma.
 
 ## Specs arquivadas
 
+- [005 — Mapa de superfície de ataque e teste local com spec de correção](./specs/archive/005-feature-security-map-probe/spec.md) — `feature/adjust-code-review`, 7 tickets
 - [003 — omp como harness, com camada própria](./specs/archive/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, 10 tickets
 - [001 — Equipe e destilação](./specs/archive/001-feature-team-distill-sentrux/spec.md) — `feature/001-team-distill-sentrux`, 12 tickets
 

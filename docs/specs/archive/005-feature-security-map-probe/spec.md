@@ -32,7 +32,7 @@ SQLite (GHSA-v49j-62m6-pgrr, 2026-09-22), IDOR entre collections
 ## Solution
 
 Duas skills autorais, conforme o
-[adr-0012](../../architecture/adr/adr-0012-skills-de-seguranca-sao-autorais.md) —
+[adr-0012](../../../architecture/adr/adr-0012-skills-de-seguranca-sao-autorais.md) —
 as skills de segurança são autorais, destiladas das referências:
 
 - **`anvil-security-map`** analisa o repositório, detecta a stack, lê o checklist
@@ -47,7 +47,7 @@ O `/anvil-boot`, ao detectar a stack, sugere rodar o map. É opcional.
 
 O conhecimento de cada tecnologia fica na skill da stack, como sétima
 capacidade do contrato do
-[adr-0006](../../architecture/adr/adr-0006-stack-como-camada-propria.md) — stack é
+[adr-0006](../../../architecture/adr/adr-0006-stack-como-camada-propria.md) — stack é
 camada própria. O `anvil-stack-payload` é a primeira stack com checklist.
 
 ## User Stories
