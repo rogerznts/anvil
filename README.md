@@ -141,7 +141,7 @@ passo mantém `.agents/skills`, por onde o Codex lê as skills: um symlink para
 | | |
 |---|---|
 | `/skill:anvil-plan <pedido>` | conduz grill, to-spec e to-tickets na mesma janela. Entre uma etapa e outra propõe a próxima ou um desvio, como research ou prototype, e só carrega com o seu sim |
-| `/skill:anvil-run [NNN]` | implementa a spec ticket a ticket, em série, cada um num `anvil-implementer` de contexto novo, com o review em dois eixos. Termina com relatório e próximo passo, e nunca faz QA, archive ou PR |
+| `/skill:anvil-run [NNN] [--parallel N]` | implementa a spec ticket a ticket, cada um num `anvil-implementer` de contexto novo, com o review em dois eixos. Em série por padrão; com `--parallel N` e a isolação do omp no modo branch, em levas de até N tickets do frontier, cada implementer num workspace isolado — ver [adr-0012](docs/architecture/adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md). Termina com relatório e próximo passo, e nunca faz QA, archive ou PR |
 | `/skill:anvil-omp` | o manual da camada: detecção, limites e como removê-la |
 | guarda de merge | um hook em `.omp/hooks/pre/` chama o mesmo `guard-spec-merge.sh` do Claude Code |
 
