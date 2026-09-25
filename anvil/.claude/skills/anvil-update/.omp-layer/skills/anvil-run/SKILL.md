@@ -161,7 +161,10 @@ Com pendência, o relatório lista:
   `blocked_by`. O operador corrige a linha para uma lista de números, como `01, 02`,
   e roda a skill de novo;
 - os pulados, que terminaram sem mudar o estado, e o motivo que o implementer deu.
-  Rodar a skill de novo tenta de novo;
+  Rodar a skill de novo tenta de novo. O pulado cujo trabalho o omp não integrou,
+  com "Branch merge failed" no resultado do `task`, leva também o nome do branch
+  `omp/task/<id>` e o aviso de que os commits dele anteriores ao conflito já estão
+  no branch da spec;
 - os que ainda esperam por outro ticket, com a lista da `class` deles.
 
 ## Nunca
@@ -187,8 +190,9 @@ Sem isolação, um implementer que caiu deixa a árvore suja, e o script para co
 spec: o ticket fica com o estado de antes, sai como pulado nesta execução, e a
 seguinte o despacha de novo.
 
-Numa leva, o omp integra o trabalho de cada implementer quando ele termina. Se o
-cherry-pick conflita, o omp o desfaz, a árvore fica como estava, e o trabalho fica
-no branch `omp/task/<id>`: o ticket não muda de estado, sai como pulado nesta
-execução, e a seguinte o despacha de novo. Se a árvore ficar suja, o script para
-com `halt`.
+Numa leva, o omp integra cada implementer quando ele termina, com o cherry-pick dos
+commits dele, um por vez. Se um commit conflita, o omp desfaz só esse e para ali:
+os commits anteriores do ticket já estão no branch da spec, e o trabalho inteiro
+fica no branch `omp/task/<id>`. O ticket não muda de estado e sai como pulado, e a
+execução seguinte o despacha sobre o que já entrou. Se a árvore ficar suja, o
+script para com `halt`.
