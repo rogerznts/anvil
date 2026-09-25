@@ -431,13 +431,18 @@ print('\n'.join(out))
 PYEOF
     }
 
+    # Nos checks 2 e 3 o laço de dentro lê de here-string, e não de `< <(...)`: dentro
+    # de uma função, o bash 3.2 do macOS só fecha o fd de uma process substitution
+    # quando a função volta. Uma por arquivo do payload vaza centenas de fds, e
+    # passado o fd 255 o bash 3.2 cai com SIGTRAP (ou, com `ulimit -n 256`, erra o
+    # redirecionamento e segue sem checar).
     echo "2. links relativos resolvem"
     while IFS= read -r f; do
         d="$(dirname "$f")"
         while IFS= read -r l; do
             [ -n "$l" ] || continue
             [ -e "$d/$l" ] || { echo "   FALHA ${f#"$PAYLOAD"/} -> $l"; falhas=$((falhas+1)); }
-        done < <(links_of "$f")
+        done <<< "$(links_of "$f")"
     done < <(find "$PAYLOAD" -name '*.md' -not -path '*/starter/*' -not -path '*/templates/*')
 
     # Dependencia entre skills se declara chamando a Skill tool, nunca com
@@ -454,7 +459,7 @@ PYEOF
             [ -n "$abs" ] || abs="$d/$l"
             case "$abs" in "$skill_dir"|"$skill_dir"/*) ;;
                 *) echo "   FALHA ${f#"$PAYLOAD"/} -> $l"; falhas=$((falhas+1)) ;; esac
-        done < <(links_of "$f")
+        done <<< "$(links_of "$f")"
     done < <(find "$PAYLOAD" -name '*.md' -not -path '*/starter/*' -not -path '*/templates/*')
 
     echo "4. denylist de tokens do upstream"
