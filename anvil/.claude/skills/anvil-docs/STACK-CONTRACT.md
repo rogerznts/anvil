@@ -82,7 +82,7 @@ Um template, dois chamadores:
 - [ ] `reference/` com o ofício, um arquivo por assunto, sem duplicar a rule
 - [ ] `SKILL.md` roteador: tabela tarefa → solução → arquivo. Não repete o que
       está no `reference/`
-- [ ] `security/CHECKLIST.md`, opcional — sétima capacidade: o que olhar em
+- [ ] `security/CHECKLIST.md` — opcional, sétima capacidade: o que olhar em
       segurança naquela tecnologia, com precedente por item (advisory
       confirmado por leitura direta, ou doc oficial). Só o
       `/anvil-security-map` carrega

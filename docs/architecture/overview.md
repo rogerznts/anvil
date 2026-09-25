@@ -24,8 +24,8 @@ com adaptação registrada — ver
 │  Nutlope/hallmark + Leonxlnx/taste-skill · 7 skills       │
 │  payloadcms/skills · 1 skill (a stack)                    │
 ├─ stack ──────────────────────────────────────────────────┤
-│  anvil-stack-payload: RULE · reference/ · bench/          │
-│  contrato de 6 capacidades                                │
+│  anvil-stack-payload: RULE · reference/ · security/ · bench/ │
+│  contrato de 7 capacidades                                 │
 └───────────────────────────────────────────────────────────┘
       apoiadas por 10 skills autorais: docs · boot · update ·
       bench · ui · distill · tea-* (4)

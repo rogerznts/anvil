@@ -81,7 +81,9 @@ por leitura direta na página do advisory. Nenhum item abaixo cita esses cinco.
 - **Teste do probe:** enviar query de introspecção e query aninhada além do
   limite esperado, e requisitar o endpoint do playground em produção.
 - **Precedente:** [Preventing abuse](https://payloadcms.com/docs/production/preventing-abuse)
-  (`maxDepth`, `graphQL.maxComplexity`, `disableIntrospectionInProduction`).
+  (`maxDepth`, `graphQL.maxComplexity`, `disableIntrospectionInProduction`) e
+  [GraphQL overview](https://payloadcms.com/docs/graphql/overview) (playground
+  em produção).
 
 ## 6. `csrf` e `cors`
 
