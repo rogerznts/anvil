@@ -55,6 +55,7 @@ arg=""; skip=""
 while [ $# -gt 0 ]; do
     case "$1" in
         --skip) [ $# -ge 2 ] || refuse "--skip pede a lista de tickets"; skip="$2"; shift 2 ;;
+        --parallel) refuse "--parallel é argumento da anvil-run, não do script; passe só o número da spec" ;;
         *)      arg="$1"; shift ;;
     esac
 done
@@ -191,7 +192,9 @@ while [ "$changed" = 1 ]; do
 done
 dependents=""; for n in $order; do has "$closure" "$n" && ! has "$locked" "$n" && dependents="$dependents $n"; done
 
+# labels e files: a lista de tickets como rotulos ou como caminhos, na mesma ordem.
 labels() { local s=""; for n in $1; do s="$s ${label[n]}"; done; echo "${s# }"; }
+files()  { local s=""; for n in $1; do s="$s ${file[n]}";  done; echo "${s# }"; }
 or_dash() { [ -n "$1" ] && echo "$1" || echo "-"; }
 
 dirty="$(git status --porcelain | wc -l | tr -d ' ')"
@@ -247,9 +250,8 @@ for n in $order; do
     echo "ticket ${label[n]} status=${status[n]:-?} reviews=${reviews[n]} last=${last[n]} blocked_by=$(or_dash "${blocked_by#,}") class=${class[n]} — ${title[n]}"
 done
 echo "frontier: $(or_dash "$(labels "$frontier")")"
-files=""; for n in $frontier; do files="$files ${file[n]}"; done
 echo "ready: $(set -- $frontier; echo $#)"
-echo "frontier_files: $(or_dash "${files# }")"
+echo "frontier_files: $(or_dash "$(files "$frontier")")"
 echo "skipped: $(or_dash "$(labels "$skipped")")"
 echo "locked: $(or_dash "$(labels "$locked")")"
 for n in $locked; do

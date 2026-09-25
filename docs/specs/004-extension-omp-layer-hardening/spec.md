@@ -284,10 +284,9 @@ O operador continua chamando os mesmos comandos. O que muda:
   dois casos já existem na 003.
 - O comportamento do omp no conflito foi lido na documentação do omp 18.2.11, não
   observado. O primeiro ticket do paralelo confere na prática e registra o que viu.
-  Conferido no ticket 09, com o omp 18.3.0: o omp faz o cherry-pick dos commits do
-  implementer um por vez e desfaz só o que conflitou, então os commits do ticket
-  anteriores ao conflito ficam no branch da spec, e o relatório os aponta junto do
-  pulado. O ADR-0012 registra o resultado.
+  Conferido no ticket 09, com o omp 18.3.0: o resultado está no ADR-0012, que é a
+  fonte; a `anvil-run` e o manual `anvil-omp` levam dele só o que o supervisor e o
+  operador precisam fazer.
 
 ### Manual `anvil-omp`
 
