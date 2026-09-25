@@ -1,7 +1,7 @@
 # 02: O map grava o perfil e o mapa
 
 **Blocked by:** 01
-**Status:** ready-for-agent
+**Status:** resolved
 
 **What to build:** Um desenvolvedor roda `/anvil-security-map` num projeto com o anvil instalado, com ou sem ter passado pelo boot, e ganha `docs/security/profile.md` e `docs/security/map.md`. O map não executa nada contra o app: roda sem servidor de dev no ar.
 
@@ -11,8 +11,8 @@ O map detecta a stack pelo que existe no repositório, carrega o checklist da sk
 
 A skill é autoral (adr-0012) e traz `SOURCES.md` com a origem de cada ideia.
 
-- [ ] Num projeto Payload descartável em `workspace/` com um route handler que chama a Local API com `user` e sem `overrideAccess: false`, o mapa lista essa falha com arquivo:linha correto
-- [ ] Numa stack sem checklist, o mapa sai com a parte genérica e diz explicitamente que a parte específica ficou de fora
-- [ ] Rodar o map de novo regrava `profile.md` e `map.md` e não toca em `findings.md`
-- [ ] O map não faz requisição ao app do projeto
-- [ ] A skill traz `SOURCES.md` e não contém texto de fonte CC-BY-SA
+- [x] Num projeto Payload descartável em `workspace/` com um route handler que chama a Local API com `user` e sem `overrideAccess: false`, o mapa lista essa falha com arquivo:linha correto
+- [x] Numa stack sem checklist, o mapa sai com a parte genérica e diz explicitamente que a parte específica ficou de fora
+- [x] Rodar o map de novo regrava `profile.md` e `map.md` e não toca em `findings.md`
+- [x] O map não faz requisição ao app do projeto
+- [x] A skill traz `SOURCES.md` e não contém texto de fonte CC-BY-SA
