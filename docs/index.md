@@ -12,12 +12,15 @@ Last updated: 2026-09-24T02:31:03Z
     de integração do anvil com o omp, antes do grill
   - [camadas-anvil-omp.md](./discovery/camadas-anvil-omp.md) — desenho em
     mermaid das camadas, da instalação, da execução e da guarda de merge
+  - [seguranca-map-probe.md](./discovery/seguranca-map-probe.md) — candidatos
+    a upstream, metodologia e ferramentas para `anvil-security-map` e
+    `anvil-security-probe`
 - **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
 
 ## Specs ativas
 
-Nenhuma.
+- [005 — Mapa de superfície de ataque e teste local com spec de correção](./specs/005-feature-security-map-probe/spec.md) — `feature/adjust-code-review`, 7 tickets
 
 ## Specs arquivadas
 
@@ -67,6 +70,9 @@ Nenhuma.
     — a verificação tem critério de parada, e ele é ausência de P1
   - [adr-0011](./architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md)
     — o omp é harness de primeira classe, com camada própria; a orquestração volta só nela
+  - [adr-0012](./architecture/adr/adr-0012-skills-de-seguranca-sao-autorais.md)
+    — as skills de segurança são autorais, destiladas das referências; exceção ao
+    adr-0001, e sétima capacidade no contrato de stack do adr-0006
 
 ### Project
 
