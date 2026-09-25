@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=6705312; scope=full; verdict=pass; p1=none
+**Review:** round=2; sha=3031b55; scope=diff:6705312..3031b55; verdict=pass; p1=none
 
 - [x] O ponta a ponta da 003 (`workspace/35-omp-e2e/`) roda do degit ao relatório da `anvil-run` com o payload deste branch, e o `check.sh` passa, ajustado só para as chaves novas.
 - [x] As linhas A1 a A11 saem de `docs/project/acompanhamento.md`, e fica uma linha para o adaptador de tracker, com origem nesta spec.
@@ -32,3 +33,7 @@
   - Desvios aceitos do "ajustado só para as chaves novas", por decisão do operador: o `e2e.sh` sem o `hub`, que o omp 18.3.0 recusa em `--tools`, e o `plan_check.py` aceitando a volta que continua a etapa sem reler a skill.
 - S2 rodada 25 (`claude-haiku-4-5`, `--thinking low`, 16 cenários), depois da mudança de tela: 74 ok, 1 falha. Os cenários de tela (C, C2, C3) e os de recomendação (B) passaram. A falha foi no A2: o supervisor parou depois do despacho do 06, com "Let me check if the agent is still available", sem relatório. É o modo de falha do laço já registrado nas rodadas 22 e 23 do ticket 09, fora do caminho da tela.
 - `vendor-sync.sh verify` depois da correção: `verify: limpo` em `/opt/local/bin/bash` e `/bin/bash`, com saídas idênticas.
+- Review round=2 · os achados da rodada 1 fecharam: o critério 1 foi marcado, com os desvios aceitos por escrito, e o `plan_check.py` confere que a origem seguiu. Nenhuma regressão da mudança de tela nas US 11 a 15. Fica de fora "interface do usuário", que deixou de casar, como a nota do operador prevê.
+- Review round=2 · P3 (Standards): a decisão **Tela** da spec ainda abre com "A lista de palavras não muda", e a nota logo abaixo diz o contrário. Quem ler só a primeira frase fica com uma regra que o `frontier.sh` não segue.
+- Review round=2 · P3 (Spec): o critério 1 do ticket 04 continua marcado com "a lista não muda", sem remissão ao ticket 11. O contrato publicado fica contraditório, sem mudança de comportamento.
+- Review round=2 · P3 (Standards): com a origem no grill, uma vez de sim que só repita a pergunta de voltar ("Quer voltar ao anvil-grill?") passa como continuação. Hoje não há falso ok.
