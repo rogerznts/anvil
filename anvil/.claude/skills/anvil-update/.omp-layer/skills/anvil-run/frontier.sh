@@ -16,7 +16,7 @@
 # mais e verdict=fail. Bloqueio ilegivel (unreadable_blockers): o Blocked by nao e
 # uma lista de numeros, e na duvida o ticket fica fora. Com a arvore suja, o next e
 # none e sai uma linha "halt:": o implementer seguinte commitaria o que sobrou
-# junto com o ticket dele.
+# junto com o ticket dele. A linha diz como sair: git stash -u ou um commit.
 set -u
 
 refuse() { echo "refusal: $1"; exit 2; }
@@ -222,7 +222,7 @@ done
 echo "depend_on_locked: $(or_dash "$(labels "$dependents")")"
 echo "all_resolved: $all_resolved"
 if [ -n "$next" ] && [ "$dirty" != 0 ]; then
-    echo "halt: a árvore tem $dirty caminhos fora de commit, e um implementer novo os commitaria junto. O operador decide o que fazer com eles."
+    echo "halt: a árvore tem $dirty caminhos fora de commit, e um implementer novo os commitaria junto. A saída é do operador: guardá-los com git stash -u, ou fazer um commit dele, e rodar a skill de novo."
     next=""
 fi
 echo "next: $([ -n "$next" ] && echo "${file[next]}" || echo none)"

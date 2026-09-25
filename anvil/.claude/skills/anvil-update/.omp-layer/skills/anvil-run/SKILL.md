@@ -15,6 +15,25 @@ em ticket. O estado é o disco, e não esta conversa nem o que o implementer dis
 O argumento, se veio, é o número da spec. Não pergunte nada ao operador durante a
 execução.
 
+## Isolação
+
+A primeira coisa que você escreve nesta execução, antes de rodar o script, é a linha
+`task aceita: <propriedades>`, com as propriedades que um item de `tasks` aceita,
+copiadas da definição do tool `task` que você recebeu, como `agent`, `task`, `name`
+e as outras. Você já tem essa definição: ela não se consulta por ferramenta nem por
+subagente.
+
+O omp só põe `isolated` nessa definição quando a isolação de tarefas está ligada na
+configuração dele. Por isso a propriedade basta, e não há outra coisa a conferir:
+
+- `isolated` está na linha: escreva `modo: com isolação`. Todo despacho sai com
+  `isolated: true`, o implementer trabalha numa cópia isolada do checkout, e o omp
+  traz os commits dele para o branch da spec;
+- `isolated` não está na linha: escreva `modo: sem isolação`. O item não leva
+  `isolated`, e o implementer trabalha na árvore da spec.
+
+O modo vale para a execução inteira, e o laço é o mesmo nos dois.
+
 ## Ler o estado
 
 O script é o `.omp/skills/anvil-run/frontier.sh`. No diretório em que a sessão
@@ -51,7 +70,8 @@ o que sobrou junto com o ticket dele.
 3. Mostre ao operador uma linha de andamento: o ticket que vai sair e quantos já
    estão resolvidos.
 4. Despache o `next` com o `task`, numa chamada com um item só: `agent` é
-   `anvil-implementer`, e o `task` é o caminho do ticket. No `context`, diga a pasta
+   `anvil-implementer` e o `task` é o caminho do ticket. Com `modo: com isolação`,
+   o item leva também `isolated: true`, em todo despacho. No `context`, diga a pasta
    da spec e o branch. O implementer é bloqueante, e a chamada só volta quando ele
    termina. Não espere pelo `hub`, não chame outra ferramenta na mesma mensagem e
    nunca despache dois tickets ao mesmo tempo.
@@ -63,15 +83,26 @@ o que sobrou junto com o ticket dele.
    mudar o estado. Anote o ticket como pulado, na memória desta execução, e rode o
    script mais uma vez, já com ele no `--skip`. Daqui em diante, toda chamada leva
    o `--skip` com todos os pulados. Nunca despache um pulado de novo nesta
-   execução.
+   execução, nem quando o implementer caiu, abortou ou devolveu erro: quem tenta de
+   novo é a próxima execução.
 6. Mostre a linha de andamento do ticket, com o `status` e a `last` lidos do
    disco. Volte ao passo 2 com a última saída do script.
 
 ## O fim
 
-Com `halt`, o relatório começa por ela: mostre o `git status --short` e diga que o
-operador decide o que fazer com o que sobrou, seja dele ou de um implementer que
-caiu. Depois, siga com o resto do relatório.
+O relatório abre com uma linha que diz o modo da execução: com isolação ou sem
+isolação.
+
+Com `halt`, o relatório segue por ela: mostre o `git status --short` e diga como
+sair, como a linha diz. A saída é do operador: ele guarda o que sobrou com
+`git stash -u`, ou faz um commit dele, e roda a skill de novo. Você não sai da
+parada: não rode `git stash`, não commite e não limpe a árvore. O que sobrou pode
+ser do operador ou de um implementer que caiu. Com `modo: com isolação`, um `halt`
+que aparece depois de um despacho sempre vem do omp, porque o script só despacha
+com a árvore limpa: o omp integrou o trabalho sem commit, e a isolação está no
+modo patch. Diga isso e aponte a configuração do omp, que precisa de
+`task.isolation.merge: branch`, como o `/skill:anvil-omp` explica. Depois, siga
+com o resto do relatório.
 
 Com `all_resolved: yes`, o relatório lista os tickets resolvidos nesta execução e
 recomenda o próximo passo, sem executá-lo, escrito como está aqui, porque no omp
@@ -107,10 +138,19 @@ Com pendência, o relatório lista:
 - Abrir a terceira rodada do review, nem pedir ao implementer que a abra.
 - Rodar browser QA ou archive, abrir PR, fazer merge ou push.
 - Implementar, editar ticket ou código, ou commitar no lugar do implementer.
+- Guardar, commitar ou descartar o que está fora de commit: `git stash`,
+  `git commit`, `git checkout`, `git restore`, `git reset` ou `git clean`.
 - Trocar de branch, criar branch ou rodar o script em outro repositório.
+- Chamar o `task` para outra coisa que não despachar o `next` a um
+  `anvil-implementer`.
 
 ## Retomada
 
 Se a sessão cair, rodar a skill de novo retoma pelo disco: o script recalcula o
 frontier a partir dos tickets gravados. A lista de pulados vale só para a execução
 que a anotou.
+
+Sem isolação, um implementer que caiu deixa a árvore suja, e o script para com
+`halt` até o operador decidir. Com isolação, o que ele deixou não chega ao branch da
+spec: o ticket fica com o estado de antes, sai como pulado nesta execução, e a
+seguinte o despacha de novo.

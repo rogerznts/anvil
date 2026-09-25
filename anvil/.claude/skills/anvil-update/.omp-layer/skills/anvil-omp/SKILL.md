@@ -1,6 +1,6 @@
 ---
 name: anvil-omp
-description: Manual da camada omp do anvil. O que ela instala em .omp/, como a detecção decide, os comandos, os limites e como removê-la.
+description: Manual da camada omp do anvil. O que ela instala em .omp/, como a detecção decide, os comandos, a isolação, os limites e como removê-la.
 argument-hint: "pergunta opcional sobre a camada"
 disable-model-invocation: true
 ---
@@ -57,6 +57,42 @@ camada inteira fica com você e nada em `.omp/` é tocado.
 A guarda de merge age sozinha: `git merge` de spec com ticket aberto ou sem archive,
 e `tea pr create` sem archive, são bloqueados com o mesmo motivo que o Claude Code
 mostra.
+
+## Isolação
+
+Com a isolação de tarefas do omp ligada, o `/skill:anvil-run` despacha cada
+implementer com `isolated: true`. Ele trabalha numa cópia isolada do checkout, e o
+omp traz os commits dele para o branch da spec. O `anvil-run` reconhece a isolação
+pelo campo `isolated` do `task`, que o omp só oferece com a isolação ligada e fora
+do modo plan, e o relatório abre dizendo se a execução rodou com ou sem ela.
+
+Para ligar, escreva no `config.yml` da pasta `.omp/` do projeto, ou no
+`~/.omp/agent/config.yml` para todos os projetos:
+
+```yaml
+task:
+  isolation:
+    enabled: true
+    merge: branch
+```
+
+O `merge: branch` é obrigatório. No modo branch, o omp commita o trabalho num
+branch `omp/task/<id>` e faz cherry-pick dos commits no branch da spec, um commit
+por passo, como sem isolação. O padrão do omp é `patch`, que aplica a mudança sem
+commit: a árvore fica suja, o `anvil-run` para com `halt` e o relatório aponta esta
+configuração.
+
+A isolação muda a retomada. Sem ela, um implementer que cai deixa a sobra na árvore
+da spec, e o `anvil-run` para com `halt` antes do próximo despacho, até você
+decidir: `git stash -u` guarda a sobra, um commit seu a mantém, e rodar a skill de
+novo retoma. Com ela, a sobra de um implementer que cai ou desiste não chega ao
+branch da spec. O omp a deixa no branch `omp/task/<id>` dele, o ticket fica como
+estava, e a execução seguinte o despacha de novo. Os branches `omp/task/*` ficam no
+repositório depois da integração; apague-os com `git branch -D` quando não
+precisar mais deles.
+
+O paralelo depende da isolação: só com ela dois implementers rodam ao mesmo tempo
+sem dividir a mesma árvore. Hoje o `anvil-run` segue em série nos dois modos.
 
 ## O que continua manual no Claude Code e no Codex
 
