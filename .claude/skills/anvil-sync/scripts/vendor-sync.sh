@@ -614,8 +614,13 @@ PYEOF
     # de fora o que esta em bloco cercado, que e exemplo. A cerca e de crase ou de
     # til, e so fecha com a mesma marca e pelo menos o mesmo comprimento: uma cerca
     # de quatro crases pode mostrar uma de tres por dentro.
-    spans_of() {  # <arquivo> <regex>
-        python3 - "$1" "$2" <<'PYEOF'
+    #
+    # Com o terceiro argumento `blocos`, sai tambem o que esta em bloco cercado: a
+    # linha do bloco se parte em palavras nos espacos, nas aspas, na crase e em
+    # `;|&()`, e sai a palavra que casa inteira com a regex. Palavra com `$` e
+    # expansao do shell, e nao caminho, e fica de fora.
+    spans_of() {  # <arquivo> <regex> [blocos]
+        python3 - "$1" "$2" "${3:-}" <<'PYEOF'
 import re, sys
 fence = None
 for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
@@ -623,6 +628,10 @@ for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
     if fence:
         if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and not line[m.end():].strip():
             fence = None
+        elif sys.argv[3] == 'blocos':
+            for t in re.split(r'[\s"\'`;|&()]+', line):
+                if '$' not in t and re.fullmatch(sys.argv[2], t):
+                    print(t)
         continue
     if m:
         fence = m.group(1)
@@ -720,7 +729,8 @@ PYEOF
     # Caminho citado que o anvil instala: a propria camada em .omp/, e o que o payload
     # poe em .claude/ — skills, agentes e o lock. O resto de .claude/, como
     # settings.json e rules/, o boot gera no projeto e nao tem par no payload. Em .md
-    # vale o span em crase fora de bloco cercado, como no check 10. Em .ts, o literal
+    # vale o span em crase fora de bloco cercado, como no check 10, e a palavra dentro
+    # do bloco cercado, que e o comando que a skill manda rodar. Em .ts, o literal
     # de string, que e onde o hook guarda o caminho do script que chama: se o script
     # mudar de lugar, o hook deixa passar tudo em silencio.
     CAMADA_PATH_RE='\.omp/[^*{<]*|\.claude/(skills|agents)/[^*{<]*|\.claude/anvil\.lock'
@@ -734,7 +744,7 @@ for line in open(sys.argv[1], encoding='utf-8', errors='replace'):
             print(m.group(2))
 PYEOF
                 ;;
-            *) spans_of "$1" "$CAMADA_PATH_RE" ;;
+            *) spans_of "$1" "$CAMADA_PATH_RE" blocos ;;
         esac
     }
     echo "15. caminho citado pela camada omp existe no payload"
