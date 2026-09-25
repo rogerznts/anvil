@@ -1,7 +1,7 @@
 # 01: O contrato de stack ganha a sétima capacidade, e o Payload traz o checklist
 
 **Blocked by:** None (can start immediately)
-**Status:** ready-for-agent
+**Status:** claimed
 
 **What to build:** A stack passa a poder declarar o que olhar em segurança, e o `anvil-stack-payload` é a primeira a declarar. O `/anvil-security-map` vai ler esse checklist; aqui ele só precisa existir, estar no contrato e sobreviver ao sync do upstream.
 

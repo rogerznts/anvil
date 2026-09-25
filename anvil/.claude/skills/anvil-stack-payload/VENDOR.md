@@ -33,6 +33,9 @@ Adicionado ao redor, sem tocar no que veio de fora:
 
 - `RULE.md` — as quatro ciladas e a fronteira de edição. Vira
   `.claude/rules/payload.md` no projeto.
+- `security/CHECKLIST.md` — a sétima capacidade do contrato de stack: o que
+  olhar em segurança no Payload, com precedente por item. Carregado só pelo
+  `/anvil-security-map`.
 - `bench/` — starter, scripts e invariantes do `/anvil-bench`, herdados do mosk.
 - este arquivo.
 
