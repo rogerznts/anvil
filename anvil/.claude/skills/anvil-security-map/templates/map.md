@@ -11,6 +11,14 @@ seguem `reference/categories.md` da skill.
 
 {{- fim se}}
 
+{{- se a consulta de advisories não foi feita, total ou parcialmente}}
+
+> Consulta de advisories (OSV.dev/GitHub Security Advisories) incompleta —
+> ver `profile.md` para o motivo. Achados de dependência abaixo, se houver,
+> vêm só da fonte que respondeu.
+
+{{- fim se}}
+
 Categoria sem achado não aparece abaixo.
 
 ## OWASP Top 10:2025
@@ -30,3 +38,13 @@ Só quando o projeto expõe API gerada (Payload: sempre).
 | id | descrição | arquivo:linha | teste do probe | precedente |
 |---|---|---|---|---|
 | {{API1-01}} | collection `{{nome}}`: REST `GET/POST/PATCH/DELETE` e GraphQL equivalentes gerados; `access` {{define X / não define}} | {{caminho:linha}} | {{teste do item 1 do checklist}} | {{link}} |
+
+## Lacunas do checklist
+
+Só aparece quando pelo menos um advisory do repositório da stack não
+corresponde a nenhum item do checklist carregado, nem a nenhuma seção da
+parte genérica (`reference/advisory-lookup.md`, resultado c).
+
+| advisory | pacote | mecanismo | nota |
+|---|---|---|---|
+| {{GHSA-xxxx-xxxx-xxxx / CVE-xxxx-xxxxx}} | {{pacote@versão instalada}} | {{nome do CWE, ou frase curta do summary quando não houver CWE}} | {{por que nenhum item/seção corresponde}} |

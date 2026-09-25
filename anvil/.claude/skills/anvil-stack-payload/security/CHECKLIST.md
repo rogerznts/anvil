@@ -6,6 +6,10 @@ que se erra sem saber que está perto do erro; este arquivo é o que o map varre
 item por item para montar `docs/security/map.md`. Nada aqui executa contra o
 app — quem executa é o `/anvil-security-probe`, pelo teste que cada item indica.
 
+**Repositório GitHub:** `payloadcms/payload` — é dele que o
+`/anvil-security-map` lê os GitHub Security Advisories, quando consulta
+advisories (passo 6 do `SKILL.md` do map).
+
 Cada item traz:
 
 - **O que olhar** — onde no projeto o item se manifesta.

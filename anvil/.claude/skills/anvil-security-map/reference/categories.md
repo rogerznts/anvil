@@ -60,7 +60,7 @@ publicada pela OWASP.
 | SQL cru, execução de comando, template (SSTI), upload sem `mimeTypes`/tipo restrito | A05 — Injection |
 | Autorização por rota sem checagem de sessão/usuário (qualquer framework), caminho de arquivo (path traversal), fetch de URL do usuário (SSRF), Local API sem `overrideAccess: false`, autorização só no middleware, Server Actions/Route Handlers sem reautorização, multi-tenant sem `useTenantAccess`, `pasteURL` sem allowlist | A01 — Broken Access Control |
 | CORS aberto, headers de segurança ausentes, GraphQL sem limite de profundidade/complexidade, introspection ou playground expostos, `csrf` mal configurado | A02 — Security Misconfiguration |
-| Versão instalada de dependência da stack vs. advisories conhecidos | A03 — Software Supply Chain Failures |
+| Versão instalada de qualquer dependência direta do projeto vs. advisory do OSV.dev ou dos GitHub Security Advisories do repositório da stack | A03 — Software Supply Chain Failures |
 | Segredo hardcoded, chave privada versionada | A04 — Cryptographic Failures |
 | `maxLoginAttempts`/`lockTime` ausentes, fluxo de reset de senha sem validação | A07 — Authentication Failures |
 | Collection Payload: rotas REST/GraphQL geradas e `access` que define ou deixa de definir | API1 — Broken Object Level Authorization |
