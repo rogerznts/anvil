@@ -5,10 +5,10 @@ consumidores com um investimento só: o `/anvil-bench`, que constrói ferramenta
 para leigos, e **qualquer agente** trabalhando naquela tecnologia num projeto
 comum.
 
-Adicionar uma stack é preencher seis lacunas conhecidas. O fluxo do bench não
+Adicionar uma stack é preencher sete lacunas conhecidas. O fluxo do bench não
 muda.
 
-## As seis capacidades
+## As sete capacidades
 
 | # | Capacidade | Onde | Carga |
 |---|---|---|---|
@@ -18,12 +18,14 @@ muda.
 | 4 | Ambiente, infra, publicação | `bench/{env,infra,deploy}.sh` | só o bench |
 | 5 | Comando de teste | `RULE.md` + `bench/` | — |
 | 6 | Invariantes e mapeamento do bench | `bench/INVARIANTS.md` | só o bench |
+| 7 | Checklist de segurança | `security/CHECKLIST.md` | só o `/anvil-security-map` |
 
 ```
 anvil-stack-<nome>/
 ├── RULE.md              ~60 l — vira .claude/rules/<nome>.md no projeto
 ├── SKILL.md             ~120 l — roteador: tabela tarefa → solução → arquivo
 ├── reference/           o ofício, um arquivo por assunto
+├── security/CHECKLIST.md  opcional — sétima capacidade, só o map carrega
 └── bench/
     ├── INVARIANTS.md
     ├── starter/
@@ -80,6 +82,13 @@ Um template, dois chamadores:
 - [ ] `reference/` com o ofício, um arquivo por assunto, sem duplicar a rule
 - [ ] `SKILL.md` roteador: tabela tarefa → solução → arquivo. Não repete o que
       está no `reference/`
+- [ ] `security/CHECKLIST.md` — opcional, sétima capacidade: o que olhar em
+      segurança naquela tecnologia, com precedente por item (advisory
+      confirmado por leitura direta, ou doc oficial). Só o
+      `/anvil-security-map` carrega. Uma linha "Repositório GitHub:" perto do
+      topo, opcional, dá ao map o repositório para consultar os GitHub
+      Security Advisories da stack; sem essa linha, o map só consulta o
+      OSV.dev
 - [ ] `bench/starter/` versionado, copiado sem regenerar
 - [ ] `bench/{env,infra,deploy}.sh` idempotentes, com `--help` e `--dry-run`
 - [ ] `bench/INVARIANTS.md` com o que é decisão de produto do bench

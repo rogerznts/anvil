@@ -9,6 +9,9 @@ caso medido: doze rodadas sobre código convergiram e acharam defeito real; trê
 rodadas sobre um documento de contrato não convergiram, porque cada correção
 virou a matéria-prima da rodada seguinte.
 
+A seção *Quando rodar a suíte* responde a outra pergunta, a do custo: quantas
+vezes a suíte roda durante o trabalho, e em que momento ela é o gate.
+
 ## Classe, decidida pela consequência
 
 Todo achado carrega uma classe, e a classe sai do que acontece **se ninguém
@@ -89,3 +92,44 @@ Dois destes bastam para parar:
 - **P2 e P3** ficam por extenso em `## Comments`, pelo perfil em
   `docs/agents/issue-tracker.md`. Não se abre rodada de verificação para limpar
   P2.
+
+## Quando rodar a suíte
+
+O custo da verificação é dado do projeto, não estimativa: está medido e datado
+no `.claude/rules/anvil.md`, e é esse número que decide quantas vezes se roda. O
+perfil não repete número nenhum. Quem medir diferente corrige o `anvil.md` no
+mesmo commit.
+
+**O gate é a suíte inteira mais o typecheck, e roda uma vez por ticket, nunca uma
+vez por spec.** Validar por spec parece mais barato em CPU. Mas quando a suíte
+fecha vermelha, você não tem um defeito: tem uma bissecção com N tickets
+candidatos, sobre commits já entrelaçados, e cada tentativa custa uma suíte
+inteira. O verde por ticket é o que faz do commit uma âncora confiável.
+
+**O gate não bloqueia.** Dispare-o em background e siga com o commit, a
+documentação ou o próximo ticket. O tempo de máquina não é tempo seu. Três
+rodadas bloqueantes por ticket são insustentáveis; uma não bloqueante é barata.
+
+**Antes do merge, a suíte inteira roda mais uma vez, sobre o branch completo.**
+Não é redundante com o gate por ticket: ela pega a interação entre tickets, que
+nenhum gate individual viu.
+
+### O laço curto, quando a suíte começar a doer
+
+Enquanto a suíte inteira couber em ~2 min, ela **é** o laço: rode-a a cada
+conferida. A divisão abaixo se adota quando o laço passar disso, e não na
+instalação. Adotada cedo, vira cerimônia.
+
+Com a divisão, o `anvil.md` passa a ter dois comandos, cada um com seu custo
+medido:
+
+- **`laço`** — roda a cada conferida durante o ticket. O que é barato e
+  transversal roda **inteiro**: é onde vivem as redes que pegam o que nenhuma
+  seleção por assunto veria. Só o caro se seleciona pelo assunto do ticket, e
+  numa invocação só, porque o custo fixo de preparar o ambiente é pago por
+  invocação, não por arquivo.
+- **`gate`** — a suíte inteira mais o typecheck, uma vez por ticket, como acima.
+
+A seleção do laço **adia** a descoberta, nunca a dispensa. A variante perigosa é
+*"rodo só o selecionado e confio"*: aí ela deixa de ser otimização de laço e vira
+redução de cobertura. Seleção larga demais é o sinal de rodar o gate direto.

@@ -73,7 +73,7 @@ flowchart TD
         B3 --> B4["anvil-docs, sem verbo<br/>escolhe scaffold ou adopt<br/>architecture · discovery<br/>specs · agents"]
         B4 --> B5["anvil-setup<br/>docs/agents/issue-tracker.md"]
         B5 --> B6{"achou<br/>payload.config.ts?"}
-        B6 -->|sim| B7["propõe rules/payload.md<br/>e espera aprovação"]
+        B6 -->|sim| B7["propõe rules/payload.md<br/>e sugere /anvil-security-map<br/>duas aprovações separadas"]
         B6 -->|não| B8
         B7 --> B8["registra o hook de merge<br/>e confirma que dispara"]
     end
@@ -238,7 +238,7 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 
 | skill | para quê | origem |
 |---|---|---|
-| `anvil-stack-payload` | o ofício do Payload em 11 arquivos, mais a `RULE.md` com as três ciladas | payloadcms |
+| `anvil-stack-payload` | o ofício do Payload em 11 arquivos, mais a `RULE.md` com as quatro ciladas | payloadcms |
 | `anvil-bench` | leva quem não programa de uma necessidade até a ferramenta rodando | autoral + `unlazy` |
 
 O bench é autoral, mas carrega material de terceiro embaixo de `unlazy/`: o
@@ -252,6 +252,18 @@ dispara em *"long or multi-part task"* e se auto-invocaria dentro do
 `/anvil-implement`. O que ficou de fora, e por quê, está em
 `anvil-bench/unlazy/VENDOR.md` — inclusive o Stop hook, que competiria com o teto
 de três tentativas do próprio bench.
+
+### Segurança
+
+| skill | para quê | origem |
+|---|---|---|
+| `anvil-security-map` | detecta a stack, carrega o checklist dela e soma a parte genérica, e grava `docs/security/profile.md` e `map.md` — nunca executa contra o app | autoral |
+| `anvil-security-probe` | confere as travas (mapa, alvo local, confirmação, proteção do banco), executa os testes do mapa e abre spec `fix` por achado reproduzido em `docs/security/findings.md` | autoral |
+
+Autorais fora do padrão comum: destiladas de referências externas — a ideia,
+não o texto —, cada uma com `SOURCES.md`. Fora do `anvil-skills.yaml`: sem pin,
+sem sync. Ver
+[adr-0013](docs/architecture/adr/adr-0013-skills-de-seguranca-sao-autorais.md).
 
 ---
 
@@ -278,6 +290,7 @@ docs/
 │   └── archive/
 │
 ├── qa/                         ◆  anvil-browser-qa
+├── security/                   ◆  anvil-security-map, anvil-security-probe
 └── prd/  ui/  project/         ○  reconhecidos, nascem quando houver conteúdo
 ```
 

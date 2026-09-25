@@ -67,6 +67,7 @@ docs/
 ├── prd/                        ○  escopo de produto
 ├── ui/                         ○  design system e fluxos duráveis
 ├── qa/                         ◆  checklist e evidências (anvil-browser-qa)
+├── security/                   ◆  perfil, mapa e achados (anvil-security-map, anvil-security-probe)
 └── project/                    ○  plano e atualizações datadas
 ```
 
@@ -92,6 +93,8 @@ Duas camadas espelhadas: **base**, que é a verdade do projeto hoje, e
 | `specs/{id}/ui/` | `anvil-grill`. Fluxo de usuário, comportamento de interface e wireframe são decisão que vira artefato — a mesma natureza de um ADR. Quando a pergunta só se responde vendo rodar, o `anvil-prototype` gera as variantes, você escolhe, e **a decisão volta para o documento**; o protótipo em si é descartável e vive fora da main |
 | `agents/issue-tracker.md` | `anvil-setup` |
 | `qa/` e `specs/{id}/qa/` | `anvil-browser-qa`, com checklist e evidências de testes no navegador |
+| `security/profile.md` e `security/map.md` | `anvil-security-map` |
+| `security/findings.md` | `anvil-security-probe` |
 | `prd/` · `ui/` · `project/` | **ninguém.** São para o que você escrever à mão |
 
 **Nenhuma skill autora PRD.** O modelo é o das skills de fluxo: a spec é a
@@ -168,8 +171,8 @@ confira o gatilho do `adopt`, em [Verbos](#verbos). Com gatilho, **pare e use
 
 1. Criar **só os quatro que têm escritor**: `architecture/adr/`, `discovery/`,
    `specs/archive/` e `agents/`. **Nunca sobrescrever** uma que já existe.
-   `prd/`, `ui/`, `qa/` e `project/` não nascem agora — nascem quando alguém
-   escrever neles.
+   `prd/`, `ui/`, `qa/`, `security/` e `project/` não nascem agora — nascem
+   quando alguém escrever neles.
 2. Cada pasta criada recebe um `README.md` curto dizendo quem escreve ali.
 3. Chamar o `anvil-setup` para escrever `docs/agents/issue-tracker.md` a partir
    do perfil em [templates/issue-tracker-anvil.md](templates/issue-tracker-anvil.md).
@@ -184,7 +187,7 @@ confira o gatilho do `adopt`, em [Verbos](#verbos). Com gatilho, **pare e use
 
 ## Contrato de stack
 
-Adicionar uma stack ao anvil é preencher seis lacunas conhecidas, sem tocar no
+Adicionar uma stack ao anvil é preencher sete lacunas conhecidas, sem tocar no
 fluxo do bench. O contrato está em [STACK-CONTRACT.md](STACK-CONTRACT.md).
 
 ## Verificação

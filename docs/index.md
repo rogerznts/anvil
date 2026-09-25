@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-25T19:05:58Z
+Last updated: 2026-09-25T23:41:55Z
 
 ## Visão geral
 
@@ -12,6 +12,9 @@ Last updated: 2026-09-25T19:05:58Z
     de integração do anvil com o omp, antes do grill
   - [camadas-anvil-omp.md](./discovery/camadas-anvil-omp.md) — desenho em
     mermaid das camadas, da instalação, da execução e da guarda de merge
+  - [seguranca-map-probe.md](./discovery/seguranca-map-probe.md) — candidatos
+    a upstream, metodologia e ferramentas para `anvil-security-map` e
+    `anvil-security-probe`
 - **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
 
@@ -21,8 +24,10 @@ Nenhuma.
 
 ## Specs arquivadas
 
+- [005 — Mapa de superfície de ataque e teste local com spec de correção](./specs/archive/005-feature-security-map-probe/spec.md) — `feature/adjust-code-review`, 7 tickets
 - [004 — Robustez e isolamento da camada omp](./specs/archive/004-extension-omp-layer-hardening/spec.md) — `extension/004-omp-layer-hardening`, 11 tickets
 - [003 — omp como harness, com camada própria](./specs/archive/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, 10 tickets
+- [002 — O custo de verificar como dado do projeto](./specs/archive/002-feature-custo-de-verificacao/spec.md) — `feature/adjust-code-review`, 5 tickets
 - [001 — Equipe e destilação](./specs/archive/001-feature-team-distill-sentrux/spec.md) — `feature/001-team-distill-sentrux`, 12 tickets
 
 ## Conteúdo por domínio
@@ -70,6 +75,9 @@ Nenhuma.
     — o omp é harness de primeira classe, com camada própria; a orquestração volta só nela
   - [adr-0012](./architecture/adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md)
     — o frontier roda em paralelo sob pedido, só com a isolação do omp no modo branch
+  - [adr-0013](./architecture/adr/adr-0013-skills-de-seguranca-sao-autorais.md)
+    — as skills de segurança são autorais, destiladas das referências; exceção ao
+    adr-0001, e sétima capacidade no contrato de stack do adr-0006
 
 ### Project
 

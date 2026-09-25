@@ -17,8 +17,8 @@ Só fale se encontrar link quebrado ou entrada obsoleta.
 1. **Carregar** [templates/docs-index.md](templates/docs-index.md).
 
 2. **Domínios base** — para cada um de `discovery/`, `prd/`, `architecture/`,
-   `ui/`, `qa/`, `project/`: se a pasta não existe, **não gere o link**. Índice
-   que aponta para pasta ausente é pior que índice incompleto.
+   `ui/`, `qa/`, `security/`, `project/`: se a pasta não existe, **não gere o
+   link**. Índice que aponta para pasta ausente é pior que índice incompleto.
 
 3. **Specs ativas** — uma linha por pasta em `docs/specs/*/` que não esteja sob
    `archive/`. O estado é derivado, não lido de campo:

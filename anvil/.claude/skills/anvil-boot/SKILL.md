@@ -88,6 +88,51 @@ O que você quer capturar: stack, entrypoints, camadas, comandos, integrações,
 convenções, testes, dívida técnica e as pegadinhas operacionais. **Com caminho
 verificado** — caminho citado de memória e errado é pior que ausente.
 
+### Arquivo gerado fora do diff
+
+A revisão lê `git diff`. Arquivo gerado e versionado entra nele inteiro, sem uma
+linha revisável: snapshot de migration, saída de codegen, lockfile. Num projeto
+com migrations, cada snapshot tem o tamanho do schema inteiro, e o seguinte é
+maior que o anterior. Ele cresce a cada spec e ocupa o que a revisão deveria
+gastar no código.
+
+Procure os gerados versionados por convenção (diretório de snapshot de
+migration, arquivo de tipos gerado, `*.generated.*`, `__generated__/`) e por
+marca no próprio arquivo (`@generated`, `DO NOT EDIT`). Meça o peso de cada um no
+histórico recente:
+
+```bash
+git log -n 50 --numstat --format= | awk '$1 != "-" {
+  l[$3] += $1 + $2; t += $1 + $2 }
+  END { for (f in l) printf "%d\t%.0f%%\t%s\n", l[f], 100 * l[f] / t, f }' |
+  sort -rn | head -20
+```
+
+**Achado relevante** é quando os gerados somam uma fatia que a revisão sentiria:
+algo como 20% das linhas mudadas, ou um arquivo que cresce a cada migration. O
+número é arbitrário; o ponto é a evidência. Sem achado relevante, não proponha
+nada.
+
+Com achado, mostre a lista (arquivo, linhas no histórico, proporção) e proponha
+uma linha por padrão:
+
+```gitattributes
+src/migrations/*.json -diff linguist-generated=true
+```
+
+- **Espere aprovação.** Um `.gitattributes` que já existe se **mescla**: só
+  entram as linhas que faltam, e as do projeto não se tocam.
+- **Diga que é apresentação, não conteúdo.** O arquivo continua versionado e no
+  `git add`, e o que depende dele segue funcionando. Para vê-lo:
+  `git diff --text -- <arquivo>`.
+- **O arquivo escrito à mão ao lado do gerado continua no diff.** O padrão pega o
+  snapshot, não a migration que a pessoa escreveu. Confira isso antes de propor.
+- **Lockfile é proposta separada.** Tirá-lo do diff esconde troca de dependência,
+  e isso é decisão do projeto, não do boot.
+
+Nada muda no `anvil-code-review`: o `git diff` que ele captura já respeita o
+atributo.
+
 ## 4. Rules
 
 `.claude/rules/` é do projeto: o `/anvil-update` **nunca** toca nele. Markdown
@@ -97,8 +142,8 @@ puro, sem frontmatter.
   camadas, convenções de pasta, como rodar os testes, fluxos comuns, e as regras
   que o agente deve seguir neste projeto.
 - **`anvil.md`** — sempre. A configuração resolvida: idioma de comunicação
-  (default pt-BR), comando de teste, e a lista de modelos por papel que o
-  `anvil-arena`, o `anvil-how` e o `anvil-architect` leem.
+  (default pt-BR), comando de teste com o custo medido, e a lista de modelos por
+  papel que o `anvil-arena`, o `anvil-how` e o `anvil-architect` leem.
 - **`frontend.md`** — só se houver código de frontend.
 
 A seção de modelos do `anvil.md`:
@@ -115,6 +160,60 @@ Lidos por `anvil-arena`, `anvil-how` e `anvil-architect`.
 
 Num `anvil.md` que já existe sem a lista, proponha acrescentá-la; valor já
 configurado não se troca.
+
+### O custo da verificação
+
+O comando de teste vai no `anvil.md` **com o custo medido**. É esse número que
+decide quantas vezes a suíte roda durante um ticket. Um número errado faz rodar a
+suíte inteira a cada conferida, *porque é rápida*, ou pular a verificação,
+*porque é lenta*. Os dois erros vêm do dado, não da disciplina.
+
+**Meça, não estime.** Peça para rodar o comando uma vez: rodar a suíte pode levar
+minutos e mexer em banco de teste. Rode em background e cronometre. Com o tempo
+em mãos, a seção fica assim:
+
+~~~markdown
+## Comando de verificação
+
+```bash
+pnpm test
+```
+
+Custo medido: 3min12s, em 2026-09-23, numa máquina Linux de 16 CPUs.
+
+Quem medir diferente corrige este arquivo no mesmo commit. O critério de quando
+rodar a suíte está em `docs/agents/verification.md`.
+~~~
+
+- **O comando não roda** (falta banco, dependência ou serviço) → grave o comando
+  sem custo, com o motivo numa linha. Número estimado não se grava: é o defeito
+  que esta seção existe para evitar.
+- **Recusado** → grave o comando sem custo e diga que ele ficou sem medição.
+
+**O custo mora só aqui.** O `project.md` diz *como* rodar os testes; quando falar
+de custo, aponta para o `anvil.md`. Número repetido em dois arquivos diverge no
+primeiro que alguém atualizar e esquecer o outro.
+
+Quando o projeto adotar o laço curto do perfil de verificação, a seção passa a ter
+dois comandos, cada um com o seu custo, nos termos do perfil:
+
+```markdown
+- `laço`: `pnpm test:ticket`. Custo medido: 1min10s, em 2026-09-23.
+- `gate`: `pnpm test && npx tsc --noEmit`. Custo medido: 16min, em 2026-09-23.
+```
+
+O boot não propõe essa divisão. Ela se adota quando o laço passar de ~2 min, e o
+perfil diz por quê.
+
+**Num `anvil.md` que já existe**, o comando configurado não se troca.
+
+- **Sem custo** → proponha medir e acrescentar, e espere aprovação.
+- **Com custo, e o medido difere** → mostre os dois, com a data de cada um, e
+  espere aprovação para trocar.
+- **Custo repetido fora do `anvil.md`** → procure tempo de teste em `CLAUDE.md` e
+  nas outras rules. Aponte cada ocorrência, com arquivo e linha, e proponha
+  trocá-la por um ponteiro para o `anvil.md`. Não edite sozinho: fora do bloco
+  delimitado, o `CLAUDE.md` é do projeto.
 
 Depois, **sugira** rules adicionais, cada uma com uma linha de evidência do
 código que a justifica, e **espere aprovação**: `coding-standards.md`,
@@ -151,18 +250,31 @@ Idêntico → siga sem perguntar. Divergente → mostre o diff e espere aprovaç
 `anvil-code-review` tira classe, orçamento e escopo diff-only; sem ele, o critério
 que se instala sozinho é "nenhum achado aberto".
 
-## 7. Stack
+## 7. Stack e segurança
 
 Se a varredura encontrou uma stack conhecida — hoje, um `payload.config.ts` —
 **proponha** a rule dela com uma linha de justificativa, e espere aprovação:
 
 > *Achei `payload.config.ts` com adapter Postgres. Posso escrever
-> `.claude/rules/payload.md` com as três ciladas de Local API, transação e loop
-> de hook, mais a fronteira do que eu posso editar?*
+> `.claude/rules/payload.md` com as quatro ciladas — Local API, transação, loop
+> de hook e `--no-isolate` com o plugin multi-tenant —, mais a fronteira do que
+> eu posso editar?*
 
 A rule sai da skill `anvil-stack-payload`, arquivo `RULE.md`, com os `{{...}}`
 preenchidos pelo que a varredura achou. **Sem** as invariantes do bench — aquelas
 são decisão de produto do `/anvil-bench` e não valem para projeto comum.
+
+Na mesma detecção, **sugira** rodar `/anvil-security-map`, numa linha dizendo a
+stack e se ela tem checklist:
+
+> *A stack é Payload, que tem checklist de segurança
+> (`anvil-stack-payload/security/CHECKLIST.md`). Quer rodar
+> `/anvil-security-map` para mapear a superfície de ataque?*
+
+Stack detectada sem checklist: diga isso na mesma linha — o map ainda cobre a
+parte genérica. **Espere aprovação**, independente da rule. Recusada, siga o
+boot sem chamar o map e sem gravar nada em `docs/security/`. Aceita, chame a
+Skill tool com **anvil-security-map**.
 
 ## 8. Guarda de merge
 
