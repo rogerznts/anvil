@@ -5,7 +5,7 @@
 - Revê em parte o [ADR-0011](./adr-0011-omp-como-harness-com-camada-propria.md): a
   alternativa "frontier em paralelo com worktree isolado" entra, sob pedido e só com
   a isolação do omp
-- Origem: spec 004, ticket 09 (`docs/specs/004-extension-omp-layer-hardening/`)
+- Origem: spec 004, ticket 09 (`docs/specs/archive/004-extension-omp-layer-hardening/`)
 
 ## Contexto
 

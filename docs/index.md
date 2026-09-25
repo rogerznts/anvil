@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-25T17:17:42Z
+Last updated: 2026-09-25T19:05:58Z
 
 ## Visão geral
 
@@ -17,10 +17,11 @@ Last updated: 2026-09-25T17:17:42Z
 
 ## Specs ativas
 
-- [004 — Robustez e isolamento da camada omp](./specs/004-extension-omp-layer-hardening/spec.md) — `extension/004-omp-layer-hardening`, pronto para arquivar, 11/11 tickets resolvidos
+Nenhuma.
 
 ## Specs arquivadas
 
+- [004 — Robustez e isolamento da camada omp](./specs/archive/004-extension-omp-layer-hardening/spec.md) — `extension/004-omp-layer-hardening`, 11 tickets
 - [003 — omp como harness, com camada própria](./specs/archive/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, 10 tickets
 - [001 — Equipe e destilação](./specs/archive/001-feature-team-distill-sentrux/spec.md) — `feature/001-team-distill-sentrux`, 12 tickets
 

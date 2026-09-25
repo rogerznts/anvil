@@ -7,7 +7,7 @@ ligada à spec de origem e tira a linha daqui no mesmo branch.
 
 ## Spec 004: robustez e isolamento da camada omp
 
-Origem: `docs/specs/004-extension-omp-layer-hardening/`, que resolveu as linhas A1
+Origem: `docs/specs/archive/004-extension-omp-layer-hardening/`, que resolveu as linhas A1
 a A11 que a spec 003 (omp como harness, com camada própria) deixou aqui: bloqueio
 fora do formato, árvore suja, P1 em linha combinada, caixa alta acentuada, check 15,
 exemplos do `tela: nao`, desvios sem prova, identificadores em português,
