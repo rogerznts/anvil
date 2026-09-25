@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-25T21:44:25Z
+Last updated: 2026-09-25T21:48:36Z
 
 ## Visão geral
 
@@ -26,6 +26,7 @@ Nenhuma.
 
 - [005 — Mapa de superfície de ataque e teste local com spec de correção](./specs/archive/005-feature-security-map-probe/spec.md) — `feature/adjust-code-review`, 7 tickets
 - [003 — omp como harness, com camada própria](./specs/archive/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, 10 tickets
+- [002 — O custo de verificar como dado do projeto](./specs/archive/002-feature-custo-de-verificacao/spec.md) — `feature/adjust-code-review`, 5 tickets
 - [001 — Equipe e destilação](./specs/archive/001-feature-team-distill-sentrux/spec.md) — `feature/001-team-distill-sentrux`, 12 tickets
 
 ## Conteúdo por domínio
