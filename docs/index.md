@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-09-24T02:31:03Z
+Last updated: 2026-09-25T21:10:43Z
 
 ## Visão geral
 
@@ -20,7 +20,7 @@ Last updated: 2026-09-24T02:31:03Z
 
 ## Specs ativas
 
-- [005 — Mapa de superfície de ataque e teste local com spec de correção](./specs/005-feature-security-map-probe/spec.md) — `feature/adjust-code-review`, 7 tickets
+- [005 — Mapa de superfície de ataque e teste local com spec de correção](./specs/005-feature-security-map-probe/spec.md) — `feature/adjust-code-review`, pronto para arquivar, 7/7 tickets
 
 ## Specs arquivadas
 
