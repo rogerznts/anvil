@@ -5,6 +5,7 @@
 **Blocked by:** 02, 03, 04, 05, 06, 07, 09, 10
 
 **Status:** resolved
+**Review:** round=1; sha=6705312; scope=full; verdict=pass; p1=none
 
 - [ ] O ponta a ponta da 003 (`workspace/35-omp-e2e/`) roda do degit ao relatório da `anvil-run` com o payload deste branch, e o `check.sh` passa, ajustado só para as chaves novas.
 - [x] As linhas A1 a A11 saem de `docs/project/acompanhamento.md`, e fica uma linha para o adaptador de tracker, com origem nesta spec.
@@ -20,3 +21,7 @@
 - A `anvil-run` despachou o 01 e o 02 em série, um item por `task`. Cada implementer rodou o `anvil-implement`, o `anvil-tdd` e o `anvil-code-review`, e os dois tickets fecharam com `round=1/pass`. O relatório abriu com `modo: sem isolação` e trouxe `ready por rodada: 1, 1`. As guardas barraram os dois merges: o primeiro com "0 de 2 tickets resolvidos", o segundo pela falta de archive.
 - Acompanhamento: saíram as linhas A1 a A11. A A12 é o adaptador de tracker, a parte do A9 que ficou fora desta spec, e entraram a A13 e a A14 deste ponta a ponta. O README (tabela de comandos do omp) e o `overview.md` (seção Harnesses) citam o paralelo sob pedido com a isolação no modo branch e o ADR-0012.
 - `vendor-sync.sh verify`: `verify: limpo` em `/opt/local/bin/bash` e `/bin/bash`, com saídas idênticas.
+- Review round=1 · P3 (Spec): o ticket fecha com o critério 1 sem marca, e os Comments atribuem isso só à falha do browser QA. Os ajustes no `plan_check.py` e no `e2e.sh` também saem de "ajustado só para as chaves novas", e nenhuma frase diz que fechar com o critério aberto foi aceito. Quem lê o ticket fechado, ou o archive, não distingue pendência aceita de esquecida. A aceitação é do operador, no fechamento da spec.
+- Review round=1 · P2 (Standards): no ramo novo do `plan_check.py`, uma vez de sim que não carregue etapa nem desvio passa como volta à origem, sem conferir que a origem seguiu. Nesta rodada as vezes 4 e 9 trazem as perguntas Q4 e Q7 do grill, mas o check não exige isso. Uma rodada futura em que o modelo pare depois do sim passaria. Correção: exigir no fim da vez m+1 um sinal da origem, como uma pergunta do grill.
+- Review round=1 · P3 (Standards): o cabeçalho da seção do acompanhamento cita "as linhas A1 a A11 da spec 003" e "o antigo A9" sem glosa, logo depois de apagá-las.
+- Review round=1 · P3 (Standards): as linhas A13 e A14 saem sem classe e rodada, ao contrário das antigas. Quem priorizar o acompanhamento precisa reler o ticket.
