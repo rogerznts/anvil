@@ -53,10 +53,18 @@ Só existe se a stack tiver sétima capacidade
 Para `profile.md`. Nada disto executa a ferramenta — só confere presença:
 
 ```bash
-for t in semgrep osv-scanner gitleaks trufflehog zap nuclei sqlmap schemathesis graphql-cop clairvoyance; do
+for t in semgrep osv-scanner gitleaks trufflehog nuclei sqlmap schemathesis clairvoyance; do
   command -v "$t" >/dev/null 2>&1 && echo "presente: $t" || echo "ausente: $t"
 done
-npm audit --version >/dev/null 2>&1 && echo "presente: npm audit"
+# zap e graphql-cop têm mais de um nome de binário conforme a instalação
+{ command -v zap.sh || command -v zaproxy || command -v zap-baseline.py; } >/dev/null 2>&1 \
+  && echo "presente: zap" || echo "ausente: zap"
+{ command -v graphql-cop || command -v graphql-cop.py; } >/dev/null 2>&1 \
+  && echo "presente: graphql-cop" || echo "ausente: graphql-cop"
+{ command -v npm >/dev/null 2>&1 && npm audit --version >/dev/null 2>&1; } \
+  && echo "presente: npm audit" || echo "ausente: npm audit"
+{ command -v pnpm >/dev/null 2>&1 && pnpm audit --version >/dev/null 2>&1; } \
+  && echo "presente: pnpm audit" || echo "ausente: pnpm audit"
 ```
 
 Ambiente local, só por leitura:
@@ -85,12 +93,14 @@ ocorrência vira uma linha do mapa, citando arquivo:linha e o "teste do probe"
 do próprio item, **verbatim** — não parafraseie o teste, porque é o contrato
 que o probe lê depois.
 
-No Payload, o item 1 do checklist (collections e rotas geradas) cobre cada
-`src/collections/*.ts` (ou o caminho equivalente do projeto): toda collection
-gera `GET/POST/PATCH/DELETE` REST e as operações GraphQL correspondentes,
-inclusive edição e remoção em massa por `where`, mesmo sem nenhuma rota
-escrita à mão. Liste cada collection com o `access` que ela define ou deixa
-de definir — é o que a User Story do Payload pede.
+Quando o "como reconhecer" de um item mira uma classe de código que se repete
+no projeto — uma collection, uma rota, um campo —, gere **uma linha do mapa
+por ocorrência**, não uma linha resumindo a classe inteira. É essa regra,
+aplicada ao item de collections e rotas geradas do checklist do Payload, que
+faz cada collection aparecer no mapa com o `access` que ela define ou deixa
+de definir — sem que esta skill agnóstica precise conhecer o Payload por
+conta própria; o "como reconhecer" e o "teste do probe" de cada linha vêm do
+item do checklist, não desta skill.
 
 ## 6. IDs e categorias
 
@@ -120,8 +130,9 @@ não informa nada que a ausência da seção já não diga.
 - Nenhum comando desta skill fez requisição de rede ao app do projeto, subiu
   processo do projeto, nem abriu conexão de banco. Consultar API de advisory
   (OSV.dev, GHSA) é uma extensão futura **deste map**, não do probe — enquanto
-  ela não existir aqui, o item de versões do checklist sai como "só leitura,
-  consulta externa não implementada nesta versão do map".
+  ela não existir aqui, o "teste do probe" do item de versões continua o
+  texto do checklist da stack, verbatim, **acrescido** de uma nota: "consulta
+  externa (OSV.dev/GHSA) não implementada nesta versão do map".
 - `docs/security/findings.md` está exatamente como estava antes de rodar —
   inclusive **ausente**, se já estava ausente.
 - `profile.md` diz, sem ambiguidade, se há checklist específico; sem ele, diz

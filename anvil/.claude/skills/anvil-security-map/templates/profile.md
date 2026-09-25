@@ -18,7 +18,8 @@ execução — não edite à mão; edite via nova execução do map.
 |---|---|
 | semgrep | {{sim/não}} |
 | osv-scanner | {{sim/não}} |
-| npm audit / pnpm audit | {{sim/não}} |
+| npm audit | {{sim/não}} |
+| pnpm audit | {{sim/não}} |
 | gitleaks | {{sim/não}} |
 | trufflehog | {{sim/não}} |
 | zap | {{sim/não}} |

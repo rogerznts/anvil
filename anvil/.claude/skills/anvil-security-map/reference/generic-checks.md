@@ -16,7 +16,7 @@ qualquer outro achado, para manter a numeração determinística de
 **Sobreposição com o checklist da stack.** Quando um achado bate tanto num
 item da parte genérica quanto num item do checklist da stack (ex.: Local API
 sem `overrideAccess: false` é ao mesmo tempo "autorização por rota" genérica e
-o item 2 do checklist do Payload), a mesma ocorrência vira **uma linha só**, e
+um item do checklist do Payload), a mesma ocorrência vira **uma linha só**, e
 o texto — descrição, teste do probe, precedente — vem do item do checklist:
 ele é mais específico da tecnologia. A parte genérica preenche a lacuna só
 quando o checklist não cobre aquele arquivo:linha.
