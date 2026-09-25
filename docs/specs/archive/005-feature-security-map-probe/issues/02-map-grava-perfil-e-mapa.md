@@ -3,6 +3,7 @@
 **Blocked by:** 01
 **Status:** resolved
 **Review:** round=1; sha=3de00ac; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 **What to build:** Um desenvolvedor roda `/anvil-security-map` num projeto com o anvil instalado, com ou sem ter passado pelo boot, e ganha `docs/security/profile.md` e `docs/security/map.md`. O map não executa nada contra o app: roda sem servidor de dev no ar.
 

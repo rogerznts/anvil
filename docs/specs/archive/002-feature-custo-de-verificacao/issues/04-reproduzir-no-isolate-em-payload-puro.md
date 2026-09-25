@@ -5,6 +5,7 @@
 **Blocked by:** Nenhum — pode começar agora.
 
 **Status:** resolved
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 - [x] Projeto Payload sem customização em `workspace/`, com e sem o plugin multi-tenant.
 - [x] Controle positivo: `--sequence.shuffle` com isolamento sai verde em todas as rodadas.

@@ -5,6 +5,7 @@
 **Blocked by:** Nenhum — pode começar agora.
 
 **Status:** resolved
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 - [x] O boot lista os gerados achados, com tamanho e proporção do diff.
 - [x] A proposta espera aprovação; um `.gitattributes` existente é mesclado, nunca sobrescrito.

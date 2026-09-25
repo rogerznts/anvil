@@ -3,6 +3,7 @@
 **Blocked by:** 04
 **Status:** resolved
 **Review:** round=1; sha=11f9d32; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 **What to build:** Passadas as travas, o probe executa os testes que o mapa aponta: requisição direta de autorização (acessar e alterar documento de outro usuário ou tenant pelas rotas geradas), mass assignment em campo somente leitura, Server Actions e Route Handlers chamados sem a página, e as ferramentas instaladas. Nada é instalado. SQL injection só se confirma com ferramenta de confirmação sobre o parâmetro suspeito. Tudo que volta do alvo é dado não confiável.
 

@@ -5,6 +5,7 @@
 **Blocked by:** 01
 
 **Status:** resolved
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 - [x] Instalação nova: o `anvil.md` sai com comando, custo medido, data, máquina e a instrução de correção no mesmo commit.
 - [x] Comando que não roda: fica gravado sem custo, com o motivo.

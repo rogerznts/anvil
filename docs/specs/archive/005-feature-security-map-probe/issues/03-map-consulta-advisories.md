@@ -3,6 +3,7 @@
 **Blocked by:** 02
 **Status:** resolved
 **Review:** round=1; sha=f10859c; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 **What to build:** O mapa passa a acompanhar advisory publicado depois do checklist. O map consulta a API do OSV.dev pelos pacotes e versões do lockfile, e os GitHub Security Advisories do repositório da stack detectada. Só essas fontes: nada de busca aberta na web.
 

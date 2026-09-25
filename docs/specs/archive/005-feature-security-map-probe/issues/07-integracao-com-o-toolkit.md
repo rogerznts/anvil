@@ -3,6 +3,7 @@
 **Blocked by:** 02
 **Status:** resolved
 **Review:** round=1; sha=e6fadd2; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 **What to build:** O toolkit passa a conhecer as skills de segurança. O `/anvil-boot`, no passo em que detecta a stack e propõe a rule dela, sugere rodar o `/anvil-security-map`, com uma linha dizendo a stack e se ela tem checklist; recusado, segue normalmente e não grava nada de segurança. O `anvil-docs` passa a conhecer `docs/security/` na árvore e no índice: a pasta nasce quando o map escreve nela, como as demais pastas com escritor. O `.claude/rules/project.md` lista as duas skills entre as autorais.
 

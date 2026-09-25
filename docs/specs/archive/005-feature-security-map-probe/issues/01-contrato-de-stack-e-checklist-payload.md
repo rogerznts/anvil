@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 **Status:** resolved
 **Review:** round=1; sha=203f333; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 **What to build:** A stack passa a poder declarar o que olhar em segurança, e o `anvil-stack-payload` é a primeira a declarar. O `/anvil-security-map` vai ler esse checklist; aqui ele só precisa existir, estar no contrato e sobreviver ao sync do upstream.
 

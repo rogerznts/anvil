@@ -5,6 +5,7 @@
 **Blocked by:** Nenhum — pode começar agora.
 
 **Status:** resolved
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 - [x] O template do perfil no `anvil-docs` tem a seção do custo, ao lado de classe, orçamento e persistência.
 - [x] A seção diz: gate por ticket, com o argumento da bissecção; gate em background; rodada antes do merge; sinal de adoção do laço curto (~2 min); forma genérica do laço curto (o barato e transversal roda inteiro, só o caro se seleciona, numa invocação só); a seleção adia e não dispensa o gate.

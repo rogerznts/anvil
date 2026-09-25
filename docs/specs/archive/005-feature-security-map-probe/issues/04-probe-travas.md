@@ -3,6 +3,7 @@
 **Blocked by:** 02
 **Status:** resolved
 **Review:** round=1; sha=cc42771; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 **What to build:** Um desenvolvedor roda `/anvil-security-probe` e, antes de qualquer teste, o probe passa pelas travas, nesta ordem:
 

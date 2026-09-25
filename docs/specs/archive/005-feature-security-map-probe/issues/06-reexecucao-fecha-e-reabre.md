@@ -3,6 +3,7 @@
 **Blocked by:** 05
 **Status:** resolved
 **Review:** round=1; sha=e0e42c2; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 **What to build:** O `findings.md` acompanha as correções. Ao rodar de novo, o probe retesta cada `SEC-#`: o que não se reproduz mais vira `corrigido`; o que estava `corrigido` e volta a se reproduzir é reaberto no mesmo `SEC-#`, com a evidência nova, sem id novo.
 

@@ -5,6 +5,7 @@
 **Blocked by:** 04
 
 **Status:** resolved
+**PR:** https://github.com/rogerznts/anvil/pull/6
 
 - [x] Reproduziu: a cilada entra no `RULE.md` do `anvil-stack-payload` no formato das outras, com o alcance do veredito do 04, e o título vira "As quatro ciladas".
 - [x] Nenhum número de projeto é citado na cilada.
