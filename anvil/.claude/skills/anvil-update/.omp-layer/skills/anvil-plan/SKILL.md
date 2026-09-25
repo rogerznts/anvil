@@ -102,6 +102,10 @@ Um sinal que aparece no meio do grill trava uma pergunta. Proponha o desvio no f
 da rodada, ao lado das perguntas que não dependem dele. O desvio só é carregado com
 o sim, como uma etapa.
 
+O sinal nunca é o sim, nem quando o operador diz que só decide vendo rodar,
+pesquisando ou perguntando a alguém. A fala dele descreve a necessidade. Quem
+nomeia o desvio é a proposta, e só a resposta a ela carrega a skill.
+
 Quando o desvio termina, proponha voltar à etapa de onde saiu, pelo nome dela. Com
 o sim, siga a skill dessa etapa do ponto em que ela parou.
 
