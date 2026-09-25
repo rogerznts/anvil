@@ -7,6 +7,7 @@
 **Status:** resolved
 **Review:** round=1; sha=d2eeede; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=4b948e2; scope=diff:d2eeede..4b948e2; verdict=pass; p1=none
+**Review:** round=3; sha=260ed19; scope=full; verdict=pass; p1=none
 
 - [x] A `anvil-run` aceita um argumento de paralelo com N de 2 em diante.
 - [x] Com isolação, cada leva é uma chamada do `task` com até N itens, um por ticket do frontier, na ordem do script; o script roda de novo depois da leva, e cada ticket passa pela comparação de antes e depois da 003.
@@ -47,3 +48,9 @@
 - Review round=2 · P3 (Standards): a história do conflito estava em quatro lugares e agora está em seis (a nota da spec e a lista de pulados entraram, e o ADR a conta na Decisão e no Contra). A próxima mudança do omp pede seis edições coordenadas, e o P1 da rodada 1 nasceu de uma divergência assim. A nota da spec poderia só apontar para o ADR.
 - Review round=2 · P2 (Spec), fora do diff e anterior a ele: nos cenários K das rodadas 23 e 24 e no I da rodada 24 do S2, o supervisor recomendou `/skill:anvil-docs archive` com `all_resolved: no`, contra "Com pendência, o relatório lista…" da `anvil-run`. O S2 não confere isso nesses cenários; o operador lê um próximo passo errado com ticket pendente.
 - Review round=2 · os P3 da rodada 1 no passo 4, nos argumentos do `frontier.sh`, no laço `files=`, no refluxo e no `docs/index.md` seguem como estavam: o diff da correção não mexe neles.
+- Review round=3 (escolha do operador, artefato inteiro; omp instalado 18.3.1) · o contrato do conflito da leva confere afirmação por afirmação com o fonte (`isolation-runner.ts` l.644-676: uma integração por filho ao terminar; `worktree.ts` l.999-1028: cherry-pick por revisão, `abort` só do que conflitou; stash antes e depois), com o `conflict2.out` e com o K da rodada 25 do S2. Fixture rodado de novo contra o HEAD: `fixture: 0 falha(s)`, 60 casos.
+- Review round=3 · P2 (Standards) e P3 (Spec), segue da rodada 2: o aviso dos commits já integrados continua sem "se houver" na lista de pulados da `anvil-run` (l.164-167), na Retomada (l.195), no `anvil-omp` (l.103-106) e no ADR-0012 (l.69-70); quando o primeiro commit conflita, o relatório anuncia commits que não existem.
+- Review round=3 · P2 (Spec), segue da rodada 2, agora com evidência direta: no K da rodada 25 o relatório fecha com "Próximo passo: `/skill:anvil-docs archive`" com `all_resolved: no` e o 02 pulado (`out-r25/K/turno.jsonl`); a seção "Com pendência" da `anvil-run` não veda o próximo passo por extenso e o S2 não o confere — o operador lê um próximo passo errado, e só a guarda o segura.
+- Review round=3 · P3 (Spec): no mesmo K o relatório diz `Ready por rodada: 2, 1`, e o "1" é a releitura do passo 5 antes do `--skip`, sem despacho; o passo 3 não fixa que só a leitura de antes do despacho conta, e a medição sai inflada em um por pulado.
+- Review round=3 · P3 (Spec): o `anvil-omp` l.94-96 diz que os `omp/task/*` ficam depois da integração, e é o observado (18.3.0 no `conflict2.out`, 18.3.1 no K), mas o fonte 18.3.1 tenta apagar o mesclado (`cleanupTaskBranches`, best-effort); "podem ficar" seria exato. As sessões não gravam a versão do omp: sondas e série 3 rodaram no 18.3.0, S2 rodada 25 e o rerun do e2e no 18.3.1.
+- Review round=3 · os P3 da rodada 1 (passo 4 vs seção Paralelo, posicional do `frontier.sh`, laço `files=`, refluxo, `docs/index.md`) e o P3 da rodada 2 (história do conflito em seis lugares) seguem como estavam.

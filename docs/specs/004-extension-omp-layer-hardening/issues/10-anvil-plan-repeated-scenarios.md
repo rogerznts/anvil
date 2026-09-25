@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=93839fa; scope=full; verdict=pass; p1=none
+**Review:** round=3; sha=260ed19; scope=full; verdict=pass; p1=none
 
 - [x] Oito cenários, cada um com um roteiro de operador cuja fala carrega o sinal do desvio: `anvil-research`, `anvil-prototype`, `anvil-to-questionnaire`, `anvil-wayfinder`, `anvil-ui` e `anvil-architect` saindo do grill, um desvio saindo do to-spec e um saindo do to-tickets.
 - [x] Três rodadas por cenário, com o modelo padrão do ponta a ponta da 003; as sessões ficam guardadas.
@@ -32,3 +33,5 @@
 - Review round=1 · P2 (Spec): o A7 fica provado só para o condutor sem subagentes; com o `task`, que o `e2e.sh` usa e o omp oferece por padrão, o invariante não foi medido em série completa. É a decisão do operador registrada acima.
 - Review round=1 · P3 (Standards): o predicado de proposta se repete três vezes no `confere` e numa variante no roteiro, e `skills`, `fim` e as listas vêm copiados do `plan_check.py`; a próxima correção do que conta como proposta pede quatro edições, e uma esquecida faz o roteiro e a conferência divergirem.
 - Review round=1 · P3 (Standards): nomes de uma letra no `runs.py` (`X`, `O`, `SEM`, `COM`, chaves `p/v/r/inv`) e dois leitores do mesmo jsonl (`FATOS` num subprocesso e `modelos` no processo); quem adaptar o conjunto num ticket futuro precisa decifrá-los.
+- Review round=3 (escolha do operador; segunda rodada de fato deste ticket, numerada junto com o 09 e o 11) · o `check.out` em disco (09:57, `anvil-head` `fabe986`) confere com o registro: 24 rodadas, invariante 24/24, desvio 24/24, volta 24/24, `openai-codex/gpt-5.6-sol` em todas. A correção da `anvil-plan` (`fabe986`) é um parágrafo só e não muda mais nada na skill.
+- Review round=3 · os P2 da rodada 1 (volta contada na vez da carga, invariante cego a seletor, caminho e subagente, A7 provado só sem o `task`) seguem como decisão do operador registrada; os P3 do `runs.py` (predicado em quatro pontos, l.218, 273, 279, 288; nomes de uma letra) seguem, e o arquivo não mudou desde a rodada 1.

@@ -7,6 +7,7 @@
 **Status:** resolved
 **Review:** round=1; sha=6705312; scope=full; verdict=pass; p1=none
 **Review:** round=2; sha=3031b55; scope=diff:6705312..3031b55; verdict=pass; p1=none
+**Review:** round=3; sha=260ed19; scope=full; verdict=pass; p1=none
 
 - [x] O ponta a ponta da 003 (`workspace/35-omp-e2e/`) roda do degit ao relatório da `anvil-run` com o payload deste branch, e o `check.sh` passa, ajustado só para as chaves novas.
 - [x] As linhas A1 a A11 saem de `docs/project/acompanhamento.md`, e fica uma linha para o adaptador de tracker, com origem nesta spec.
@@ -38,3 +39,7 @@
 - Review round=2 · P3 (Spec): o critério 1 do ticket 04 continua marcado com "a lista não muda", sem remissão ao ticket 11. O contrato publicado fica contraditório, sem mudança de comportamento.
 - Review round=2 · P3 (Standards): com a origem no grill, uma vez de sim que só repita a pergunta de voltar ("Quer voltar ao anvil-grill?") passa como continuação. Hoje não há falso ok.
 - Depois da rodada 2, por decisão do operador, os três P3 e o falso negativo que a mudança de tela abriu: `interface do usuário` (e `de usuário`) voltou a contar como tela, com o caso G `f-tela-022-interface-usuario` (red `fixture: 1 falha(s)`, depois `fixture: 0 falha(s)` com 60 casos, nos dois bash e nos dois locales); a decisão **Tela** da spec agora abre com "fora o `interface` (ver a nota)"; o ticket 04 ganhou a remissão ao ticket 11; e o `plan_check.py` recusa a vez do sim que só repete a proposta de voltar ao grill (conferido às avessas com a vez 4 trocada por "Quer voltar ao anvil-grill?": falha). O `check.sh` segue `E2E: tudo passou`, e o `verify` sai limpo nos dois bash, com saídas idênticas. Sem rodada nova de review: são P3.
+- Review round=3 (escolha do operador, artefato inteiro, cobrindo `a2a3bdd` e `260ed19`, feitos depois da rodada 2) · a mudança de tela é coerente na nota **Tela** da spec, na nota do ticket 04 e no comentário do `frontier.sh`; o `frontier.sh` de HEAD rodado no projeto do e2e dá `screen: no` e `next: none`; fixture `fixture: 0 falha(s)` com 60 casos, inclusive `f-tela-020`, `021` e `022`, nos dois locales.
+- Review round=3 · P2 (Spec): a última afirmação do ticket ("o `check.sh` segue `E2E: tudo passou`" e a conferência às avessas do `plan_check.py`) não tem saída gravada — `out-004/check.out` é de 12:33, anterior a `260ed19` (12:55) e ao `plan_check.py` (12:54). Quem lê o ticket fechado precisa rodar o check para confiar.
+- Review round=3 · P3 (Standards, precisão): a regex de HEAD casa também `de usuário` e os plurais; a nota **Tela** da spec, a nota do 04 e o comentário do `frontier.sh` dizem só "do usuário". O mesmo comentário mistura acento ("gráfica", "usuário") com o padrão sem acento do resto do arquivo.
+- Review round=3 · P3 (Standards): a linha "os achados da rodada 1 fecharam" (rodada 2) cobre dois P3 que não foram tocados — o cabeçalho do acompanhamento cita "A1 a A11" e "o antigo A9" sem glosa, e A12/A14 seguem sem classe e rodada. O comentário seguinte rotula como "são P3" uma mudança de comportamento do `frontier.sh` feita depois do `sha` da rodada 2; esta rodada a mede.
