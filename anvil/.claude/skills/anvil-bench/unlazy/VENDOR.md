@@ -17,7 +17,7 @@ dá caminho para desligar isso: `rename` cobre só o `name:`, e a `description`
 fica verbatim por regra.
 
 Por isso o `SKILL.md` do upstream é copiado como `UNLAZY.md`. O frontmatter
-continua lá, inerte — mesma solução das 21 `principle-*` do pstack, que viraram
+continua lá, inerte — mesma solução das 23 `principle-*` do pstack, que viraram
 `references/` dentro do `anvil-principles`.
 
 ## O que ficou de fora

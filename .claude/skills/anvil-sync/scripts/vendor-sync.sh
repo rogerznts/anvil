@@ -5,6 +5,7 @@
 #   pull                atualiza os submodules em references/ para o HEAD remoto
 #   vendor <nome>       primeira cópia de uma skill planned
 #   update [<nome>]     merge 3-way do upstream sobre a cópia adaptada
+#   resolved <nome>     grava o pin depois de resolver os conflitos à mão
 #   verify              checagens de integridade do payload
 #   lock                regenera o anvil.lock a partir do payload
 #   stats               a métrica do README: linhas nossas contra o pin
@@ -98,11 +99,14 @@ if m:
     sys.exit(0)
 
 # Formato inline:  - { name: x, ... }
-inl = re.compile(r'(-\s*\{[^}]*\bname:\s*' + re.escape(name) + r'\b[^}]*\})', re.S)
+# Nome delimitado por `,` ou `}`: com `\b`, `anvil-grill` casaria `anvil-grill-me`.
+inl = re.compile(r'(-\s*\{[^}]*\bname:\s*' + re.escape(name) + r'\s*(?:,[^}]*)?\})', re.S)
 m = inl.search(txt)
 if m:
     b = m.group(1)
-    nb = b.replace('state: planned', f'pin: {pin}, state: vendored')
+    # Pin existente e trocado; sem isso o `update` de entrada inline nunca avancava.
+    nb, n = re.subn(r'\bpin:\s*[0-9a-f]+', f'pin: {pin}', b, count=1)
+    nb = nb.replace('state: planned', 'state: vendored' if n else f'pin: {pin}, state: vendored')
     open(path, 'w', encoding='utf-8').write(txt[:m.start(1)] + nb + txt[m.end(1):])
     sys.exit(0)
 
@@ -139,7 +143,7 @@ is_listed() {  # <arquivo> <lista-csv>  — casa exato ou prefixo de diretório
 # update apagaria qualquer adaptacao feita no extra — e o link relativo de um
 # arquivo que mudou de lugar e exatamente o tipo de adaptacao que ele precisa.
 copy_extras() {  # <submodule> <ref> <dest-skill> <extra-csv> [<pin>]
-    local sub="$1" ref="$2" dest="$3" list="$4" pin="${5:-}" pair from to n=0
+    local sub="$1" ref="$2" dest="$3" list="$4" pin="${5:-}" pair from to n=0 nconf=0
     local base theirs
     [ -n "$list" ] || { echo 0; return 0; }
     IFS=',' read -ra arr <<< "$list"
@@ -161,10 +165,14 @@ copy_extras() {  # <submodule> <ref> <dest-skill> <extra-csv> [<pin>]
             n=$((n + 1))
         else
             echo "    CONFLITO no extra: $to" >&2
+            nconf=$((nconf + 1))
         fi
         rm -f "$base" "$theirs"
     done
     echo "$n"
+    # Status = numero de conflitos: o update nao pode avancar o pin sobre um
+    # extra com marcadores, como nao avanca sobre um arquivo da arvore.
+    return "$nconf"
 }
 
 # `rename` — a única regra mecânica: o name: do frontmatter casa com o diretório.
@@ -187,9 +195,10 @@ apply_invocable() {  # <dir-da-skill>
 # --- status -------------------------------------------------------------------
 
 cmd_status() {
-    local name state sub path pin head n_changed
+    local name state sub path pin extra head n_changed pair
+    local -a specs
     printf '%-26s %-9s %-10s %s\n' SKILL ESTADO UPSTREAM DETALHE
-    while IFS=$'\x1f' read -r name state sub path pin _ _ _; do
+    while IFS=$'\x1f' read -r name state sub path pin _ _ _ extra; do
         if [ "$state" != "vendored" ]; then
             printf '%-26s %-9s %-10s %s\n' "$name" "$state" '-' "$path"
             continue
@@ -203,7 +212,19 @@ cmd_status() {
             printf '%-26s %-9s %-10s %s\n' "$name" "$state" 'em-dia' "${pin:0:7}"
             continue
         fi
-        n_changed="$(git -C "$ROOT/$sub" diff --name-only "$pin" "$head" -- "$path" 2>/dev/null | wc -l | tr -d ' ')"
+        # A skill andou se andou a arvore dela OU a origem de algum `extra`.
+        # Com `path` vazio, `-- ""` e pathspec invalido: o git falha, o erro e
+        # engolido e a skill sairia "em dia" mesmo com os extras mudados.
+        specs=()
+        [ -n "$path" ] && specs+=("$path")
+        if [ -n "$extra" ]; then
+            while IFS= read -r pair; do
+                [ -n "$pair" ] && specs+=("${pair%%::*}")
+            done < <(tr ',' '\n' <<< "$extra")
+        fi
+        n_changed=0
+        [ "${#specs[@]}" -gt 0 ] && \
+            n_changed="$(git -C "$ROOT/$sub" diff --name-only "$pin" "$head" -- "${specs[@]}" 2>/dev/null | wc -l | tr -d ' ')"
         if [ "$n_changed" = "0" ]; then
             printf '%-26s %-9s %-10s %s\n' "$name" "$state" 'em-dia' "submodule andou, a skill não"
         else
@@ -339,13 +360,20 @@ update_one() {
         fi
     done < <(tree_files "$sub" "$pin" "$path")
 
+    # Extras so depois da arvore limpa, e ANTES de decidir o pin: um conflito
+    # num extra segura o pin do mesmo jeito que um conflito na arvore.
+    if [ "$conflitos" -eq 0 ]; then
+        local nconf_extra=0
+        copy_extras "$sub" "$head" "$dest" "$extra" "$pin" >/dev/null || nconf_extra=$?
+        conflitos=$((conflitos + nconf_extra))
+    fi
+
     printf '  %s: %s limpo(s), %s conflito(s), %s novo(s), %s sumiram upstream\n' \
         "$name" "$limpos" "$conflitos" "$novos" "$apagados"
     [ "$conflitos" -gt 0 ] && { echo "    CONFLITO — resolva os marcadores:"; printf "%b" "$conf_list"; }
     [ "$apagados" -gt 0 ] && { echo "    SUMIRAM upstream (não apagados aqui):"; printf "%b" "$del_list"; }
 
     if [ "$conflitos" -eq 0 ]; then
-        copy_extras "$sub" "$head" "$dest" "$extra" "$pin" >/dev/null
         case ",$adapt," in *,rename,*) apply_rename "$dest" "$name" ;; esac
         case ",$adapt," in *,invocable,*) apply_invocable "$dest" ;; esac
         set_pin "$name" "$head"
@@ -358,7 +386,7 @@ update_one() {
         case ",$adapt," in *,verification-profile,*) j="$j verification-profile" ;; esac
         [ -n "$j" ] && echo "    revise as regras de julgamento:$j"
     else
-        echo "    pin NÃO atualizado — resolva os conflitos e rode de novo."
+        echo "    pin NÃO atualizado — resolva os marcadores e rode 'resolved $name'."
     fi
     return 0
 }
@@ -370,6 +398,28 @@ cmd_update() {
     while IFS=$'\x1f' read -r name state _ _ _ _ _ _; do
         [ "$state" = "vendored" ] && update_one "$name"
     done < <(manifest_rows)
+}
+
+# Fecha um update que conflitou. Rodar o `update` de novo nao serve: ele refaz o
+# merge contra a MESMA base, e todo hunk em que o anvil manteve a adaptacao
+# conflita outra vez. Quem resolveu os marcadores declara aqui que terminou.
+cmd_resolved() {
+    local name="${1:-}" row state sub adapt head dest left
+    [ -n "$name" ] || die "uso: resolved <nome-da-skill>"
+    row="$(row_for "$name")"
+    [ -n "$row" ] || die "'$name' não está no manifesto"
+    IFS=$'\x1f' read -r _ state sub _ _ adapt _ _ _ <<< "$row"
+    [ "$state" = "vendored" ] || die "'$name' não está vendorizada"
+    dest="$PAYLOAD/$name"
+    left="$(grep -rlE '^(<<<<<<<|>>>>>>>) ' "$dest" 2>/dev/null)"
+    [ -z "$left" ] || die "ainda há marcadores de conflito em:
+$left"
+    head="$(git -C "$ROOT/$sub" rev-parse HEAD)" || die "submodule $sub ausente"
+    case ",$adapt," in *,rename,*) apply_rename "$dest" "$name" ;; esac
+    case ",$adapt," in *,invocable,*) apply_invocable "$dest" ;; esac
+    set_pin "$name" "$head" || die "falha ao gravar o pin"
+    gerar_lock >/dev/null
+    echo "  $name: pin atualizado para ${head:0:7}"
 }
 
 # --- lock ---------------------------------------------------------------------
@@ -910,7 +960,7 @@ cmd_stats() {
 # --- despacho -----------------------------------------------------------------
 
 usage() {
-    sed -n '3,10p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '3,11p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 case "${1:-status}" in
@@ -918,6 +968,7 @@ case "${1:-status}" in
     pull)   cmd_pull ;;
     vendor) shift; cmd_vendor "$@" ;;
     update) shift; cmd_update "$@" ;;
+    resolved) shift; cmd_resolved "$@" ;;
     verify) cmd_verify ;;
     lock)   gerar_lock ;;
     stats)  cmd_stats ;;

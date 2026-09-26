@@ -34,6 +34,7 @@ bash $S status              # o que andou upstream desde cada pin
 bash $S pull                # atualiza os submodules para o HEAD remoto
 bash $S vendor <nome>       # primeira cópia de uma skill `planned`
 bash $S update [<nome>]     # merge 3-way; sem argumento, todas
+bash $S resolved <nome>     # grava o pin depois de resolver um conflito à mão
 bash $S verify              # integridade do payload
 bash $S lock                # regenera o anvil.lock a partir do payload
 bash $S stats               # a métrica do README: linhas nossas contra o pin
@@ -71,8 +72,11 @@ bash $S update        # todas, ou uma por vez
 revisar. Confira o diff mesmo assim: limpo não quer dizer certo.
 
 **Conflito** → o pin **não** avança. Resolva os marcadores nos arquivos que o
-script listou e rode o `update` de novo. Ao resolver, o lado do anvil só ganha
-quando há uma regra do catálogo justificando; caso contrário, o upstream ganha.
+script listou e rode `resolved <nome>`, que recusa enquanto houver marcador. Não
+rode o `update` de novo: ele refaz o merge contra a mesma base, e todo hunk em que
+o anvil ficou com a adaptação conflita outra vez. Ao resolver, o lado do anvil só
+ganha quando há uma regra do catálogo justificando; caso contrário, o upstream
+ganha.
 
 **Arquivo que sumiu upstream** → o script **reporta e não apaga**. Decida:
 sumiu porque foi renomeado (então há um arquivo novo correspondente), ou porque

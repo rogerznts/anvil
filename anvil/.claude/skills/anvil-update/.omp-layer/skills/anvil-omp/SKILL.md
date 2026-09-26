@@ -124,7 +124,7 @@ espelho `.agents/skills` e não tem guarda.
 - O frontier é em série sem isolação. O paralelo existe sob pedido,
   `--parallel N`, e só com a isolação no modo branch.
 - O `task` não escolhe modelo por chamada. O implementer herda o modelo da sessão,
-  e as listas `runners`, `how-critics` e `cross-judge` do `.claude/rules/anvil.md`
+  e as linhas `runners`, `how-explorer`, `how-explainer` e `cross-judge` do `.claude/rules/anvil.md`
   não têm efeito no omp. Para outro modelo, use `task.agentModelOverrides` na
   configuração do omp.
 - Os condutores recusam fora do perfil `docs/specs`. O `anvil-plan` e o `anvil-run`

@@ -37,17 +37,17 @@ Isso é possível porque as skills do Matt Pocock não têm caminho fixo: elas l
 documental do anvil é um perfil de tracker** — ao lado de github, gitlab e local
 — e não um alvo de reescrita.
 
-O resultado, medido em 2026-09-13 com
+O resultado, medido em 2026-09-25 com
 `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh stats`:
 
 | | |
 |---|---|
 | skills `vendored` no manifesto | 36 entradas: as 35 skills curadas e o `anvil-bench`, autoral, que traz o `unlazy`. 34 têm árvore no upstream; `anvil-principles` e `anvil-bench` são só `keep` e `extra` |
-| linhas dos arquivos que existem no pin e no payload | 21.887 |
-| **linhas nossas que diferem do upstream** | **202 — 0,92%** |
+| linhas dos arquivos que existem no pin e no payload | 21.676 |
+| **linhas nossas que diferem do upstream** | **204 — 0,94%** |
 | arquivos deixados de fora (`strip`) | 59 |
-| arquivos do anvil dentro de skill vendorizada (`keep`) | 35 arquivos · 7.866 linhas |
-| material trazido de fora da árvore da skill (`extra`, inclui o `unlazy` do bench) | 45 arquivos · 5.771 linhas · 4 nossas |
+| arquivos do anvil dentro de skill vendorizada (`keep`) | 35 arquivos · 7.868 linhas |
+| material trazido de fora da árvore da skill (`extra`, inclui o `unlazy` do bench) | 47 arquivos · 5.966 linhas · 8 nossas |
 | arquivo sem par, fora da conta | 0 |
 
 *Linha nossa* é a que está no payload e não está na versão do pin. A definição
@@ -185,7 +185,7 @@ tem a guarda pelo hook do `.claude/settings.json`, e o Codex não tem guarda.
 | `anvil-arena` | N candidatos em paralelo, um juiz independente, enxerta o melhor de cada | pstack |
 | `anvil-prototype` | protótipo descartável para responder uma pergunta de design que só se responde vendo rodar. A decisão volta para o documento; o protótipo morre fora da main | mattpocock |
 | `anvil-wayfinder` | trabalho grande demais para uma sessão: mapa de tickets de decisão | mattpocock |
-| `anvil-principles` | os 21 princípios que `poteto`, `architect` e `arena` citam | pstack |
+| `anvil-principles` | os 23 princípios que `poteto`, `architect` e `arena` citam | pstack |
 | `anvil-poteto` | modo de trabalho: todolist, playbook por formato de tarefa, prosa sem gordura | pstack |
 
 ### Interface
