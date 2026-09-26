@@ -109,7 +109,8 @@ A seção de modelos do `anvil.md`:
 Lidos por `anvil-arena`, `anvil-how` e `anvil-architect`.
 
 - `runners`: `opus`, `fable`, `sonnet`
-- `how-critics`: `opus`, `fable`, `sonnet`
+- `how-explorer`: `sonnet`
+- `how-explainer`: `opus`
 - `cross-judge`: `opus`, `fable`, `sonnet`
 ```
 

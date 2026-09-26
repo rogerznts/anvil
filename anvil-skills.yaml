@@ -60,38 +60,38 @@ skills:
     keep: [RULE.md, VENDOR.md, bench]
 
   # ---- mattpocock: fluxo principal -----------------------------------------
-  - { name: anvil-grill,        source: mattpocock, path: skills/engineering/grill-with-docs,          pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], strip: [agents] }
-  - { name: anvil-to-spec,      source: mattpocock, path: skills/engineering/to-spec,                  pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], keep: [scripts/new-spec.sh], strip: [agents] }
-  - { name: anvil-to-tickets,   source: mattpocock, path: skills/engineering/to-tickets,               pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable], strip: [agents] }
-  - { name: anvil-implement,    source: mattpocock, path: skills/engineering/implement,                pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, invocable, verification-profile], strip: [agents] }
-  - { name: anvil-code-review,  source: mattpocock, path: skills/engineering/code-review,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, verification-profile], strip: [agents] }
+  - { name: anvil-grill,        source: mattpocock, path: skills/engineering/grill-with-docs,          pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename, invocable], strip: [agents] }
+  - { name: anvil-to-spec,      source: mattpocock, path: skills/engineering/to-spec,                  pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename, invocable], keep: [scripts/new-spec.sh], strip: [agents] }
+  - { name: anvil-to-tickets,   source: mattpocock, path: skills/engineering/to-tickets,               pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename, invocable], strip: [agents] }
+  - { name: anvil-implement,    source: mattpocock, path: skills/engineering/implement,                pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename, invocable, verification-profile], strip: [agents] }
+  - { name: anvil-code-review,  source: mattpocock, path: skills/engineering/code-review,              pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename, verification-profile], strip: [agents] }
 
   # ---- mattpocock: setup e dependências ocultas ----------------------------
-  - { name: anvil-setup,           source: mattpocock, path: skills/engineering/setup-matt-pocock-skills, pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap, tracker-profile, invocable], strip: [agents] }
-  - { name: anvil-grilling,        source: mattpocock, path: skills/productivity/grilling,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
-  - { name: anvil-domain-modeling, source: mattpocock, path: skills/engineering/domain-modeling,        pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
-  - { name: anvil-codebase-design, source: mattpocock, path: skills/engineering/codebase-design,        pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-setup,           source: mattpocock, path: skills/engineering/setup-matt-pocock-skills, pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename, docs-remap, tracker-profile, invocable], strip: [agents] }
+  - { name: anvil-grilling,        source: mattpocock, path: skills/productivity/grilling,              pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-domain-modeling, source: mattpocock, path: skills/engineering/domain-modeling,        pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
+  - { name: anvil-codebase-design, source: mattpocock, path: skills/engineering/codebase-design,        pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
 
   # ---- mattpocock: extras --------------------------------------------------
-  - { name: anvil-wayfinder,          source: mattpocock, path: skills/engineering/wayfinder,           pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
-  - { name: anvil-prototype,          source: mattpocock, path: skills/engineering/prototype,           pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
-  - { name: anvil-research,           source: mattpocock, path: skills/engineering/research,            pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
-  - { name: anvil-diagnose,           source: mattpocock, path: skills/engineering/diagnosing-bugs,     pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
-  - { name: anvil-wizard,             source: mattpocock, path: skills/engineering/wizard,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
-  - { name: anvil-tdd,                source: mattpocock, path: skills/engineering/tdd,                 pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
-  - { name: anvil-grill-me,           source: mattpocock, path: skills/productivity/grill-me,           pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
-  - { name: anvil-handoff,            source: mattpocock, path: skills/productivity/handoff,            pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
-  - { name: anvil-teach,              source: mattpocock, path: skills/productivity/teach,              pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
-  - { name: anvil-wait-what,          source: mattpocock, path: skills/productivity/wait-what,          pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
-  - { name: anvil-writing-for-agents, source: mattpocock, path: skills/productivity/writing-for-agents, pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
-  - { name: anvil-to-questionnaire,   source: mattpocock, path: skills/productivity/to-questionnaire,   pin: 6654f6b60cd9d5be8b54c6fafe44346dabeb3b76, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-wayfinder,          source: mattpocock, path: skills/engineering/wayfinder,           pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-prototype,          source: mattpocock, path: skills/engineering/prototype,           pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-research,           source: mattpocock, path: skills/engineering/research,            pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-diagnose,           source: mattpocock, path: skills/engineering/diagnosing-bugs,     pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
+  - { name: anvil-wizard,             source: mattpocock, path: skills/engineering/wizard,              pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-tdd,                source: mattpocock, path: skills/engineering/tdd,                 pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
+  - { name: anvil-grill-me,           source: mattpocock, path: skills/productivity/grill-me,           pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-handoff,            source: mattpocock, path: skills/productivity/handoff,            pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-teach,              source: mattpocock, path: skills/productivity/teach,              pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-wait-what,          source: mattpocock, path: skills/productivity/wait-what,          pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
+  - { name: anvil-writing-for-agents, source: mattpocock, path: skills/productivity/writing-for-agents, pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-to-questionnaire,   source: mattpocock, path: skills/productivity/to-questionnaire,   pin: c55ee46073ed923f86ce59a5eb3b6d895095d1b7, state: vendored, adapt: [rename], strip: [agents] }
 
   # ---- pstack --------------------------------------------------------------
-  - { name: anvil-unslop,    source: pstack, path: skills/unslop,      pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename] }
-  - { name: anvil-how,       source: pstack, path: skills/how,         pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename, decursor] }
-  - { name: anvil-architect, source: pstack, path: skills/architect,   pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename, decursor, invocable] }
-  - { name: anvil-arena,     source: pstack, path: skills/arena,       pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename, decursor, invocable] }
-  - { name: anvil-poteto,    source: pstack, path: skills/poteto-mode, pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8, state: vendored, adapt: [rename, decursor],
+  - { name: anvil-unslop,    source: pstack, path: skills/unslop,      pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db, state: vendored, adapt: [rename] }
+  - { name: anvil-how,       source: pstack, path: skills/how,         pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db, state: vendored, adapt: [rename, decursor, invocable] }
+  - { name: anvil-architect, source: pstack, path: skills/architect,   pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db, state: vendored, adapt: [rename, decursor, invocable] }
+  - { name: anvil-arena,     source: pstack, path: skills/arena,       pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db, state: vendored, adapt: [rename, decursor, invocable] }
+  - { name: anvil-poteto,    source: pstack, path: skills/poteto-mode, pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db, state: vendored, adapt: [rename, decursor],
       strip: [scripts, references, "playbooks/autonomous-run.md", "playbooks/autopilot-full.md",
               "playbooks/autopilot-stack.md", "playbooks/babysit.md", "playbooks/eval.md",
               "playbooks/hillclimb.md", "playbooks/multi-phase-plan.md", "playbooks/opening-a-pr.md",
@@ -101,18 +101,19 @@ skills:
               "playbooks/authoring-a-skill.md", "playbooks/shipping.md"] }
 
   # ---- pstack: principles ----
-  # As 21 principle-* do upstream vêm como REFERENCES de uma skill só. Elas têm
-  # disable-model-invocation e nunca disparam sozinhas, então 21 lugares no
+  # As 23 principle-* do upstream vêm como REFERENCES de uma skill só. Elas têm
+  # disable-model-invocation e nunca disparam sozinhas, então 23 lugares no
   # namespace não se pagam. Três skills as citam — poteto, architect e arena —
   # logo o lugar compartilhado é uma skill, não a pasta de uma delas.
   - name: anvil-principles
     source: pstack
-    pin: fdf357fae76feff7e5f2e5aaff57f99f644b55f8
+    pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db
     state: vendored
     path: ""                 # sem árvore própria: esta skill é só o índice + extras
     adapt: []
     keep: [SKILL.md]
     extra:
+      - "skills/principle-attack-the-premise/SKILL.md::references/attack-the-premise.md"
       - "skills/principle-boundary-discipline/SKILL.md::references/boundary-discipline.md"
       - "skills/principle-build-the-lever/SKILL.md::references/build-the-lever.md"
       - "skills/principle-encode-lessons-in-structure/SKILL.md::references/encode-lessons-in-structure.md"
@@ -133,6 +134,7 @@ skills:
       - "skills/principle-separate-before-serializing-shared-state/SKILL.md::references/separate-before-serializing-shared-state.md"
       - "skills/principle-sequence-verifiable-units/SKILL.md::references/sequence-verifiable-units.md"
       - "skills/principle-subtract-before-you-add/SKILL.md::references/subtract-before-you-add.md"
+      - "skills/principle-test-behavior-not-implementation/SKILL.md::references/test-behavior-not-implementation.md"
       - "skills/principle-type-system-discipline/SKILL.md::references/type-system-discipline.md"
 
   # ---- UI: métodos ---------------------------------------------------------
@@ -149,14 +151,14 @@ skills:
       - "site/css/tokens.css::references/themes.css"
       - "docs/recipes.md::docs/recipes.md"
       - "docs/study-examples.md::docs/study-examples.md"
-  - { name: anvil-ui-taste,    source: taste,    path: skills/taste-skill,     pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
-  - { name: anvil-ui-redesign, source: taste,    path: skills/redesign-skill,  pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
+  - { name: anvil-ui-taste,    source: taste,    path: skills/taste-skill,     pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
+  - { name: anvil-ui-redesign, source: taste,    path: skills/redesign-skill,  pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
 
   # ---- UI: presets ---------------------------------------------------------
-  - { name: anvil-ui-brutalist,  source: taste, path: skills/brutalist-skill,  pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
-  - { name: anvil-ui-minimalist, source: taste, path: skills/minimalist-skill, pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
-  - { name: anvil-ui-soft,       source: taste, path: skills/soft-skill,       pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
-  - { name: anvil-ui-stitch,     source: taste, path: skills/stitch-skill,     pin: ccbc15639c97057cbfcf32ecebc38ef716e4bb37, state: vendored, adapt: [rename] }
+  - { name: anvil-ui-brutalist,  source: taste, path: skills/brutalist-skill,  pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
+  - { name: anvil-ui-minimalist, source: taste, path: skills/minimalist-skill, pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
+  - { name: anvil-ui-soft,       source: taste, path: skills/soft-skill,       pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
+  - { name: anvil-ui-stitch,     source: taste, path: skills/stitch-skill,     pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
 
   # ---- unlazy: material do bench, não uma skill ----------------------------
   # O unlazy vira `extra` DENTRO do anvil-bench, e não uma skill própria. Duas
@@ -169,7 +171,7 @@ skills:
   # 2. O uso é exclusivo do bench, que é quem tem loop headless e precisa de
   #    condição de parada mecânica.
   #
-  # O SKILL.md vira UNLAZY.md na cópia, pelo mesmo motivo que as 21 principle-*
+  # O SKILL.md vira UNLAZY.md na cópia, pelo mesmo motivo que as 23 principle-*
   # viram references/: um SKILL.md aninhado não deve existir no payload.
   #
   # A árvore é preservada tal como no upstream para que todo link relativo
@@ -185,7 +187,7 @@ skills:
   # condições de parada rivais na mesma sessão. O motivo está no VENDOR.md.
   - name: anvil-bench
     source: unlazy
-    pin: 473d4b80421c36d733042434cd4b938f81a19ef1
+    pin: 16671491f6679ad9378f52604d3bc2415b4120c7
     state: vendored
     path: ""                 # sem árvore própria: a skill é autoral, só os extras vêm de fora
     adapt: []
