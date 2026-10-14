@@ -5,6 +5,7 @@
 **Blocked by:** 03
 
 **Status:** resolved
+**Review:** round=1; sha=f9980b9; scope=full; verdict=pass; p1=none
 
 - [x] O `dev-link` cria symlinks para o payload deste repositório em quatro lugares: `~/.claude/skills/<skill>` para cada skill do roster, os agentes, o espelho em `~/.agents/skills` e a camada omp em `~/.omp/agent/`.
 - [x] O `--all` continua ligando o payload inteiro, e o `--dry-run` continua mostrando sem alterar.
@@ -26,3 +27,14 @@
 - Spec, achado da implementação: a spec põe o `dev-link` em quatro lugares, e as outras peças da instalação de usuário não chegam à máquina de desenvolvimento — o bloco de diretivas no `~/.claude/CLAUDE.md`, a rule `~/.omp/agent/rules/anvil-directives.md`, gerada e sem fonte para ligar, e o hook da guarda no `~/.claude/settings.json`. O reset, que os escreve, recusa por cima dos symlinks. Nessa máquina, os outros projetos rodam sem as diretivas, e sem a guarda no Claude Code (no omp ela vem pelo hook da camada); o passo 8 do boot vai acusar a guarda ausente. Decisão do operador.
 - Spec, achado da implementação: numa máquina com a instalação publicada, as skills em `~/.claude/skills` são diretório real, e o `dev-link` as pula, como sempre pulou diretório real. Não há ferramenta que tire a instalação publicada para ligar a de desenvolvimento no lugar; hoje é à mão.
 - Num clone deste repositório numa máquina com a instalação publicada, a guarda roda duas vezes no Claude Code — a de usuário e a do `.claude/settings.json` deste repositório —, e o bloqueio sai com a mensagem duplicada.
+- Review round=1 · P2 (Spec): na máquina de desenvolvimento nenhum projeto recebe as diretivas nem a guarda do Claude Code, e o passo 8 do boot acusa a guarda ausente sem dizer o que fazer ali — quem roda o boot nessa máquina acha a instalação quebrada na primeira vez. É o achado de spec registrado acima, à espera do operador.
+- Review round=1 · P3 (Spec): o `--unlink` não devolve o symlink do usuário que o `dev-link` refez ao ligar — um ciclo ligar/desligar perde esse link, e só o relatório guarda o alvo antigo.
+- Review round=1 · P3 (Spec): o `SKILL.md` do update manda parar na recusa sem passar pelo passo de limpeza — a pasta temporária do degit fica esquecida.
+- Review round=1 · P3 (Spec): num clone com a instalação publicada, a guarda roda duas vezes no Claude Code — o bloqueio sai com a mensagem duplicada (registrado acima).
+- Review round=1 · P3 (Standards): o comentário de decisão cita "os tickets 04 e 05" sem glosa — quem lê precisa abrir os dois para saber qual decisão foi herdada.
+- Review round=1 · P3 (Standards): identificadores novos do `dev-link.sh` em português (`nosso`, `curto`, `liga`, `antigos`, `tira_antigos`, `seria`), contra a regra de código em inglês — o arquivo inteiro já é assim, e "Match existing style" justifica; se ficar, o script se afasta mais da regra.
+- Review round=1 · P3 (Standards): o `--help` do `reset-install.sh` (`sed -n '2,53p'`) corta o aviso "NO RESET, RODE A CÓPIA RECÉM-BAIXADA" do cabeçalho, como o `51` antigo já cortava — quem lê só a ajuda pode rodar a cópia instalada.
+- Review round=1 · P3 (Standards): possível Duplicated Code no `dev-link.sh` — o `seria()` novo convive com a forma inline no ramo `--unlink`, e o laço "coleta, `rm -f`, `poda`" aparece três vezes; mudar a redação ou a regra de remoção exige editar vários lugares.
+- Review round=1 · P3 (Standards): possível Duplicated Code no `reset-install.sh` — três laços quase iguais montam a lista da recusa; uma quarta pasta da instalação exige copiar o laço.
+- Review round=1 · P3 (Standards): `tira_antigos` grava a global `antigos_n`, lida longe dali no relatório — reordenar a chamada faz o `set -u` derrubar o script.
+- Review round=1 · P3 (Standards): `liga` devolve 1 também quando o `ln -s` ou o `mkdir` falha, e a falha sai rotulada como "tem diretório ou arquivo real com o nome" — o operador procura um arquivo que não existe.
