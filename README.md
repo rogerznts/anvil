@@ -82,7 +82,7 @@ flowchart TD
         B5 --> B6{"achou<br/>payload.config.ts?"}
         B6 -->|sim| B7["propõe rules/payload.md<br/>e espera aprovação"]
         B6 -->|não| B8
-        B7 --> B8["registra o hook de merge<br/>e confirma que dispara"]
+        B7 --> B8["confere a guarda de merge<br/>da instalação de usuário"]
     end
 
     B8 --> C["/anvil-grill"]
@@ -154,12 +154,17 @@ do lock.
 | `/skill:anvil-plan <pedido>` | conduz grill, to-spec e to-tickets na mesma janela. Entre uma etapa e outra propõe a próxima ou um desvio, como research ou prototype, e só carrega com o seu sim |
 | `/skill:anvil-run [NNN] [--parallel N]` | implementa a spec ticket a ticket, cada um num `anvil-implementer` de contexto novo, com o review em dois eixos. Em série por padrão; com `--parallel N` e a isolação do omp no modo branch, em levas de até N tickets do frontier, cada implementer num workspace isolado — ver [adr-0012](docs/architecture/adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md). Termina com relatório e próximo passo, e nunca faz QA, archive ou PR |
 | `/skill:anvil-omp` | o manual da camada: detecção, limites e como removê-la |
-| guarda de merge | um hook em `~/.omp/agent/hooks/pre/` chama o mesmo `guard-spec-merge.sh` do Claude Code |
+| guarda de merge | um hook em `~/.omp/agent/hooks/pre/` chama o mesmo `guard-spec-merge.sh` do Claude Code, da instalação de usuário |
 
 **O que segue manual.** No Claude Code e no Codex, a lista de skills é a de sempre
 e nenhum desses comandos existe. O fluxo é `/anvil-grill`, `/anvil-to-spec`,
 `/anvil-to-tickets` e uma sessão de `/anvil-implement` por ticket. O Claude Code
-tem a guarda pelo hook do `.claude/settings.json`, e o Codex não tem guarda.
+tem a guarda pelo hook do `~/.claude/settings.json`, e o Codex não tem guarda.
+
+**A guarda vale para toda a máquina, mas só age em projeto anvil**, o que tem a
+rule `.claude/rules/anvil.md` que o boot escreve. Num outro repositório, `git
+merge` passa sem mensagem. Num projeto anvil, ela lê a spec do projeto e chama o
+`validate.sh` da instalação de usuário.
 
 ---
 
@@ -320,10 +325,11 @@ a rule `.claude/rules/anvil.md` que o boot escreve.
 | `~/.claude/agents/` | os agentes instalados, se o payload trouxer algum |
 | `~/.claude/anvil.lock` | o que a instalação de usuário possui, e o que o update usa para calcular órfãos |
 | `~/.claude/CLAUDE.md` | o bloco `ANVIL:DIRECTIVES`, que o Claude Code carrega em toda sessão; o resto do arquivo é seu |
+| `~/.claude/settings.json` | o hook da guarda de merge, uma entrada em `hooks.PreToolUse`; o resto do arquivo é seu |
 | `~/.agents/skills/` | o espelho: um symlink por skill, lido pelo Codex e pelo omp |
 | `~/.omp/agent/` | a camada omp, com as diretivas como rule `alwaysApply` |
 | `.claude/rules/` | do projeto: o contexto que o boot levantou dele |
-| `.claude/settings.json` | do projeto: a configuração, incluindo o hook |
+| `.claude/settings.json` | do projeto, se ele tiver: a guarda de merge não mora mais nele |
 | `docs/` | do projeto: o trabalho |
 
 Um projeto bootado antes ignorava o toolkit no `.gitignore`, por um bloco
@@ -341,7 +347,7 @@ O boot detecta e **propõe** a migração, esperando aprovação antes de apagar
 |---|---|
 | `.claude/agents/mosk-*.md` — as doze personas | `.claude/rules/` — é do projeto |
 | `.claude/mosk/` — 252 arquivos de core | `docs/` — vai para o verbo `adopt` |
-| `.claude/skills/mosk-*` | `.claude/settings.json` — o hook é **mesclado** |
+| `.claude/skills/mosk-*` | `.claude/settings.json` — sai só a entrada do hook do mosk |
 
 No `CLAUDE.md`, o bloco `MOSK:DIRECTIVES` sai, e nada entra no lugar: as
 diretivas do anvil vêm da instalação de usuário. Ele não pode ficar, porque as

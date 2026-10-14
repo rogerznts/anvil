@@ -67,7 +67,11 @@ tocado.
 
 A guarda de merge age sozinha: `git merge` de spec com ticket aberto ou sem archive,
 e `tea pr create` sem archive, são bloqueados com o mesmo motivo que o Claude Code
-mostra.
+mostra. Ela só age em projeto anvil, o que tem `.claude/rules/anvil.md`, e chama o
+`guard-spec-merge.sh` da instalação de usuário, em
+`~/.claude/skills/anvil-docs/scripts/`. Se ele faltar num projeto anvil, cada
+comando do `bash` traz um aviso de que a guarda está desligada, até um
+`/anvil-update` reinstalá-lo.
 
 ## Isolação
 
@@ -123,8 +127,8 @@ série. O relatório traz quantos tickets estavam prontos a cada rodada, na linh
 Nos dois, a lista de skills é a mesma de sempre e nenhum comando acima existe. O
 fluxo segue à mão: `/anvil-grill`, `/anvil-to-spec`, `/anvil-to-tickets`, e depois
 uma sessão de `/anvil-implement` por ticket, um de cada vez. O Claude Code tem a
-guarda de merge pelo hook do `.claude/settings.json`. O Codex lê as skills pelo
-espelho `~/.agents/skills` e não tem guarda.
+guarda de merge pelo hook do `~/.claude/settings.json`, que o `/anvil-update`
+registra. O Codex lê as skills pelo espelho `~/.agents/skills` e não tem guarda.
 
 ## Limites
 

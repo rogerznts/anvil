@@ -9,6 +9,13 @@
 # sem `Status: resolved`, ou quando ela ainda não foi arquivada. Cobre GitHub
 # (`gh`), Gitea (`tea`) e `git merge`.
 #
+# É instalada uma vez por usuário e roda em todo repositório da máquina: o hook
+# do Claude Code fica no ~/.claude/settings.json, e o do omp em
+# ~/.omp/agent/hooks/pre/. Por isso só age em projeto anvil — o que tem a rule
+# de configuração .claude/rules/anvil.md que o boot escreve. Fora dele sai 0, sem
+# mensagem. A raiz vem do projeto; o validate.sh, da instalação de usuário, ao
+# lado deste script.
+#
 # "A spec do branch" é a do branch atual E a de cada branch que o `git merge`
 # nomeia. Olhando só o atual, o merge local disparado da `main` — o jeito natural
 # de mesclar — passava sem conferir nada: a `main` não tem número. `git
@@ -69,6 +76,14 @@
 
 set -u
 INPUT="$(cat)"
+
+# --- 0. só em projeto anvil ---------------------------------------------------
+# Antes de tudo, para que nada seja dito fora dele. O modo de teste decide mesmo
+# assim: ele confere o parse, não o projeto.
+ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
+if [ "${GUARD_DECIDE_ONLY:-0}" != "1" ]; then
+    [ -n "$ROOT" ] && [ -f "$ROOT/.claude/rules/anvil.md" ] || exit 0
+fi
 
 # --- 1. filtro barato ---------------------------------------------------------
 # `|| exit 0` seria fail-open: grep ausente devolve 127, indistinguível de "não
@@ -337,16 +352,13 @@ fi
 [ "$DECISAO" = "verifica" ] || exit 0
 
 # --- 3. verificar -------------------------------------------------------------
-ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-if [ -z "$ROOT" ]; then
-    echo "guard-spec-merge: raiz do repositorio nao resolvida — nao foi possivel verificar." >&2
-    exit 0
-fi
-
-VALIDATE="$ROOT/.claude/skills/anvil-docs/scripts/validate.sh"
+# Exit 1, e não 0: o Claude Code mostra ao usuário a saída de erro do hook que
+# falha sem ser 2, e o hook do omp a repassa como aviso. Projeto anvil sem
+# validador não passa calado.
+VALIDATE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/validate.sh"
 if [ ! -f "$VALIDATE" ]; then
-    echo "guard-spec-merge: validate.sh nao encontrado — nao foi possivel verificar." >&2
-    exit 0
+    echo "guard-spec-merge: $VALIDATE nao encontrado — o merge nao foi verificado. Reinstale o anvil com /anvil-update." >&2
+    exit 1
 fi
 
 set --
@@ -369,6 +381,6 @@ cat >&2 <<'RODAPE'
 A ordem e: todo ticket em Status: resolved, depois /anvil-docs archive, os dois
 commitados no branch da spec, depois o merge ou o PR. A guarda le a spec do
 commit de cada branch, nao do disco: o que nao foi commitado nao conta.
-Para conferir: bash .claude/skills/anvil-docs/scripts/validate.sh ship-ready [branch...]
+Para conferir: bash ~/.claude/skills/anvil-docs/scripts/validate.sh ship-ready [branch...]
 RODAPE
 exit 2

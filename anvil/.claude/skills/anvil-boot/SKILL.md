@@ -1,6 +1,6 @@
 ---
 name: anvil-boot
-description: "Bootstrap: prepara um projeto para o anvil — garante a instalação de usuário do toolkit, gera .claude/rules/, monta ou adota a árvore docs/, escreve o perfil do issue tracker, propõe a rule da stack detectada e registra a guarda de merge. Rode uma vez por projeto, e de novo quando a estrutura mudar bastante."
+description: "Bootstrap: prepara um projeto para o anvil — garante a instalação de usuário do toolkit, gera .claude/rules/, monta ou adota a árvore docs/, escreve o perfil do issue tracker, propõe a rule da stack detectada e confere a guarda de merge. Rode uma vez por projeto, e de novo quando a estrutura mudar bastante."
 ---
 
 # Boot
@@ -9,13 +9,13 @@ Prepara um projeto para o anvil. Roda uma vez; repetir é seguro, porque cada
 passo é idempotente e nada é sobrescrito sem aviso.
 
 O toolkit não é copiado para o projeto: ele mora na instalação de usuário, que
-vale para todos os projetos da máquina e que o passo 2 garante. O projeto recebe
-o que é dele — `.claude/rules/`, os perfis em `docs/agents/` e a árvore de
-`docs/` —, além da guarda de merge do passo 8.
+vale para todos os projetos da máquina e que o passo 2 garante, com a guarda de
+merge inclusive. O projeto recebe o que é dele: `.claude/rules/`, os perfis em
+`docs/agents/` e a árvore de `docs/`.
 
 **Nada é escrito sem aprovação**, exceto a árvore vazia de `docs/`. Todo o resto
-— instalação de usuário, rules, perfil de tracker, rule de stack, hook — é
-proposto e espera confirmação.
+— instalação de usuário, rules, perfil de tracker, rule de stack — é proposto e
+espera confirmação.
 
 ## 1. Vindo do mosk?
 
@@ -35,7 +35,8 @@ encontrar e tentar usar:
 | `.claude/mosk/` | o core: tasks, templates, checklists, scripts, schemas |
 | `.claude/skills/mosk-*` | os wrappers de agente e as skills soltas |
 | `.claude/skills/tea-*` | as cópias do mosk. As do anvil vêm da instalação de usuário, e a cópia do mosk no projeto as sombrearia no omp |
-| `.claude/hooks/guard-spec-merge.sh` | é substituído pela versão do `anvil-docs` |
+| `.claude/hooks/guard-spec-merge.sh` | a guarda do mosk. A do anvil vem da instalação de usuário |
+| em `.claude/settings.json`, só a entrada do hook que chama `.claude/hooks/guard-spec-merge.sh` | chamaria um script apagado a cada comando. O resto do arquivo, hooks do projeto inclusive, fica |
 
 Fica, sem ser tocado:
 
@@ -44,7 +45,6 @@ Fica, sem ser tocado:
 | `.claude/agents/`, fora as personas | os agentes que o projeto escreveu |
 | `.claude/rules/` | é do projeto, não do toolkit. Só o `project.md` é revisado no passo 4, porque cita caminhos do mosk |
 | `docs/` | é o trabalho. O passo 5 chama o `anvil-docs`, que escolhe entre `scaffold` e `adopt` |
-| `.claude/settings.json` | pode ter hook do projeto. O passo 8 **mescla**, não sobrescreve |
 
 **No `CLAUDE.md`**, o bloco entre `<!-- MOSK:DIRECTIVES:START -->` e `END` sai
 inteiro, e nada entra no lugar: as diretivas do anvil chegam pela instalação de
@@ -87,6 +87,10 @@ A instalação põe as diretivas no `~/.claude/CLAUDE.md`, entre os marcadores
 `ANVIL:DIRECTIVES`, sem tocar o que está fora deles, e, com a camada omp, na rule
 `~/.omp/agent/rules/anvil-directives.md`. **O `CLAUDE.md` do projeto não recebe
 bloco**: o que o projeto já tinha nele fica como estava.
+
+Ela também registra a guarda de merge no `~/.claude/settings.json`, como uma
+entrada a mais em `hooks.PreToolUse`, sem tocar o resto do arquivo. O passo 8
+confere que ela dispara.
 
 ## 3. Varrer o projeto
 
@@ -208,26 +212,26 @@ Uma verificação que ninguém chama tem a força de uma prosa e o custo de um
 programa. O mosk pagou por isso: uma spec dele chegou ao branch padrão ainda
 aberta, com o verificador instalado, correto e nunca invocado.
 
-1. `chmod +x .claude/hooks/guard-spec-merge.sh` — copie de `anvil-docs/scripts/`.
-2. **Mescle** no `.claude/settings.json`, nunca sobrescreva; o projeto pode já
-   ter hooks:
+A guarda vem da instalação de usuário e vale para todo projeto anvil da máquina:
+o hook do Claude Code fica no `~/.claude/settings.json`, e o do omp na camada em
+`~/.omp/agent/hooks/pre/`. Ela reconhece o projeto pela rule `anvil.md` do passo
+4, e fora de projeto anvil não faz nada. **O boot não escreve hook nem script no
+projeto.**
 
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      { "matcher": "Bash",
-        "hooks": [ { "type": "command",
-                     "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/guard-spec-merge.sh" } ] }
-    ]
-  }
-}
+**Confirme que ela dispara.** Instalar sem verificar é repetir o erro que a guarda
+existe para evitar. Da raiz do projeto:
+
+```bash
+grep -qF 'anvil-docs/scripts/guard-spec-merge.sh' ~/.claude/settings.json 2>/dev/null &&
+    echo "hook: registrado" || echo "hook: AUSENTE"
+printf '{"tool_name":"Bash","tool_input":{"command":"git merge x"}}' |
+    bash ~/.claude/skills/anvil-docs/scripts/guard-spec-merge.sh; echo "saída: $?"
 ```
 
-3. **Confirme que dispara.** Passe um JSON de chamada falsa para o hook: num
-   branch sem número ele sai 0; num branch de spec com ticket aberto, ou com a
-   spec ainda fora de `docs/specs/archive/`, sai 2 e diz o que falta. Instalar
-   sem verificar é repetir o erro que o hook existe para evitar.
+Num branch sem número a guarda sai 0; num branch de spec com ticket aberto, ou
+com a spec ainda fora de `docs/specs/archive/`, sai 2 e diz o que falta. Com o
+hook ausente, a instalação de usuário é de uma versão anterior: aponte o
+`/anvil-update`, que o registra.
 
 Diga ao usuário que a guarda está ativa e o que ela bloqueia.
 

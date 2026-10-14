@@ -20,13 +20,15 @@ projetos da máquina de uma vez. O destino é o diretório do usuário:
 | espelho | `~/.agents/skills/`, um symlink por skill, lido pelo Codex e pelo omp |
 | camada omp | `~/.omp/agent/{skills,rules,agents,hooks/pre}` |
 | diretivas | o bloco `ANVIL:DIRECTIVES` do `~/.claude/CLAUDE.md` e, no omp, a rule `~/.omp/agent/rules/anvil-directives.md` |
+| guarda de merge | no Claude Code, um hook `PreToolUse`/`Bash` no `~/.claude/settings.json` que chama o `guard-spec-merge.sh` das skills instaladas; no omp, o hook da camada |
 
 O que é de cada projeto — `.claude/rules/`, os perfis em `docs/agents/` e o resto
 de `docs/` — não é tocado. O update **nunca commita**.
 
 **Isto é um reset, não uma sobrescrita.** As skills e os agentes que o anvil
 instalou são apagados e reinstalados. Ficam intactos: **qualquer skill ou agente
-que você tenha escrito** em `~/.claude/`, as suas settings, o `~/.claude/CLAUDE.md`
+que você tenha escrito** em `~/.claude/`, as suas settings fora da entrada da
+guarda de merge, o `~/.claude/CLAUDE.md`
 fora do bloco do anvil e os seus arquivos em `~/.omp/agent/`. A ressalva é a skill
 ou o agente seu, fora do lock, com o mesmo nome de um do payload: é sobrescrito,
 depois do destaque de colisão no dry-run e do aviso do passo 3.
@@ -56,6 +58,16 @@ sem marcador, o bloco entra no topo, e sem o arquivo, ele é criado. Marcador fo
 de um único par `START..END` para o reset antes de qualquer escrita. No omp, a
 diretiva é a rule `alwaysApply` da camada, porque o omp não lê o `CLAUDE.md` de
 usuário; sem camada omp, ela não é escrita.
+
+A **guarda de merge** é instalada uma vez por usuário e roda em todo repositório
+da máquina, mas só age em projeto anvil — o que tem `.claude/rules/anvil.md`. No
+`~/.claude/settings.json`, o reset acrescenta a `hooks.PreToolUse` uma entrada
+`Bash` com o comando `bash "$HOME/.claude/skills/anvil-docs/scripts/guard-spec-merge.sh"`,
+e só ela: a entrada é achada por esse comando, rodar de novo não a duplica, e o
+resto do arquivo fica. Settings que não é um objeto JSON com `hooks.PreToolUse` em
+lista, ou máquina sem `python3`, deixa o arquivo intocado, e o dry-run diz o
+comando para registrar à mão. No omp, a guarda é o hook da camada em
+`~/.omp/agent/hooks/pre/`.
 
 **Por que reset e não `degit --force`:** o `--force` sobrescreve arquivo a
 arquivo e **nunca apaga**. Uma skill que deixou de existir upstream ficaria no
@@ -127,7 +139,9 @@ for symlink ou arquivo, ou se um arquivo da camada for diretório, a camada inte
 linhas `omp:` do lock ficam como estavam.
 
 Depois, as diretivas do `~/.claude/CLAUDE.md`: arquivo novo, bloco novo no topo,
-bloco em dia ou bloco que será substituído.
+bloco em dia ou bloco que será substituído. E a guarda de merge do
+`~/.claude/settings.json`: arquivo novo, hook novo, hook em dia, ou um `ATENÇÃO`
+quando o arquivo fica intocado.
 
 Por último, o projeto: *fora de projeto anvil*, ou o projeto onde roda, com uma
 linha `BOOT PENDENTE` para cada perfil de `docs/agents/` ausente ou divergente do
@@ -162,6 +176,8 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP"
 - as colisões que foram sobrescritas, por nome
 - a camada omp: nova, mantida ou não instalada, e o sinal que decidiu
 - as diretivas: o bloco do `~/.claude/CLAUDE.md` criado, trocado ou em dia
+- a guarda de merge: o hook do `~/.claude/settings.json` registrado agora, já em
+  dia, ou o `ATENÇÃO` com o comando para registrar à mão
 - o que há de novo no toolkit
 - o que ficou no disco para você decidir
 - **o que o update não toca e pode ter ficado para trás.** Os perfis em

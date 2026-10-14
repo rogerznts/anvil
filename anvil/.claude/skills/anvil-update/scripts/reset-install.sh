@@ -18,6 +18,8 @@
 #   ~/.omp/agent/          a camada omp: skills, rules, agents e hooks/pre
 #   ~/.claude/CLAUDE.md    o bloco ANVIL:DIRECTIVES, que o Claude Code carrega
 #                          em toda sessão
+#   ~/.claude/settings.json  o hook PreToolUse/Bash da guarda de merge, que chama
+#                          o guard-spec-merge.sh das skills instaladas
 #
 # O conjunto a apagar vem do lock de usuário, não de um prefixo de nome. Um
 # lockfile diz a verdade; um prefixo adivinha — e adivinha errado nas skills que
@@ -34,7 +36,9 @@
 # os marcadores ANVIL:DIRECTIVES do ~/.claude/CLAUDE.md, sem tocar o que está fora
 # dele, e a rule alwaysApply rules/anvil-directives.md da camada omp, porque o omp
 # não lê o CLAUDE.md de usuário.
-#
+# A guarda de merge entra no ~/.claude/settings.json como uma entrada a mais em
+# hooks.PreToolUse, achada pelo comando exato; o resto do arquivo fica. O hook do
+# omp vem com a camada.
 # Nada é escrito em projeto, e nada é commitado. Rodado de dentro de um projeto
 # anvil — o que tem .claude/rules/anvil.md —, o relatório confere os perfis de
 # docs/agents/ contra o template novo e aponta o /anvil-boot quando divergem.
@@ -356,6 +360,46 @@ elif ! tem_bloco "$CLAUDE_MD" "$DIR_INI"; then estado_diretivas="bloco-novo"
 elif bloco_atual | cmp -s - "$DIRETIVAS"; then estado_diretivas="em-dia"
 else estado_diretivas="substituido"; fi
 
+# A guarda de merge no ~/.claude/settings.json: a entrada e nossa pelo comando
+# exato. O python3 le e escreve o JSON; sem ele, ou com um settings que nao e um
+# objeto com hooks.PreToolUse em lista, o arquivo fica intocado e o relatorio avisa.
+SETTINGS="$U/.claude/settings.json"
+GUARDA_CMD='bash "$HOME/.claude/skills/anvil-docs/scripts/guard-spec-merge.sh"'
+guarda_settings() {  # <estado|escreve>
+    python3 - "$1" "$SETTINGS" "$GUARDA_CMD" <<'PYEOF'
+import json, os, sys
+modo, caminho, cmd = sys.argv[1:4]
+if not os.path.exists(caminho):
+    dados, estado = {}, "arquivo-novo"
+else:
+    try:
+        with open(caminho, encoding="utf-8") as f:
+            dados = json.load(f)
+    except (ValueError, OSError):
+        print("invalido"); sys.exit()
+    estado = "nova"
+hooks = dados.get("hooks", {}) if isinstance(dados, dict) else None
+pre = hooks.get("PreToolUse", []) if isinstance(hooks, dict) else None
+if not isinstance(pre, list) or not all(isinstance(e, dict) for e in pre):
+    print("invalido"); sys.exit()
+if any(isinstance(h, dict) and h.get("command") == cmd for e in pre for h in (e.get("hooks") or [])):
+    estado = "em-dia"
+if modo == "estado":
+    print(estado); sys.exit()
+if estado != "em-dia":
+    pre.append({"matcher": "Bash", "hooks": [{"type": "command", "command": cmd}]})
+    hooks["PreToolUse"] = pre
+    dados["hooks"] = hooks
+    # open com "w" trunca no lugar: o arquivo mantem as permissoes, e o alvo, se for symlink
+    with open(caminho, "w", encoding="utf-8") as f:
+        json.dump(dados, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+PYEOF
+}
+if [ ! -f "$FROM_ABS/.claude/skills/anvil-docs/scripts/guard-spec-merge.sh" ]; then estado_guarda="sem-fonte"
+elif ! command -v python3 >/dev/null 2>&1; then estado_guarda="sem-python"
+else estado_guarda="$(guarda_settings estado)"; fi
+
 # --- o projeto de onde roda ---------------------------------------------------
 # Projeto anvil e o que tem a rule de configuracao que o boot escreve. A raiz vem
 # do git, ou do diretorio corrente fora de repositorio.
@@ -399,7 +443,7 @@ fi
 echo "órfãos, serão REMOVIDOS ($(conta "$orfaos$orfaos_ag")):"; lista "$orfaos" "$orfaos_ag"
 echo "não são do anvil, ficam intocados ($(conta "$alheios$alheios_ag")):"; lista "$alheios" "$alheios_ag"
 echo "preservados sempre:"
-for p in .claude/settings.json .claude/settings.local.json .claude/rules .omp/agent/config.yml; do
+for p in .claude/settings.local.json .claude/rules .omp/agent/config.yml; do
     if [ -e "$U/$p" ]; then echo "  ~/$p"; fi
 done
 echo "  o resto de ~/.claude, ~/.agents e ~/.omp, fora do que está listado aqui"
@@ -443,6 +487,13 @@ case "$estado_diretivas" in
     bloco-novo)   echo "diretivas em ~/.claude/CLAUDE.md: bloco ANVIL:DIRECTIVES novo, no topo; o resto do arquivo fica intocado" ;;
     em-dia)       echo "diretivas em ~/.claude/CLAUDE.md: bloco ANVIL:DIRECTIVES em dia" ;;
     substituido)  echo "diretivas em ~/.claude/CLAUDE.md: bloco ANVIL:DIRECTIVES será SUBSTITUÍDO; fora do bloco fica intocado" ;;
+esac
+case "$estado_guarda" in
+    sem-fonte)    echo "guarda de merge: o payload não traz o guard-spec-merge.sh, ~/.claude/settings.json fica intocado" ;;
+    arquivo-novo) echo "guarda de merge em ~/.claude/settings.json: o arquivo não existe e será criado com o hook PreToolUse/Bash" ;;
+    nova)         echo "guarda de merge em ~/.claude/settings.json: hook PreToolUse/Bash novo; o resto do arquivo fica" ;;
+    em-dia)       echo "guarda de merge em ~/.claude/settings.json: hook em dia" ;;
+    *)            echo "ATENÇÃO, guarda de merge: ~/.claude/settings.json fica intocado ($([ "$estado_guarda" = sem-python ] && echo "sem python3 para editá-lo" || echo "não é um objeto JSON com hooks.PreToolUse em lista")); registre à mão o hook PreToolUse/Bash com o comando: $GUARDA_CMD" ;;
 esac
 if [ -n "$PROJETO" ]; then
     echo "projeto anvil em $PROJETO: nada é escrito nele; perfis de docs/agents/ conferidos contra o template novo"
@@ -541,6 +592,9 @@ escreve_diretivas() {
 }
 case "$estado_diretivas" in
     arquivo-novo|bloco-novo|substituido) escreve_diretivas ;;
+esac
+case "$estado_guarda" in
+    arquivo-novo|nova) guarda_settings escreve ;;
 esac
 
 echo
