@@ -45,16 +45,19 @@ Mais estreita que a de um projeto comum:
 | Capacidade | Implementação |
 |---|---|
 | Starter | `bench/starter/` — copiado as-is, nunca regenerado |
-| Ambiente | `bench/env.sh` |
-| Infra e alocação | `bench/infra.sh` |
+| Ambiente | `~/.claude/skills/anvil-stack-payload/bench/env.sh` |
+| Infra e alocação | `~/.claude/skills/anvil-stack-payload/bench/infra.sh` |
 | Rule gerada | `.claude/rules/payload.md`, a partir de `../RULE.md` mais esta seção |
 | Testes | `docker compose exec app pnpm test` (Vitest, via Local API) |
-| Publicação opt-in | `bench/deploy.sh` — Railway |
+| Publicação opt-in | `~/.claude/skills/anvil-stack-payload/bench/deploy.sh` — Railway |
 
 ## Alocação por projeto
 
 O `infra.sh` provisiona uma infra compartilhada por máquina — Postgres, Redis e a
-rede `anvil-net` — e aloca por projeto:
+rede `anvil-net` — e aloca por projeto. Ele roda da instalação de usuário,
+chamado do diretório do projeto: a raiz do projeto é a do `git`, ou o diretório
+corrente quando o `git` ainda não foi iniciado, e nunca é deduzida do lugar onde
+o script mora. Por projeto, ele aloca:
 
 - nome do banco
 - índice do Redis (0–15, com prefixo como fallback)

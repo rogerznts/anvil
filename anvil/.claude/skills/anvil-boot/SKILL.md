@@ -278,8 +278,8 @@ do projeto, e tirar as linhas faz as skills instaladas aparecerem no `git status
 - **O bloco.** Veja o que sai e, com a aprovação, tire:
 
   ```bash
-  bash .claude/skills/anvil-update/scripts/reset-install.sh --unignore --dry-run --to .
-  bash .claude/skills/anvil-update/scripts/reset-install.sh --unignore --to .
+  bash ~/.claude/skills/anvil-update/scripts/reset-install.sh --unignore --dry-run --to .
+  bash ~/.claude/skills/anvil-update/scripts/reset-install.sh --unignore --to .
   ```
 
   Rodar de novo não muda nada, e o `/anvil-update` remove o bloco sozinho na
@@ -310,11 +310,11 @@ do projeto, e tirar as linhas faz as skills instaladas aparecerem no `git status
 O omp e o Codex leem o que o anvil instala fora de `.claude/`: a camada omp em
 `.omp/` e o espelho do Codex em `.agents/skills`. Quem os instala é o modo de
 camadas do `reset-install.sh`, o mesmo código do `/anvil-update`, rodando da
-cópia instalada:
+instalação de usuário com o projeto como destino:
 
 ```bash
-bash .claude/skills/anvil-update/scripts/reset-install.sh --layers --dry-run --to .
-bash .claude/skills/anvil-update/scripts/reset-install.sh --layers --to .
+bash ~/.claude/skills/anvil-update/scripts/reset-install.sh --layers --dry-run --to .
+bash ~/.claude/skills/anvil-update/scripts/reset-install.sh --layers --to .
 ```
 
 Rode o dry-run e, logo depois, o modo, **sem perguntar**. A camada omp só entra

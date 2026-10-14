@@ -31,8 +31,13 @@ As invariantes completas do produto gerado (INV-1..6) estão na skill
 
 ### 1. Preparar
 
-Rode o validador e o provisionador da stack — na `anvil-stack-payload`,
-`bench/env.sh` e depois `bench/infra.sh`, com `--provision "<nome>"`.
+Rode o validador e o provisionador da stack, da instalação de usuário, no
+diretório do projeto:
+
+```
+bash ~/.claude/skills/anvil-stack-payload/bench/env.sh
+bash ~/.claude/skills/anvil-stack-payload/bench/infra.sh --provision "<nome>"
+```
 
 Traduza só o progresso. Em falha, diga qual requisito falta **sem** mostrar
 comando, porta, banco ou container. Confirmação humana só para instalar
@@ -90,11 +95,13 @@ só sai quando tudo passou, nada de número copiado do briefing, item sem teste
 vira gate manual — estão em [CHECKLIST.md](CHECKLIST.md). O formato do arquivo é
 o do upstream, em [unlazy/references/gates.md](unlazy/references/gates.md).
 
-Antes de seguir, rode o linter, que acha o gate incapaz de falhar:
+Antes de seguir, rode o linter, que acha o gate incapaz de falhar. Ele vem da
+instalação de usuário, fora do que o container monta, e por isso entra no
+container antes de rodar:
 
 ```
-docker compose exec -T app node \
-  .claude/skills/anvil-bench/unlazy/scripts/gate-lint.mjs docs/specs/<id>/gates.md
+docker compose cp ~/.claude/skills/anvil-bench/unlazy/scripts/. app:/tmp/anvil-gates
+docker compose exec -T app node /tmp/anvil-gates/gate-lint.mjs docs/specs/<id>/gates.md
 ```
 
 Nada disto aparece para quem pediu a ferramenta (INV-6).
@@ -126,7 +133,8 @@ linguagem de negócio.
 
 Com `CONCERNS` ou `FAIL`: diga o que falta, em uma frase, **sem despejar log**.
 
-Publicar é opt-in e não faz parte deste fluxo — `bench/deploy.sh`, na stack.
+Publicar é opt-in e não faz parte deste fluxo —
+`~/.claude/skills/anvil-stack-payload/bench/deploy.sh`, no diretório do projeto.
 
 ## Evoluir uma ferramenta
 

@@ -189,12 +189,17 @@ fluxo do bench. O contrato está em [STACK-CONTRACT.md](STACK-CONTRACT.md).
 
 ## Verificação
 
-- `bash scripts/validate.sh docs-paths` — as saídas declaradas ficam sob os
-  domínios canônicos. Consultivo, não bloqueia.
-- `bash scripts/validate.sh ship-ready [branch...]` — a spec do branch atual, e
-  a de cada branch passado, está fechada (tickets `resolved`) **e arquivada**,
-  lida do commit de cada um. É o que o hook de merge chama, passando os branches
-  que o `git merge` nomeia, e é o que impõe o `archive` antes do merge ou do PR.
-- `bash scripts/find-dupes.sh docs` — conteúdo duplicado: mesmo hash, mesmo
-  identificador de artefato, mesmo título. O `adopt` roda no começo e no fim;
-  vale rodar à mão depois de qualquer movimentação em massa.
+Os scripts vêm da instalação de usuário do anvil e leem o projeto em que rodam:
+a raiz do `git`, ou o diretório corrente no caso do `find-dupes`.
+
+- `bash ~/.claude/skills/anvil-docs/scripts/validate.sh docs-paths` — as saídas
+  declaradas ficam sob os domínios canônicos. Consultivo, não bloqueia.
+- `bash ~/.claude/skills/anvil-docs/scripts/validate.sh ship-ready [branch...]` —
+  a spec do branch atual, e a de cada branch passado, está fechada (tickets
+  `resolved`) **e arquivada**, lida do commit de cada um. É o que o hook de merge
+  chama, passando os branches que o `git merge` nomeia, e é o que impõe o
+  `archive` antes do merge ou do PR.
+- `bash ~/.claude/skills/anvil-docs/scripts/find-dupes.sh docs` — conteúdo
+  duplicado: mesmo hash, mesmo identificador de artefato, mesmo título. O `adopt`
+  roda no começo e no fim; vale rodar à mão depois de qualquer movimentação em
+  massa.

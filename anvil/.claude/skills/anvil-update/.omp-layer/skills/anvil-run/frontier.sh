@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Estado de uma spec do anvil, lido do disco, para a skill anvil-run.
 #
-# Uso, de dentro do repositorio:
-#   bash .omp/skills/anvil-run/frontier.sh [NNN] [--skip "NN NN"]
+# Uso, de dentro do repositorio, com a camada na instalacao de usuario:
+#   bash ~/.omp/agent/skills/anvil-run/frontier.sh [NNN] [--skip "NN NN"]
 #
 # Sem NNN, a spec sai do prefixo numerico do branch atual, {tipo}/{NNN}-{nome}.
 # --skip tira do frontier os tickets que o supervisor ja despachou nesta execucao

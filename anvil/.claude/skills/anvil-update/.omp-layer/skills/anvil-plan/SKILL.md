@@ -19,11 +19,12 @@ discutiu. Não abra subagente para uma etapa, não compacte e não sugira `/comp
 ## Onde o planejamento está
 
 Comece sempre por aqui, com argumento ou sem, antes de dizer qualquer coisa ao
-operador. O script é o `.omp/skills/anvil-plan/stage.sh`. No diretório em que a
-sessão está, que é a raiz do projeto, rode sem `cd`:
+operador. O script é o `~/.omp/agent/skills/anvil-plan/stage.sh`, da instalação
+de usuário. No diretório em que a sessão está, que é a raiz do projeto, rode sem
+`cd`:
 
 ```bash
-bash .omp/skills/anvil-plan/stage.sh
+bash ~/.omp/agent/skills/anvil-plan/stage.sh
 ```
 
 O script lê o branch e a pasta da spec e devolve as linhas `spec`, `next`,

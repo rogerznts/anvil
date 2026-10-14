@@ -58,5 +58,6 @@ Só fale se encontrar link quebrado ou entrada obsoleta.
 - Caminho relativo começando com `./`.
 - **Idempotente** a menos do timestamp: rodar duas vezes seguidas não muda mais
   nada.
-- Opcionalmente rode `bash scripts/validate.sh docs-paths --quiet` e mostre as
-  violações como aviso não bloqueante.
+- Opcionalmente rode
+  `bash ~/.claude/skills/anvil-docs/scripts/validate.sh docs-paths --quiet` e
+  mostre as violações como aviso não bloqueante.

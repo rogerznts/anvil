@@ -31,7 +31,7 @@ Ask the user **two questions in a single message**:
 Compose the full branch name as `<type>/<name>` (e.g., `hotfix/login-fix`).
 
 > **For an anvil spec, do not name the branch by hand.** Run
-> `bash .claude/skills/anvil-to-spec/scripts/new-spec.sh` instead — it reserves the
+> `bash ~/.claude/skills/anvil-to-spec/scripts/new-spec.sh` instead — it reserves the
 > spec number atomically and produces `{tipo}/{NNN}-{nome}` plus the matching
 > flat folder. This skill is for ordinary branches that are not specs.
 

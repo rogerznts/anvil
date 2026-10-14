@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Onde o planejamento de uma spec esta, lido do disco, para a skill anvil-plan.
 #
-# Uso, de dentro do repositorio:
-#   bash .omp/skills/anvil-plan/stage.sh
+# Uso, de dentro do repositorio, com a camada na instalacao de usuario:
+#   bash ~/.omp/agent/skills/anvil-plan/stage.sh
 #
 # A spec sai do prefixo numerico do branch atual, {tipo}/{NNN}-{nome}, casado com
 # a pasta docs/specs/{NNN}-*/ pelo numero, como no perfil do tracker. Nada e

@@ -64,7 +64,9 @@ propósito. Nunca resolva uma na outra por igualdade; use o prefixo numérico.
 
 ## Quando uma skill disser "publish to the issue tracker"
 
-Rode `bash .claude/skills/anvil-to-spec/scripts/new-spec.sh --json`.
+Rode `bash ~/.claude/skills/anvil-to-spec/scripts/new-spec.sh --json`, da raiz do
+projeto. O script vem da instalação de usuário do anvil, e o branch e a pasta
+nascem no repositório em que ele roda.
 
 O script reserva o próximo número **atomicamente no `origin`**, num ref imutável
 `refs/spec-numbers/{NNN}`, antes de criar o branch. Duas pessoas criando spec ao

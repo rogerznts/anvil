@@ -43,8 +43,8 @@ O `gate.yaml` é o veredito. O que o produz é a **reexecução do ledger** que 
 fase 4 escreveu, nunca a leitura do que o agente disse ter feito:
 
 ```
-docker compose exec -T app node \
-  .claude/skills/anvil-bench/unlazy/scripts/gate-check.mjs \
+docker compose cp ~/.claude/skills/anvil-bench/unlazy/scripts/. app:/tmp/anvil-gates
+docker compose exec -T app node /tmp/anvil-gates/gate-check.mjs \
   --reverify --approve docs/specs/<id>/gates.md
 ```
 
@@ -61,10 +61,12 @@ auto-declarado outra vez, com mais cerimônia e nenhuma prova a mais. O disco é
 fronteira: o agente entrega o código, o supervisor reexecuta.
 
 **Dentro do container.** É onde os testes já rodam e onde o Node existe sem
-ninguém instalar nada na máquina (INV-4). O `--approve` fica no comando porque a
-aprovação do unlazy amarra o `PATH` inteiro e não sobrevive à recriação do
-container: em loop headless ela é registro, não consentimento. Quem lê os
-comandos antes de aprová-los é você, na fase 4, ao escrever o ledger.
+ninguém instalar nada na máquina (INV-4). O checker vem da instalação de usuário,
+que o container não monta: o `cp` o põe lá antes de cada execução, e o projeto
+continua sendo o diretório de trabalho do container. O `--approve` fica no
+comando porque a aprovação do unlazy amarra o `PATH` inteiro e não sobrevive à
+recriação do container: em loop headless ela é registro, não consentimento. Quem
+lê os comandos antes de aprová-los é você, na fase 4, ao escrever o ledger.
 
 Contexto e limites do material adotado: [unlazy/VENDOR.md](unlazy/VENDOR.md).
 

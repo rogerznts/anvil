@@ -54,11 +54,11 @@ e siga em série:
 
 ## Ler o estado
 
-O script é o `.omp/skills/anvil-run/frontier.sh`. No diretório em que a sessão
-está, que é a raiz do projeto, rode sem `cd`:
+O script é o `~/.omp/agent/skills/anvil-run/frontier.sh`, da instalação de
+usuário. No diretório em que a sessão está, que é a raiz do projeto, rode sem `cd`:
 
 ```bash
-bash .omp/skills/anvil-run/frontier.sh [NNN] [--skip "NN NN"]
+bash ~/.omp/agent/skills/anvil-run/frontier.sh [NNN] [--skip "NN NN"]
 ```
 
 Passe o número da spec se o operador passou. `--skip` leva os tickets que você anotou

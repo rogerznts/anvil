@@ -81,7 +81,9 @@ Um template, dois chamadores:
 - [ ] `SKILL.md` roteador: tabela tarefa → solução → arquivo. Não repete o que
       está no `reference/`
 - [ ] `bench/starter/` versionado, copiado sem regenerar
-- [ ] `bench/{env,infra,deploy}.sh` idempotentes, com `--help` e `--dry-run`
+- [ ] `bench/{env,infra,deploy}.sh` idempotentes, com `--help` e `--dry-run`. Eles
+      rodam da instalação de usuário e acham o projeto pelo `git` ou pelo
+      diretório corrente, nunca subindo a partir do próprio arquivo
 - [ ] `bench/INVARIANTS.md` com o que é decisão de produto do bench
 - [ ] registro no manifesto `anvil-skills.yaml`, com origem upstream se houver
 

@@ -17,7 +17,10 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-INSTALL_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+# O script roda da instalação de usuário, e o projeto é onde ele é chamado: a
+# raiz do git, ou o diretório corrente quando o git ainda não foi iniciado. Do
+# próprio arquivo só sai o que é da skill, como o compose da infra.
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 STARTER_INFRA="$SCRIPT_DIR/starter/.anvil-infra/docker-compose.yml"
 
 # Diretório de projetos do usuário (overridable para testes).
@@ -64,7 +67,8 @@ Modo padrão:
   - Se está parada: up -d.
   - Health gate: pg_isready + redis-cli ping antes de liberar.
 
-Modo --provision <projeto>:
+Modo --provision <projeto>, chamado do diretório do projeto:
+  - Projeto: a raiz do git, ou o diretório corrente sem git.
   - Banco próprio: slug sanitizado [a-z0-9_]; checa pg_database antes do CREATE.
   - Índice Redis livre: 0-15; se todos ocupados, cai para prefixo "<slug>:".
   - Porta livre: bind-test a partir de 3000.
@@ -265,6 +269,7 @@ provision_project() {
         echo "ERRO: nome de projeto inválido: '$name'." >&2
         exit 1
     fi
+    echo "projeto: $PROJECT_ROOT"
 
     registry_init
 

@@ -75,7 +75,7 @@ spec ainda não está sob `archive/`.
 ```bash
 ls "$SPEC_DIR"issues/*.md
 grep -L 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # se voltar algo, pare aqui
-bash .claude/skills/anvil-docs/scripts/validate.sh ship-ready   # o que a guarda vai ver
+bash ~/.claude/skills/anvil-docs/scripts/validate.sh ship-ready   # o que a guarda vai ver
 ```
 
 ### Step 2 — Read the diff

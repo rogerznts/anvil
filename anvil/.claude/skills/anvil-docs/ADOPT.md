@@ -36,7 +36,7 @@ ser · para onde iria* — sem mover nada:
 Rode a checagem de duplicata **antes de propor qualquer coisa**:
 
 ```bash
-bash scripts/find-dupes.sh docs
+bash ~/.claude/skills/anvil-docs/scripts/find-dupes.sh docs
 ```
 
 Ela lista conteúdo idêntico, mesmo identificador (`US-014` numa cópia,
@@ -128,8 +128,8 @@ Três condições, e a terceira é a que se esquece:
 2. **Nenhuma duplicata introduzida.** Rode de novo:
 
    ```bash
-   bash scripts/validate.sh docs-paths
-   bash scripts/find-dupes.sh docs
+   bash ~/.claude/skills/anvil-docs/scripts/validate.sh docs-paths
+   bash ~/.claude/skills/anvil-docs/scripts/find-dupes.sh docs
    ```
 
    Os dois precisam sair limpos. Se o `find-dupes` acusar algo que não acusava no
