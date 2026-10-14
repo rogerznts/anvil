@@ -189,6 +189,10 @@ bash "$TMP/.claude/skills/anvil-update/scripts/migrate-project.sh" --dry-run
   já migrado.
 - **Árvore suja** → o script para sem tocar em nada. Peça commit ou stash: o diff
   da migração precisa mostrar só a remoção. Depois, rode o dry-run de novo.
+- **Ignorado pelo git** → o `.gitignore` de uma versão antiga ainda ignora o
+  toolkit, e a remoção não apareceria no `git status`; o script para sem tocar em
+  nada e nomeia o que está ignorado. Quem tira essas linhas, com aprovação, é o
+  passo 9 do `/anvil-boot`: aponte o boot neste projeto, que migra depois disso.
 - **Com `.claude/anvil.lock` no projeto** → o dry-run lista por nome o que sai:
   as skills e os agentes do lock, o próprio lock, os symlinks de `.agents/skills`
   com nome de skill do lock, os arquivos de `.omp/` das linhas `omp:`, a entrada

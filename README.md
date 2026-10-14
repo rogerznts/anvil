@@ -343,8 +343,9 @@ Um projeto instalado do jeito antigo, com cópia do toolkit nele, é migrado pel
 symlinks de `.agents/skills`, os arquivos de `.omp/` do lock, a guarda copiada com
 o hook dela no `.claude/settings.json` e o bloco `ANVIL:DIRECTIVES` do `CLAUDE.md`.
 O que é do projeto fica. Sem lock, ela pergunta antes quais skills e agentes não
-vieram do anvil. Exige árvore limpa, mostra um dry-run, espera aprovação e nunca
-commita: a remoção fica no `git status` para você revisar.
+vieram do anvil. Exige árvore limpa e o toolkit fora do `.gitignore`, mostra um
+dry-run, espera aprovação e nunca commita: a remoção fica no `git status` para
+você revisar.
 
 ---
 

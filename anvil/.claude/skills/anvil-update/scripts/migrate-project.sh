@@ -28,34 +28,41 @@
 # não há linha `omp:`, e .omp/ fica.
 #
 # Fica: .claude/rules/, docs/, o settings fora da entrada do hook, o CLAUDE.md fora
-# do bloco, e skill, agente e arquivo de .omp/ fora do lock. Nada é apagado através
-# de symlink: item cujo caminho passa por um diretório que é symlink fica intocado.
+# do bloco, e skill, agente e arquivo de .omp/ fora do lock. Nada é apagado nem
+# escrito através de symlink: o item cujo caminho passa por um diretório que é
+# symlink fica intocado, e o CLAUDE.md e o settings que são symlink também. O item
+# que é ele mesmo symlink, como o do espelho, sai como link, sem tocar o alvo.
 #
-# Exige repositório git com árvore limpa, para que o diff da remoção seja
-# revisável, e nunca commita. Rodado em qualquer projeto, confere também os perfis
-# de docs/agents/: perfil que cita script pelo caminho da instalação por projeto
-# sai como BOOT PENDENTE, migrado ou não.
+# Exige repositório git com árvore limpa, e nada do que sai ignorado pelo
+# .gitignore, para que o diff da remoção seja revisável; nunca commita. Rodado em
+# qualquer projeto, confere também os perfis de docs/agents/: perfil que cita
+# script pelo caminho da instalação por projeto sai como BOOT PENDENTE, migrado ou
+# não.
 #
-#   migrate-project.sh [--dry-run] [--keep-skills "<nomes>"] [--keep-agents "<nomes>"]
+#   migrate-project.sh [--dry-run] [--keep-skills "<nomes>" --keep-agents "<nomes>"]
 #
-# Os nomes vão separados por espaço; "" quando tudo veio do anvil.
+# Os nomes vão separados por espaço; "" quando tudo veio do anvil. As duas listas
+# vão juntas.
 # Saída 0: migrou, ou nada a migrar. 2: erro, nada foi alterado. 3: sem lock e sem
 # a resposta, nada foi alterado.
 
 set -euo pipefail
 
-DRY=0; ANSWERED=0; KEEP_SKILLS=""; KEEP_AGENTS=""
+DRY=0; KEEP_SKILLS=""; KEEP_AGENTS=""; KS=0; KA=0
 while [ $# -gt 0 ]; do
     case "$1" in
         --dry-run) DRY=1; shift ;;
         --keep-skills|--keep-agents)
             [ $# -ge 2 ] || { echo "erro: $1 pede a lista de nomes, \"\" se nenhum" >&2; exit 2; }
-            if [ "$1" = --keep-skills ]; then KEEP_SKILLS="$2"; else KEEP_AGENTS="$2"; fi
-            ANSWERED=1; shift 2 ;;
-        -h|--help) sed -n '2,44p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+            if [ "$1" = --keep-skills ]; then KEEP_SKILLS="$2"; KS=1; else KEEP_AGENTS="$2"; KA=1; fi
+            shift 2 ;;
+        -h|--help) sed -n '2,47p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
     esac
 done
+# A resposta vem inteira: uma lista esquecida apagaria tudo o que ela cobre
+[ "$KS" -eq "$KA" ] || { echo "erro: --keep-skills e --keep-agents vão juntos, com \"\" no que não tem nada do usuário" >&2; exit 2; }
+ANSWERED=$KS
 
 # Listas de um nome por linha: o for divide só em quebra de linha e não expande glob
 IFS=$'\n'; set -f
@@ -222,9 +229,18 @@ if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
     git -C "$ROOT" status --short >&2
     exit 2
 fi
-markers_ok || { echo "erro: CLAUDE.md tem marcadores ANVIL:DIRECTIVES fora de um único par START..END — conserte à mão" >&2; exit 2; }
+# Escrever num CLAUDE.md ou num settings que é symlink, ou que está atrás de um,
+# escreveria no alvo, que pode ser de outros projetos: o item fica intocado.
+behind_link=""
+if [ -n "$block" ] && [ -L "$CLAUDE_MD" ]; then
+    behind_link="${behind_link}CLAUDE.md, o bloco ANVIL:DIRECTIVES"$'\n'; block=""; claude_md_gone=0
+fi
+[ -L "$CLAUDE_MD" ] || markers_ok ||
+    { echo "erro: CLAUDE.md tem marcadores ANVIL:DIRECTIVES fora de um único par START..END — conserte à mão" >&2; exit 2; }
 settings_state="none"
-if [ "$guard_in_settings" -eq 1 ]; then
+if [ "$guard_in_settings" -eq 1 ] && { ! safe ".claude/settings.json" || [ -L "$SETTINGS" ]; }; then
+    behind_link="${behind_link}.claude/settings.json, a entrada do hook que chama $GUARD_REF"$'\n'
+elif [ "$guard_in_settings" -eq 1 ]; then
     command -v python3 >/dev/null 2>&1 ||
         { echo "erro: sem python3 para tirar do .claude/settings.json a entrada que chama $GUARD_REF — tire-a à mão e rode de novo" >&2; exit 2; }
     settings_state="$(settings_guard state)"
@@ -267,7 +283,7 @@ else
 fi
 
 # Cada item do anvil sai se está no disco e o caminho até ele não passa por symlink
-rm_skills=""; rm_agents=""; rm_mirror=""; rm_omp=""; behind_link=""
+rm_skills=""; rm_agents=""; rm_mirror=""; rm_omp=""
 take() {  # <variável> <relativo>
     present "$2" || return 0
     if safe "$2"; then printf -v "$1" '%s' "${!1}$2"$'\n'
@@ -284,6 +300,20 @@ for f in $anvil_omp; do
 done
 rm_lock=""; [ "$has_lock" -eq 1 ] && take rm_lock ".claude/anvil.lock"
 rm_guard=""; take rm_guard "$GUARD_REF"
+
+# O que o .gitignore ignora não aparece no git status, e a remoção não seria
+# revisável nem se desfaria pelo git. O tracked não conta: ls-files -o só lista o
+# que o git não versiona.
+ignored=""
+for x in $rm_skills $rm_agents $rm_mirror $rm_omp $rm_lock $rm_guard; do
+    [ -z "$(git -C "$ROOT" ls-files -o -i --exclude-standard -- "$x")" ] || ignored="$ignored$x"$'\n'
+done
+if [ -n "$ignored" ]; then
+    echo "erro: o .gitignore do projeto ignora parte do que a migração tiraria, e a remoção não apareceria no git status. Nada foi alterado. Ignorados ($(count "$ignored")):" >&2
+    printf '%s' "$ignored" | sed 's/^/  /' >&2
+    echo "Tire do .gitignore as linhas que ignoram o toolkit — o passo 9 do /anvil-boot faz isso, com aprovação —, commite o que passar a aparecer e rode de novo." >&2
+    exit 2
+fi
 
 kept_skills=""; kept_agents=""; kept_omp=""
 for s in $disk_skills; do in_list "$anvil_skills" "$s" || kept_skills="$kept_skills.claude/skills/$s"$'\n'; done

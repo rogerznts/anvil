@@ -4,7 +4,7 @@
 
 **Blocked by:** 02, 03, 04
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=a2318309e7292ba0fe28690d9ac8a76e0f76eadf; scope=full; verdict=fail; p1=open
 
 - [x] Com lock no projeto, a migração remove:
@@ -45,3 +45,4 @@
 - Review round=1 · P3 (Standards): possível Duplicated Code/Shotgun Surgery — a árvore de decisão do dry-run se repete no passo 2 do boot e no passo 5 do update; mudar o comportamento do script exige editar as duas skills, e uma tende a ficar para trás.
 - Review round=1 · P3 (Spec): o `json.dump(indent=2)` regrava o settings inteiro; um settings com outra indentação ou com `\uXXXX` ganha mudança de formatação no diff além da remoção, contra o "settings fora da entrada do hook intocados" — o dry-run avisa.
 - Review round=1 · P3 (Spec): o aviso de perfil só desconta `~/.claude/`, `$HOME/.claude/` e `${HOME}/.claude/`; um perfil que cita `/Users/<u>/.claude/skills/x/scripts/` ou `"${HOME}"/.claude/...` recebe um `BOOT PENDENTE` falso.
+- Correção dos P1 da rodada 1: (1) o script para com código 2, sem tocar em nada, quando algo que sairia está ignorado pelo `.gitignore` e fora do git, nomeia o que está ignorado e aponta o passo 9 do boot; o passo 2 do boot manda fazer o passo 9 nesse caso e o passo 5 do update aponta o boot — com isso a remoção sempre aparece no `git status`, como os três contratos dizem, e o comentário acima sobre o `.gitignore` deixa de valer para a migração; (2) o `.claude/settings.json` e o `CLAUDE.md` que são symlink, ou estão atrás de um diretório symlink, ficam intocados e saem no grupo "passa por symlink" do relatório; (3) no passo 2 do boot, "**Com instalação**" segue para a migração, e não mais para o passo 3. De passagem, o P3 das respostas: `--keep-skills` e `--keep-agents` só valem juntos. O cenário ganhou o boot numa máquina com instalação, o toolkit ignorado, o `.claude` e o `CLAUDE.md` como symlink e a resposta pela metade: 56 checks, todos passando, e os cinco novos falhavam antes da correção.

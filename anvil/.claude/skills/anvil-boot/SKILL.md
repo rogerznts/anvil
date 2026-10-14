@@ -71,8 +71,9 @@ else
 fi
 ```
 
-- **Com instalação** → siga para o passo 3, sem tocar nela. Diga que a versão
-  instalada fica como está e que quem troca de versão é o `/anvil-update`.
+- **Com instalação** → não toque nela e siga para "Projeto instalado do jeito
+  antigo", logo abaixo. Diga que a versão instalada fica como está e que quem
+  troca de versão é o `/anvil-update`.
 - **Sem instalação** → o dry-run lista por nome o que entra em `~/.claude/`,
   `~/.agents/skills/` e `~/.omp/agent/`, o que já estava lá e fica, e as
   colisões: skill ou agente seu com o nome de um do payload, que **será
@@ -110,6 +111,10 @@ bash ~/.claude/skills/anvil-update/scripts/migrate-project.sh --dry-run
 - **Árvore suja** → o script para sem tocar em nada. Peça commit ou stash, para o
   diff da migração mostrar só a remoção, e rode o dry-run de novo. A migração do
   mosk do passo 1, se houve, também precisa estar commitada antes.
+- **Ignorado pelo git** → o `.gitignore` de uma versão antiga ainda ignora o
+  toolkit, e a remoção não apareceria no `git status`; o script para sem tocar em
+  nada e nomeia o que está ignorado. Faça agora o passo 9, que tira essas linhas
+  com aprovação, peça o commit do que passar a aparecer e rode o dry-run de novo.
 - **Com `.claude/anvil.lock` no projeto** → o dry-run lista por nome o que sai,
   guiado pelo lock, e o que fica: skill, agente e arquivo de `.omp/` fora do lock,
   rules, `docs/`, o resto do settings e do `CLAUDE.md`. Diga isso numa frase e
