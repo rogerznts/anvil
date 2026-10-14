@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=0fa89a3; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=6f1aeb4; scope=diff:0fa89a3..6f1aeb4; verdict=pass; p1=none
 
 - [x] O `reset-install` instala as skills e os agentes do payload em `~/.claude/skills/` e `~/.claude/agents/`, com o lock de usuário ao lado das skills e no formato de linhas de hoje (`skill:`, `agent:`, `omp:`).
 - [x] O espelho do Codex passa a ser `~/.agents/skills/`, com um symlink por skill.
@@ -46,3 +47,5 @@
 - Review round=1 · P3 (Standards): possível Mysterious Name em `U` (a raiz do `HOME`) e em `raiz` (a raiz do projeto, ao lado de `raiz_espelho` e `raiz_omp`, que são o caminho que bloqueia) — confunde quem mantiver o script.
 - Review round=1 · P3 (Standards): possível Duplicated Code — o prólogo awk que tira espaço e `\r` do fim aparece seis vezes, e os prefixos `~/.claude/agents/`, `~/.agents/skills/` e `~/.omp/agent/` do relatório repetem em texto o que `$AGENTS`, `$ESPELHO` e `$OMP` derivam; mudar um destino exige editar dois lugares.
 - Correção dos P1 da rodada 1, em `af1459e`: o disco da camada passa a ser só `skills`, `rules`, `agents` e `hooks/pre` de `~/.omp/agent`, e o resto — sessões, bancos, cache, `config.yml` — sai do dry-run; com 15.500 arquivos em `~/.omp/agent/sessions/`, o dry-run leva 1 s e 77 linhas. O cenário ganhou o check "o que o omp guarda fora da camada não é listado", com sessões, `agent.db` e cache no `HOME` do caso 2: 56 checks, todos passando. O manual `anvil-omp` e o README dizem que quem roda o reset é o `/anvil-update`, e que o boot só o roda na primeira instalação.
+- Review round=2 · P1 de round=1 remedidos: com 15.500 arquivos em `~/.omp/agent/sessions/`, o dry-run sai em 2 s e 84 linhas, sem `sessions`, `cache` nem `agent.db`, e a camada segue classificada pelo lock (órfão fora das quatro pastas sai, arquivo do usuário em `rules/` e `skills/` listado como não sendo do anvil, colisão destacada); o manual `anvil-omp` e o README conferem com o passo 2 do boot.
+- Review round=2 · P3 (Standards): possível Duplicated Code/Shotgun Surgery — `PASTAS_OMP` repete à mão as pastas de topo da `.omp-layer/`; uma pasta nova na camada sem editar a variável tira do relatório os arquivos do usuário nela, sem apagar nem sobrescrever nada, porque órfão e colisão vêm do lock e do payload.
