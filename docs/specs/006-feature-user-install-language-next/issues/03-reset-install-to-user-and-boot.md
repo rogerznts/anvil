@@ -4,7 +4,8 @@
 
 **Blocked by:** 02
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=0fa89a3; scope=full; verdict=fail; p1=open
 
 - [x] O `reset-install` instala as skills e os agentes do payload em `~/.claude/skills/` e `~/.claude/agents/`, com o lock de usuário ao lado das skills e no formato de linhas de hoje (`skill:`, `agent:`, `omp:`).
 - [x] O espelho do Codex passa a ser `~/.agents/skills/`, com um symlink por skill.
@@ -35,3 +36,12 @@
 - Fica para o ticket 04: o passo 8 do boot ainda copia o `guard-spec-merge.sh` para o projeto e registra o hook nas settings do projeto, e esse script chama o `validate.sh` pelo caminho do projeto; o hook omp em `~/.omp/agent/hooks/pre/` ainda procura a guarda em `.claude/skills/anvil-docs/scripts/` do projeto e, sem cópia ali, deixa passar em silêncio. Por isso o critério "o projeto recebe só rules e perfis" é medido sem o passo 8.
 - Fica para os tickets 06 e 07: o `dev-link`, o `project.md`, o glossário, o `overview.md` e os ADR-0009/0011 ainda descrevem a instalação por projeto. O `anvil/.claude/anvil.lock` do payload e o `vendor-sync.sh lock` deixaram de servir à instalação — o reset tira a lista do próprio payload —, e a remoção cabe a quem mexer no `vendor-sync`.
 - Cenários antigos em `workspace/` que chamam o reset com `--to <projeto>` ou `--layers` (`03-`, `28-`, `29-`, `30-` e vizinhos) não rodam mais. O `38-script-paths/s1.sh` perdeu o caso do `--layers`; o `37-language-tail/s2.sh` ganhou o modo `USER_INSTALL=1`, só no omp, com a instalação de usuário num `HOME` por caso.
+- Review round=1 · P1 (Spec): o dry-run lista como "não são do anvil" tudo que há em `~/.omp/agent`, sessões, cache e bancos do omp inclusive — 15.571 arquivos nesta máquina; com 15.500, o dry-run levou 2m24s e 15.579 linhas — e o dry-run obrigatório do boot e do update não termina no tempo do harness, ou termina com as linhas de diretivas e `BOOT PENDENTE` perdidas no corte de saída.
+- Review round=1 · P1 (Standards): o manual `anvil-omp` (detecção e remoção) e o README ("Como a camada chega") dizem que o `/anvil-boot` detecta o omp e instala ou reinstala a camada, mas o boot só roda o reset quando falta `~/.claude/anvil.lock` — quem tira a camada pelo manual ou instala o omp depois e roda o boot fica sem camada achando que ela voltou. O eixo Spec deu o mesmo achado como P2.
+- Review round=1 · P3 (Spec): a migração do mosk passou a tirar `.claude/skills/tea-*` do projeto sem o ticket pedir — uma `tea-*` que o projeto do mosk escreveu entra no plano de remoção; a aprovação antes de apagar segura o dano. Justificativa no comentário acima.
+- Review round=1 · P3 (Standards): identificadores novos do `reset-install.sh` em português (`marcadores_ok`, `estado_diretivas`, `regra_diretivas`…), contra a regra de código em inglês do `CLAUDE.md` — o arquivo inteiro já é assim, e a diretiva "Match existing style" justifica; se ficar, o arquivo se afasta mais da regra de idioma.
+- Review round=1 · P3 (Standards): ADR citado sem glosa no comentário dos tickets 06 e 07 — quem lê precisa abrir o ADR para saber se importa.
+- Review round=1 · P3 (Standards): o `anvil/.claude/anvil.lock` do payload e o `vendor-sync.sh lock` ficam sem uso e sem ticket que os remova — o payload segue carregando e regenerando um arquivo que ninguém lê.
+- Review round=1 · P3 (Standards): possível Repeated Switches no `case "$estado_diretivas"` em três lugares; dentro de `escreve_diretivas`, um estado fora da lista deixaria o temporário vazio e o `cat` apagaria o `~/.claude/CLAUDE.md` — hoje só o filtro de fora impede.
+- Review round=1 · P3 (Standards): possível Mysterious Name em `U` (a raiz do `HOME`) e em `raiz` (a raiz do projeto, ao lado de `raiz_espelho` e `raiz_omp`, que são o caminho que bloqueia) — confunde quem mantiver o script.
+- Review round=1 · P3 (Standards): possível Duplicated Code — o prólogo awk que tira espaço e `\r` do fim aparece seis vezes, e os prefixos `~/.claude/agents/`, `~/.agents/skills/` e `~/.omp/agent/` do relatório repetem em texto o que `$AGENTS`, `$ESPELHO` e `$OMP` derivam; mudar um destino exige editar dois lugares.
