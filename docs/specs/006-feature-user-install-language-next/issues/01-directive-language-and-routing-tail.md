@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 - [ ] A seção de idioma da diretiva diz que o idioma de comunicação vale para toda saída que chega ao chat, nomeando conclusão de skill, relatório de subagente repassado, veredito e resumo de saída de ferramenta. O idioma vem das rules do projeto e, sem declaração, é pt-BR.
 - [ ] A diretiva manda acrescentar a linha de idioma de saída a todo brief de subagente, inclusive quando a skill dá o brief literal em inglês.

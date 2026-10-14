@@ -206,7 +206,8 @@ já que o Step 1 pergunta tipo e nome livres, sem número.
 Applying hotfix changes to the integration branch.
 ```
 
-- All text must be in English.
+- The PR title, body and commit messages must be in English. What you tell the
+  user in the chat follows the project's communication language, not this rule.
 - Be clear and professional.
 
 ---

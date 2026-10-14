@@ -106,11 +106,14 @@ pelo supervisor — nunca a leitura da marca que o agente deixou nele.
 Fronteira única, na rule sempre carregada (`claude_boot.md`, injetada no
 `CLAUDE.md` do projeto entre marcadores):
 
-- **pt-BR** — conversa e toda documentação gerada
+- **Idioma de comunicação** (pt-BR sem declaração nas rules) — tudo que chega ao
+  chat, inclusive relatório de subagente repassado, e toda documentação gerada
 - **Inglês** — código: identificadores, comandos, caminhos, commits
 
-As skills não são traduzidas. Skill em inglês produz documentação em pt-BR — quem
-decide o idioma da saída é a regra, não o idioma do arquivo que a produz.
+As skills não são traduzidas. Skill em inglês produz chat e documentação no idioma
+de comunicação — quem decide o idioma da saída é a regra, não o idioma do arquivo
+que a produz. Todo brief de subagente leva a linha de idioma, e chave de formato
+estável, como a linha `Review:`, não se traduz.
 
 ## Sincronização
 

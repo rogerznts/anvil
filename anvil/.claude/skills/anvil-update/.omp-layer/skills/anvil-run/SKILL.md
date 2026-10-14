@@ -138,17 +138,20 @@ seguinte, com a árvore limpa, recomenda o próximo passo. O relatório não diz
 é, nem como passo para depois da parada.
 
 Com `all_resolved: yes` sem `halt`, o relatório lista os tickets resolvidos nesta
-execução e recomenda um só próximo passo, sem executá-lo, escrito como está aqui,
-porque no omp skill se chama por `/skill:`. A linha `screen` decide:
+execução e termina invocando o `anvil-next` — leia `skill://anvil-next` e siga-o —,
+com o foco na rota que a linha `screen` decide. Escreva a rota no foco como ela se
+chama no omp, por `/skill:`, para o prompt sair pronto para colar. A invocação
+acontece só aqui, no relatório final, nunca entre despachos, e você não executa a
+rota:
 
-1. `screen: yes`: recomende `/skill:anvil-browser-qa` e diga o motivo que a linha dá.
+1. `screen: yes`: o foco é `/skill:anvil-browser-qa`, com o motivo que a linha dá.
 2. `screen: no`: leia as linhas `story`. Se uma delas descreve algo que abre no
    navegador com palavras que o script não reconhece, como um gráfico que o usuário
-   filtra, um mapa clicável ou cards que se arrastam entre colunas, recomende
-   `/skill:anvil-browser-qa` e cite essa história.
+   filtra, um mapa clicável ou cards que se arrastam entre colunas, o foco é
+   `/skill:anvil-browser-qa`, citando essa história.
    Saída de terminal, stdout, stderr, código de saída, arquivo, log e API não são
-   tela, porque o browser QA precisa de algo que abra no navegador. Senão,
-   recomende `/skill:anvil-docs archive`.
+   tela, porque o browser QA precisa de algo que abra no navegador. Senão, o foco é
+   `/skill:anvil-docs archive`.
 
 Nunca troque um `screen: yes` por archive: a falta de `ui/` não conta contra, porque
 a pasta só existe quando alguém a escreveu.
@@ -169,6 +172,9 @@ QA: a spec ainda não terminou. Ele lista:
   `omp/task/<id>` e, se houver, o aviso de que os commits dele anteriores ao
   conflito já estão no branch da spec;
 - os que ainda esperam por outro ticket, com a lista da `class` deles.
+
+Com pendência ou com `halt`, você não invoca o `anvil-next` com foco: a cauda de
+roteamento das diretivas o invoca sem argumento, depois do relatório.
 
 ## Nunca
 

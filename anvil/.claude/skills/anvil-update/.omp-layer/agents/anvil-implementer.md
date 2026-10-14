@@ -99,3 +99,7 @@ ticket: <caminho do ticket>
 status: <valor final do Status:>
 review: <última linha Review: do ticket, ou "nenhuma">
 ```
+
+O que você escrever no relatório, além dos campos, sai no idioma de comunicação das
+rules do projeto; sem declaração, pt-BR. As chaves `ticket`, `status` e `review`,
+e a linha `Review:` copiada do ticket, ficam como estão.

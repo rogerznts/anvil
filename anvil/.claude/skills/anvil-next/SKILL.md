@@ -1,8 +1,7 @@
 ---
 name: anvil-next
-description: Sugere um prompt curto para continuar o trabalho em uma nova sessão.
+description: Sugere um prompt curto para continuar o trabalho em uma nova sessão. Roda pela cauda de roteamento das diretivas do anvil, ao fim das skills que ela lista, ou quando o usuário pede.
 argument-hint: "foco opcional da próxima sessão"
-disable-model-invocation: true
 ---
 
 # Próximo passo
@@ -18,7 +17,7 @@ Identifique, nesta ordem:
 3. decisões, erros observados e restrições que existem só na conversa;
 4. as skills que realmente mudam a forma do próximo trabalho.
 
-Argumentos do usuário definem o foco da próxima sessão. Faça apenas leituras pontuais de artefatos já implicados no trabalho; o prompt deve mandar a sessão nova ler o restante na fonte.
+Argumentos, do usuário ou da skill que invocou esta, definem o foco da próxima sessão. Faça apenas leituras pontuais de artefatos já implicados no trabalho; o prompt deve mandar a sessão nova ler o restante na fonte.
 
 ## 2. Escolha a rota
 
