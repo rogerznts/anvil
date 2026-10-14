@@ -146,8 +146,9 @@ A cauda não dispara:
 - quando a própria skill já invocou o `anvil-next` no fim, como o `anvil-run` faz
   ao fechar a spec.
 
-Fora da lista, o `anvil-next` roda só a pedido do usuário. Esta lista é o único
-lugar a editar para mudar quais skills têm cauda.
+Fora da lista, o `anvil-next` roda só a pedido do usuário, e a skill termina sem
+prompt nem sugestão de próxima sessão. Esta lista é o único lugar a editar para
+mudar quais skills têm cauda.
 
 ## Citar id sempre com a glosa
 
