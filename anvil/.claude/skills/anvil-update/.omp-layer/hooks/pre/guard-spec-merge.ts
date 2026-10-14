@@ -9,7 +9,7 @@
 // Só o tool `bash` é interceptado: comando disparado pelo `eval` escapa, como
 // escapa do hook do Claude o que não passa pelo Bash.
 //
-// Instalado pelo /anvil-update em .omp/hooks/pre/. Não edite a cópia instalada:
+// Instalado pelo /anvil-update em ~/.omp/agent/hooks/pre/. Não edite a cópia instalada:
 // o próximo update a reescreve.
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";

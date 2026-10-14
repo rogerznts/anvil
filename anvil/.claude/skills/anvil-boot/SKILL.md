@@ -1,6 +1,6 @@
 ---
 name: anvil-boot
-description: "Bootstrap: prepara um projeto para o anvil — injeta as diretivas no CLAUDE.md, gera .claude/rules/, monta ou adota a árvore docs/, escreve o perfil do issue tracker, propõe a rule da stack detectada e registra a guarda de merge. Rode uma vez por projeto, e de novo quando a estrutura mudar bastante."
+description: "Bootstrap: prepara um projeto para o anvil — garante a instalação de usuário do toolkit, gera .claude/rules/, monta ou adota a árvore docs/, escreve o perfil do issue tracker, propõe a rule da stack detectada e registra a guarda de merge. Rode uma vez por projeto, e de novo quando a estrutura mudar bastante."
 ---
 
 # Boot
@@ -8,9 +8,13 @@ description: "Bootstrap: prepara um projeto para o anvil — injeta as diretivas
 Prepara um projeto para o anvil. Roda uma vez; repetir é seguro, porque cada
 passo é idempotente e nada é sobrescrito sem aviso.
 
-**Nada é escrito sem aprovação**, exceto o bloco delimitado do `CLAUDE.md`, a
-árvore vazia de `docs/` e as camadas de harness do passo 11, que só param diante
-de colisão. Todo o resto — rules, perfil de tracker, rule de stack, hook — é
+O toolkit não é copiado para o projeto: ele mora na instalação de usuário, que
+vale para todos os projetos da máquina e que o passo 2 garante. O projeto recebe
+o que é dele — `.claude/rules/`, os perfis em `docs/agents/` e a árvore de
+`docs/` —, além da guarda de merge do passo 8.
+
+**Nada é escrito sem aprovação**, exceto a árvore vazia de `docs/`. Todo o resto
+— instalação de usuário, rules, perfil de tracker, rule de stack, hook — é
 proposto e espera confirmação.
 
 ## 1. Vindo do mosk?
@@ -30,49 +34,59 @@ encontrar e tentar usar:
 | `.claude/agents/mosk-*.md` | as doze personas. Só elas: o diretório fica |
 | `.claude/mosk/` | o core: tasks, templates, checklists, scripts, schemas |
 | `.claude/skills/mosk-*` | os wrappers de agente e as skills soltas |
+| `.claude/skills/tea-*` | as cópias do mosk. As do anvil vêm da instalação de usuário, e a cópia do mosk no projeto as sombrearia no omp |
 | `.claude/hooks/guard-spec-merge.sh` | é substituído pela versão do `anvil-docs` |
 
 Fica, sem ser tocado:
 
 | O quê | Por quê |
 |---|---|
-| `.claude/agents/`, fora as personas | os agentes do anvil e os que o projeto escreveu |
+| `.claude/agents/`, fora as personas | os agentes que o projeto escreveu |
 | `.claude/rules/` | é do projeto, não do toolkit. Só o `project.md` é revisado no passo 4, porque cita caminhos do mosk |
 | `docs/` | é o trabalho. O passo 5 chama o `anvil-docs`, que escolhe entre `scaffold` e `adopt` |
 | `.claude/settings.json` | pode ter hook do projeto. O passo 8 **mescla**, não sobrescreve |
 
-As `tea-*` existem nos dois e são substituídas pelas do anvil, que já não
-mencionam o mosk.
-
-**No `CLAUDE.md`**, o bloco entre `<!-- MOSK:DIRECTIVES:START -->` e `END` vira o
-bloco `ANVIL:DIRECTIVES` do passo 2. Substitua o bloco inteiro; não deixe os dois
-convivendo, porque as regras de idioma deles são diferentes — o mosk mandava
-escrever artefato em inglês, o anvil manda em pt-BR.
+**No `CLAUDE.md`**, o bloco entre `<!-- MOSK:DIRECTIVES:START -->` e `END` sai
+inteiro, e nada entra no lugar: as diretivas do anvil chegam pela instalação de
+usuário do passo 2, não pelo `CLAUDE.md` do projeto. Não deixe o bloco do mosk,
+porque as regras de idioma são diferentes — o mosk mandava escrever artefato em
+inglês, o anvil manda em pt-BR.
 
 Diga quantos arquivos serão removidos, listando os diretórios, e **espere o
 "pode ir"**.
 
-## 2. Diretivas no CLAUDE.md
+## 2. Instalação de usuário
 
-O conteúdo de [claude_boot.md](claude_boot.md) entra como **bloco delimitado**,
-para poder ser atualizado depois sem estragar o que o projeto já tinha:
+O toolkit — skills, agentes, lock, o espelho `~/.agents/skills`, a camada omp e as
+diretivas — mora no diretório do usuário. O boot garante que ele está lá:
 
+```bash
+if [ -f ~/.claude/anvil.lock ]; then
+    echo "instalação de usuário presente; para trocar de versão, rode /anvil-update"
+else
+    TMP="$(mktemp -d)"
+    npx degit rogerznts/anvil/anvil "$TMP"
+    bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --dry-run --from "$TMP"
+fi
 ```
-<!-- ANVIL:DIRECTIVES:START -->
-… conteúdo do claude_boot.md …
-<!-- ANVIL:DIRECTIVES:END -->
+
+- **Com instalação** → siga para o passo 3, sem tocar nela. Diga que a versão
+  instalada fica como está e que quem troca de versão é o `/anvil-update`.
+- **Sem instalação** → o dry-run lista por nome o que entra em `~/.claude/`,
+  `~/.agents/skills/` e `~/.omp/agent/`, o que já estava lá e fica, e as
+  colisões: skill ou agente seu com o nome de um do payload, que **será
+  sobrescrito**. Diga isso numa frase, nomeando as colisões, e **espere
+  aprovação**. Então instale:
+
+```bash
+bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP"
+rm -rf "$TMP"
 ```
 
-- `CLAUDE.md` não existe → crie, com o bloco marcado.
-- Existe **com** os marcadores → substitua **só** o que está entre eles. Nada
-  fora é tocado.
-- Existe **sem** os marcadores → **acrescente** o bloco no topo, sem modificar
-  uma linha do que já estava lá. Nunca reescreva nem parafraseie instrução do
-  projeto.
-- Existe um quase-duplicado sem marcador, de um boot antigo → **aponte e
-  pergunte**. Não apague em silêncio.
-
-Só siga adiante depois de confirmar que o bloco está lá e delimitado.
+A instalação põe as diretivas no `~/.claude/CLAUDE.md`, entre os marcadores
+`ANVIL:DIRECTIVES`, sem tocar o que está fora deles, e, com a camada omp, na rule
+`~/.omp/agent/rules/anvil-directives.md`. **O `CLAUDE.md` do projeto não recebe
+bloco**: o que o projeto já tinha nele fica como estava.
 
 ## 3. Varrer o projeto
 
@@ -97,8 +111,9 @@ puro, sem frontmatter.
   camadas, convenções de pasta, como rodar os testes, fluxos comuns, e as regras
   que o agente deve seguir neste projeto.
 - **`anvil.md`** — sempre. A configuração resolvida: idioma de comunicação
-  (default pt-BR), comando de teste, e a lista de modelos por papel que o
-  `anvil-arena`, o `anvil-how` e o `anvil-architect` leem.
+  (default pt-BR), comando de teste, a lista de modelos por papel que o
+  `anvil-arena`, o `anvil-how` e o `anvil-architect` leem, e a seção de
+  instalação, para quem clona o projeto.
 - **`frontend.md`** — só se houver código de frontend.
 
 A seção de modelos do `anvil.md`:
@@ -114,8 +129,29 @@ Lidos por `anvil-arena`, `anvil-how` e `anvil-architect`.
 - `cross-judge`: `opus`, `fable`, `sonnet`
 ```
 
-Num `anvil.md` que já existe sem a lista, proponha acrescentá-la; valor já
-configurado não se troca.
+A seção de instalação do `anvil.md`. O toolkit não vem no clone, e quem clona sem
+ter o anvil na máquina precisa saber disso antes de achar que o projeto está
+quebrado:
+
+```markdown
+## Instalação do anvil
+
+O toolkit do anvil não vem no clone. Ele é instalado uma vez por usuário — em
+`~/.claude/`, `~/.agents/skills/` e `~/.omp/agent/` — e vale para todos os
+projetos da máquina; o projeto guarda só `.claude/rules/` e `docs/`. Sem a
+instalação, as skills e as diretivas do anvil não existem na sessão. Para
+instalar, de qualquer diretório:
+
+    TMP="$(mktemp -d)" && npx degit rogerznts/anvil/anvil "$TMP"
+    bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --dry-run --from "$TMP"
+    bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP"
+
+O segundo comando mostra o que entra e o que fica; o terceiro instala. Para
+trocar de versão depois, rode `/anvil-update`.
+```
+
+Num `anvil.md` que já existe sem a lista de modelos ou sem a seção de instalação,
+proponha acrescentá-las; valor já configurado não se troca.
 
 Depois, **sugira** rules adicionais, cada uma com uma linha de evidência do
 código que a justifica, e **espere aprovação**: `coding-standards.md`,
@@ -146,7 +182,8 @@ publicam no lugar errado e não reclamam.
 
 Confirme que o passo de documentação deixou
 `docs/agents/verification.md` igual a
-`.claude/skills/anvil-docs/templates/verification-anvil.md`. Ausente → copie.
+`~/.claude/skills/anvil-docs/templates/verification-anvil.md`, da instalação de
+usuário. Ausente → copie.
 Idêntico → siga sem perguntar. Divergente → mostre o diff e espere aprovação;
 **nunca sobrescreva** o perfil que o projeto pode ter ajustado. É dele que o
 `anvil-code-review` tira classe, orçamento e escopo diff-only; sem ele, o critério
@@ -194,76 +231,18 @@ aberta, com o verificador instalado, correto e nunca invocado.
 
 Diga ao usuário que a guarda está ativa e o que ela bloqueia.
 
-## 9. Conferir o `anvil.lock`
+## 9. O `.gitignore` de uma versão antiga
 
-O payload traz `.claude/anvil.lock` pronto. É dele que o `/anvil-update` calcula
-os órfãos. O lock tem uma linha `skill:` por skill e uma `agent:` por agente, e,
-com a camada omp instalada, uma `omp:` por arquivo dela.
-Confira se algum
-item do lock falta no disco:
+**Nada é escrito no `.gitignore`.** O toolkit não mora no projeto, e o que o
+projeto tem em `.claude/` — rules, settings e as skills que ele mesmo escreveu — é
+versionado como o resto. Não pergunte o que ignorar.
 
-```bash
-comm -23 <(sed -n 's/^skill: *//p' .claude/anvil.lock | tr -d '\r' | sort) \
-         <(ls .claude/skills | sort)
-comm -23 <(sed -n 's/^agent: *//p' .claude/anvil.lock | tr -d '\r' | sed 's/$/.md/' | sort) \
-         <(ls .claude/agents 2>/dev/null | sort)
-```
-
-- **Saída vazia** → em dia.
-- **Saiu nome** — o lock dá como instalada uma skill ou um agente (`nome.md`) que
-  não está no disco — ou **não há o arquivo**, numa instalação antiga →
-  divergência: reescreva o lock a partir do disco.
-
-**Skill ou agente no disco fora do lock não é divergência.** Costuma ser o que o
-usuário escreveu, e não entra no lock: o que está no lock é tratado como do anvil,
-e o update o apaga como órfão.
-
-Por isso, antes de reescrever, mostre **todas** as skills de `.claude/skills/` e
-todos os agentes de `.claude/agents/`, inclusive os que o lock lista, e **pergunte
-quais não vieram do anvil**. Os que estão fora do lock atual são os candidatos
-mais prováveis, mas não os únicos: um boot antigo reescrevia o lock a partir do
-disco, e pode ter posto ali uma skill do usuário. Nada do usuário volta ao lock
-sem ter sido perguntado. Os que não vieram do anvil entram em `USER_SKILLS` e
-`USER_AGENTS` e ficam fora:
-
-```bash
-USER_SKILLS="minha-skill outra-skill"   # skills que não vieram do anvil; vazio se nenhuma
-USER_AGENTS="meu-agente"                # agentes que não vieram do anvil, sem o .md; vazio se nenhum
-OMP_LINES="$(sed -n '/^omp:/p' .claude/anvil.lock 2>/dev/null | tr -d '\r')"
-{ echo "# anvil.lock — o que esta instalacao possui."
-  echo "# Derivado do payload. Nao edite a mao."
-  ls .claude/skills | while read -r s; do
-    case " $USER_SKILLS " in *" $s "*) ;; *) echo "skill: $s" ;; esac
-  done
-  ls .claude/agents 2>/dev/null | sed -n 's/\.md$//p' | while read -r a; do
-    case " $USER_AGENTS " in *" $a "*) ;; *) echo "agent: $a" ;; esac
-  done
-  printf '%s\n' "$OMP_LINES" | sed '/^$/d'
-} > .claude/anvil.lock
-```
-
-As linhas `omp:` passam para o lock novo como estavam: são elas que mantêm a
-camada omp num update rodado sem omp, e quem as confere é o passo 11.
-
-**Sem lock, o update não limpa órfão nenhum** — ele não tem como distinguir o que
-o anvil instalou do que você escreveu, e o lado seguro é não apagar nada.
-
-## 10. O toolkit fica versionado
-
-**Nada é escrito no `.gitignore`.** O que o degit instalou — `.claude/skills/`,
-`.claude/agents/` e o `.claude/anvil.lock` — é versionado como o resto do projeto,
-junto com `.claude/rules/`, `.claude/settings.json` e `docs/`. Não pergunte o que
-ignorar, e não ofereça tirar o toolkit do repositório.
-
-A razão é a reprodutibilidade: quem clona o repositório tem o toolkit na versão em
-que o projeto foi trabalhado, sem rodar instalação nenhuma, e o diff de um
-`/anvil-update` é a revisão do que mudou.
-
-**Num projeto instalado por uma versão antiga, o toolkit está ignorado**, de duas
-formas: um bloco `ANVIL:INSTALLED`, ou uma linha que cobre `.claude/skills/`
-inteiro, com um comentário exato em cima — em duas versões, com e sem o `--force`.
-Procure as três. O `awk` tira do fim de cada linha o espaço, o tab e o `\r` de um
-`.gitignore` com CRLF, porque o `grep -x` não casaria com eles:
+**Num projeto bootado por uma versão antiga, o `.gitignore` ainda ignora
+`.claude/skills/`**, de duas formas: um bloco `ANVIL:INSTALLED`, ou uma linha que
+cobre `.claude/skills/` inteiro, com um comentário exato em cima — em duas
+versões, com e sem o `--force`. Procure as três. O `awk` tira do fim de cada linha
+o espaço, o tab e o `\r` de um `.gitignore` com CRLF, porque o `grep -x` não
+casaria com eles:
 
 ```bash
 awk '{ sub(/[ \t\r]+$/, "") } 1' .gitignore | grep -nxF -A1 \
@@ -273,7 +252,8 @@ awk '{ sub(/[ \t\r]+$/, "") } 1' .gitignore | grep -nxF -A1 \
 ```
 
 Achou alguma delas → mostre o que sairia e **espere aprovação**; é o `.gitignore`
-do projeto, e tirar as linhas faz as skills instaladas aparecerem no `git status`.
+do projeto, e tirar as linhas faz o que está em `.claude/skills/` aparecer no
+`git status`.
 
 - **O bloco.** Veja o que sai e, com a aprovação, tire:
 
@@ -282,8 +262,7 @@ do projeto, e tirar as linhas faz as skills instaladas aparecerem no `git status
   bash ~/.claude/skills/anvil-update/scripts/reset-install.sh --unignore --to .
   ```
 
-  Rodar de novo não muda nada, e o `/anvil-update` remove o bloco sozinho na
-  reinstalação.
+  Rodar de novo não muda nada.
 
 - **A linha antiga**, quando o comentário do boot está em cima dela. Apague as
   duas com o comando, não à mão: cada linha mantém o fim de linha que tinha, `\r`
@@ -302,41 +281,13 @@ do projeto, e tirar as linhas faz as skills instaladas aparecerem no `git status
   `.claude/skills/`, a skill do usuário inclusive.
 
 - **Linha parecida sem esse comentário** → não toque nela. Foi o usuário que
-  escreveu. Avise que ela continua ignorando o toolkit e a skill que ele escrever
-  ali, e que tirá-la é decisão dele.
+  escreveu. Avise que ela continua ignorando a skill que ele escrever em
+  `.claude/skills/`, e que tirá-la é decisão dele.
 
-## 11. Camadas de harness
-
-O omp e o Codex leem o que o anvil instala fora de `.claude/`: a camada omp em
-`.omp/` e o espelho do Codex em `.agents/skills`. Quem os instala é o modo de
-camadas do `reset-install.sh`, o mesmo código do `/anvil-update`, rodando da
-instalação de usuário com o projeto como destino:
-
-```bash
-bash ~/.claude/skills/anvil-update/scripts/reset-install.sh --layers --dry-run --to .
-bash ~/.claude/skills/anvil-update/scripts/reset-install.sh --layers --to .
-```
-
-Rode o dry-run e, logo depois, o modo, **sem perguntar**. A camada omp só entra
-com sinal de omp — o binário `omp` no `PATH`, o diretório `~/.omp/` ou uma linha
-`omp:` no lock —, e projeto sem sinal nenhum não ganha `.omp/`. A exceção é a
-colisão da camada: arquivo do projeto em `.omp/`, fora do lock, com o caminho de
-um arquivo da camada. Ele **será substituído**. Com colisão no dry-run, nomeie o
-arquivo e espere aprovação.
-
-O modo lê as linhas `skill:` do lock, por isso vem depois do passo 9. Do lock, só
-as linhas `omp:` mudam; skills, agentes e `.gitignore` ficam como estão.
-
-Relate o que o modo relatou: a camada omp nova, mantida ou não instalada, e o
-sinal que decidiu; o que entrou em `.omp/` e em `.agents/skills`; e as colisões do
-espelho, que ficam como estão e o Codex continua lendo.
-
-O hook do Claude do passo 8 fica registrado com ou sem camada omp: num time misto,
-quem usa Claude Code continua protegido por ele.
-
-## 12. Índice e relatório
+## 10. Índice e relatório
 
 Chame o verbo `index` do `anvil-docs`.
 
-Relate: o que foi criado, o que foi proposto e aprovado, o que foi proposto e
-recusado, e o que ficou pendente. Nunca commite sozinho.
+Relate: a instalação de usuário, feita agora ou já presente; o que foi criado, o
+que foi proposto e aprovado, o que foi proposto e recusado, e o que ficou
+pendente. Nunca commite sozinho.

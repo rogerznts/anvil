@@ -8,21 +8,28 @@ de cinco repositórios upstream, mantidos como submodules em `references/`, e as
 vendoriza com adaptação registrada num manifesto — de forma que continuem
 atualizáveis quando o upstream andar.
 
+O toolkit é instalado **uma vez por usuário**, e vale para todos os projetos da
+máquina. De qualquer diretório:
+
 ```bash
-npx degit rogerznts/anvil/anvil . --force
+TMP="$(mktemp -d)" && npx degit rogerznts/anvil/anvil "$TMP"
+bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --dry-run --from "$TMP"
+bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP"
 ```
 
-depois
+O primeiro comando baixa o payload para um diretório temporário; o segundo mostra,
+por nome, o que entra em `~/.claude/`, `~/.agents/skills/` e `~/.omp/agent/` e o
+que já estava lá e fica; o terceiro instala. Depois, em cada projeto:
 
 ```bash
 claude
 > /anvil-boot
 ```
 
-O `--force` é necessário em projeto que já existe: o degit recusa diretório
-não-vazio. Ele sobrescreve arquivo a arquivo e **não apaga** nada que já estava
-lá — o `README.md` e o código do projeto passam intactos. Em diretório vazio o
-`--force` é dispensável.
+O boot escreve no projeto só o que é dele: `.claude/rules/`, os perfis em
+`docs/agents/` e a árvore de `docs/`. Sem instalação de usuário, ele mesmo a faz,
+com o mesmo dry-run. Para trocar de versão, `/anvil-update`, de qualquer
+diretório: um update atualiza todos os projetos da máquina de uma vez.
 
 ---
 
@@ -63,11 +70,11 @@ Em dezessete dessas skills, os arquivos pareados têm **uma linha** de delta: o
 
 ```mermaid
 flowchart TD
-    A["npx degit rogerznts/anvil/anvil . --force"] --> B["/anvil-boot"]
+    A["instalação de usuário<br/>degit + reset-install.sh"] --> B["/anvil-boot"]
 
     subgraph boot ["Boot — uma vez por projeto"]
         direction TB
-        B --> B1["CLAUDE.md<br/>bloco ANVIL:DIRECTIVES"]
+        B --> B1["garante a instalação<br/>de usuário"]
         B1 --> B2["varre o projeto"]
         B2 --> B3[".claude/rules/<br/>project.md · anvil.md"]
         B3 --> B4["anvil-docs, sem verbo<br/>escolhe scaffold ou adopt<br/>architecture · discovery<br/>specs · agents"]
@@ -129,11 +136,12 @@ filhas que nascem sem a conversa do pai — ver
 [adr-0011](docs/architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md).
 
 **Como a camada chega.** O `/anvil-boot` e o `/anvil-update` procuram o omp: o
-binário no `PATH`, o diretório `~/.omp/` ou uma linha `omp:` no `anvil.lock`.
-Qualquer um basta, e a camada omp entra em `.omp/` sem pergunta. Ela é versionada
-como o resto, e a linha `omp:` a mantém no update de quem não tem omp. O mesmo
-passo mantém `.agents/skills`, por onde o Codex lê as skills: um symlink para
-`.claude/skills/<nome>` por skill do lock.
+binário no `PATH`, o diretório `~/.omp/` ou uma linha `omp:` no lock de usuário,
+`~/.claude/anvil.lock`. Qualquer um basta, e a camada omp entra em `~/.omp/agent/`
+sem pergunta, com as diretivas do anvil como uma rule `alwaysApply`. A linha `omp:`
+a mantém no update de uma máquina sem os outros dois sinais. A mesma instalação
+mantém `~/.agents/skills`, por onde o Codex e o omp leem as skills: um symlink para
+`~/.claude/skills/<nome>` por skill do lock.
 
 **O que o omp ganha.** Lá, skill se chama por `/skill:<nome>`, e o boot é
 `/skill:anvil-boot`.
@@ -143,7 +151,7 @@ passo mantém `.agents/skills`, por onde o Codex lê as skills: um symlink para
 | `/skill:anvil-plan <pedido>` | conduz grill, to-spec e to-tickets na mesma janela. Entre uma etapa e outra propõe a próxima ou um desvio, como research ou prototype, e só carrega com o seu sim |
 | `/skill:anvil-run [NNN] [--parallel N]` | implementa a spec ticket a ticket, cada um num `anvil-implementer` de contexto novo, com o review em dois eixos. Em série por padrão; com `--parallel N` e a isolação do omp no modo branch, em levas de até N tickets do frontier, cada implementer num workspace isolado — ver [adr-0012](docs/architecture/adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md). Termina com relatório e próximo passo, e nunca faz QA, archive ou PR |
 | `/skill:anvil-omp` | o manual da camada: detecção, limites e como removê-la |
-| guarda de merge | um hook em `.omp/hooks/pre/` chama o mesmo `guard-spec-merge.sh` do Claude Code |
+| guarda de merge | um hook em `~/.omp/agent/hooks/pre/` chama o mesmo `guard-spec-merge.sh` do Claude Code |
 
 **O que segue manual.** No Claude Code e no Codex, a lista de skills é a de sempre
 e nenhum desses comandos existe. O fluxo é `/anvil-grill`, `/anvil-to-spec`,
@@ -225,8 +233,8 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 
 | skill | para quê | origem |
 |---|---|---|
-| `anvil-boot` | prepara o projeto: diretivas, rules, `docs/`, tracker, stack, hook, lock | autoral |
-| `anvil-update` | reinstala do zero, apagando órfãos pelo `anvil.lock` | autoral |
+| `anvil-boot` | prepara o projeto: garante a instalação de usuário, rules, `docs/`, tracker, stack, hook | autoral |
+| `anvil-update` | reinstala a instalação de usuário do zero, apagando órfãos pelo `anvil.lock` | autoral |
 | `anvil-docs` | onde o documento mora, como a spec se chama, e o que acontece quando fecha | autoral |
 | `anvil-setup` | escreve o perfil do issue tracker que o fluxo lê | mattpocock |
 | `anvil-wizard` | gera um wizard em bash para o passo que só um humano pode fazer | mattpocock |
@@ -297,30 +305,27 @@ de `resolved` → em andamento; pasta sob `archive/` → arquivado.
 
 ---
 
-## O que fica versionado
+## O que fica onde
 
-**Tudo.** O que o degit escreve em `.claude/` — skills, agentes e o `anvil.lock` —
-entra no repositório do projeto como qualquer outro arquivo. O boot não escreve
-bloco no `.gitignore`, não pergunta o que ignorar e não oferece tirar o toolkit do
-versionamento.
-
-A razão é a reprodutibilidade: quem clona o repositório tem o toolkit na versão em
-que o projeto foi trabalhado, sem rodar instalação nenhuma, e o diff de um
-`/anvil-update` é a revisão do que mudou no toolkit — não um buraco no histórico.
+**O toolkit não mora no projeto.** Ele é instalado uma vez por usuário, e o clone
+de um projeto não o traz: quem clona instala o anvil na própria máquina, como diz
+a rule `.claude/rules/anvil.md` que o boot escreve.
 
 | | |
 |---|---|
-| `.claude/skills/` | as skills instaladas |
-| `.claude/agents/` | os agentes instalados, se o payload trouxer algum |
-| `.claude/anvil.lock` | o que esta instalação possui, e o que o update usa para calcular órfãos |
-| `.claude/rules/` | o contexto que o boot levantou deste projeto |
-| `.claude/settings.json` | a configuração, incluindo o hook |
-| `docs/` | o trabalho |
+| `~/.claude/skills/` | as skills instaladas |
+| `~/.claude/agents/` | os agentes instalados, se o payload trouxer algum |
+| `~/.claude/anvil.lock` | o que a instalação de usuário possui, e o que o update usa para calcular órfãos |
+| `~/.claude/CLAUDE.md` | o bloco `ANVIL:DIRECTIVES`, que o Claude Code carrega em toda sessão; o resto do arquivo é seu |
+| `~/.agents/skills/` | o espelho: um symlink por skill, lido pelo Codex e pelo omp |
+| `~/.omp/agent/` | a camada omp, com as diretivas como rule `alwaysApply` |
+| `.claude/rules/` | do projeto: o contexto que o boot levantou dele |
+| `.claude/settings.json` | do projeto: a configuração, incluindo o hook |
+| `docs/` | do projeto: o trabalho |
 
-Um projeto bootado antes ignorava o toolkit, por um bloco `ANVIL:INSTALLED` ou por
-uma linha que cobria `.claude/skills/` inteiro. O boot acha os dois, mostra o antes
-e o depois, e **propõe removê-los** para o toolkit voltar a ser versionado. O
-`/anvil-update` remove o bloco sozinho na reinstalação, e o relata. Linha parecida
+Um projeto bootado antes ignorava o toolkit no `.gitignore`, por um bloco
+`ANVIL:INSTALLED` ou por uma linha que cobria `.claude/skills/` inteiro. O boot
+acha os dois, mostra o antes e o depois, e **propõe removê-los**. Linha parecida
 que o boot não escreveu não é tocada.
 
 ---
@@ -335,9 +340,10 @@ O boot detecta e **propõe** a migração, esperando aprovação antes de apagar
 | `.claude/mosk/` — 252 arquivos de core | `docs/` — vai para o verbo `adopt` |
 | `.claude/skills/mosk-*` | `.claude/settings.json` — o hook é **mesclado** |
 
-No `CLAUDE.md`, o bloco `MOSK:DIRECTIVES` vira `ANVIL:DIRECTIVES`. Os dois não
-convivem: as regras de idioma se contradizem — o mosk mandava escrever artefato
-em inglês, o anvil manda em pt-BR.
+No `CLAUDE.md`, o bloco `MOSK:DIRECTIVES` sai, e nada entra no lugar: as
+diretivas do anvil vêm da instalação de usuário. Ele não pode ficar, porque as
+regras de idioma se contradizem — o mosk mandava escrever artefato em inglês, o
+anvil manda em pt-BR.
 
 As specs em layout antigo — `spec-meta.yaml`, `tasks.md`, `stories/` — são
 convertidas pelo verbo `adopt`, que classifica **lendo o arquivo, nunca o nome**,
@@ -387,7 +393,7 @@ references/                   submodules — os pins são a base do merge
   taste/       Leonxlnx/taste-skill
   payload-skills/  payloadcms/skills
   mosk/        rogerznts/mosk (herança)
-anvil/                        o payload que o degit copia
+anvil/                        o payload que a instalação de usuário copia
 docs/                         a documentação do próprio anvil
 ```
 

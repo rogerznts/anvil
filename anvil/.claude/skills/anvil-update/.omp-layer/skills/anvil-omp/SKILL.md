@@ -1,6 +1,6 @@
 ---
 name: anvil-omp
-description: Manual da camada omp do anvil. O que ela instala em .omp/, como a detecção decide, os comandos, a isolação, os limites e como removê-la.
+description: Manual da camada omp do anvil. O que ela instala em ~/.omp/agent/, como a detecção decide, os comandos, a isolação, os limites e como removê-la.
 argument-hint: "pergunta opcional sobre a camada"
 disable-model-invocation: true
 ---
@@ -16,11 +16,13 @@ O anvil roda em três harnesses: Claude Code, Codex e omp. Nos três as skills s
 mesmas, e só no omp o fluxo pode ser conduzido, porque o omp tem `task`, agentes
 próprios e sessões filhas que nascem sem a conversa do pai.
 
-A camada omp é o que o anvil instala em `.omp/` para isso: o hook que traz a guarda
-de merge para o omp, a rule que traduz o vocabulário do Claude Code nas skills, o
-agente que implementa um ticket, e as skills `anvil-plan`, `anvil-run` e esta. A
-lista exata do que está instalado neste projeto são as linhas `omp:` do
-`.claude/anvil.lock`, uma por arquivo, com o caminho relativo a `.omp/`.
+A camada omp é o que o anvil instala em `~/.omp/agent/`, uma vez por usuário, para
+isso: o hook que traz a guarda de merge para o omp, a rule que traduz o vocabulário
+do Claude Code nas skills, a rule com as diretivas do anvil, o agente que
+implementa um ticket, e as skills `anvil-plan`, `anvil-run` e esta. As skills do
+payload chegam ao omp pelo espelho `~/.agents/skills`. A lista exata do que está
+instalado são as linhas `omp:` do `~/.claude/anvil.lock`, uma por arquivo, com o
+caminho relativo a `~/.omp/agent/`.
 
 ## Como a detecção decide
 
@@ -29,17 +31,19 @@ acham um destes sinais:
 
 - o binário `omp` no `PATH`;
 - o diretório `~/.omp/`;
-- uma linha `omp:` no lock.
+- uma linha `omp:` no lock de usuário.
 
-Qualquer um basta. O terceiro torna a camada pegajosa: um colega sem omp roda o
-update e a camada fica, atualizada. Sem sinal nenhum, o projeto não ganha `.omp/`.
-O relatório e o dry-run dizem qual sinal decidiu e o que muda em `.omp/`.
+Qualquer um basta. O terceiro torna a camada pegajosa: um update rodado sem os
+outros dois a mantém, atualizada. Sem sinal nenhum, a máquina não ganha
+`~/.omp/agent/`. O relatório e o dry-run dizem qual sinal decidiu e o que muda em
+`~/.omp/agent/`.
 
-Os seus arquivos em `.omp/`, como `config.yml` e os agentes, rules e skills que
-você escreveu, ficam fora do lock e o update não os toca. A exceção é o arquivo seu
-com o caminho de um arquivo da camada: o dry-run o mostra como colisão e o update o
-substitui. Se `.omp`, ou uma pasta no caminho da camada, for symlink ou arquivo, a
-camada inteira fica com você e nada em `.omp/` é tocado.
+Os seus arquivos em `~/.omp/agent/`, como `config.yml` e os agentes, rules e skills
+que você escreveu, ficam fora do lock e o update não os toca. A exceção é o arquivo
+seu com o caminho de um arquivo da camada: o dry-run o mostra como colisão e o
+update o substitui. Se `~/.omp/agent`, ou uma pasta no caminho da camada, for
+symlink ou arquivo, a camada inteira fica com você e nada em `~/.omp/agent/` é
+tocado.
 
 ## Comandos
 
@@ -114,7 +118,7 @@ Nos dois, a lista de skills é a mesma de sempre e nenhum comando acima existe. 
 fluxo segue à mão: `/anvil-grill`, `/anvil-to-spec`, `/anvil-to-tickets`, e depois
 uma sessão de `/anvil-implement` por ticket, um de cada vez. O Claude Code tem a
 guarda de merge pelo hook do `.claude/settings.json`. O Codex lê as skills pelo
-espelho `.agents/skills` e não tem guarda.
+espelho `~/.agents/skills` e não tem guarda.
 
 ## Limites
 
@@ -138,20 +142,19 @@ espelho `.agents/skills` e não tem guarda.
 
 ## Como remover a camada à mão
 
-Apague os arquivos da camada e as linhas `omp:` do lock no mesmo commit:
+Apague os arquivos da camada e as linhas `omp:` do lock de usuário juntos:
 
 ```bash
-sed -n 's/^omp: //p' .claude/anvil.lock | while IFS= read -r f; do rm -f ".omp/$f"; done
-grep -v '^omp: ' .claude/anvil.lock > .claude/anvil.lock.novo && mv .claude/anvil.lock.novo .claude/anvil.lock
+sed -n 's/^omp: //p' ~/.claude/anvil.lock | while IFS= read -r f; do rm -f ~/.omp/agent/"$f"; done
+grep -v '^omp: ' ~/.claude/anvil.lock > ~/.claude/anvil.lock.novo && mv ~/.claude/anvil.lock.novo ~/.claude/anvil.lock
 ```
 
-As pastas que ficarem vazias em `.omp/` podem sair também. Os dois passos andam
-juntos. Sem os arquivos e com as linhas, o update seguinte vê a linha `omp:` e
-reinstala tudo. Com os arquivos e sem as linhas, eles viram arquivos seus: numa
-máquina sem omp, nenhum update os atualiza nem remove.
+As pastas que ficarem vazias em `~/.omp/agent/` podem sair também. Os dois passos
+andam juntos. Sem os arquivos e com as linhas, o update seguinte vê a linha `omp:`
+e reinstala tudo. Com os arquivos e sem as linhas, eles viram arquivos seus: nenhum
+update os atualiza nem remove.
 
-A remoção não sobrevive a uma máquina com omp. Se quem rodar o próximo
-`/anvil-update` ou `/skill:anvil-boot` tiver o binário `omp` no `PATH` ou o
-diretório `~/.omp/`, a detecção acha o sinal e reinstala a camada como nova, com as
-linhas `omp:` de volta no lock. Ela só fica fora nos updates rodados em máquina sem
-esses dois sinais.
+A remoção não sobrevive a uma máquina com omp. Se o próximo `/anvil-update` ou
+`/skill:anvil-boot` achar o binário `omp` no `PATH` ou o diretório `~/.omp/`, a
+detecção reinstala a camada como nova, com as linhas `omp:` de volta no lock. Ela
+só fica fora quando a máquina não tem nenhum dos dois.
