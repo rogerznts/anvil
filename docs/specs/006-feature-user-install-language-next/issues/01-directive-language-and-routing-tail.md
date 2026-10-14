@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=178c545; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=fc42f16; scope=diff:178c545..fc42f16; verdict=pass; p1=none
 
@@ -17,7 +17,7 @@
 - [x] O `tea-open-pr` e o `tea-open-fast-pr` limitam o inglês a título, corpo e commit do PR. O que dizem ao usuário segue o idioma de comunicação.
 - [x] O agente `anvil-implementer` do omp declara o idioma do relatório que devolve. As chaves do retorno não mudam.
 - [x] O `anvil-run` troca a recomendação de próximo passo em texto pela invocação do `anvil-next`, passando como foco a rota que já calcula: QA de browser quando há tela, archive quando não há. Isso acontece só no relatório final, nunca por despacho.
-- [ ] Cenário manual da Seam 2 em `workspace/`, num projeto pt-BR. O `anvil-code-review` com os dois eixos chega em pt-BR, com a linha `Review:` igual. O `anvil-diagnose` e o `anvil-browser-qa` narram em pt-BR. No `tea-open-pr`, o corpo do PR sai em inglês e o chat em pt-BR. Um projeto com outro idioma nas rules segue esse idioma. A cauda aparece no fim do `anvil-to-spec`, do `anvil-implement` rodado direto e do `/anvil-docs archive`. A cauda não aparece no `tea-commit`, dentro do `anvil-implementer` nem quando a skill termina numa pergunta. Os mesmos casos passam no omp, incluindo o relatório final do `anvil-run`.
+- [x] Cenário manual da Seam 2 em `workspace/`, num projeto pt-BR. O `anvil-code-review` com os dois eixos chega em pt-BR, com a linha `Review:` igual. O `anvil-diagnose` e o `anvil-browser-qa` narram em pt-BR. No `tea-open-pr`, o corpo do PR sai em inglês e o chat em pt-BR. Um projeto com outro idioma nas rules segue esse idioma. A cauda aparece no fim do `anvil-to-spec`, do `anvil-implement` rodado direto e do `/anvil-docs archive`. A cauda não aparece no `tea-commit`, dentro do `anvil-implementer` nem quando a skill termina numa pergunta. Os mesmos casos passam no omp, incluindo o relatório final do `anvil-run`.
 - [x] O `vendor-sync.sh verify` sai limpo, sem nenhuma skill vendorizada alterada.
 
 ## Comments
@@ -37,3 +37,4 @@
   - Claude Code, todos passam. `anvil-code-review` chega em pt-BR com `## Standards`/`## Spec` e a linha `Review:` com as cinco chaves; quando despacha os eixos, o brief abre com "Responda em pt-BR." (2/2 no `anvil-implement`, 2/2 numa rodada do review; na bateria final ele revisou sem subagente). `anvil-diagnose` e `anvil-browser-qa` narram em pt-BR. `tea-open-pr`: título e corpo em inglês no stub, chat em pt-BR. Rules com `English.` e pedido em pt-BR: conclusão em inglês. Cauda presente no fim de `anvil-to-spec`, `anvil-implement` (depois da `Review:` gravada), `/anvil-docs archive`, `anvil-diagnose`, `anvil-browser-qa` e `tea-open-pr`; ausente em `tea-commit`, `anvil-code-review` e no `tea-open-fast-pr` parado na pergunta do Step 1.
   - omp, passam: pt-BR em todos os casos pt-BR; briefs do review com "Respond in pt-BR." (2/2); `Review:` igual; corpo do PR em inglês; cauda no fim de `anvil-to-spec`, `anvil-implement`, `/anvil-docs archive` (quando executa; parado na confirmação do plano não dispara, como deve), `anvil-browser-qa`; `anvil-run` fecha com o `anvil-next` focado em `/skill:anvil-docs archive`, e nenhuma sessão do `anvil-implementer` nem dos eixos lê `skill://anvil-next`; sem cauda em `tea-commit`, `tea-open-fast-pr` na pergunta e `anvil-code-review` (4/4 em `fc42f16`; em `5371cc3`, 1/3 com cauda).
   - omp, não passam de forma estável: (a) rules com `English.` e pedido em pt-BR — a narrativa sai em pt-BR em todas as execuções, mesmo quando o modelo lê `.claude/rules/`; (b) cauda no `tea-open-pr` — 2/2 nas primeiras baterias, 0/3 nas últimas; (c) cauda no `anvil-diagnose` — 3/3 nas últimas, 3/6 antes, às vezes trocada por um prompt escrito de memória. Teste exploratório com a diretiva como rule `alwaysApply` em `.omp/rules/` — o lugar que o ticket 03 dá a ela no omp — melhorou (a) para 2/3 e piorou (c) para 0/6: a entrega não resolve sozinha.
+- Seam 2, decisão do operador: o critério é marcado com a ressalva do omp acima. Os casos (a)–(c) seguem para o `## Comments` do ticket 03, que muda a entrega da diretiva no omp e roda de novo esses três casos.

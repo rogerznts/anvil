@@ -19,3 +19,7 @@
 - [ ] Cenário com instalação de usuário existente. A skill que saiu do payload sai de `HOME`, a skill do usuário fora do lock fica, e a colisão aparece no dry-run.
 - [ ] Cenário de sinal de omp. Com sinal, a camada aparece em `HOME/.omp/agent/`. Sem sinal e sem linha no lock, a camada não aparece. Com linha no lock e sem sinal, a camada fica.
 - [ ] O `vendor-sync.sh verify` sai limpo.
+
+## Comments
+
+- Herdado do ticket 01, por decisão do operador: na Seam 2 do omp, com a diretiva entregue pelo `CLAUDE.md` do projeto, três casos não passam de forma estável — (a) rules com outro idioma e pedido em pt-BR: a narrativa sai em pt-BR; (b) a cauda no fim do `tea-open-pr`; (c) a cauda no fim do `anvil-diagnose`, às vezes trocada por um prompt escrito de memória. Ao entregar a diretiva como rule `alwaysApply` no omp, rode de novo esses três casos com `workspace/37-language-tail/s2.sh` (`case omp diagnose-en`, `case omp pr`, `case omp diagnose`). Um teste exploratório com a rule em `.omp/rules/` do projeto melhorou (a) e piorou (c). Detalhe no `## Comments` do ticket 01.
