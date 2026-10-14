@@ -5,6 +5,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** claimed
+**Review:** round=1; sha=178c545; scope=full; verdict=fail; p1=open
 
 - [ ] A seção de idioma da diretiva diz que o idioma de comunicação vale para toda saída que chega ao chat, nomeando conclusão de skill, relatório de subagente repassado, veredito e resumo de saída de ferramenta. O idioma vem das rules do projeto e, sem declaração, é pt-BR.
 - [ ] A diretiva manda acrescentar a linha de idioma de saída a todo brief de subagente, inclusive quando a skill dá o brief literal em inglês.
@@ -17,3 +18,12 @@
 - [ ] O `anvil-run` troca a recomendação de próximo passo em texto pela invocação do `anvil-next`, passando como foco a rota que já calcula: QA de browser quando há tela, archive quando não há. Isso acontece só no relatório final, nunca por despacho.
 - [ ] Cenário manual da Seam 2 em `workspace/`, num projeto pt-BR. O `anvil-code-review` com os dois eixos chega em pt-BR, com a linha `Review:` igual. O `anvil-diagnose` e o `anvil-browser-qa` narram em pt-BR. No `tea-open-pr`, o corpo do PR sai em inglês e o chat em pt-BR. Um projeto com outro idioma nas rules segue esse idioma. A cauda aparece no fim do `anvil-to-spec`, do `anvil-implement` rodado direto e do `/anvil-docs archive`. A cauda não aparece no `tea-commit`, dentro do `anvil-implementer` nem quando a skill termina numa pergunta. Os mesmos casos passam no omp, incluindo o relatório final do `anvil-run`.
 - [ ] O `vendor-sync.sh verify` sai limpo, sem nenhuma skill vendorizada alterada.
+
+## Comments
+
+- Review round=1 · P1 (Standards): a diretiva diz que a lista da cauda é o único lugar a editar, mas o `anvil-run` invoca o `anvil-next` por conta própria no fechamento limpo — quem tirar o `anvil-run` da lista continua com a cauda disparando ali.
+- Review round=1 · P1 (Standards), contestado: o bloco `ANVIL:DIRECTIVES` do `CLAUDE.md` divergiria do `claude_boot.md`. O eixo não rodou `git diff`; o `awk … | diff - claude_boot.md` sai igual em `178c545`, e as duas cópias têm a seção da cauda. A rodada 2 remede.
+- Review round=1 · P2 (Spec): no `anvil-run` com `halt`, o relatório diz que a execução seguinte recomenda o próximo passo, e a cauda da diretiva invoca o `anvil-next` sem argumento logo depois — o operador pode ler duas direções. As duas apontam para rodar de novo com a árvore limpa; registro sem mudança.
+- Review round=1 · P2 (Spec), inferência: a rule `anvil-harness` traduz "Skill tool" quando citado dentro de uma skill, e a diretiva não é skill — no omp a cauda poderia não disparar. O cenário manual da Seam 2 mede.
+- Review round=1 · P3 (Spec): a exclusão "quando a própria skill já invocou o `anvil-next`" acopla a diretiva ao `anvil-run` — se ele mudar, a cauda dispara duas vezes ou nenhuma sem a diretiva acusar.
+- Review round=1 · P2 (Standards), fora do diff: `anvil-implement` e `anvil-code-review` repetem regras de `verification.md` além do que o `verification-profile` declara — se o perfil mudar, as skills ficam com a regra velha. Pré-existente; não é deste ticket.
