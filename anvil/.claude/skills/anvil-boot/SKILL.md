@@ -74,6 +74,11 @@ fi
 - **Com instalação** → não toque nela e siga para "Projeto instalado do jeito
   antigo", logo abaixo. Diga que a versão instalada fica como está e que quem
   troca de versão é o `/anvil-update`.
+- **Instalação de desenvolvimento** → o dry-run recusa e não escreve nada: as
+  skills em `~/.claude/` são symlinks do `dev-link` para o payload fonte, na
+  máquina de desenvolvimento do anvil. Elas são a instalação de usuário dessa
+  máquina. Não instale nem desfaça a ligação; diga isso e siga para "Projeto
+  instalado do jeito antigo", logo abaixo.
 - **Sem instalação** → o dry-run lista por nome o que entra em `~/.claude/`,
   `~/.agents/skills/` e `~/.omp/agent/`, o que já estava lá e fica, e as
   colisões: skill ou agente seu com o nome de um do payload, que **será

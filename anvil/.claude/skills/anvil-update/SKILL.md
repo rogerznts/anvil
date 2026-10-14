@@ -113,6 +113,14 @@ de reset é a nova, não a da versão velha. O `--unignore`, que só tira do
 `.gitignore` de um projeto o bloco de uma instalação antiga, pode rodar da cópia
 instalada — é o que o `/anvil-boot` faz.
 
+**Instalação de desenvolvimento.** Se uma skill, um agente ou um arquivo da
+camada do payload for symlink em `~/.claude/` ou em `~/.omp/agent/` — o que o
+`dev-link` deixa na máquina de desenvolvimento do anvil —, o dry-run recusa,
+lista essas entradas e não escreve nada. Instalar por cima escreveria o payload
+publicado dentro da fonte, através do link. Pare aqui e repasse a recusa, que
+aponta o `dev-link.sh --unlink` no repositório do anvil; não apague symlink
+nenhum por conta própria.
+
 O diretório do usuário não tem git por trás, então o dry-run **lista por nome**
 tudo que será substituído, removido e preservado. A saída classifica as skills e
 os agentes em quatro grupos: *substituídos* · *órfãos, serão removidos* · *não são

@@ -4,13 +4,25 @@
 
 **Blocked by:** 03
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] O `dev-link` cria symlinks para o payload deste repositório em quatro lugares: `~/.claude/skills/<skill>` para cada skill do roster, os agentes, o espelho em `~/.agents/skills` e a camada omp em `~/.omp/agent/`.
-- [ ] O `--all` continua ligando o payload inteiro, e o `--dry-run` continua mostrando sem alterar.
-- [ ] O `--unlink` remove só os symlinks que apontam para o payload deste repositório e deixa intocado o que não aponta para ele.
-- [ ] Os symlinks de projeto em `.claude/skills/anvil-*` deixam de ser criados. O `anvil-sync` fica onde está, e o `anvil-update` segue fora do roster.
-- [ ] O `reset-install` recusa instalar quando alguma entrada do payload no diretório de usuário é symlink. Nesse caso não escreve nada e aponta o `dev-link --unlink` na mensagem.
-- [ ] Cenário em `workspace/` com `HOME` temporário. Depois do `dev-link`, as entradas de `HOME` são symlinks para o payload. O update recusa e não escreve nada.
-- [ ] No mesmo cenário, depois do `--unlink`, o update instala normalmente.
-- [ ] O `vendor-sync.sh verify` sai limpo.
+- [x] O `dev-link` cria symlinks para o payload deste repositório em quatro lugares: `~/.claude/skills/<skill>` para cada skill do roster, os agentes, o espelho em `~/.agents/skills` e a camada omp em `~/.omp/agent/`.
+- [x] O `--all` continua ligando o payload inteiro, e o `--dry-run` continua mostrando sem alterar.
+- [x] O `--unlink` remove só os symlinks que apontam para o payload deste repositório e deixa intocado o que não aponta para ele.
+- [x] Os symlinks de projeto em `.claude/skills/anvil-*` deixam de ser criados. O `anvil-sync` fica onde está, e o `anvil-update` segue fora do roster.
+- [x] O `reset-install` recusa instalar quando alguma entrada do payload no diretório de usuário é symlink. Nesse caso não escreve nada e aponta o `dev-link --unlink` na mensagem.
+- [x] Cenário em `workspace/` com `HOME` temporário. Depois do `dev-link`, as entradas de `HOME` são symlinks para o payload. O update recusa e não escreve nada.
+- [x] No mesmo cenário, depois do `--unlink`, o update instala normalmente.
+- [x] O `vendor-sync.sh verify` sai limpo.
+
+## Comments
+
+- Cenário: `workspace/42-dev-link/s1.sh`, 60 checks, todos passando. O repositório é um fixture — o payload da árvore de trabalho mais um agente, e o `dev-link` da árvore de trabalho —, porque o `dev-link` acha a fonte pelo próprio caminho: rodar o do repositório real ligaria o `HOME` ao repositório real. O fixture começa como o `dev-link` de `2d00a4d` o deixava, com os symlinks de projeto. Cobre o roster e o `--all` em `HOME` com skill, agente, espelho, rule e sessões do usuário; o `--dry-run` de ligar e de desligar com `HOME` e repositório iguais antes e depois; a recusa do reset no dry-run e na execução, por skill, por agente e por arquivo da camada, com `HOME`, payload fonte e ausência de lock conferidos; a mesma recusa pelo bloco do passo 2 do boot; o `--unlink` deixando o symlink para outro repositório e o que é do usuário; e o update instalando depois do `--unlink`, sem tocar o payload fonte. O `39-user-install/s1.sh` (sem a sessão no omp real) e o `41-legacy-migration/s1.sh` continuam passando.
+- Os symlinks são absolutos, para o payload: o `HOME` e o repositório não têm caminho relativo estável entre si. O espelho aponta direto para `anvil/.claude/skills/<skill>`, e não para `~/.claude/skills/<skill>` como o reset faz, para que o `--unlink` reconheça o que é dele pelo alvo. Nosso é o symlink cujo alvo começa por `<repositório>/anvil/.claude/`; symlink para outro clone do anvil fica no `--unlink`.
+- Ao ligar, symlink com nome de skill, de agente ou de arquivo da camada que aponta para outro lugar é refeito, como o `dev-link` antigo fazia no projeto, e o relatório o lista com o alvo antigo. Diretório e arquivo real continuam pulados.
+- A recusa do reset olha skill, agente e arquivo da camada do payload novo, a rule de diretivas inclusive; o espelho fica de fora, porque ali o symlink é a forma normal. Ela vem antes de qualquer escrita, também no dry-run, e sai com código 2. O `SKILL.md` do update manda parar e repassar; o do boot trata a recusa como instalação presente e segue para o projeto, porque na máquina de desenvolvimento os symlinks são a instalação de usuário.
+- Decisão que os tickets 04 e 05 deixaram para este: o `dev-link` tira, ao ligar e no `--unlink`, os symlinks de projeto que o `dev-link` antigo criava (`.claude/skills`, `.claude/agents`, `.agents/skills`, `.omp/`), reconhecidos pela forma relativa que ele usava; o que é do repositório fica, a `anvil-sync` e o espelho dela inclusive. A guarda deste repositório chamava o `validate.sh` por `.claude/skills/anvil-docs/`, que só existia pelo symlink de projeto; o hook do `.claude/settings.json` passa a chamar a guarda do payload, `anvil/.claude/skills/anvil-docs/scripts/guard-spec-merge.sh`, que acha o `validate.sh` ao lado dela, e a cópia velha em `.claude/hooks/` sai. Conferido aqui: um `git merge` do branch da spec é bloqueado com os tickets abertos. O bloco de diretivas do `CLAUDE.md` deste repositório fica: é instrução do repositório, e na máquina de desenvolvimento nada mais entrega as diretivas (ver abaixo). O `.gitignore` mantém as entradas dos symlinks de projeto para o clone que ainda os tem.
+- Não rodado nesta máquina: o `dev-link` não foi executado contra o `HOME` real. Os symlinks de projeto do `dev-link` antigo continuam nesta árvore até o operador rodar `bash .claude/skills/anvil-sync/scripts/dev-link.sh`, que liga `~/` e os tira.
+- Spec, achado da implementação: a spec põe o `dev-link` em quatro lugares, e as outras peças da instalação de usuário não chegam à máquina de desenvolvimento — o bloco de diretivas no `~/.claude/CLAUDE.md`, a rule `~/.omp/agent/rules/anvil-directives.md`, gerada e sem fonte para ligar, e o hook da guarda no `~/.claude/settings.json`. O reset, que os escreve, recusa por cima dos symlinks. Nessa máquina, os outros projetos rodam sem as diretivas, e sem a guarda no Claude Code (no omp ela vem pelo hook da camada); o passo 8 do boot vai acusar a guarda ausente. Decisão do operador.
+- Spec, achado da implementação: numa máquina com a instalação publicada, as skills em `~/.claude/skills` são diretório real, e o `dev-link` as pula, como sempre pulou diretório real. Não há ferramenta que tire a instalação publicada para ligar a de desenvolvimento no lugar; hoje é à mão.
+- Num clone deste repositório numa máquina com a instalação publicada, a guarda roda duas vezes no Claude Code — a de usuário e a do `.claude/settings.json` deste repositório —, e o bloqueio sai com a mensagem duplicada.

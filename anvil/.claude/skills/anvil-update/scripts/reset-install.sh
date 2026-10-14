@@ -43,6 +43,8 @@
 # anvil — o que tem .claude/rules/anvil.md —, o relatório confere os perfis de
 # docs/agents/ contra o template novo e aponta o /anvil-boot quando divergem. Tirar
 # de um projeto a cópia de uma instalação antiga é do migrate-project.sh, ao lado.
+# Recusa instalar por cima de uma instalação de desenvolvimento — skill, agente ou
+# arquivo da camada do payload que, em $HOME, é symlink, como o dev-link deixa.
 #
 #   reset-install.sh --from <tmp> [--dry-run]
 #   reset-install.sh --unignore --to <projeto> [--dry-run]
@@ -63,7 +65,7 @@ while [ $# -gt 0 ]; do
         --to)   TO="${2:-}";   shift 2 ;;
         --dry-run) DRY=1; shift ;;
         --unignore) UNIGNORE=1; shift ;;
-        -h|--help) sed -n '2,51p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '2,53p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
     esac
 done
@@ -184,6 +186,34 @@ if [ -d "$CAMADA_OMP" ]; then
 fi
 if [ -f "$DIRETIVAS" ]; then
     novo_omp="$(printf '%s\n%s\n' "$novo_omp" "$REGRA_DIRETIVAS" | sed '/^$/d' | LC_ALL=C sort -u)"
+fi
+
+# --- instalacao de desenvolvimento --------------------------------------------
+# Na maquina de desenvolvimento do anvil, o dev-link liga ~/.claude/skills, os
+# agentes e a camada omp ao payload fonte, por symlink. Instalar por cima
+# escreveria o payload publicado dentro da fonte, atraves do link. Entrada do
+# payload que e symlink recusa o reset antes de qualquer escrita, no dry-run
+# tambem. O espelho fica de fora: ali o symlink e a forma normal.
+dev=""
+for s in $novo; do
+    if [ -L "$SKILLS/$s" ]; then dev="$dev  ~/.claude/skills/$s -> $(readlink "$SKILLS/$s")"$'\n'; fi
+done
+for a in $novo_ag; do
+    if [ -L "$AGENTS/$a.md" ]; then dev="$dev  ~/.claude/agents/$a.md -> $(readlink "$AGENTS/$a.md")"$'\n'; fi
+done
+while IFS= read -r r; do
+    if [ -n "$r" ] && [ -L "$OMP/$r" ]; then dev="$dev  ~/.omp/agent/$r -> $(readlink "$OMP/$r")"$'\n'; fi
+done <<< "$novo_omp"
+if [ -n "$dev" ]; then
+    {
+        echo "erro: instalação de desenvolvimento em $U — estas entradas do payload são symlink:"
+        printf '%s' "$dev"
+        echo "O reset escreveria o payload publicado através delas. Desfaça a ligação, no"
+        echo "repositório do anvil, com"
+        echo "  bash .claude/skills/anvil-sync/scripts/dev-link.sh --unlink"
+        echo "e rode o update de novo. Nada foi alterado."
+    } >&2
+    exit 2
 fi
 
 # --- o que esta instalacao possui --------------------------------------------
