@@ -4,9 +4,10 @@
 
 **Blocked by:** 02, 03, 04
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=a2318309e7292ba0fe28690d9ac8a76e0f76eadf; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=c260570910ecca08efe73b2ec374f20fff081b49; scope=diff:a231830..c260570; verdict=fail; p1=open
+**Review:** round=3; sha=01552cda15d517a12248add034080848e74a792b; scope=diff:492fc50..01552cd; verdict=pass; p1=none
 
 - [x] Com lock no projeto, a migração remove:
   - as skills e os agentes listados no lock;
@@ -56,3 +57,7 @@
 - Review round=2 · P3 (Standards): um `CLAUDE.md` ou um settings que é symlink para um arquivo com o bloco ou com a guarda de usuário — o `~/.claude/CLAUDE.md`, por exemplo — conta como instalação antiga; o projeto passa a exigir árvore limpa e recebe um relatório de migração sem nada a tirar.
 - Review round=2 · P3 (Spec): sem lock, a saída com código 3 vem antes da checagem de itens ignorados — o usuário responde quais skills são dele e só na rodada seguinte descobre o `.gitignore`.
 - Rodada 2 reprovada: pela regra de `docs/agents/verification.md`, a verificação para aqui e entrega ao operador o P1 aberto acima; a terceira rodada é escolha dele. Custo: a rodada 1 achou três P1, corrigidos em `c260570`; a rodada 2 achou um P1 novo, criado pela correção do primeiro.
+- Rodada 3, aberta pelo operador. Correção do P1 da rodada 2 em `01552cd`: a checagem de ignorados conta só o item sem nada versionado (`git ls-files -- "$x"` vazio); a skill versionada com um `.DS_Store` solto dentro migra, e o ignorado sai junto. O cenário 41 ganhou o caso p15 — `.DS_Store` ignorado dentro de `anvil-grill` e de `minha-skill` —, que falhava antes da correção e passa depois: 57 checks, todos passando, o p11 (toolkit ignorado e fora do git) ainda para com código 2. `vendor-sync.sh verify` limpo.
+- Review round=3 · P1 de round=2 remedido: resolvido nos dois eixos; o `.DS_Store` solto não trava mais, o laço entre boot e update acabou, e o toolkit ignorado e fora do git — skill, symlink do espelho, lock, guarda — ainda faz parar e é nomeado.
+- Review round=3 · P2 (Spec e Standards, mesmo achado): num item com algo versionado, o que está ignorado dentro dele sai pelo `rm -rf` sem aparecer no dry-run nem no `git status`; sem lock, com a linha antiga que ignora `.claude/skills/` inteira, uma skill do usuário commitada antes dela e esquecida no `--keep-skills` perde de vez os arquivos ignorados criados depois — o `git checkout` traz só a parte versionada. A versão de `c260570` recusava esse caso. Saída apontada: listar no dry-run, num grupo "sai junto, fora do git", o que `git ls-files -o -i --exclude-standard -- "$x"` devolve para item versionado. Os textos que prometem a remoção inteira no `git status` — cabeçalho do script, `anvil-boot/SKILL.md:119-121`, `anvil-update/SKILL.md:200-202`, `README.md:346-347` — deixam de valer nesse caso misto. O Spec registra o sinal de laço do `docs/agents/verification.md`: a rodada 3 achou o que a correção da 2 criou, com a classe descendo de P1 para P2.
+- Review round=3 · P3 (Standards): o cabeçalho do script, linhas 36-37, que o `--help` imprime, ainda diz "nada do que sai ignorado pelo .gitignore"; depois da correção vale só para o item sem nada versionado, e quem lê só o `--help` acha que nenhum ignorado é apagado.
