@@ -1,14 +1,15 @@
 # anvil
 
 Toolkit de skills para agentes de código — Claude Code, Codex e omp —, curadorizado a
-partir de repositórios upstream e distribuído a projetos por cópia.
+partir de repositórios upstream e instalado uma vez por usuário.
 
 ## Language
 
 ### Toolkit e curadoria
 
 **Payload**:
-O conjunto de skills e agentes que o anvil copia para um projeto.
+O conjunto de skills e agentes que o anvil publica e instala no diretório do
+usuário.
 _Avoid_: pacote, distribuição
 
 **Skill vendorizada**:
@@ -33,6 +34,19 @@ _Avoid_: lock, bloqueio
 O registro do que uma instalação do anvil possui, de onde saem os órfãos.
 _Avoid_: manifesto, lockfile de dependência
 
+**Instalação de usuário**:
+O toolkit instalado uma vez por usuário, no diretório dele — `~/.claude/`,
+`~/.agents/skills/` e `~/.omp/agent/` —, com o lock de usuário, e válido para
+todos os projetos da máquina. O projeto guarda só rules e `docs/`.
+_Avoid_: instalação global, instalação do sistema
+
+**Instalação de projeto antiga**:
+O toolkit copiado dentro de um projeto, como o anvil instalava antes da instalação
+de usuário: skills, agentes e lock em `.claude/`, espelho em `.agents/skills`,
+camada em `.omp/`, diretivas no `CLAUDE.md` e a guarda nas settings do projeto.
+Sai do projeto pela migração, quando o update ou o boot roda nele.
+_Avoid_: instalação local, instalação legada
+
 ### Harness
 
 **Harness**:
@@ -41,8 +55,9 @@ Claude Code é a referência. Só o omp automatiza o fluxo; nos outros ele é ma
 _Avoid_: runtime, executor, cliente
 
 **Camada de harness**:
-A parte do payload que só um harness lê, instalada no projeto quando esse harness
-é detectado e mantida depois, mesmo que a máquina seguinte não o tenha.
+A parte do payload que só um harness lê, instalada no diretório de usuário desse
+harness quando ele é detectado e mantida depois, mesmo que a máquina perca o
+sinal dele.
 _Avoid_: adapter, plugin, integração
 
 **Condutor**:

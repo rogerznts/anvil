@@ -34,16 +34,18 @@ com adaptação registrada — ver
 ## Harnesses
 
 O payload é lido por três harnesses: Claude Code, Codex e omp. As skills são as
-mesmas nos três, e o Claude Code é a referência. O que só um harness lê vem numa
-**camada de harness**, instalada pelo boot e pelo update quando o harness é
-detectado e mantida depois pela linha `omp:` do `anvil.lock`. Hoje há uma, a
-camada omp, em `.omp/`: a guarda de merge como hook do omp, a rule que traduz o
-vocabulário do Claude Code, o agente `anvil-implementer`, os condutores
-`anvil-plan` e `anvil-run` e o manual `anvil-omp`. Só no omp o fluxo é conduzido;
-no Claude Code e no Codex ele segue manual. A `anvil-run` despacha os tickets em
-série e, sob pedido e com a isolação do omp no modo branch, em paralelo, em levas
-de tickets do frontier. O Codex lê as skills pelo espelho `.agents/skills`, que o
-mesmo passo mantém. Ver
+mesmas nos três, e o Claude Code é a referência. O toolkit é instalado uma vez por
+usuário, e o projeto guarda só rules e `docs/` — ver
+[adr-0013](./adr/adr-0013-toolkit-instalado-por-usuario.md). O que só um harness
+lê vem numa **camada de harness**, instalada pelo boot e pelo update quando o
+harness é detectado e mantida depois pela linha `omp:` do lock de usuário. Hoje há
+uma, a camada omp, em `~/.omp/agent/`: a guarda de merge como hook do omp, a rule
+que traduz o vocabulário do Claude Code, a rule com as diretivas, o agente
+`anvil-implementer`, os condutores `anvil-plan` e `anvil-run` e o manual
+`anvil-omp`. Só no omp o fluxo é conduzido; no Claude Code e no Codex ele segue
+manual. A `anvil-run` despacha os tickets em série e, sob pedido e com a isolação
+do omp no modo branch, em paralelo, em levas de tickets do frontier. O Codex e o
+omp leem as skills pelo espelho `~/.agents/skills`, que o mesmo passo mantém. Ver
 [adr-0011](./adr/adr-0011-omp-como-harness-com-camada-propria.md),
 [adr-0012](./adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md) e os termos
 em [context.md](./context.md).
@@ -103,8 +105,8 @@ pelo supervisor — nunca a leitura da marca que o agente deixou nele.
 
 ## Idioma
 
-Fronteira única, na rule sempre carregada (`claude_boot.md`, injetada no
-`CLAUDE.md` do projeto entre marcadores):
+Fronteira única, na rule sempre carregada (`claude_boot.md`, instalada no
+`~/.claude/CLAUDE.md` entre marcadores e como rule `alwaysApply` da camada omp):
 
 - **Idioma de comunicação** (pt-BR sem declaração nas rules) — tudo que chega ao
   chat, inclusive relatório de subagente repassado, e toda documentação gerada

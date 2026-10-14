@@ -16,12 +16,13 @@ Confundir as duas coisas é o erro caro daqui.
 
 | Caminho | O que é |
 |---|---|
-| `anvil/` | **o payload — a fonte.** É o que o `npx degit` copia para um projeto |
-| `.claude/skills/anvil-*` | **symlinks** para `anvil/.claude/skills/*`. Editar a skill instalada **é** editar o payload |
-| `.claude/agents/*.md` | **symlinks** para `anvil/.claude/agents/*.md`, do mesmo jeito |
-| `.agents/skills/*` | o espelho do Codex: **symlinks** para `.claude/skills/*`, um por skill ligada. Fora do git |
-| `.omp/` | a camada omp: **symlinks** para `anvil/.claude/skills/anvil-update/.omp-layer/`, um por arquivo. Fora do git |
+| `anvil/` | **o payload — a fonte.** É o que o `/anvil-update` instala no diretório de usuário de uma máquina comum |
+| `~/.claude/skills/<skill>` | **symlinks** para `anvil/.claude/skills/<skill>`, um por skill ligada. Editar a skill instalada **é** editar o payload. Fora do repositório |
+| `~/.claude/agents/<agente>.md` | **symlinks** para `anvil/.claude/agents/<agente>.md`, do mesmo jeito |
+| `~/.agents/skills/<skill>` | o espelho do Codex, que o omp também lê: **symlinks** direto para `anvil/.claude/skills/<skill>`, um por skill ligada |
+| `~/.omp/agent/` | a camada omp: **symlinks** para `anvil/.claude/skills/anvil-update/.omp-layer/`, um por arquivo, em `skills/`, `rules/`, `agents/` e `hooks/pre/`. O resto de `~/.omp/agent` é do omp |
 | `.claude/skills/anvil-sync/` | a ferramenta de manutenção. É do repositório e **não vai no degit** |
+| `.claude/settings.json` | o hook da guarda de merge deste repositório, que chama a guarda direto do payload, `anvil/.claude/skills/anvil-docs/scripts/guard-spec-merge.sh` |
 | `anvil-skills.yaml` | o manifesto de curadoria. Também não vai no degit |
 | `references/` — upstream vendorizado | submodule com pin, listado em `sources:` no manifesto. De onde vem o que é vendorizado: skills e, no caso do `unlazy`, material de terceiro dentro do `anvil-bench`. **O pin é a base do merge 3-way** |
 | `references/` — sistema de referência | sistema de terceiro estudado para portar algo, fora do manifesto. Entra passageiro, fora do git por `.git/info/exclude`, ou versionado como submodule, com pin. **Não é base de merge**: o `mosk` — o toolkit de agentes-persona que o anvil sucede — está aqui |
@@ -34,17 +35,40 @@ Os symlinks se reconstroem com:
 bash .claude/skills/anvil-sync/scripts/dev-link.sh
 ```
 
-Das skills, só o roster de fluxo é ligado, não o payload inteiro — `--all` liga
-tudo, `--unlink` desfaz. Os agentes do payload e os arquivos da camada omp são
-ligados todos. Uma skill ou um agente ligado agora **só aparece na próxima
-sessão**, e editá-lo não muda a cópia que já está carregada nesta.
+Eles moram no diretório do usuário, não no repositório: **todo projeto da máquina
+roda a fonte em edição**, e uma skill editada pela metade chega a todos. Das
+skills, só o roster de fluxo é ligado, não o payload inteiro — `--all` liga tudo,
+`--dry-run` mostra sem alterar. Os agentes do payload e os arquivos da camada omp
+são ligados todos. Symlink com o nome de uma peça do payload que aponta para outro
+lugar é refeito; diretório ou arquivo real é pulado, e numa máquina com a
+instalação publicada tirá-la para ligar a fonte é à mão.
+
+O `--unlink` tira só os symlinks que apontam para o payload deste repositório, e
+deixa a máquina pronta para receber a instalação publicada. Ao ligar e no
+`--unlink`, saem também os symlinks que o `dev-link` antigo criava no projeto, em
+`.claude/skills`, `.claude/agents`, `.agents/skills` e `.omp/`; a `anvil-sync`
+fica.
+
+O `dev-link` não liga o resto da instalação de usuário: o bloco de diretivas do
+`~/.claude/CLAUDE.md`, a rule `~/.omp/agent/rules/anvil-directives.md` e o hook da
+guarda no `~/.claude/settings.json`. Aqui, as diretivas vêm do `CLAUDE.md` da raiz
+e a guarda vem do `.claude/settings.json`; nos outros projetos da máquina, a sessão
+roda sem as diretivas e, no Claude Code, sem a guarda.
+
+Uma skill ou um agente ligado agora **só aparece na próxima sessão**, e editá-lo
+não muda a cópia que já está carregada nesta.
 
 ## Nunca rode `/anvil-update` aqui
 
-Ele baixa o payload publicado do GitHub e instala por cima. Num projeto é o
-caminho certo; aqui, escreveria a versão publicada por cima da fonte em
-desenvolvimento. Ele não está entre as skills ligadas — não estar instalado é a
-trava.
+Ele baixa o payload publicado do GitHub e o instala no diretório do usuário. Numa
+máquina comum é o caminho certo; nesta, a instalação de usuário é feita de
+symlinks para a fonte, e instalar por cima escreveria a versão publicada dentro da
+fonte em desenvolvimento, através do link. Ele não está entre as skills ligadas —
+não estar instalado é a primeira trava. A segunda é a recusa: o `reset-install`
+não instala quando alguma skill, agente ou arquivo da camada omp do payload é
+symlink no diretório do usuário. A recusa vem antes de qualquer escrita, no
+dry-run também, e aponta o `dev-link.sh --unlink`. Para voltar à instalação
+publicada, rode o `--unlink` e depois o update.
 
 ## Mudança em skill vendorizada
 

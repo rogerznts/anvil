@@ -66,13 +66,15 @@ Nenhuma.
   - [adr-0008](./architecture/adr/adr-0008-equipe-sai-do-toolkit.md)
     — a equipe por papel sai do toolkit; a máquina de agentes fica
   - [adr-0009](./architecture/adr/adr-0009-toolkit-instalado-fica-versionado.md)
-    — o toolkit instalado fica versionado; o boot não escreve no `.gitignore`
+    — o toolkit instalado fica versionado; o boot não escreve no `.gitignore`; **revogado pelo adr-0013**
   - [adr-0010](./architecture/adr/adr-0010-verificacao-tem-criterio-de-parada.md)
     — a verificação tem critério de parada, e ele é ausência de P1
   - [adr-0011](./architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md)
-    — o omp é harness de primeira classe, com camada própria; a orquestração volta só nela
+    — o omp é harness de primeira classe, com camada própria; a orquestração volta só nela; **emendado pelo adr-0013**
   - [adr-0012](./architecture/adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md)
     — o frontier roda em paralelo sob pedido, só com a isolação do omp no modo branch
+  - [adr-0013](./architecture/adr/adr-0013-toolkit-instalado-por-usuario.md)
+    — o toolkit é instalado uma vez por usuário; o projeto fica só com rules e `docs/`
 
 ### Project
 

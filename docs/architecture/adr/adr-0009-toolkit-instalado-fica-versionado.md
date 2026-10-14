@@ -1,6 +1,6 @@
 # ADR-0009 — O toolkit instalado fica versionado no projeto
 
-- Status: aceito
+- Status: revogado pelo [ADR-0013](./adr-0013-toolkit-instalado-por-usuario.md) em 2026-10-14 — o toolkit passa a ser instalado uma vez por usuário, e o projeto fica só com rules e `docs/`
 - Data: 2026-09-21
 - Revoga a decisão de ignorar o toolkit registrada na spec 001 e implementada pelo bloco `ANVIL:INSTALLED`
 

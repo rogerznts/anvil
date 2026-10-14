@@ -4,6 +4,7 @@
 - Data: 2026-09-23
 - Revê em parte o [ADR-0008](./adr-0008-equipe-sai-do-toolkit.md), só na camada omp
 - Revisto em parte pelo [ADR-0012](./adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md): o frontier em paralelo entra, sob pedido e com a isolação do omp
+- Emendado pelo [ADR-0013](./adr-0013-toolkit-instalado-por-usuario.md): a camada omp vai para `~/.omp/agent/`, pegajosa pela linha `omp:` do lock de usuário, e o espelho vai para `~/.agents/skills`
 
 ## Contexto
 
