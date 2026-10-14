@@ -12,6 +12,9 @@ Last updated: 2026-09-25T19:05:58Z
     de integração do anvil com o omp, antes do grill
   - [camadas-anvil-omp.md](./discovery/camadas-anvil-omp.md) — desenho em
     mermaid das camadas, da instalação, da execução e da guarda de merge
+  - [bench-autonomo.md](./discovery/bench-autonomo.md) — proposta para pôr o
+    bench sobre o plan e o run e torná-lo autônomo da entrevista ao relatório,
+    antes do grill
 - **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
 
