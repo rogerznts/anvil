@@ -5,6 +5,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=0d30bba; scope=full; verdict=pass; p1=none
 
 - [x] O `tea-open-fast-pr`, o template do perfil do tracker e o perfil do tracker deste repositório citam o `new-spec.sh` na instalação de usuário.
 - [x] O `tea-open-pr` e o `anvil-docs` citam o `validate.sh` na instalação de usuário. A resolução do validador pela guarda de merge fica para o ticket 04.
@@ -23,3 +24,12 @@
 - Além dos critérios, pela frase "toda instrução autoral" do ticket: o `stage.sh` do `anvil-plan` e o `frontier.sh` do `anvil-run` passam a ser citados em `~/.omp/agent/skills/`, onde a spec põe a camada omp; o `deploy.sh` do bench e o checklist do `STACK-CONTRACT.md` seguem a mesma regra.
 - Fica para o ticket 04, como o critério 2 manda: o `guard-spec-merge.sh` ainda chama e cita `.claude/skills/anvil-docs/scripts/validate.sh` do projeto, e o hook omp ainda aponta o script da guarda no projeto.
 - Até o ticket 03 instalar no usuário, e o 06 ligar a fonte nesta máquina, os caminhos citados não existem: neste repositório, criar spec nova pelo perfil do tracker, ou rodar o `anvil-run`/`anvil-plan` no omp, falha até lá.
+- Review round=1 · P2 (Spec): no cenário, o caso `--layers` só confere que a saída cita o lock do projeto, e o script ainda tira a camada do próprio projeto (`FROM_ABS="$TO_ABS"`) — não há prova de que o verbo funciona sem cópia no projeto, e se o ticket 03 não refizer essa origem ninguém percebe.
+- Review round=1 · P3 (Spec): a linha `projeto:` do `infra.sh --provision` não foi pedida por critério — é mais uma linha de progresso para o agente traduzir; o bloco `ALLOC_*` que monta o `.env` não muda.
+- Review round=1 · P3 (Spec): o cabeçalho do `reset-install.sh` (linhas 26–37) ainda diz que a camada vem da `anvil-update` do projeto e que o `--layers` roda da cópia instalada, como faz o boot — quem lê o cabeçalho acha uma descrição do boot que não é mais a do `anvil-boot`.
+- Review round=1 · P3 (Spec): fora o `echo`, nada usa o `PROJECT_ROOT`, e o parágrafo "Caminhos" da spec sugere que a raiz serve a algo — quem lê só a spec supõe que ela alimenta a alocação; o achado está só neste `## Comments`.
+- Review round=1 · P3 (Standards): possível Speculative Generality no `infra.sh` — o `--help` ("chamado do diretório do projeto") e o `INVARIANTS.md` fazem o provisionamento parecer depender da raiz, mas banco, porta e Redis saem só do argumento `<projeto>`; quem ler procura um vínculo que não existe.
+- Review round=1 · P3 (Standards): possível Duplicated Code — o `docker compose cp ~/.claude/skills/anvil-bench/unlazy/scripts/. app:/tmp/anvil-gates` se repete no `anvil-bench/SKILL.md` e no `GATE.md`; trocar o destino exige editar os dois, e o esquecido roda script velho ou não acha o script.
+- Review round=1 · P3 (Standards): possível Shotgun Surgery — o prefixo `~/.claude/skills/` fica literal em cerca de 20 citações em 14 arquivos; se a raiz da instalação de usuário mudar (por exemplo, com `CLAUDE_CONFIG_DIR`), todas quebram juntas. A spec fixa esse local.
+- Review round=1 · P3 (Standards): o checklist do `STACK-CONTRACT.md` diz que `bench/{env,infra,deploy}.sh` acham o projeto pelo `git` ou pelo diretório corrente, mas o `env.sh` não resolve projeto e o `deploy.sh` usa só `pwd` — o autor de uma stack nova lê uma obrigação mais uniforme que o modelo real.
+- Review round=1 · P3 (Standards): o critério "Nenhuma skill vendorizada é tocada" está marcado, e o `anvil-stack-payload`, vendorizado, foi tocado em arquivos `keep` (`bench/`) — sem essa ressalva, quem audita o ticket lê o critério como falso.
