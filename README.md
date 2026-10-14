@@ -337,6 +337,15 @@ Um projeto bootado antes ignorava o toolkit no `.gitignore`, por um bloco
 acha os dois, mostra o antes e o depois, e **propõe removê-los**. Linha parecida
 que o boot não escreveu não é tocada.
 
+Um projeto instalado do jeito antigo, com cópia do toolkit nele, é migrado pelo
+`/anvil-update` ou pelo `/anvil-boot` rodado nele, um projeto por vez. Guiada pelo
+`.claude/anvil.lock` do projeto, a migração tira as skills, os agentes, o lock, os
+symlinks de `.agents/skills`, os arquivos de `.omp/` do lock, a guarda copiada com
+o hook dela no `.claude/settings.json` e o bloco `ANVIL:DIRECTIVES` do `CLAUDE.md`.
+O que é do projeto fica. Sem lock, ela pergunta antes quais skills e agentes não
+vieram do anvil. Exige árvore limpa, mostra um dry-run, espera aprovação e nunca
+commita: a remoção fica no `git status` para você revisar.
+
 ---
 
 ## Vindo do mosk

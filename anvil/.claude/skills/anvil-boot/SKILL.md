@@ -1,6 +1,6 @@
 ---
 name: anvil-boot
-description: "Bootstrap: prepara um projeto para o anvil — garante a instalação de usuário do toolkit, gera .claude/rules/, monta ou adota a árvore docs/, escreve o perfil do issue tracker, propõe a rule da stack detectada e confere a guarda de merge. Rode uma vez por projeto, e de novo quando a estrutura mudar bastante."
+description: "Bootstrap: prepara um projeto para o anvil — garante a instalação de usuário do toolkit, migra o projeto instalado do jeito antigo, gera .claude/rules/, monta ou adota a árvore docs/, escreve o perfil do issue tracker, propõe a rule da stack detectada e confere a guarda de merge. Rode uma vez por projeto, e de novo quando a estrutura mudar bastante."
 ---
 
 # Boot
@@ -11,11 +11,12 @@ passo é idempotente e nada é sobrescrito sem aviso.
 O toolkit não é copiado para o projeto: ele mora na instalação de usuário, que
 vale para todos os projetos da máquina e que o passo 2 garante, com a guarda de
 merge inclusive. O projeto recebe o que é dele: `.claude/rules/`, os perfis em
-`docs/agents/` e a árvore de `docs/`.
+`docs/agents/` e a árvore de `docs/`. Um projeto instalado do jeito antigo, com
+cópia do toolkit nele, é migrado no mesmo passo 2.
 
 **Nada é escrito sem aprovação**, exceto a árvore vazia de `docs/`. Todo o resto
-— instalação de usuário, rules, perfil de tracker, rule de stack — é proposto e
-espera confirmação.
+— instalação de usuário, migração, rules, perfil de tracker, rule de stack — é
+proposto e espera confirmação.
 
 ## 1. Vindo do mosk?
 
@@ -91,6 +92,50 @@ bloco**: o que o projeto já tinha nele fica como estava.
 Ela também registra a guarda de merge no `~/.claude/settings.json`, como uma
 entrada a mais em `hooks.PreToolUse`, sem tocar o resto do arquivo. O passo 8
 confere que ela dispara.
+
+### Projeto instalado do jeito antigo
+
+A instalação antiga copiava o toolkit para o projeto: skills, agentes, lock,
+espelho, camada omp, a guarda com o hook nas settings e o bloco de diretivas no
+`CLAUDE.md`. Uma cópia velha fica inerte no Claude Code, onde a skill de usuário
+vence, mas no omp a camada do projeto pode vencer a de usuário; por isso ela sai.
+É a mesma migração do `/anvil-update`, do mesmo script, e só deste projeto. Da
+raiz dele:
+
+```bash
+bash ~/.claude/skills/anvil-update/scripts/migrate-project.sh --dry-run
+```
+
+- **Nada a migrar** → siga para o passo 3.
+- **Árvore suja** → o script para sem tocar em nada. Peça commit ou stash, para o
+  diff da migração mostrar só a remoção, e rode o dry-run de novo. A migração do
+  mosk do passo 1, se houve, também precisa estar commitada antes.
+- **Com `.claude/anvil.lock` no projeto** → o dry-run lista por nome o que sai,
+  guiado pelo lock, e o que fica: skill, agente e arquivo de `.omp/` fora do lock,
+  rules, `docs/`, o resto do settings e do `CLAUDE.md`. Diga isso numa frase e
+  **espere aprovação**.
+- **Sem lock** → o script sai com código 3 e lista as skills e os agentes do
+  projeto sem apagar nada. Mostre a lista e **pergunte quais não vieram do
+  anvil**; rode o dry-run de novo com a resposta, e espere aprovação:
+
+  ```bash
+  bash ~/.claude/skills/anvil-update/scripts/migrate-project.sh --dry-run \
+       --keep-skills "minha-skill outra-skill" --keep-agents "meu-agente"
+  ```
+
+Aprovado, execute, com os mesmos `--keep-*` quando houve a pergunta:
+
+```bash
+bash ~/.claude/skills/anvil-update/scripts/migrate-project.sh
+```
+
+A remoção fica no `git status` para o usuário revisar e commitar; o boot não
+commita.
+
+O dry-run também acusa com `BOOT PENDENTE` o perfil de `docs/agents/` que cita
+script pelo caminho da instalação por projeto, como
+`.claude/skills/anvil-to-spec/scripts/new-spec.sh`, migrado o projeto ou não. Esse
+caminho não existe mais; o passo 6 propõe o perfil do template no lugar.
 
 ## 3. Varrer o projeto
 
@@ -193,6 +238,10 @@ Idêntico → siga sem perguntar. Divergente → mostre o diff e espere aprovaç
 `anvil-code-review` tira classe, orçamento e escopo diff-only; sem ele, o critério
 que se instala sozinho é "nenhum achado aberto".
 
+Perfil que o passo 2 acusou por citar o caminho antigo diverge do template pelo
+menos nessa linha: mostre o diff contra o template da instalação de usuário,
+em `~/.claude/skills/anvil-docs/templates/`, e proponha trocá-lo.
+
 ## 7. Stack
 
 Se a varredura encontrou uma stack conhecida — hoje, um `payload.config.ts` —
@@ -292,6 +341,7 @@ do projeto, e tirar as linhas faz o que está em `.claude/skills/` aparecer no
 
 Chame o verbo `index` do `anvil-docs`.
 
-Relate: a instalação de usuário, feita agora ou já presente; o que foi criado, o
+Relate: a instalação de usuário, feita agora ou já presente; a migração do projeto
+antigo, se houve, com o diff esperando o commit do usuário; o que foi criado, o
 que foi proposto e aprovado, o que foi proposto e recusado, e o que ficou
 pendente. Nunca commite sozinho.

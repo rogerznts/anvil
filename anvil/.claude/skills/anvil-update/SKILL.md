@@ -1,6 +1,6 @@
 ---
 name: anvil-update
-description: "Update: reinstala do zero o toolkit anvil na instalação de usuário (reset + degit), apagando órfãos de versões anteriores, e resume o que mudou. Use ao atualizar ou sincronizar a versão do anvil na máquina."
+description: "Update: reinstala do zero o toolkit anvil na instalação de usuário (reset + degit), apagando órfãos de versões anteriores, migra o projeto instalado do jeito antigo de onde roda, e resume o que mudou. Use ao atualizar ou sincronizar a versão do anvil na máquina."
 ---
 
 # Update
@@ -23,7 +23,9 @@ projetos da máquina de uma vez. O destino é o diretório do usuário:
 | guarda de merge | no Claude Code, um hook `PreToolUse`/`Bash` no `~/.claude/settings.json` que chama o `guard-spec-merge.sh` das skills instaladas; no omp, o hook da camada |
 
 O que é de cada projeto — `.claude/rules/`, os perfis em `docs/agents/` e o resto
-de `docs/` — não é tocado. O update **nunca commita**.
+de `docs/` — não é tocado. O update **nunca commita**. A única escrita em projeto é
+a migração do passo 5, que tira de um projeto instalado do jeito antigo a cópia
+local do toolkit.
 
 **Isto é um reset, não uma sobrescrita.** As skills e os agentes que o anvil
 instalou são apagados e reinstalados. Ficam intactos: **qualquer skill ou agente
@@ -86,9 +88,11 @@ toda skill ou agente do payload que já estiver em `~/.claude/` sai como colisã
 
 ## Fluxo
 
-Roda de qualquer diretório. Fora de um projeto anvil, só atualiza o usuário. Dentro
-de um — o que tem `.claude/rules/anvil.md` —, não escreve nada nele e confere os
-perfis de `docs/agents/` contra o template novo.
+Roda de qualquer diretório. Fora de um projeto, só atualiza o usuário. Dentro de
+um projeto anvil — o que tem `.claude/rules/anvil.md` —, confere os perfis de
+`docs/agents/` contra o template novo. Dentro de um projeto instalado do jeito
+antigo, com cópia do toolkit nele, migra esse projeto na mesma execução, no passo
+5, com dry-run e aprovação próprios.
 
 ### 1. Baixar, sem tocar em nada
 
@@ -170,10 +174,58 @@ Codex e o omp vão continuar lendo a sua versão.
 bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP"
 ```
 
-### 5. Relatar
+### 5. Migrar o projeto instalado do jeito antigo
+
+A instalação antiga copiava o toolkit para o projeto. Uma cópia velha no projeto
+fica inerte no Claude Code, onde a skill de usuário vence, mas no omp a camada do
+projeto pode vencer a de usuário; por isso ela sai. A migração cuida só do projeto
+de onde o update roda, e não procura outros. Da raiz dele:
+
+```bash
+bash "$TMP/.claude/skills/anvil-update/scripts/migrate-project.sh" --dry-run
+```
+
+- **Nada a migrar** → siga para o passo 6. É o caso fora de projeto e no projeto
+  já migrado.
+- **Árvore suja** → o script para sem tocar em nada. Peça commit ou stash: o diff
+  da migração precisa mostrar só a remoção. Depois, rode o dry-run de novo.
+- **Com `.claude/anvil.lock` no projeto** → o dry-run lista por nome o que sai:
+  as skills e os agentes do lock, o próprio lock, os symlinks de `.agents/skills`
+  com nome de skill do lock, os arquivos de `.omp/` das linhas `omp:`, a entrada
+  do hook que chama `.claude/hooks/guard-spec-merge.sh` no `.claude/settings.json`,
+  a cópia da guarda e o bloco `ANVIL:DIRECTIVES` do `CLAUDE.md`. E o que fica:
+  skill, agente e arquivo de `.omp/` fora do lock, rules, `docs/`, o resto do
+  settings e do `CLAUDE.md`. Diga isso numa frase e **espere aprovação**.
+- **Sem lock** → o script sai com código 3 e lista as skills de `.claude/skills/`
+  e os agentes de `.claude/agents/` sem apagar nada. Mostre a lista e **pergunte
+  quais não vieram do anvil**. A resposta volta nos dois parâmetros, e tudo fora
+  deles sai: rode o dry-run de novo com eles e espere aprovação.
+
+  ```bash
+  bash "$TMP/.claude/skills/anvil-update/scripts/migrate-project.sh" --dry-run \
+       --keep-skills "minha-skill outra-skill" --keep-agents "meu-agente"
+  ```
+
+Aprovado, execute, com os mesmos `--keep-*` quando houve a pergunta:
+
+```bash
+bash "$TMP/.claude/skills/anvil-update/scripts/migrate-project.sh"
+```
+
+A migração **nunca commita**: a remoção fica no `git status` para o usuário revisar
+e commitar.
+
+Em qualquer projeto, migrado ou não, o dry-run também acusa com `BOOT PENDENTE` o
+perfil de `docs/agents/` que cita script pelo caminho da instalação por projeto,
+como `.claude/skills/anvil-to-spec/scripts/new-spec.sh`. Esse caminho não existe
+sem a cópia: aponte o `/anvil-boot`, que traz o perfil do template.
+
+### 6. Relatar
 
 - órfãos removidos, **por nome**, inclusive os do espelho e da camada omp
 - as colisões que foram sobrescritas, por nome
+- o projeto migrado, se houve: o que saiu dele, e que o diff está no `git status`
+  esperando o commit do usuário
 - a camada omp: nova, mantida ou não instalada, e o sinal que decidiu
 - as diretivas: o bloco do `~/.claude/CLAUDE.md` criado, trocado ou em dia
 - a guarda de merge: o hook do `~/.claude/settings.json` registrado agora, já em
@@ -183,8 +235,9 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP"
 - **o que o update não toca e pode ter ficado para trás.** Os perfis em
   `docs/agents/` são do projeto e escritos pelo `/anvil-boot`, então uma versão
   nova do toolkit pode trazer perfil que um projeto ainda não tem. Rodado de
-  dentro de um projeto, o dry-run já acusou com `BOOT PENDENTE`. Perfil que
-  existe e diverge do template **não** é sobrescrito: o projeto pode tê-lo
+  dentro de um projeto, os dry-runs já acusaram com `BOOT PENDENTE`, inclusive o
+  perfil que cita script pelo caminho antigo. Perfil que existe e diverge do
+  template **não** é sobrescrito: o projeto pode tê-lo
   ajustado. Mostre o diff contra o template instalado e pergunte:
 
   ```bash
@@ -194,10 +247,10 @@ bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP"
 - se a estrutura de rules ou templates mudou, sugira rodar `/anvil-boot` nos
   projetos
 
-**Nunca commite.** O update não escreve em projeto, e o diretório do usuário não
-tem git.
+**Nunca commite.** Nem a migração do projeto, nem nada no diretório do usuário,
+que não tem git.
 
-### 6. Limpar
+### 7. Limpar
 
 ```bash
 rm -rf "$TMP"
@@ -211,4 +264,4 @@ rm -rf "$TMP"
 - Nada é apagado fora do conjunto que o script calcula. **Skill ou agente que o
   usuário escreveu não é do anvil para remover.**
 - O lockfile é reescrito pelo script. Não edite à mão.
-- Nada é escrito em projeto, e nada é commitado.
+- Fora da migração do passo 5, nada é escrito em projeto. Nada é commitado.

@@ -41,7 +41,8 @@
 # omp vem com a camada.
 # Nada é escrito em projeto, e nada é commitado. Rodado de dentro de um projeto
 # anvil — o que tem .claude/rules/anvil.md —, o relatório confere os perfis de
-# docs/agents/ contra o template novo e aponta o /anvil-boot quando divergem.
+# docs/agents/ contra o template novo e aponta o /anvil-boot quando divergem. Tirar
+# de um projeto a cópia de uma instalação antiga é do migrate-project.sh, ao lado.
 #
 #   reset-install.sh --from <tmp> [--dry-run]
 #   reset-install.sh --unignore --to <projeto> [--dry-run]
@@ -62,7 +63,7 @@ while [ $# -gt 0 ]; do
         --to)   TO="${2:-}";   shift 2 ;;
         --dry-run) DRY=1; shift ;;
         --unignore) UNIGNORE=1; shift ;;
-        -h|--help) sed -n '2,50p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '2,51p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
     esac
 done
@@ -126,7 +127,14 @@ if [ "$UNIGNORE" -eq 1 ]; then
 fi
 
 # --- o reset: origem e destino -----------------------------------------------
-[ -z "$TO" ] || { echo "erro: o reset instala no usuário, em \$HOME; --to só vale com --unignore" >&2; exit 2; }
+# Um /anvil-update de instalação antiga, por projeto, chama o reset novo com --to:
+# a mensagem aponta o fluxo novo, que instala no usuário e migra o projeto.
+if [ -n "$TO" ]; then
+    echo "erro: o reset instala no usuário, em \$HOME; --to só vale com --unignore" >&2
+    [ -n "$FROM" ] && [ -f "$FROM/.claude/skills/anvil-update/SKILL.md" ] &&
+        echo "Este payload não instala mais no projeto. Siga o fluxo novo, em $FROM/.claude/skills/anvil-update/SKILL.md, a partir do dry-run: ele instala no usuário e migra este projeto." >&2
+    exit 2
+fi
 [ -n "$FROM" ] || { echo "erro: --from é obrigatório" >&2; exit 2; }
 [ -d "$FROM/.claude/skills" ] || { echo "erro: $FROM não parece um payload do anvil" >&2; exit 2; }
 [ -n "${HOME:-}" ] && [ -d "$HOME" ] || { echo "erro: \$HOME não é um diretório — é o destino da instalação" >&2; exit 2; }
