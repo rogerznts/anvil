@@ -125,7 +125,9 @@ Skills são para **ações**. Contexto de projeto mora em rules, nunca em skill.
 Quando uma destas skills chega ao fim, com sucesso ou bloqueada, a sessão
 principal invoca a skill `anvil-next` pela Skill tool, sem argumento, na mesma
 resposta, depois da conclusão da skill. Invocar é carregar a skill e seguir o
-formato dela; um prompt de próxima sessão escrito de memória não a substitui.
+formato dela; um prompt de próxima sessão escrito de memória não a substitui. O
+`anvil-next` vem no payload do anvil: invoque-o mesmo quando ele não aparecer na
+lista de skills do contexto, que o harness pode cortar.
 
 - `anvil-to-spec`
 - `anvil-to-tickets`
