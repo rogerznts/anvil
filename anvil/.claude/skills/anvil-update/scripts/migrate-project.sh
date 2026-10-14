@@ -302,10 +302,12 @@ rm_lock=""; [ "$has_lock" -eq 1 ] && take rm_lock ".claude/anvil.lock"
 rm_guard=""; take rm_guard "$GUARD_REF"
 
 # O que o .gitignore ignora não aparece no git status, e a remoção não seria
-# revisável nem se desfaria pelo git. O tracked não conta: ls-files -o só lista o
-# que o git não versiona.
+# revisável nem se desfaria pelo git. Conta só o item sem nada versionado: o
+# versionado com um ignorado solto dentro, como um .DS_Store, aparece no git
+# status ao sair, e o ignorado vai junto.
 ignored=""
 for x in $rm_skills $rm_agents $rm_mirror $rm_omp $rm_lock $rm_guard; do
+    [ -n "$(git -C "$ROOT" ls-files -- "$x")" ] && continue
     [ -z "$(git -C "$ROOT" ls-files -o -i --exclude-standard -- "$x")" ] || ignored="$ignored$x"$'\n'
 done
 if [ -n "$ignored" ]; then
