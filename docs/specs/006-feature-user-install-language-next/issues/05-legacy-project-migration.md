@@ -4,7 +4,8 @@
 
 **Blocked by:** 02, 03, 04
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=a2318309e7292ba0fe28690d9ac8a76e0f76eadf; scope=full; verdict=fail; p1=open
 
 - [x] Com lock no projeto, a migração remove:
   - as skills e os agentes listados no lock;
@@ -34,3 +35,13 @@
 - O aviso de perfil acusa a linha que cita `.claude/skills/<skill>/scripts/` ou `.claude/hooks/guard-spec-merge.sh` relativos ao projeto; `~/.claude/` e `$HOME/.claude/` não contam. Ele sai do mesmo script, em qualquer projeto, migrado ou não, e o update e o boot o mostram no dry-run da migração.
 - Não migrado neste ticket: este repositório ainda tem `.claude/hooks/guard-spec-merge.sh`, o hook dele no `.claude/settings.json`, os symlinks de `.claude/skills/anvil-*` do `dev-link` e o bloco de diretivas no `CLAUDE.md`, que aqui é instrução do repositório. Rodar a migração aqui tiraria tudo isso; quem decide é o ticket 06, que muda o `dev-link`, ou o operador.
 - Não pedido e não feito: o update não tira mais o bloco `ANVIL:INSTALLED` do `.gitignore` do projeto, como o ticket 03 registrou; só o passo 9 do boot o tira. Num projeto em que o `.gitignore` ignora `.claude/skills/`, a remoção das skills não aparece no `git status`.
+- Review round=1 · P1 (Standards): com o toolkit ignorado pelo `.gitignore` do projeto — o bloco `ANVIL:INSTALLED` ou a linha antiga, que o boot só tira no passo 9, depois de migrar no passo 2 —, a checagem de árvore limpa não vê os arquivos e a remoção não aparece no `git status`, ao contrário do que o script e as duas skills dizem; sem lock, a skill do usuário que ficou fora do `--keep-skills` some sem volta pelo git.
+- Review round=1 · P1 (Standards): o `.claude/settings.json` é regravado, ou apagado, através de symlink — com `.claude` apontando para fora, o settings compartilhado perde o hook sem nada no `git status`, contra o cabeçalho que promete deixar intocado o que passa por symlink.
+- Review round=1 · P1 (Spec): no `anvil-boot/SKILL.md`, o passo 2 manda "**Com instalação** → siga para o passo 3", e a subseção da migração vem depois desse desvio — o boot num projeto antigo, numa máquina que já tem a instalação de usuário, pula a migração, contra a linha 3 do ticket e a user story 39; o cenário só testava o boot numa máquina sem instalação.
+- Review round=1 · P2 (Spec): o README, o passo 5 do update e o passo 2 do boot prometem a remoção no `git status`, o que é falso com o toolkit ignorado pelo `.gitignore`; quem confere o `git status`, como pede a user story 37, não vê as skills, os agentes e o lock removidos. Mesma causa do primeiro P1 do Standards.
+- Review round=1 · P3 (Standards): `--keep-skills` sem `--keep-agents`, ou o contrário, marca a resposta como dada e tira todos os agentes, ou todas as skills — um esquecimento no comando apaga o que é do usuário, e só o dry-run mostra.
+- Review round=1 · P3 (Standards): qualquer menção a `.claude/hooks/guard-spec-merge.sh` no settings, numa string de `permissions` por exemplo, já conta como instalação antiga — o relatório diz "instalação antiga" sem nada a tirar e exige árvore limpa sem motivo.
+- Review round=1 · P3 (Standards): possível Duplicated Code — o awk de `block_lines`/`markers_ok` repete o de marcadores do `reset-install.sh`; uma correção de CRLF ou de marcador precisa ser feita nos dois.
+- Review round=1 · P3 (Standards): possível Duplicated Code/Shotgun Surgery — a árvore de decisão do dry-run se repete no passo 2 do boot e no passo 5 do update; mudar o comportamento do script exige editar as duas skills, e uma tende a ficar para trás.
+- Review round=1 · P3 (Spec): o `json.dump(indent=2)` regrava o settings inteiro; um settings com outra indentação ou com `\uXXXX` ganha mudança de formatação no diff além da remoção, contra o "settings fora da entrada do hook intocados" — o dry-run avisa.
+- Review round=1 · P3 (Spec): o aviso de perfil só desconta `~/.claude/`, `$HOME/.claude/` e `${HOME}/.claude/`; um perfil que cita `/Users/<u>/.claude/skills/x/scripts/` ou `"${HOME}"/.claude/...` recebe um `BOOT PENDENTE` falso.
