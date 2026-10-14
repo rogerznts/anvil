@@ -4,7 +4,7 @@
 
 **Blocked by:** 02
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=0fa89a3; scope=full; verdict=fail; p1=open
 
 - [x] O `reset-install` instala as skills e os agentes do payload em `~/.claude/skills/` e `~/.claude/agents/`, com o lock de usuário ao lado das skills e no formato de linhas de hoje (`skill:`, `agent:`, `omp:`).
@@ -45,3 +45,4 @@
 - Review round=1 · P3 (Standards): possível Repeated Switches no `case "$estado_diretivas"` em três lugares; dentro de `escreve_diretivas`, um estado fora da lista deixaria o temporário vazio e o `cat` apagaria o `~/.claude/CLAUDE.md` — hoje só o filtro de fora impede.
 - Review round=1 · P3 (Standards): possível Mysterious Name em `U` (a raiz do `HOME`) e em `raiz` (a raiz do projeto, ao lado de `raiz_espelho` e `raiz_omp`, que são o caminho que bloqueia) — confunde quem mantiver o script.
 - Review round=1 · P3 (Standards): possível Duplicated Code — o prólogo awk que tira espaço e `\r` do fim aparece seis vezes, e os prefixos `~/.claude/agents/`, `~/.agents/skills/` e `~/.omp/agent/` do relatório repetem em texto o que `$AGENTS`, `$ESPELHO` e `$OMP` derivam; mudar um destino exige editar dois lugares.
+- Correção dos P1 da rodada 1, em `af1459e`: o disco da camada passa a ser só `skills`, `rules`, `agents` e `hooks/pre` de `~/.omp/agent`, e o resto — sessões, bancos, cache, `config.yml` — sai do dry-run; com 15.500 arquivos em `~/.omp/agent/sessions/`, o dry-run leva 1 s e 77 linhas. O cenário ganhou o check "o que o omp guarda fora da camada não é listado", com sessões, `agent.db` e cache no `HOME` do caso 2: 56 checks, todos passando. O manual `anvil-omp` e o README dizem que quem roda o reset é o `/anvil-update`, e que o boot só o roda na primeira instalação.
