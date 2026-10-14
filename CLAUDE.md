@@ -148,7 +148,9 @@ A cauda não dispara:
 
 Fora da lista, o `anvil-next` roda só a pedido do usuário, e a skill termina sem
 prompt nem sugestão de próxima sessão. Esta lista é o único lugar a editar para
-mudar quais skills têm cauda.
+mudar quais skills têm cauda, com uma exceção: o `anvil-run` invoca o
+`anvil-next` com foco no próprio relatório final, e tirá-lo da lista não desliga
+isso — é a skill dele que muda.
 
 ## Citar id sempre com a glosa
 
