@@ -135,13 +135,16 @@ Só no omp o fluxo é conduzido, porque ele tem `task`, agentes próprios e sess
 filhas que nascem sem a conversa do pai — ver
 [adr-0011](docs/architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md).
 
-**Como a camada chega.** O `/anvil-boot` e o `/anvil-update` procuram o omp: o
+**Como a camada chega.** O reset da instalação de usuário procura o omp: o
 binário no `PATH`, o diretório `~/.omp/` ou uma linha `omp:` no lock de usuário,
 `~/.claude/anvil.lock`. Qualquer um basta, e a camada omp entra em `~/.omp/agent/`
-sem pergunta, com as diretivas do anvil como uma rule `alwaysApply`. A linha `omp:`
-a mantém no update de uma máquina sem os outros dois sinais. A mesma instalação
-mantém `~/.agents/skills`, por onde o Codex e o omp leem as skills: um symlink para
-`~/.claude/skills/<nome>` por skill do lock.
+sem pergunta à parte, com as diretivas do anvil como uma rule `alwaysApply`. A
+linha `omp:` a mantém no update de uma máquina sem os outros dois sinais. Quem roda
+o reset é o `/anvil-update`; o `/anvil-boot` só o roda na primeira instalação, sem
+`~/.claude/anvil.lock`, e numa máquina que ganhou o omp depois do anvil a camada
+chega no próximo `/anvil-update`. O mesmo reset mantém `~/.agents/skills`, por onde
+o Codex e o omp leem as skills: um symlink para `~/.claude/skills/<nome>` por skill
+do lock.
 
 **O que o omp ganha.** Lá, skill se chama por `/skill:<nome>`, e o boot é
 `/skill:anvil-boot`.

@@ -26,8 +26,8 @@ caminho relativo a `~/.omp/agent/`.
 
 ## Como a detecção decide
 
-O `/anvil-update` e o `/skill:anvil-boot` instalam a camada sem perguntar quando
-acham um destes sinais:
+O reset da instalação de usuário instala a camada, sem pergunta à parte, quando
+acha um destes sinais:
 
 - o binário `omp` no `PATH`;
 - o diretório `~/.omp/`;
@@ -37,6 +37,12 @@ Qualquer um basta. O terceiro torna a camada pegajosa: um update rodado sem os
 outros dois a mantém, atualizada. Sem sinal nenhum, a máquina não ganha
 `~/.omp/agent/`. O relatório e o dry-run dizem qual sinal decidiu e o que muda em
 `~/.omp/agent/`.
+
+Quem roda o reset é o `/anvil-update`, a cada troca de versão. O
+`/skill:anvil-boot` só o roda na primeira instalação, quando ainda não há
+`~/.claude/anvil.lock`; numa máquina já instalada, ele não toca na camada. Para
+pôr a camada numa máquina que ganhou o omp depois do anvil, rode o
+`/anvil-update`.
 
 Os seus arquivos em `~/.omp/agent/`, como `config.yml` e os agentes, rules e skills
 que você escreveu, ficam fora do lock e o update não os toca. A exceção é o arquivo
@@ -154,7 +160,8 @@ andam juntos. Sem os arquivos e com as linhas, o update seguinte vê a linha `om
 e reinstala tudo. Com os arquivos e sem as linhas, eles viram arquivos seus: nenhum
 update os atualiza nem remove.
 
-A remoção não sobrevive a uma máquina com omp. Se o próximo `/anvil-update` ou
-`/skill:anvil-boot` achar o binário `omp` no `PATH` ou o diretório `~/.omp/`, a
-detecção reinstala a camada como nova, com as linhas `omp:` de volta no lock. Ela
-só fica fora quando a máquina não tem nenhum dos dois.
+A remoção não sobrevive a uma máquina com omp. Se o próximo `/anvil-update` achar
+o binário `omp` no `PATH` ou o diretório `~/.omp/`, a detecção reinstala a camada
+como nova, com as linhas `omp:` de volta no lock. Ela só fica fora quando a
+máquina não tem nenhum dos dois. O `/skill:anvil-boot`, com o lock já instalado,
+não a reinstala.

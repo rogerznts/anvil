@@ -254,15 +254,21 @@ confere_raiz_omp() {
         if [ -d "$OMP/$f" ] && [ ! -L "$OMP/$f" ]; then raiz_omp="$f"; return; fi
     done
 }
+# O disco da camada e so o das pastas dela. O resto de ~/.omp/agent e do omp —
+# sessoes, bancos, cache, config.yml —, e listar milhares de arquivos ali afogaria
+# o dry-run. O orfao sai do lock, nao desta lista.
+PASTAS_OMP="skills rules agents hooks/pre"
 instala_omp=0
 disco_omp=""
 if [ -n "$sinais_omp" ] && [ -n "$novo_omp$possui_omp" ]; then
     confere_raiz_omp
     if [ -z "$raiz_omp" ]; then
         instala_omp=1
-        if [ -d "$OMP" ]; then
-            disco_omp="$(cd "$OMP" && find . \( -type f -o -type l \) | sed 's|^\./||' | LC_ALL=C sort)"
-        fi
+        for p in $PASTAS_OMP; do
+            [ -d "$OMP/$p" ] || continue
+            disco_omp="$disco_omp$(cd "$OMP" && find "$p" \( -type f -o -type l \))"$'\n'
+        done
+        disco_omp="$(printf '%s' "$disco_omp" | sed '/^$/d' | LC_ALL=C sort)"
     fi
 fi
 
