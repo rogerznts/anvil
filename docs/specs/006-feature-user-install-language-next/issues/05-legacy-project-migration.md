@@ -4,8 +4,9 @@
 
 **Blocked by:** 02, 03, 04
 
-**Status:** resolved
+**Status:** claimed
 **Review:** round=1; sha=a2318309e7292ba0fe28690d9ac8a76e0f76eadf; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=c260570910ecca08efe73b2ec374f20fff081b49; scope=diff:a231830..c260570; verdict=fail; p1=open
 
 - [x] Com lock no projeto, a migração remove:
   - as skills e os agentes listados no lock;
@@ -46,3 +47,12 @@
 - Review round=1 · P3 (Spec): o `json.dump(indent=2)` regrava o settings inteiro; um settings com outra indentação ou com `\uXXXX` ganha mudança de formatação no diff além da remoção, contra o "settings fora da entrada do hook intocados" — o dry-run avisa.
 - Review round=1 · P3 (Spec): o aviso de perfil só desconta `~/.claude/`, `$HOME/.claude/` e `${HOME}/.claude/`; um perfil que cita `/Users/<u>/.claude/skills/x/scripts/` ou `"${HOME}"/.claude/...` recebe um `BOOT PENDENTE` falso.
 - Correção dos P1 da rodada 1: (1) o script para com código 2, sem tocar em nada, quando algo que sairia está ignorado pelo `.gitignore` e fora do git, nomeia o que está ignorado e aponta o passo 9 do boot; o passo 2 do boot manda fazer o passo 9 nesse caso e o passo 5 do update aponta o boot — com isso a remoção sempre aparece no `git status`, como os três contratos dizem, e o comentário acima sobre o `.gitignore` deixa de valer para a migração; (2) o `.claude/settings.json` e o `CLAUDE.md` que são symlink, ou estão atrás de um diretório symlink, ficam intocados e saem no grupo "passa por symlink" do relatório; (3) no passo 2 do boot, "**Com instalação**" segue para a migração, e não mais para o passo 3. De passagem, o P3 das respostas: `--keep-skills` e `--keep-agents` só valem juntos. O cenário ganhou o boot numa máquina com instalação, o toolkit ignorado, o `.claude` e o `CLAUDE.md` como symlink e a resposta pela metade: 56 checks, todos passando, e os cinco novos falhavam antes da correção.
+- Review round=2 · P1 de round=1 remedidos: os três estão resolvidos nos dois eixos — o toolkit ignorado faz o script parar antes de escrever, o settings e o `CLAUDE.md` através de symlink ficam intocados, e o boot com instalação existente segue para a migração; o cenário passa nos 56 checks rodado sozinho.
+- Review round=2 · P1 (Standards): regressão da correção — a checagem `git ls-files -o -i --exclude-standard -- "$x"` recusa um item versionado que só tem dentro um arquivo solto ignorado, como `.DS_Store` ou `__pycache__/`, e nomeia o diretório inteiro; o passo 9 do boot não acha linha do anvil para tirar, e o boot e o update ficam em laço sem conseguir migrar um projeto cuja remoção apareceria no `git status` — comum no macOS. Saídas apontadas: tratar como ignorado só o item sem nada versionado (`git ls-files -- "$x"` vazio), ou listar os arquivos ignorados em si.
+- Review round=2 · P2 (Spec): a recusa por item ignorado faz o `/anvil-update` parar e apontar o boot, contra o "migra esse projeto na mesma execução" da spec (`spec.md:298-299`) e da linha 3 do ticket, justo no caso do bloco `ANVIL:INSTALLED`; a divergência só está neste `## Comments`, e quem lê a spec espera migrar só pelo update.
+- Review round=2 · P2 (Spec): o `--exclude-standard` também lê `.git/info/exclude`, o excludes global e linhas que o usuário escreveu, que o passo 9 manda não tocar — nesses casos o "faça o passo 9 e rode de novo" entra em laço sem saída, e a mensagem culpa "o .gitignore do projeto" quando a regra vem de outro lugar.
+- Review round=2 · P2 (Spec): o `CLAUDE.md` que é symlink fica intocado mesmo com o alvo dentro do repositório, como no comum `CLAUDE.md → AGENTS.md`; o bloco `ANVIL:DIRECTIVES` velho fica, o script diz "pronto", contra a linha 17 do ticket, e as skills não dizem o que fazer com o item do grupo "passa por symlink".
+- Review round=2 · P2 (Spec): o caminho novo do boot — passo 9 com `--unignore`, commit, migração — não é exercitado; o cenário desfaz o ignore com `git rm .gitignore`, e a orientação do `SKILL.md` fica sem prova de ponta a ponta.
+- Review round=2 · P3 (Standards): um `CLAUDE.md` ou um settings que é symlink para um arquivo com o bloco ou com a guarda de usuário — o `~/.claude/CLAUDE.md`, por exemplo — conta como instalação antiga; o projeto passa a exigir árvore limpa e recebe um relatório de migração sem nada a tirar.
+- Review round=2 · P3 (Spec): sem lock, a saída com código 3 vem antes da checagem de itens ignorados — o usuário responde quais skills são dele e só na rodada seguinte descobre o `.gitignore`.
+- Rodada 2 reprovada: pela regra de `docs/agents/verification.md`, a verificação para aqui e entrega ao operador o P1 aberto acima; a terceira rodada é escolha dele. Custo: a rodada 1 achou três P1, corrigidos em `c260570`; a rodada 2 achou um P1 novo, criado pela correção do primeiro.
