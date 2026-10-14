@@ -89,8 +89,9 @@ A fronteira é uma só:
 - **Inglês** — código: identificadores, comandos, caminhos, nomes de arquivo,
   chaves de YAML e mensagens de commit.
 
-O idioma de comunicação é o que as regras do projeto declaram; sem declaração, é
-pt-BR. O inglês no código não muda.
+O idioma de comunicação é o que as regras do projeto declaram, mesmo quando o
+usuário escreve em outro idioma; sem declaração, é pt-BR. O inglês no código não
+muda.
 
 Isso vale **independentemente do idioma das skills**, que são escritas em inglês
 porque vêm de repositórios upstream e não são traduzidas. Uma skill em inglês
