@@ -839,6 +839,15 @@ PYEOF
         done < <(autoload_of "$f")
     done
 
+    # Skill da camada e condutor, piloto ou manual: nenhuma pode ser disparada por um
+    # modelo por conta propria (spec 003, spec 008). Sem a trava, o omp a oferece ao
+    # modelo como qualquer skill. A leitura da trava e a do tem_trava.
+    echo "17. skill da camada omp tem trava de invocação"
+    for f in "$camada"/skills/*/SKILL.md; do
+        [ -f "$f" ] || continue
+        tem_trava "$f" || { echo "   FALHA .omp-layer/${f#"$camada"/}: sem trava de invocacao"; falhas=$((falhas+1)); }
+    done
+
     echo
     if [ "$falhas" -eq 0 ]; then echo "verify: limpo"; return 0; fi
     echo "verify: $falhas falha(s)"; return 1
