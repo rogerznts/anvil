@@ -4,13 +4,18 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] A seção da spec 006 aponta a origem: a pasta arquivada da 006 e o ticket 05.
-- [ ] Uma linha por P3, cada uma com a consequência:
+- [x] A seção da spec 006 aponta a origem: a pasta arquivada da 006 e o ticket 05.
+- [x] Uma linha por P3, cada uma com a consequência:
   - qualquer menção à guarda no settings, numa string de `permissions` por exemplo, faz o projeto contar como instalação antiga;
   - o awk de marcadores da migração repete o do `reset-install.sh`;
   - a árvore de decisão do dry-run se repete no passo 2 do boot e no passo 5 do update;
   - o `json.dump` regrava a formatação do settings inteiro;
   - o aviso de perfil acusa `/Users/<u>/.claude/...` e `"${HOME}"/.claude/...` como caminho da instalação por projeto.
-- [ ] As linhas seguem a numeração `A<n>` do arquivo, a partir da próxima livre.
+- [x] As linhas seguem a numeração `A<n>` do arquivo, a partir da próxima livre.
+
+## Comments
+
+- Seção `## Spec 006` em `docs/project/acompanhamento.md`, linhas A15 a A19, na ordem dos critérios. A próxima livre é a A15: a A13 já foi usada e saiu do arquivo em `a2a3bdd`, e o arquivo não reaproveita número — a A14 ficou com o seu depois disso.
+- Sem teste: o ticket é só documentação, e a spec diz que texto sem seam executável se confere lendo. Cada consequência foi conferida contra o `migrate-project.sh` atual: o `grep -qF` da guarda no settings inteiro, o `json.dump(indent=2)`, o regex do aviso de perfil e o awk de marcadores comentado "como o reset-install".
