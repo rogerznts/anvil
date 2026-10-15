@@ -22,7 +22,7 @@ mais de uma spec:
     roadmap.md           o roteiro do piloto automático (anvil-auto): uma seção
                          "## nome" por entrada, com Tipo:, Depende de: e, depois
                          que a spec nasce, Spec:. Escrito pelo piloto no fim do
-                         grill, depois do sim do operador
+                         grill e commitado na main depois do sim do operador
     report.md            o relatório da execução do piloto, escrito por ele e
                          commitado na main a cada fronteira de spec
 

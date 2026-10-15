@@ -2,7 +2,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=5dc530a; scope=full; verdict=fail; p1=open
 
 **What to build:** o operador, e mais tarde o piloto e o verbo `index`, roda o

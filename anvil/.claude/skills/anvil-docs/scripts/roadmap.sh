@@ -16,7 +16,8 @@
 #   refusal: <motivo>, uma por problema, quando o roteiro nao pode terminar: nome
 #          repetido, Depende de: para nome inexistente, ciclo, Tipo: fora dos tipos
 #          do new-spec.sh. Com recusa nao ha entry nem frontier, o next e none e o
-#          script sai com 2, como o frontier.sh; argumento invalido tambem
+#          script sai com 2, como o frontier.sh. Argumento invalido e chamada fora
+#          de um repositorio git saem so com a linha refusal:, tambem com 2
 #
 # Estado, lido do checkout atual e, para spec aberta, do commit do branch local
 # de spec com o mesmo numero, sem trocar de checkout:
@@ -30,7 +31,7 @@
 set -u
 
 roadmap=docs/specs/roadmap.md
-US=$'\037'
+FIELD_SEP=$'\037'
 # Os tipos do new-spec.sh da anvil-to-spec, que o piloto chama com o Tipo: da entrada.
 TYPES="feature fix hotfix gmud refactor experimental extension"
 
@@ -39,7 +40,7 @@ refuse() { echo "refusal: $1"; exit 2; }
 skip=""
 while [ $# -gt 0 ]; do
     case "$1" in
-        --skip) [ $# -ge 2 ] || refuse "--skip pede a lista de entradas"; skip="$skip ${2//,/ }"; shift 2 ;;
+        --skip) [ $# -ge 2 ] || refuse "--skip pede a lista de entradas"; skip="$skip $2"; shift 2 ;;
         *) refuse "argumento desconhecido '$1'; o único é --skip \"nome nome\"" ;;
     esac
 done
@@ -56,10 +57,11 @@ fi
 # --- roteiro ------------------------------------------------------------------
 # Cada entrada e uma secao "## nome". As chaves sao linhas "Chave: valor" no
 # comeco da linha, com ou sem negrito, como o Status: dos tickets; vale a primeira
-# de cada chave na secao. Sai uma linha por entrada, campos separados por US:
-# nome, Tipo, Depende de (nomes separados por virgula, sem espacos) e Spec.
+# de cada chave na secao. Sai uma linha por entrada, campos separados por
+# FIELD_SEP: nome, Tipo, Depende de (nomes separados por virgula, sem espacos) e
+# Spec.
 parse() {
-    awk -v US="$US" '
+    awk -v FS_OUT="$FIELD_SEP" '
         function trim(s) { sub(/^[ \t]+/, "", s); sub(/[ \t\r]+$/, "", s); return s }
         function val(line, k) {
             got = match(line, "^\\**" k "\\**:\\**")
@@ -67,31 +69,29 @@ parse() {
         }
         /^## / { n++; name[n] = trim(substr($0, 4)); next }
         n == 0 { next }
-        { v = val($0, "Tipo") }       got && !(n in tipo) { tipo[n] = v }
-        { v = val($0, "Depende de") } got && !(n in dep)  { dep[n] = v }
+        { v = val($0, "Tipo") }       got && !(n in etype) { etype[n] = v }
+        { v = val($0, "Depende de") } got && !(n in edeps) { edeps[n] = v }
         { v = val($0, "Spec") }       got && !(n in spec) { spec[n] = v }
         END {
             for (i = 1; i <= n; i++) {
-                k = split(dep[i], parts, ","); d = ""
+                k = split(edeps[i], parts, ","); d = ""
                 for (j = 1; j <= k; j++) { p = trim(parts[j]); if (p != "") d = d (d == "" ? "" : ",") p }
-                print name[i] US tipo[i] US d US spec[i]
+                print name[i] FS_OUT etype[i] FS_OUT d FS_OUT spec[i]
             }
         }
     ' "$roadmap"
 }
 
-count=0
-while IFS="$US" read -r n t d s; do
-    count=$((count + 1))
-    name[count]="$n"; tipo[count]="$t"; deps[count]="${d//,/ }"; spec[count]="$s"
-done <<EOF
-$(parse)
-EOF
-[ -n "${name[1]:-}" ] || count=0
+# entries: os indices das entradas, na ordem do arquivo, para os lacos.
+entries=""; count=0
+while IFS="$FIELD_SEP" read -r n t d s; do
+    count=$((count + 1)); entries="$entries $count"
+    name[count]="$n"; entry_type[count]="$t"; deps[count]="${d//,/ }"; spec[count]="$s"
+done < <(parse)
 
 index_of() {  # <nome>: o indice da primeira entrada com o nome, ou nada
     local i
-    for i in $(seq 1 "$count"); do [ "${name[i]}" = "$1" ] && { echo "$i"; return; }; done
+    for i in $entries; do [ "${name[i]}" = "$1" ] && { echo "$i"; return; }; done
 }
 has() { case " $1 " in *" $2 "*) return 0 ;; esac; return 1; }
 
@@ -101,11 +101,11 @@ has() { case " $1 " in *" $2 "*) return 0 ;; esac; return 1; }
 # refusal: por problema, sem frontier.
 refusals=""
 add_refusal() { refusals="$refusals$1"$'\n'; }
-for i in $(seq 1 "$count"); do
+for i in $entries; do
     [ "$(index_of "${name[i]}")" = "$i" ] ||
         add_refusal "nome repetido: a entrada '${name[i]}' aparece mais de uma vez"
-    case "${tipo[i]}" in *[[:space:]]*) false ;; *) has "$TYPES" "${tipo[i]}" ;; esac ||
-        add_refusal "a entrada '${name[i]}' tem Tipo: '${tipo[i]}', e o new-spec.sh aceita: $TYPES"
+    case "${entry_type[i]}" in *[[:space:]]*) false ;; *) has "$TYPES" "${entry_type[i]}" ;; esac ||
+        add_refusal "a entrada '${name[i]}' tem Tipo: '${entry_type[i]}', e o new-spec.sh aceita: $TYPES"
     for d in ${deps[i]}; do
         [ -n "$(index_of "$d")" ] || add_refusal "a entrada '${name[i]}' depende de '$d', que não existe no roteiro"
     done
@@ -113,7 +113,7 @@ done
 # Ciclo: tira, rodada a rodada, as entradas cujas dependencias existentes ja
 # sairam. Toda que sobra tem uma dependencia que tambem sobrou, e seguir essas
 # dependencias a partir dela fecha um ciclo, que sai no motivo.
-left=" $(seq 1 "$count" | tr '\n' ' ')"; changed=1
+left="$entries "; changed=1
 while [ "$changed" = 1 ]; do
     changed=0
     for i in $left; do
@@ -198,18 +198,18 @@ read_blockers() {
 # O status do ticket n da spec que o spec_state esta lendo.
 resolved() { [ "${tstatus[$1]:-}" = resolved ]; }
 
-# Estado de uma spec achada fora de archive/, em st e rs. open quando falta
-# spec.md ou ticket de implementacao, ou quando ha ticket a despachar. stopped
-# quando nao ha. Ticket de implementacao e o sem Type:, como no stage.sh da
-# anvil-plan: com Type:, e decisao do wayfinder. A despachar e o que o frontier.sh
-# da anvil-run poe no frontier, lido como ele le, sobre todos os tickets: nao
-# resolved, nao travado, com o Blocked by legivel e todo resolved.
+# Estado de uma spec achada fora de archive/, em found_state e found_reason. open
+# quando falta spec.md ou ticket de implementacao, ou quando ha ticket a
+# despachar. stopped quando nao ha. Ticket de implementacao e o sem Type:, como no
+# stage.sh da anvil-plan: com Type:, e decisao do wayfinder. A despachar e o que o
+# frontier.sh da anvil-run poe no frontier, lido como ele le, sobre todos os
+# tickets: nao resolved, nao travado, com o Blocked by legivel e todo resolved.
 spec_state() {  # <fonte> <pasta> <onde>
     local src="$1" dir="$2" where="$3" f p n text review round verdict
     local order="" impl=0 ready="" locked="" closure changed rest="" all_resolved=yes
     local -a tstatus tblockers tunreadable tlocked tlabel
     if ! has "$(src_entries "$src" "$dir" f | tr '\n' ' ')" spec.md; then
-        st=open; rs="$dir sem spec.md ($where)"; return
+        found_state=open; found_reason="$dir sem spec.md ($where)"; return
     fi
     for f in $(src_entries "$src" "$dir/issues" f); do
         case "$f" in [0-9]*.md) ;; *) continue ;; esac
@@ -226,7 +226,7 @@ spec_state() {  # <fonte> <pasta> <onde>
         [ -n "$round" ] && [ "$round" -ge 2 ] && [ "$verdict" = fail ] && tlocked[n]=1
         order="$order $n"
     done
-    if [ "$impl" = 0 ]; then st=open; rs="$dir sem ticket de implementação ($where)"; return; fi
+    if [ "$impl" = 0 ]; then found_state=open; found_reason="$dir sem ticket de implementação ($where)"; return; fi
     for n in $order; do
         resolved "$n" && continue
         all_resolved=no
@@ -235,9 +235,9 @@ spec_state() {  # <fonte> <pasta> <onde>
         p=yes; for f in ${tblockers[n]}; do resolved "$f" || p=no; done
         [ "$p" = yes ] && ready="$ready ${tlabel[n]}"
     done
-    if [ -n "$ready" ]; then st=open; rs="ticket a despachar:$ready ($where)"; return; fi
-    st=stopped
-    if [ "$all_resolved" = yes ]; then rs="todos os tickets resolved, e a spec sem archive ($where)"; return; fi
+    if [ -n "$ready" ]; then found_state=open; found_reason="ticket a despachar:$ready ($where)"; return; fi
+    found_state=stopped
+    if [ "$all_resolved" = yes ]; then found_reason="todos os tickets resolved, e a spec sem archive ($where)"; return; fi
     # Quem depende de um travado, direta ou indiretamente, e ainda nao esta resolvido.
     closure=" "; for n in $order; do [ -n "${tlocked[n]}" ] && closure="$closure$n "; done
     changed=1
@@ -258,22 +258,22 @@ spec_state() {  # <fonte> <pasta> <onde>
         else rest="$rest ${tlabel[n]}"
         fi
     done
-    rs=""
-    [ -z "$locked" ] || rs="travado (round 2 ou mais com verdict=fail):$locked"
-    [ -z "$dependents" ] || rs="${rs:+$rs; }dependem de travado:$dependents"
-    [ -z "$rest" ] || rs="${rs:+$rs; }sem como despachar (Blocked by ilegível ou que nunca se resolve):$rest"
-    rs="nenhum ticket a despachar: $rs ($where)"
+    found_reason=""
+    [ -z "$locked" ] || found_reason="travado (round 2 ou mais com verdict=fail):$locked"
+    [ -z "$dependents" ] || found_reason="${found_reason:+$found_reason; }dependem de travado:$dependents"
+    [ -z "$rest" ] || found_reason="${found_reason:+$found_reason; }sem como despachar (Blocked by ilegível ou que nunca se resolve):$rest"
+    found_reason="nenhum ticket a despachar: $found_reason ($where)"
 }
 
-entry_state() {  # <Spec:>: o estado da entrada em st e rs
+entry_state() {  # <Spec:>: o estado da entrada em found_state e found_reason
     local s="$1" num dir br src where
     case "$s" in
-        "") st=pending; rs="sem Spec:"; return ;;
-        *[!0-9]*) st=stopped; rs="o Spec: '$s' não é um número de spec"; return ;;
+        "") found_state=pending; found_reason="sem Spec:"; return ;;
+        *[!0-9]*) found_state=stopped; found_reason="o Spec: '$s' não é um número de spec"; return ;;
     esac
     num=$((10#$s))
     dir="$(spec_dir_in "" docs/specs/archive "$num")"
-    if [ -n "$dir" ]; then st=closed; rs="arquivada em $dir"; return; fi
+    if [ -n "$dir" ]; then found_state=closed; found_reason="arquivada em $dir"; return; fi
     br="$(branch_of "$num")"
     if [ -n "$br" ] && [ "$br" != "$current" ]; then src="$br"; where="branch $br"
     else src=""; where="checkout atual${current:+, $current}"
@@ -281,27 +281,27 @@ entry_state() {  # <Spec:>: o estado da entrada em st e rs
     if [ -n "$src" ]; then
         dir="$(spec_dir_in "$src" docs/specs/archive "$num")"
         if [ -n "$dir" ]; then
-            st=stopped; rs="arquivada no branch $br e ainda sem merge: espera o merge do PR"; return
+            found_state=stopped; found_reason="arquivada no branch $br e ainda sem merge: espera o merge do PR"; return
         fi
     fi
     dir="$(spec_dir_in "$src" docs/specs "$num")"
     if [ -n "$dir" ]; then spec_state "$src" "$dir" "$where"; return; fi
     if [ -n "$br" ]; then
-        st=open; rs="o branch $br ainda não tem a pasta docs/specs/$s-* commitada"
+        found_state=open; found_reason="o branch $br ainda não tem a pasta docs/specs/$s-* commitada"
     else
-        st=stopped; rs="nem pasta docs/specs/$s-* nem branch local de spec com o número $s"
+        found_state=stopped; found_reason="nem pasta docs/specs/$s-* nem branch local de spec com o número $s"
     fi
 }
 
-for i in $(seq 1 "$count"); do
-    entry_state "${spec[i]}"; state[i]="$st"; reason[i]="$rs"
+for i in $entries; do
+    entry_state "${spec[i]}"; state[i]="$found_state"; reason[i]="$found_reason"
 done
 
 # Frontier: pending com todas as dependencias closed, na ordem do arquivo, menos
 # as do --skip. A dependente transitiva de uma stopped nunca entra: alguma
 # dependencia dela nunca chega a closed.
 frontier=""
-for i in $(seq 1 "$count"); do
+for i in $entries; do
     [ "${state[i]}" = pending ] || continue
     waiting=""
     for d in ${deps[i]}; do
@@ -316,7 +316,7 @@ done
 
 or_dash() { [ -n "$1" ] && echo "$1" || echo "-"; }
 echo "roadmap: $roadmap"
-for i in $(seq 1 "$count"); do
+for i in $entries; do
     deplist="${deps[i]// /,}"
     echo "entry: ${name[i]} state=${state[i]} spec=$(or_dash "${spec[i]}") depends=$(or_dash "$deplist") reason=${reason[i]}"
 done
