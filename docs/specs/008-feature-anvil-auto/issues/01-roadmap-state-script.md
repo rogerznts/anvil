@@ -4,6 +4,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=5dc530a; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=857800b; scope=diff:5dc530a..857800b; verdict=pass; p1=none
 
 **What to build:** o operador, e mais tarde o piloto e o verbo `index`, roda o
 script de estado do roteiro na raiz de um projeto. O script lê
@@ -62,3 +63,7 @@ repositório e no `README` de `docs/specs/`. Esses três lugares registram que
 - Review round=1 · P3 (Spec): a saída 2 da recusa só está no cabeçalho do script — o índice (ticket 02) precisa saber que a recusa sai com 2 para não tratá-la como falha.
 - Review round=1 · P3 (Spec): spec cujos únicos tickets têm `Type:` (decisões do wayfinder), todos `resolved`, sai `open … sem ticket de implementação`, e a tabela da spec diria `stopped` — o índice mostraria "em andamento" numa spec parada.
 - Review round=1 · P3 (Spec): o `docs/specs/README.md` diz que o roteiro é escrito "depois do sim do operador", e a spec manda escrevê-lo e mostrá-lo antes do sim, com só o commit depois — quem ler só o README acha que o arquivo não existe enquanto o roteiro espera confirmação.
+- Review round=2 · P2 (Standards): segue aberta a cópia do `frontier.sh` e do `VALID` do `new-spec.sh` marcada só no `roadmap.sh` (o `frontier.sh` está fora do escopo da spec 008) — quem mudar o gêmeo não sabe do `roadmap.sh`, e o roteiro diverge da `anvil-run`.
+- Review round=2 · P3 (Spec): segue aberto que a saída 2 da recusa só está no cabeçalho do script — o índice (ticket 02) pode tratar a recusa como falha.
+- Review round=2 · P3 (Spec): segue aberto que spec só com tickets `Type:`, todos `resolved`, sai `open` — o índice mostraria "em andamento" numa spec parada.
+- Review round=2 · P3 (Spec): sem a vírgula no `--skip`, `--skip a,b` é lido como um nome inexistente e ignorado sem aviso — quem errar a sintaxe vê a entrada que devia pular voltar como `next`.
