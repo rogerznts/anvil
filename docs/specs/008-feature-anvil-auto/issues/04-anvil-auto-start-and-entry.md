@@ -3,6 +3,7 @@
 **Blocked by:** 01
 
 **Status:** resolved
+**Review:** round=1; sha=f6625bd; scope=full; verdict=pass; p1=none
 
 **What to build:** o operador chama `/skill:anvil-auto` no omp com um pedido. O
 piloto é uma skill nova da camada omp, ao lado de `anvil-plan` e `anvil-run`, com
@@ -69,3 +70,14 @@ A entrada pelo bench fica com o ticket 10. Aqui a entrada é só o `anvil-grill`
 - O manual `anvil-omp` ainda diz que a camada traz as skills `anvil-plan`,
   `anvil-run` e o próprio manual. A correção fica com o ticket 11, junto da seção do
   piloto.
+- Review round=1 · P2 (Spec): o caso I do S2 não passa pelo caminho de escrever o roteiro, receber a recusa do `roadmap.sh` e voltar ao grill — uma regressão nessa regra da seção "Escrever e validar" passaria pelo S2 sem ser vista.
+- Review round=1 · P2 (Standards): possível Feature Envy — o piloto consome o `stage.sh` da `anvil-plan`, cuja linha `do:` manda propor a etapa num branch de spec aberta, e a skill não manda ignorá-la — a recusa interina do passo 4, que vale até o ticket 06, pode virar proposta de etapa, e isso nunca foi visto rodando.
+- Review round=1 · P3 (Spec): o caso E só exercita a cópia de um CSV, e não a extração do texto de um anexo que não é texto — um erro na extração passaria sem ser notado.
+- Review round=1 · P3 (Spec): o commit do sim usa `git add -A` e leva anexos, ADRs e glossário, mas a mensagem cita só o roteiro — quem ler o log não vê pela mensagem que o commit traz mais que o roteiro.
+- Review round=1 · P3 (Spec): o `anvil-update/SKILL.md` diz que o piloto leva o roteiro "do grill ao fechamento", e neste HEAD ele para no roteiro pronto — quem instalar este estado do branch espera a corrente, que só chega com o ticket 05.
+- Review round=1 · P3 (Spec): as linhas `do:` do `stage.sh` contradizem a recusa interina num branch de spec aberta, e nenhum caso do S2 cobre esse branch — até o ticket 06, o modelo pode propor uma etapa em vez de recusar.
+- Review round=1 · P3 (Spec): o check 15 não enxerga os caminhos com `~/` que o `anvil-auto` cita, então o S3 não confere os caminhos citados que a spec menciona — um caminho quebrado no futuro passaria pelo verify.
+- Review round=1 · P3 (Standards): possível Duplicated Code — o exemplo do roteiro no `anvil-auto` repete o da seção "Roteiro e relatório" do perfil do tracker — uma mudança de formato exige editar os dois lugares.
+- Review round=1 · P3 (Standards): o `anvil-update/SKILL.md` diz "do grill ao fechamento", e neste HEAD o piloto para no roteiro — a frase fica falsa se o branch for mesclado antes dos tickets seguintes.
+- Review round=1 · P3 (Standards): o comentário do check 16 do `vendor-sync.sh` ainda trata como válida uma skill da camada sem trava, e o check 17 agora a proíbe — quem ler o script pode supor que uma skill da camada cabe em `autoloadSkills`.
+- Review round=1 · P3 (Standards): o comentário de implementação diz "nos dois bash" sem dizer quais (o do `PATH` e o `/bin/bash` 3.2, pelo `BASH_BIN`) — quem refizer a prova não sabe em que versões ela rodou.
