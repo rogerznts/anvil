@@ -68,7 +68,18 @@ não estar instalado é a primeira trava. A segunda é a recusa: o `reset-instal
 não instala quando alguma skill, agente ou arquivo da camada omp do payload é
 symlink no diretório do usuário. A recusa vem antes de qualquer escrita, no
 dry-run também, e aponta o `dev-link.sh --unlink`. Para voltar à instalação
-publicada, rode o `--unlink` e depois o update.
+publicada, rode o `--unlink` e depois a instalação de máquina nova — o
+`/anvil-update` não serve, porque não está instalado aqui:
+
+```bash
+TMP="$(mktemp -d)" && npx degit rogerznts/anvil/anvil "$TMP"
+bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --dry-run --from "$TMP"
+bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP"
+```
+
+São os comandos da seção de instalação que o `anvil-boot/SKILL.md` escreve no
+`anvil.md` dos projetos: o segundo mostra o que entra e o que fica; o terceiro
+instala.
 
 ## Mudança em skill vendorizada
 

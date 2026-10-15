@@ -87,8 +87,9 @@ sessão principal invoca o `anvil-next`. No omp, a diretiva segue entregue como 
 `alwaysApply` em `~/.omp/agent/rules/`, por decisão do operador, porque é o único
 caminho que alcança o omp no nível de usuário: ele não lê o `~/.claude/CLAUDE.md`.
 
-Medido no `workspace/37-language-tail/s2.sh` com `USER_INSTALL=1`, três execuções
-por caso, com a diretiva como rule de usuário:
+Medido no ticket 03 da spec 006, com a diretiva como rule de usuário e três
+execuções por caso; método e números no `## Comments` do
+[ticket](../../specs/archive/006-feature-user-install-language-next/issues/03-reset-install-to-user-and-boot.md):
 
 - **o idioma melhorou** — rules em `English.` com pedido em pt-BR saem em inglês em
   2 de 3; antes, com a diretiva no `CLAUDE.md` do projeto, em nenhuma;
