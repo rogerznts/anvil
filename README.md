@@ -343,9 +343,13 @@ Um projeto instalado do jeito antigo, com cópia do toolkit nele, é migrado pel
 symlinks de `.agents/skills`, os arquivos de `.omp/` do lock, a guarda copiada com
 o hook dela no `.claude/settings.json` e o bloco `ANVIL:DIRECTIVES` do `CLAUDE.md`.
 O que é do projeto fica. Sem lock, ela pergunta antes quais skills e agentes não
-vieram do anvil. Exige árvore limpa e o toolkit fora do `.gitignore`, mostra um
-dry-run, espera aprovação e nunca commita: a remoção fica no `git status` para
-você revisar.
+vieram do anvil. Exige árvore limpa, mostra um dry-run, espera aprovação e nunca
+commita. O que sai fica em duas partes: o que o git conhece aparece no
+`git status` para você revisar; o que está fora do git — o toolkit ignorado por um
+`.gitignore` antigo, pelo `.git/info/exclude` ou pelo excludes global, e o arquivo
+ignorado dentro de item versionado, como um `.DS_Store` — sai junto e aparece,
+arquivo por arquivo, no grupo "sai junto, fora do git, sem volta pelo git" do
+dry-run.
 
 ---
 

@@ -33,11 +33,18 @@
 # symlink fica intocado, e o CLAUDE.md e o settings que são symlink também. O item
 # que é ele mesmo symlink, como o do espelho, sai como link, sem tocar o alvo.
 #
-# Exige repositório git com árvore limpa, e nada do que sai ignorado pelo
-# .gitignore, para que o diff da remoção seja revisável; nunca commita. Rodado em
-# qualquer projeto, confere também os perfis de docs/agents/: perfil que cita
-# script pelo caminho da instalação por projeto sai como BOOT PENDENTE, migrado ou
-# não.
+# Exige repositório git com árvore limpa e nunca commita. O que sai fica em duas
+# partes. O que o git conhece aparece no git status depois da execução, e o diff
+# da remoção é revisável. O que está fora do git — o item sem nada versionado e o
+# arquivo ignorado dentro de item versionado, como um .DS_Store — sai junto, sem
+# volta pelo git, e o relatório o lista arquivo por arquivo no grupo "sai junto,
+# fora do git, sem volta pelo git", no dry-run e na execução. A regra de ignore,
+# venha do .gitignore, do .git/info/exclude ou do excludes global, não faz a
+# migração parar.
+#
+# Rodado em qualquer projeto, confere também os perfis de docs/agents/: perfil que
+# cita script pelo caminho da instalação por projeto sai como BOOT PENDENTE,
+# migrado ou não.
 #
 #   migrate-project.sh [--dry-run] [--keep-skills "<nomes>" --keep-agents "<nomes>"]
 #
@@ -56,7 +63,7 @@ while [ $# -gt 0 ]; do
             [ $# -ge 2 ] || { echo "erro: $1 pede a lista de nomes, \"\" se nenhum" >&2; exit 2; }
             if [ "$1" = --keep-skills ]; then KEEP_SKILLS="$2"; KS=1; else KEEP_AGENTS="$2"; KA=1; fi
             shift 2 ;;
-        -h|--help) sed -n '2,47p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '2,54p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
     esac
 done
@@ -301,20 +308,19 @@ done
 rm_lock=""; [ "$has_lock" -eq 1 ] && take rm_lock ".claude/anvil.lock"
 rm_guard=""; take rm_guard "$GUARD_REF"
 
-# O que o .gitignore ignora não aparece no git status, e a remoção não seria
-# revisável nem se desfaria pelo git. Conta só o item sem nada versionado: o
-# versionado com um ignorado solto dentro, como um .DS_Store, aparece no git
-# status ao sair, e o ignorado vai junto.
-ignored=""
-for x in $rm_skills $rm_agents $rm_mirror $rm_omp $rm_lock $rm_guard; do
-    [ -n "$(git -C "$ROOT" ls-files -- "$x")" ] && continue
-    [ -z "$(git -C "$ROOT" ls-files -o -i --exclude-standard -- "$x")" ] || ignored="$ignored$x"$'\n'
-done
-if [ -n "$ignored" ]; then
-    echo "erro: o .gitignore do projeto ignora parte do que a migração tiraria, e a remoção não apareceria no git status. Nada foi alterado. Ignorados ($(count "$ignored")):" >&2
-    printf '%s' "$ignored" | sed 's/^/  /' >&2
-    echo "Tire do .gitignore as linhas que ignoram o toolkit — o passo 9 do /anvil-boot faz isso, com aprovação —, commite o que passar a aparecer e rode de novo." >&2
-    exit 2
+# O que sai fica em duas partes. O que o git conhece aparece no git status depois
+# da execução. O que o git ignora, venha a regra de onde vier, sai junto sem
+# aparecer lá: o item sem nada versionado e o ignorado dentro de item versionado.
+# Esse vai para o relatório, arquivo por arquivo. A árvore limpa garante que não
+# há, no caminho, arquivo não versionado e não ignorado.
+gone="$rm_skills$rm_agents$rm_mirror$rm_omp$rm_lock$rm_guard"
+[ "$settings_state" = file ] && gone="$gone.claude/settings.json"$'\n'
+[ "$claude_md_gone" -eq 1 ] && gone="${gone}CLAUDE.md"$'\n'
+out_of_git=""
+if [ -n "$gone" ]; then
+    for f in $(git --literal-pathspecs -C "$ROOT" -c core.quotePath=false ls-files -o -i --exclude-standard -- $gone | LC_ALL=C sort); do
+        out_of_git="$out_of_git$f"$'\n'
+    done
 fi
 
 kept_skills=""; kept_agents=""; kept_omp=""
@@ -350,13 +356,14 @@ if [ "$claude_md_gone" -eq 1 ]; then
 elif [ -n "$block" ]; then
     echo "  CLAUDE.md: o bloco ANVIL:DIRECTIVES, linhas ${block% *} a ${block#* }, marcadores inclusive; o resto do arquivo fica byte a byte"
 fi
+[ -z "$out_of_git" ] || group "sai junto, fora do git, sem volta pelo git" "$out_of_git"
 echo "fica no projeto:"
 group "skills que não vieram do anvil" "$kept_skills"
 group "agentes que não vieram do anvil" "$kept_agents"
 [ -z "$kept_omp" ] || group "em .omp/, fora das linhas omp:" "$kept_omp"
 [ -z "$behind_link" ] || group "do anvil, mas o caminho passa por symlink, intocados" "$behind_link"
 echo "  .claude/rules/, docs/ e o resto do projeto"
-echo "nada é commitado: revise a remoção com git status e commite"
+echo "nada é commitado: revise com git status a remoção do que era versionado e commite"
 report_profiles
 
 [ "$DRY" -eq 1 ] && exit 0
