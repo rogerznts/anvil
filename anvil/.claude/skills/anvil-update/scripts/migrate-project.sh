@@ -23,9 +23,9 @@
 #                                       o arquivo inteiro quando só tinha o bloco
 #
 # Sem lock, não há como saber o que veio do anvil: o script lista as skills e os
-# agentes do projeto e para, com saída 3, sem apagar nada. A resposta, o que NÃO
-# veio do anvil, volta em --keep-skills e --keep-agents, e o resto sai. Sem lock
-# não há linha `omp:`, e .omp/ fica.
+# agentes do projeto, marca os que têm conteúdo fora do git, e para, com saída 3,
+# sem apagar nada. A resposta, o que NÃO veio do anvil, volta em --keep-skills e
+# --keep-agents, e o resto sai. Sem lock não há linha `omp:`, e .omp/ fica.
 #
 # Fica: .claude/rules/, docs/, o settings fora da entrada do hook, o CLAUDE.md fora
 # do bloco, e skill, agente e arquivo de .omp/ fora do lock. Nada é apagado nem
@@ -198,6 +198,15 @@ valid_name() { case "$1" in ""|.|..|*/*) return 1 ;; esac; }
 lock_lines() {  # <chave>
     tr -d '\r' < "$LOCK" | sed -n "s/^$1: *//p" | sed 's/[[:space:]]*$//'
 }
+# ignored_under <relativo>...: os arquivos fora do git abaixo dos caminhos, os que o
+# git ignora, venha a regra de onde vier. A árvore limpa garante que não há, no
+# caminho, arquivo não versionado e não ignorado.
+ignored_under() {
+    [ $# -gt 0 ] || return 0
+    git --literal-pathspecs -C "$ROOT" -c core.quotePath=false ls-files -o -i --exclude-standard -- "$@" | LC_ALL=C sort
+}
+# under <lista> <relativo>: algum caminho da lista é <relativo> ou fica abaixo dele
+under() { awk -v p="$2" '$0 == p || index($0, p "/") == 1 { f = 1; exit } END { exit !f }' <<< "$1"; }
 
 disk_skills=""; disk_agents=""
 if safe ".claude/skills/x"; then
@@ -268,10 +277,14 @@ else
     if [ "$ANSWERED" -eq 0 ] && [ -n "$disk_skills$disk_agents" ]; then
         echo "migrate-project: instalação antiga do anvil em $ROOT, sem .claude/anvil.lock"
         echo "Sem lock, não há como saber o que veio do anvil. Nada foi alterado."
+        # O item que tem conteúdo fora do git vem marcado: se sair, esse conteúdo não
+        # volta pelo git, e quem responde precisa saber disso antes
+        oog="$(ignored_under .claude/skills .claude/agents)"
+        mark="  (tem conteúdo fora do git: se sair, não volta pelo git)"
         echo "skills em .claude/skills ($(count "$disk_skills")):"
-        for s in $disk_skills; do echo "  $s"; done
+        for s in $disk_skills; do echo "  $s$(under "$oog" ".claude/skills/$s" && echo "$mark")"; done
         echo "agentes em .claude/agents ($(count "$disk_agents")):"
-        for a in $disk_agents; do echo "  .claude/agents/$a.md"; done
+        for a in $disk_agents; do echo "  .claude/agents/$a.md$(under "$oog" ".claude/agents/$a.md" && echo "$mark")"; done
         echo "Pergunte quais NÃO vieram do anvil e rode de novo com a resposta; o resto sai:"
         echo "  migrate-project.sh --dry-run --keep-skills \"<nomes>\" --keep-agents \"<nomes>\""
         report_profiles
@@ -309,19 +322,14 @@ rm_lock=""; [ "$has_lock" -eq 1 ] && take rm_lock ".claude/anvil.lock"
 rm_guard=""; take rm_guard "$GUARD_REF"
 
 # O que sai fica em duas partes. O que o git conhece aparece no git status depois
-# da execução. O que o git ignora, venha a regra de onde vier, sai junto sem
-# aparecer lá: o item sem nada versionado e o ignorado dentro de item versionado.
-# Esse vai para o relatório, arquivo por arquivo. A árvore limpa garante que não
-# há, no caminho, arquivo não versionado e não ignorado.
+# da execução. O que o git ignora sai junto sem aparecer lá: o item sem nada
+# versionado e o ignorado dentro de item versionado. Esse vai para o relatório,
+# arquivo por arquivo.
 gone="$rm_skills$rm_agents$rm_mirror$rm_omp$rm_lock$rm_guard"
 [ "$settings_state" = file ] && gone="$gone.claude/settings.json"$'\n'
 [ "$claude_md_gone" -eq 1 ] && gone="${gone}CLAUDE.md"$'\n'
 out_of_git=""
-if [ -n "$gone" ]; then
-    for f in $(git --literal-pathspecs -C "$ROOT" -c core.quotePath=false ls-files -o -i --exclude-standard -- $gone | LC_ALL=C sort); do
-        out_of_git="$out_of_git$f"$'\n'
-    done
-fi
+for f in $(ignored_under $gone); do out_of_git="$out_of_git$f"$'\n'; done
 
 kept_skills=""; kept_agents=""; kept_omp=""
 for s in $disk_skills; do in_list "$anvil_skills" "$s" || kept_skills="$kept_skills.claude/skills/$s"$'\n'; done

@@ -205,9 +205,11 @@ bash "$TMP/.claude/skills/anvil-update/scripts/migrate-project.sh" --dry-run
   skill, agente e arquivo de `.omp/` fora do lock, rules, `docs/`, o resto do
   settings e do `CLAUDE.md`. Diga isso numa frase e **espere aprovação**.
 - **Sem lock** → o script sai com código 3 e lista as skills de `.claude/skills/`
-  e os agentes de `.claude/agents/` sem apagar nada. Mostre a lista e **pergunte
-  quais não vieram do anvil**. A resposta volta nos dois parâmetros, e tudo fora
-  deles sai: rode o dry-run de novo com eles e espere aprovação.
+  e os agentes de `.claude/agents/` sem apagar nada, com uma marca nos que têm
+  conteúdo fora do git: se o item sair, esse conteúdo não volta pelo git. Mostre a
+  lista com as marcas e **pergunte quais não vieram do anvil**. A resposta volta
+  nos dois parâmetros, e tudo fora deles sai: rode o dry-run de novo com eles e
+  espere aprovação.
 
   ```bash
   bash "$TMP/.claude/skills/anvil-update/scripts/migrate-project.sh" --dry-run \

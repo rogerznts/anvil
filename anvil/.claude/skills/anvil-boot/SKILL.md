@@ -121,8 +121,10 @@ bash ~/.claude/skills/anvil-update/scripts/migrate-project.sh --dry-run
   rules, `docs/`, o resto do settings e do `CLAUDE.md`. Diga isso numa frase e
   **espere aprovação**.
 - **Sem lock** → o script sai com código 3 e lista as skills e os agentes do
-  projeto sem apagar nada. Mostre a lista e **pergunte quais não vieram do
-  anvil**; rode o dry-run de novo com a resposta, e espere aprovação:
+  projeto sem apagar nada, com uma marca nos que têm conteúdo fora do git: se o
+  item sair, esse conteúdo não volta pelo git. Mostre a lista com as marcas e
+  **pergunte quais não vieram do anvil**; rode o dry-run de novo com a resposta, e
+  espere aprovação:
 
   ```bash
   bash ~/.claude/skills/anvil-update/scripts/migrate-project.sh --dry-run \
