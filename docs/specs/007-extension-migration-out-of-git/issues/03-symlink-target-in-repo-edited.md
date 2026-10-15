@@ -5,6 +5,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=1e782ef68085fc010d9a19ea87584a8c94cd7801; scope=full; verdict=pass; p1=none
 
 - [x] Com `CLAUDE.md → AGENTS.md` e o bloco no `AGENTS.md`, o bloco sai do `AGENTS.md`, o resto fica byte a byte e a mudança aparece no `git status`.
 - [x] Com `CLAUDE.md → AGENTS.md` e o `AGENTS.md` só com o bloco, os dois saem.
@@ -19,3 +20,11 @@
 ## Comments
 
 - Implementação: o cenário ganhou a seção 6 (p18–p24) e o p13 passou a conferir o grupo "passa por symlink". Antes da correção, falharam os seis casos novos dos critérios 1 a 4 — bloco no `AGENTS.md`, `AGENTS.md` só com o bloco, settings symlink no repositório (entrada e arquivo inteiro), `CLAUDE.md` para o `~/.claude/CLAUDE.md` e settings para fora, sem outro sinal. Os casos "com outro sinal" (p13, p23) e o de diretório symlink (p24) já passavam, como o critério 5 descreve. A resolução segue um salto só: alvo que é ele mesmo symlink fica intocado no grupo "passa por symlink".
+- Review round=1 · P2 (Standards): no grupo "passa por symlink", a linha do `CLAUDE.md` e a do settings não mostram o alvo do link. As skills mandam decidir pelo alvo, se é do projeto ou da instalação de usuário. Consequência: o agente tem de rodar `readlink` para saber o que dizer ao usuário.
+- Review round=1 · P3 (Standards): os trios `claude_rel/claude_link/claude_out` e `settings_rel/settings_link/settings_out` são resolvidos por dois blocos quase iguais (Data Clumps/Duplicated Code). Consequência: um terceiro arquivo resolvido por symlink copiaria o bloco mais uma vez.
+- Review round=1 · P3 (Standards): `claude_out` e `settings_out` não dizem que o item fica intocado, com o alvo fora do repositório ou atrás de symlink (Mysterious Name). Consequência: quem mantém o código precisa ler o bloco de resolução para entender os testes.
+- Review round=1 · P3 (Standards): a regra do symlink está escrita em quatro comentários. O da linha da remoção do link está no relatório, e não na execução. Consequência: quando a regra mudar, uma das cópias fica desatualizada.
+- Review round=1 · P3 (Standards): o título do grupo, "o caminho passa por symlink", não descreve bem o `CLAUDE.md` que é ele mesmo o link. Consequência: o título engana um pouco, mas não muda nenhuma decisão.
+- Review round=1 · P3 (Standards/Spec): um link absoluto escrito por um prefixo que é symlink, como `/var` → `/private/var` no macOS, conta como fora do repositório, porque o `ROOT` vem de `pwd -P`. Consequência: o bloco ou a entrada fica para ser tirado à mão. A falha é conservadora e não escreve nada indevido.
+- Review round=1 · P3 (Spec): uma cadeia de links dentro do repositório (`CLAUDE.md → A.md → B.md`) fica intocada, e as skills dizem que isso acontece "porque a migração não escreve fora do projeto". Consequência: o motivo está errado, mas a ação indicada, tirar à mão o que é do próprio projeto, continua certa.
+- Review round=1 · P3 (Spec): quando o alvo está ignorado pelo git, a edição não aparece no `git status` nem no grupo fora do git, embora as skills digam que a mudança aparece no `git status`. A lacuna já existia para o `CLAUDE.md` comum ignorado. Consequência: o usuário não encontra a mudança onde o texto manda procurar, mas nenhuma linha dele se perde.
