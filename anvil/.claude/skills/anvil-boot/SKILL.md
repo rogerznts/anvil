@@ -141,6 +141,16 @@ que está nele não volta com `git checkout`. A regra de ignore não faz a migra
 parar, venha de onde vier; o bloco `ANVIL:INSTALLED` do `.gitignore`, se houver,
 fica para o passo 9.
 
+O `CLAUDE.md` e o `.claude/settings.json` que são symlink com o alvo dentro do
+repositório, como o comum `CLAUDE.md → AGENTS.md`, têm o alvo editado pelas
+mesmas regras, e a mudança aparece no `git status`. O grupo **"passa por
+symlink"** lista o que ficou intocado: o item cujo caminho passa por diretório
+symlink e o `CLAUDE.md` ou o settings com o alvo fora do repositório. Diga ao
+usuário que o item ficou porque a migração não escreve fora do projeto. Se o
+alvo é do próprio projeto, ele tira à mão o bloco `ANVIL:DIRECTIVES` ou a entrada
+do hook da guarda; se é da instalação de usuário (`~/.claude/CLAUDE.md`,
+`~/.claude/settings.json`), deixa como está.
+
 Aprovado, execute, com os mesmos `--keep-*` quando houve a pergunta:
 
 ```bash
