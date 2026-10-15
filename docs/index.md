@@ -15,6 +15,9 @@ Last updated: 2026-10-15T18:57:45Z
   - [bench-autonomo.md](./discovery/bench-autonomo.md) — proposta para pôr o
     bench sobre o plan e o run e torná-lo autônomo da entrevista ao relatório,
     antes do grill
+  - [piloto-automatico-decisoes-do-grill.md](./discovery/piloto-automatico-decisoes-do-grill.md)
+    — handoff do grill das specs 007 e 008, com as decisões Q5–Q29 da 008 que
+    não estão no ADR-0014
 - **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
 
