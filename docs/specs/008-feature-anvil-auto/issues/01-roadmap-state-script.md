@@ -2,7 +2,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 **What to build:** o operador, e mais tarde o piloto e o verbo `index`, roda o
 script de estado do roteiro na raiz de um projeto. O script lê
@@ -18,28 +18,37 @@ template do perfil do tracker que o `anvil-setup` escreve, na cópia deste
 repositório e no `README` de `docs/specs/`. Esses três lugares registram que
 `roadmap.md` e `report.md` moram em `docs/specs/`, fora das pastas de spec.
 
-- [ ] Sem `roadmap.md`, a saída é `roadmap: none` e `next: none`.
-- [ ] Cada entrada sai numa linha `entry:`, na ordem do arquivo, com `state`
+- [x] Sem `roadmap.md`, a saída é `roadmap: none` e `next: none`.
+- [x] Cada entrada sai numa linha `entry:`, na ordem do arquivo, com `state`
       (`pending`, `open`, `closed` ou `stopped`), `spec`, `depends` e `reason`.
-- [ ] `closed` exige a pasta `docs/specs/archive/{NNN}-*` no checkout atual.
-- [ ] Spec aberta só no branch local dela é lida pelo commit desse branch, sem
+- [x] `closed` exige a pasta `docs/specs/archive/{NNN}-*` no checkout atual.
+- [x] Spec aberta só no branch local dela é lida pelo commit desse branch, sem
       trocar de checkout e sem mexer na árvore.
-- [ ] `stopped` cobre todos os casos da tabela da spec: todos `resolved` sem
+- [x] `stopped` cobre todos os casos da tabela da spec: todos `resolved` sem
       archive; não resolvidos travados (`round` 2 ou mais com `verdict=fail`) ou
       dependentes de travado; spec arquivada no branch e sem merge; e `Spec:` sem
       pasta nem branch. Cada caso sai com o seu `reason`.
-- [ ] `frontier:` traz as entradas `pending` com todas as dependências `closed`,
+- [x] `frontier:` traz as entradas `pending` com todas as dependências `closed`,
       na ordem do arquivo. A dependente transitiva de uma `stopped` nunca entra.
-- [ ] `--skip "a b"` tira essas entradas do frontier, e o `next` passa para a
+- [x] `--skip "a b"` tira essas entradas do frontier, e o `next` passa para a
       seguinte.
-- [ ] Nome repetido, `Depende de:` que aponta para nome inexistente, ciclo e
+- [x] Nome repetido, `Depende de:` que aponta para nome inexistente, ciclo e
       `Tipo:` fora dos tipos do `new-spec.sh` saem com `refusal:` e o motivo, sem
       frontier.
-- [ ] As chaves são aceitas com ou sem negrito, como o `Status:` dos tickets.
-- [ ] O cenário S1, descrito em Testing Decisions da spec, roda num diretório
+- [x] As chaves são aceitas com ou sem negrito, como o `Status:` dos tickets.
+- [x] O cenário S1, descrito em Testing Decisions da spec, roda num diretório
       novo de `workspace/` sobre repositórios de fixture e passa em todos os casos
       listados lá.
-- [ ] O template do perfil do tracker, a cópia deste repositório e o `README` de
+- [x] O template do perfil do tracker, a cópia deste repositório e o `README` de
       `docs/specs/` descrevem o `roadmap.md` (formato e quem escreve) e o
       `report.md`.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai `0`.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai `0`.
+
+## Comments
+
+- S1 em `workspace/43-roadmap-state/s1.sh`: todos os casos da spec passam, com o
+  script rodado no bash 5 e no `/bin/bash` 3.2 do macOS, com saídas iguais.
+- A spec diz que o nome da entrada é kebab-case, mas não põe o nome fora de
+  kebab-case entre as recusas. O script segue a lista da spec e não recusa; um
+  nome com espaço quebraria a linha `frontier:` e o `--skip`, que separam nomes
+  por espaço. Fica para decisão do operador se vira recusa.
