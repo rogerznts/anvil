@@ -4,7 +4,7 @@
 - Data: 2026-10-14
 - Revoga o [ADR-0009](./adr-0009-toolkit-instalado-fica-versionado.md): o toolkit deixa de ficar versionado no projeto
 - Emenda o [ADR-0011](./adr-0011-omp-como-harness-com-camada-propria.md): a camada omp e o espelho `.agents/skills` passam à instalação de usuário, e a linha `omp:` que torna a camada pegajosa passa a ser a do lock de usuário
-- Origem: spec 006 (`docs/specs/006-feature-user-install-language-next/`)
+- Origem: spec 006 (`docs/specs/archive/006-feature-user-install-language-next/`)
 
 ## Contexto
 
