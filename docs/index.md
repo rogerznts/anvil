@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-15T19:30:00Z
+Last updated: 2026-10-15T19:45:00Z
 
 ## Visão geral
 
@@ -23,7 +23,7 @@ Last updated: 2026-10-15T19:30:00Z
 
 ## Specs ativas
 
-- [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, especificado
+- [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, em andamento — 0/11
 
 ## Specs arquivadas
 
