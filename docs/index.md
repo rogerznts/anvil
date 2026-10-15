@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-15T02:42:45Z
+Last updated: 2026-10-15T03:48:26Z
 
 ## Visão geral
 
@@ -20,7 +20,7 @@ Last updated: 2026-10-15T02:42:45Z
 
 ## Specs ativas
 
-- [007 — Migração lista o que está fora do git e edita o alvo de symlink no repositório](./specs/007-extension-migration-out-of-git/spec.md) — `extension/007-migration-out-of-git`, especificado
+- [007 — Migração lista o que está fora do git e edita o alvo de symlink no repositório](./specs/007-extension-migration-out-of-git/spec.md) — `extension/007-migration-out-of-git`, em andamento — 0/4
 
 ## Specs arquivadas
 
