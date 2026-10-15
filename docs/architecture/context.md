@@ -66,6 +66,19 @@ parando em cada pausa humana: `anvil-plan` no planejamento, `anvil-run` na
 implementação.
 _Avoid_: orquestrador, pipeline, flow
 
+**Piloto automático**:
+Skill da camada omp que, depois do entendimento confirmado no grill ou na
+entrevista, leva o roteiro do planejamento ao fechamento sem pausa humana, spec
+por spec, e segue com o que não depende de uma spec que não fechou sozinha:
+`anvil-auto`.
+_Avoid_: modo autônomo, autopilot, condutor autônomo
+
+**Roteiro**:
+A sequência de specs combinada no grill, cada uma com escopo, critério de pronto
+e dependências, que o piloto automático executa. O estado de cada entrada sai do
+disco.
+_Avoid_: plano, plano principal, backlog
+
 ### Referências
 
 **Upstream vendorizado**:

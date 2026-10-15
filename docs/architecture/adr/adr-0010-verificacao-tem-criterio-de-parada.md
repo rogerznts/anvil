@@ -3,6 +3,7 @@
 - Status: aceito
 - Data: 2026-09-21
 - Origem: [gate-sem-criterio-de-parada.md](../../discovery/gate-sem-criterio-de-parada.md), nota de campo do caso medido no `labstorm-idp`
+- Revisto em parte pelo [ADR-0014](./adr-0014-piloto-automatico-fecha-sem-humano.md): no piloto automático, a terceira rodada pode ser aberta por evidência nova de pesquisa, uma vez por ticket e nunca com sinal de laço
 
 ## Contexto
 
