@@ -18,3 +18,4 @@
 - Review round=1 · P3 (Standards): a variável `oog` do ramo da saída 3 do `migrate-project.sh` repete a ideia que logo abaixo se chama `out_of_git` — quem lê perde um ciclo para decifrar o nome, sem mudança de comportamento.
 - Review round=1 · P3 (Standards): a função `marcados` do cenário `s1.sh` reconhece a marca pelo trecho literal "fora do git", contra o "nunca o texto exato de uma mensagem" das Testing Decisions — se a redação da marca mudar, o cenário quebra com o comportamento certo.
 - Review round=1 · P3 (Spec): uma skill que é ela mesma symlink ignorado recebe a marca "se sair, não volta pelo git", mas a migração apaga só o link e o alvo fica [inferência, não testado] — o aviso diz mais do que se perde, sem levar a perda nenhuma.
+- Fechamento (archive): os três P3 foram aceitos. O `oog` é forma; o `marcados` vive no cenário, fora do git; a marca da skill que é symlink ignorado é inferência não testada e exagera o aviso sem levar a perda.

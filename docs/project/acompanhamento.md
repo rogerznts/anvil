@@ -36,8 +36,9 @@ condutores presos ao perfil `docs/specs`, frontier em paralelo e `verify` no bas
 
 Origem: `docs/specs/archive/006-feature-user-install-language-next/`, ticket 05
 (migração de projeto antigo), P3 da rodada 1 no `## Comments`. A própria 006
-resolveu o das respostas pela metade, e a spec 007 fechou os P2 das rodadas 2 e 3
-com os P3 que as mesmas correções tocam. Ficam estes.
+resolveu o P3 da resposta pela metade, `--keep-skills` sem `--keep-agents`, que
+agora para com código 2. A spec 007 fechou os P2 das rodadas 2 e 3 e os P3 que as
+mesmas correções tocam. Ficam estes.
 
 - **A15 · menção à guarda no settings conta como instalação antiga.** Ticket 05
   da spec 006, rodada 1, P3 (Standards). A migração procura
@@ -49,10 +50,11 @@ com os P3 que as mesmas correções tocam. Ficam estes.
 - **A16 · o awk de marcadores da migração repete o do `reset-install.sh`.**
   Ticket 05 da spec 006, rodada 1, P3 (Standards), possível Duplicated Code: o
   `block_lines` e o `markers_ok` do `migrate-project.sh` refazem o awk de
-  marcadores `ANVIL:DIRECTIVES` do `reset-install.sh`. Enquanto ninguém mexer,
-  uma correção de CRLF ou de marcador precisa ser feita nos dois scripts, e a que
-  ficar só num deles faz a instalação e a migração lerem o mesmo bloco de jeitos
-  diferentes.
+  marcadores `ANVIL:DIRECTIVES` do `reset-install.sh`. Os dois leem arquivos
+  diferentes, o `CLAUDE.md` do projeto e o `~/.claude/CLAUDE.md`, com o mesmo
+  formato de marcadores. Enquanto ninguém mexer, uma correção de CRLF ou de
+  marcador precisa ser feita nos dois scripts, e a que ficar só num deles faz a
+  instalação e a migração lerem o mesmo formato de jeitos diferentes.
 - **A17 · a árvore de decisão do dry-run se repete nas duas skills.** Ticket 05
   da spec 006, rodada 1, P3 (Standards), possível Duplicated Code e Shotgun
   Surgery: o que fazer com cada saída do dry-run da migração está escrito no passo
@@ -64,11 +66,64 @@ com os P3 que as mesmas correções tocam. Ficam estes.
   `json.dump(indent=2)` regrava o `.claude/settings.json` inteiro, ou o alvo dele
   quando é symlink dentro do repositório. Enquanto ninguém mexer, um settings com
   outra indentação ou com `\uXXXX` ganha mudança de formatação no diff além da
-  remoção, contra o "settings fora da entrada do hook intocados" da 006; o
-  dry-run avisa.
+  remoção, contra o "settings fora da entrada do hook intocados" do critério da
+  linha 21 do ticket 05 da 006; o dry-run avisa.
 - **A19 · o aviso de perfil acusa caminho da instalação de usuário.** Ticket 05
-  da spec 006, rodada 1, P3 (Spec): o aviso de perfil desconta só `~/.claude/`,
-  `$HOME/.claude/`, `"$HOME"/.claude/` e `${HOME}/.claude/`. Enquanto ninguém
-  mexer, um perfil em `docs/agents/` que cita `/Users/<u>/.claude/skills/<s>/scripts/`
-  ou `"${HOME}"/.claude/...` recebe um `BOOT PENDENTE` falso, e o usuário roda o
+  da spec 006, rodada 1, P3 (Spec): o aviso de perfil desconta `~/.claude/`,
+  `${HOME}/.claude/` e `$HOME/.claude/` com ou sem aspas em volta do `$HOME`
+  (`"$HOME"/`, `"$HOME/`, `$HOME"/`). Enquanto ninguém mexer, um perfil em
+  `docs/agents/` que cita `/Users/<u>/.claude/skills/<s>/scripts/` ou
+  `"${HOME}"/.claude/...` recebe um `BOOT PENDENTE` falso, e o usuário roda o
   `/anvil-boot` atrás de uma linha que já aponta para a instalação de usuário.
+
+## Spec 007: migração lista o que está fora do git e edita o alvo de symlink no repositório
+
+Origem: `docs/specs/archive/007-extension-migration-out-of-git/`, rodada 1 dos
+tickets 01 e 03, no `## Comments` de cada um. Os demais P2 e P3 abertos dos quatro
+tickets foram aceitos no fechamento, e a decisão está registrada nos `## Comments`.
+
+- **A20 · o grupo "passa por symlink" não mostra o alvo.** Ticket 03, rodada 1,
+  P2 (Standards). A linha do `CLAUDE.md` e a do `.claude/settings.json` nesse
+  grupo não dizem para onde o link aponta, e o passo 5 do `anvil-update` e o
+  passo 2 do `anvil-boot` mandam decidir pelo alvo: do projeto, tirar à mão; da
+  instalação de usuário, deixar. Enquanto ninguém mexer, o agente roda `readlink`
+  para saber o que dizer ao usuário.
+- **A21 · edição parcial em arquivo ignorado não aparece em lugar nenhum.**
+  Tickets 01 e 03, rodada 1, P3 (Spec), o mesmo achado. Quando o `CLAUDE.md`, o
+  `.claude/settings.json` ou o alvo do symlink de um deles está ignorado pelo git
+  e perde só o bloco ou a entrada da guarda, a mudança não aparece no `git status`
+  nem no grupo "sai junto, fora do git, sem volta pelo git". Enquanto ninguém
+  mexer, o README e as duas skills mandam procurar a mudança onde ela não está; a
+  edição aparece só em "sai do projeto", antes da aprovação, e nenhuma linha do
+  usuário se perde.
+- **A22 · o relato final do boot não fala do que saiu fora do git.** Ticket 01,
+  rodada 1, P3 (Standards). O passo 10 do `anvil-boot` diz só que o diff espera o
+  commit do usuário; o relato do update ganhou a parte fora do git. Enquanto
+  ninguém mexer, quem migra pelo boot não ouve no fim que parte do que saiu não
+  volta pelo git.
+- **A23 · o grupo fora do git mostra nomes escapados.** Ticket 01, rodada 1, P3
+  (Spec). O `git ls-files` que monta o grupo roda sem `-z`, e o
+  `core.quotePath=false` não desliga as aspas e os escapes de nome com `"`, `\`
+  ou caractere de controle. Enquanto ninguém mexer, esse arquivo aparece no grupo
+  com um nome diferente do que está no disco, embora continue listado.
+- **A24 · link absoluto por um prefixo symlink conta como fora do repositório.**
+  Ticket 03, rodada 1, P3 (Standards e Spec). A raiz vem de `pwd -P`, e um
+  `CLAUDE.md` ou settings que aponta para o próprio repositório por um caminho
+  absoluto com prefixo symlink, como `/var` → `/private/var` no macOS, é tratado
+  como alvo de fora. Enquanto ninguém mexer, o bloco ou a entrada fica para ser
+  tirado à mão; a falha é conservadora e não escreve nada indevido.
+- **A25 · cadeia de links: um salto só, e as skills dão o motivo errado.** Ticket
+  03, rodada 1, P3 (Spec), sobre a decisão do implementer de seguir um salto só.
+  Uma cadeia dentro do repositório, `CLAUDE.md → A.md → B.md`, fica intocada no
+  grupo "passa por symlink", e as skills dizem que isso acontece porque a
+  migração não escreve fora do projeto. Enquanto ninguém mexer, o usuário recebe
+  o motivo errado; a ação indicada, tirar à mão o que é do projeto, continua
+  certa.
+- **A26 · as regras das duas partes e do symlink estão escritas em vários
+  lugares.** Tickets 01 e 03, rodada 1, P3 (Standards), Duplicated Code. O
+  parágrafo "o que o git conhece / o que está fora do git" está quase igual no
+  passo 5 do `anvil-update`, no passo 2 do `anvil-boot`, no README, no cabeçalho
+  do `migrate-project.sh` e num comentário em linha; a regra do symlink, em quatro
+  comentários do script. Enquanto ninguém mexer, a próxima mudança numa delas
+  exige editar todas as cópias, e a que ficar para trás volta a mentir. Vizinha
+  da A17, que cobre a árvore de decisão do dry-run nas duas skills.
