@@ -4,10 +4,10 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Sem lock e sem resposta, a lista de skills e agentes da saída 3 marca os que têm conteúdo fora do git e não marca os outros. Nada é alterado, como hoje.
-- [ ] A resposta continua em `--keep-skills` e `--keep-agents`, juntos.
-- [ ] Com a resposta, a migração chega ao dry-run e à execução sem outra parada, e o conteúdo fora do git do que sai aparece no grupo fora do git.
-- [ ] Cenário `workspace/41-legacy-migration/s1.sh`, falhando antes da correção: sem lock, a saída 3 marca a skill que tem conteúdo fora do git, e depois uma rodada de resposta basta para migrar.
-- [ ] O `vendor-sync.sh verify` sai limpo.
+- [x] Sem lock e sem resposta, a lista de skills e agentes da saída 3 marca os que têm conteúdo fora do git e não marca os outros. Nada é alterado, como hoje.
+- [x] A resposta continua em `--keep-skills` e `--keep-agents`, juntos.
+- [x] Com a resposta, a migração chega ao dry-run e à execução sem outra parada, e o conteúdo fora do git do que sai aparece no grupo fora do git.
+- [x] Cenário `workspace/41-legacy-migration/s1.sh`, falhando antes da correção: sem lock, a saída 3 marca a skill que tem conteúdo fora do git, e depois uma rodada de resposta basta para migrar.
+- [x] O `vendor-sync.sh verify` sai limpo.
