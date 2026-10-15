@@ -4,19 +4,19 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Algo que sai e está ignorado não faz mais a migração parar. O código 2 fica para os outros erros (sem git, árvore suja, marcadores quebrados, settings inválido, sem `python3`, argumento ruim), e os códigos 0 e 3 mantêm o sentido.
-- [ ] O grupo "sai junto, fora do git, sem volta pelo git" lista cada arquivo fora do git, tanto do item sem nada versionado quanto do ignorado dentro de item versionado, no dry-run e na execução.
-- [ ] Nenhuma mensagem culpa "o .gitignore do projeto" por uma regra de ignore.
-- [ ] O passo 5 do `anvil-update` e o passo 2 do `anvil-boot` perdem o ramo "Ignorado pelo git" e explicam o grupo fora do git. O passo 2 do boot não desvia mais para o passo 9.
-- [ ] O relato final do update diz que o que era versionado está no `git status` e que o que estava fora do git foi listado no dry-run.
-- [ ] O README troca "exige o toolkit fora do `.gitignore`" pela explicação das duas partes.
-- [ ] O `--help` do `migrate-project.sh` descreve as duas partes e deixa de dizer que nada ignorado é apagado.
-- [ ] O passo 9 do boot continua sendo o único que tira o bloco `ANVIL:INSTALLED` do `.gitignore`. A migração continua exigindo árvore limpa, passando por dry-run, esperando aprovação e nunca commitando.
-- [ ] Cenário `workspace/41-legacy-migration/s1.sh`, cada caso falhando antes da correção:
+- [x] Algo que sai e está ignorado não faz mais a migração parar. O código 2 fica para os outros erros (sem git, árvore suja, marcadores quebrados, settings inválido, sem `python3`, argumento ruim), e os códigos 0 e 3 mantêm o sentido.
+- [x] O grupo "sai junto, fora do git, sem volta pelo git" lista cada arquivo fora do git, tanto do item sem nada versionado quanto do ignorado dentro de item versionado, no dry-run e na execução.
+- [x] Nenhuma mensagem culpa "o .gitignore do projeto" por uma regra de ignore.
+- [x] O passo 5 do `anvil-update` e o passo 2 do `anvil-boot` perdem o ramo "Ignorado pelo git" e explicam o grupo fora do git. O passo 2 do boot não desvia mais para o passo 9.
+- [x] O relato final do update diz que o que era versionado está no `git status` e que o que estava fora do git foi listado no dry-run.
+- [x] O README troca "exige o toolkit fora do `.gitignore`" pela explicação das duas partes.
+- [x] O `--help` do `migrate-project.sh` descreve as duas partes e deixa de dizer que nada ignorado é apagado.
+- [x] O passo 9 do boot continua sendo o único que tira o bloco `ANVIL:INSTALLED` do `.gitignore`. A migração continua exigindo árvore limpa, passando por dry-run, esperando aprovação e nunca commitando.
+- [x] Cenário `workspace/41-legacy-migration/s1.sh`, cada caso falhando antes da correção:
   - o p11 (toolkit ignorado pelo bloco `ANVIL:INSTALLED` e fora do git) migra pelo update e pelo boot, sai com código 0 e põe cada arquivo no grupo fora do git;
   - a mesma regra de ignore em `.git/info/exclude` dá o mesmo resultado;
   - uma skill versionada com um arquivo ignorado dentro põe esse arquivo no grupo fora do git;
   - o p15 (`.DS_Store` solto dentro de skill versionada) continua passando.
-- [ ] O `vendor-sync.sh verify` sai limpo.
+- [x] O `vendor-sync.sh verify` sai limpo.
