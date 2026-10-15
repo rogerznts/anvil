@@ -1,6 +1,6 @@
 ---
 name: anvil-auto
-description: Piloto automático do anvil no omp. Recusa a largada indevida, conduz o grill sobre o plano inteiro de várias specs, escreve o roteiro em docs/specs/roadmap.md, valida pelo roadmap.sh e o commita na main com o único sim do operador.
+description: Piloto automático do anvil no omp. Recusa a largada indevida, conduz o grill sobre o plano inteiro de várias specs, escreve o roteiro em docs/specs/roadmap.md e o commita na main com o único sim do operador. Depois, sem pausa, leva cada entrada do roteiro da spec ao merge local, com relatório em docs/specs/report.md.
 argument-hint: "o pedido, que vai para o grill"
 disable-model-invocation: true
 ---
@@ -10,8 +10,10 @@ disable-model-invocation: true
 O operador chamou esta skill com um pedido que pode ocupar várias specs. Você é o
 piloto. Ele participa uma vez só: no grill, que cobre o plano inteiro e termina no
 **roteiro** escrito em `docs/specs/roadmap.md`. A confirmação dele sobre o roteiro
-escrito é o único sim da execução. Carregar uma skill é lê-la com o `read` em
-`skill://<nome>` e segui-la.
+escrito é o único sim da execução. Depois do sim, você conduz a **corrente** sem
+pausa: cada entrada do roteiro vira uma spec, que vai da spec ao merge local, e a
+execução termina oferecendo um grill novo. Carregar uma skill é lê-la com o `read`
+em `skill://<nome>` e segui-la.
 
 O argumento, se veio, é o pedido.
 
@@ -192,8 +194,252 @@ git add -A
 git commit -m "docs(roadmap): record the roadmap confirmed by the operator"
 ```
 
-Rode o `roadmap.sh` mais uma vez e termine a vez com a frase "O roteiro está
-pronto", seguida do commit na `main` e da entrada da linha `next`.
+Se a entrada não mudou nenhum arquivo, não há o que commitar: o roteiro
+confirmado já está na `main`. Anote o commit da `main` com
+`git rev-parse --short HEAD`, para o relatório, e siga para a corrente na mesma
+vez, sem esperar resposta.
+
+## Corrente
+
+Do sim ao fim, conduza sem pausa: não pergunte nada ao operador e não termine a
+vez entre uma spec e outra. O estado é o disco, relido a cada passo, e não esta
+conversa. Dentro desta execução, quem decide o próximo passo é você: quando uma
+skill de etapa termina, siga a corrente, sem ler o `anvil-next`.
+
+Guarde na conversa, para o relatório, o que cada spec deixar: as pausas que você
+respondeu e a saída do comando de verificação.
+
+O laço, a partir da `main`:
+
+1. Rode o `roadmap.sh`. Com `next: none`, vá para o fim. Senão, a entrada desta
+   volta é a da linha `next`: leia a seção dela no `roadmap.md`.
+2. Abra a spec.
+3. Escreva a spec e os tickets.
+4. Despache os tickets.
+5. Confira o `PASS`.
+6. Feche a spec.
+7. Escreva o relatório na `main`, commite e volte ao passo 1.
+
+Qualquer passo que não sai como as seções abaixo descrevem para a corrente, como a
+seção "Fora do caminho feliz" diz.
+
+### Abrir a spec
+
+Na `main`, rode o script de spec nova, da instalação de usuário, com o `Tipo:` e o
+nome da entrada:
+
+```bash
+bash ~/.claude/skills/anvil-to-spec/scripts/new-spec.sh --type <Tipo> --short-name <nome> --json
+```
+
+O JSON da saída dá o número, em `number`, e o branch, em `branch`, e vale sobre
+qualquer previsão. O script deixa o checkout no branch novo, ainda sem commit.
+Então, nesta ordem:
+
+1. Volte à `main` com `git checkout main`.
+2. No `roadmap.md`, acrescente a linha `Spec: <number>` à seção da entrada, junto
+   das outras chaves: logo abaixo de `Depende de:` ou, sem ela, de `Tipo:`. É a
+   única mudança no roteiro.
+3. Commite só o roteiro:
+
+   ```bash
+   git add docs/specs/roadmap.md
+   git commit -m "docs(roadmap): record spec <number> for <nome>"
+   ```
+
+4. Leve o branch da spec até esse commit e volte a ele:
+
+   ```bash
+   git checkout -B <branch> main
+   ```
+
+   O branch acabou de nascer e não tem commit próprio, então o `-B` só o avança.
+   Assim o `Spec:` está na `main` antes de qualquer commit da spec, e o branch o
+   contém.
+
+### Spec e tickets
+
+No branch da spec, carregue o `anvil-to-spec` com a entrada do roteiro como
+contexto: o `Entra:` e o `Fica de fora:` são o escopo da spec, o `Pronto quando:`
+é o critério de pronto dela, e o que o grill decidiu sobre a entrada também vale.
+A skill publica na pasta do branch, como o perfil do tracker manda para quem já
+está num branch de spec. Com a spec escrita, commite no branch:
+
+```bash
+git add -A
+git commit -m "docs(spec): add spec <number>"
+```
+
+Depois carregue o `anvil-to-tickets` sobre a spec e commite os tickets do mesmo
+jeito, com `docs(spec): add the tickets of spec <number>`.
+
+As duas skills param para perguntar ao operador, como na checagem dos seams do
+`anvil-to-spec` e na da granularidade do `anvil-to-tickets`. Na corrente, quem
+responde é você, na mesma vez: escolha a opção que a skill recomenda ou, sem
+recomendação, a mais conservadora, que mantém o que a skill propôs e não amplia o
+escopo da entrada. Guarde a skill, a pergunta, a resposta e se ela era a
+recomendada ou a mais conservadora. A mesma regra vale para as pausas do
+`archive`, no fechamento.
+
+### Despacho
+
+É o laço de despacho da `anvil-run`, em série. No branch da spec, rode o script
+dela, da instalação de usuário:
+
+```bash
+bash ~/.omp/agent/skills/anvil-run/frontier.sh [--skip "NN NN"]
+```
+
+1. Com `next: none`, o despacho acabou: siga para o `PASS`.
+2. Despache o ticket da linha `next` com o `task`, numa chamada só, com um item:
+   `agent` é `anvil-implementer`, `task` é o caminho do ticket e, com a linha
+   `isolation` em `on` ou `misconfigured`, o item leva `isolated: true`. No
+   `context`, diga a pasta da spec, o branch e o idioma de saída. O implementer
+   é bloqueante: não chame outra ferramenta na mesma mensagem, e não leia o
+   ticket, não investigue nem termine o trabalho dele.
+3. Rode o script de novo e compare a linha do ticket com a de antes. Se `status`,
+   `reviews` e `last` estão iguais, o ticket é pulado nesta execução: daí em
+   diante, toda chamada leva o `--skip` com todos os pulados, e ele não é
+   despachado de novo. Volte ao passo 1 com a última saída do script.
+
+### `PASS`
+
+A spec só fecha com `PASS`, que é, tudo junto:
+
+- a última saída do `frontier.sh` com `all_resolved: yes` e sem linha `halt`;
+- a última linha `Review:` de cada ticket de `issues/` em `verdict=pass; p1=none`;
+- o bloco de `## Comando de verificação`, rodado por você na raiz, saindo `0`:
+
+  ```bash
+  bash -c "$(awk '$0 == "## Comando de verificação" {s=1; next} s && /^## /{exit} s && /^```bash$/{b=1; next} b && /^```$/{exit} b' .claude/rules/anvil.md)"; echo "exit: $?"
+  ```
+
+Guarde o comando, a saída e a linha `exit:` para o relatório. O `PASS` é o que o
+disco e a execução mostram, e não o que o implementer disse.
+
+### Fechamento
+
+Com `PASS`, no branch da spec, carregue o `anvil-docs` no verbo `archive` e
+commite o que ele moveu e escreveu:
+
+```bash
+git add -A
+git commit -m "docs(spec): archive spec <number>"
+```
+
+O fechamento segue a regra do projeto: o perfil do tracker, na seção de fechar a
+spec, mais as rules de `.claude/rules/`. Quando elas dizem que a spec fecha com
+merge local, sem PR, mescle da `main`:
+
+```bash
+git checkout main
+git merge --no-ff --no-edit <branch>
+```
+
+A guarda de merge confere esse merge como confere o do operador, e um bloqueio
+dela é recusa, não sucesso. Ela não tem contorno: nenhum outro verbo leva o branch
+para a `main`, como `git pull`, `git rebase`, `git reset` ou `git cherry-pick`, e
+nada de `--no-verify`.
+
+Com o merge parado em conflito, liste os arquivos com
+`git diff --name-only --diff-filter=U`. Se o único é `docs/index.md`, gere o
+índice de novo pelo verbo `index` do `anvil-docs`, com o bloco custom da versão
+da `main`, `git show HEAD:docs/index.md`, e conclua o merge:
+
+```bash
+git add docs/index.md
+git commit --no-edit
+```
+
+### Relatório
+
+Na `main`, depois do merge, rode o `roadmap.sh` e escreva `docs/specs/report.md`
+inteiro, com tudo o que a execução fez até aqui, no idioma de comunicação das
+rules. Há um relatório por execução: o primeiro desta execução substitui o da
+anterior, que fica no git. Commite só ele:
+
+```bash
+git add docs/specs/report.md
+git commit -m "docs(report): record spec <number> in the autopilot report"
+```
+
+O relatório tem esta forma, com uma seção de segundo nível por spec da execução,
+na ordem, e as seções sem conteúdo ficam com "nenhum":
+
+````markdown
+# Relatório do piloto automático
+
+Roteiro: `docs/specs/roadmap.md`, confirmado no commit <commit do sim>.
+
+## <nome da entrada> — spec <number>
+
+- Estado: fechada, com merge local na `main`
+- Branch: `<branch>`
+
+### Pausas respondidas pelo piloto
+
+- `anvil-to-spec` — <pergunta> Resposta: <resposta> (<recomendada pela skill | a mais conservadora>).
+
+### Tickets
+
+- `<caminho do ticket>` — Status: <status>
+  - Review: <cada linha Review: do ticket, como está>
+
+### P2 e P3 que ficaram
+
+- `<ticket>` — <a linha do ## Comments do ticket, como está>
+
+### Travados em round=2
+
+nenhum
+
+### Comando de verificação
+
+```text
+$ <comando>
+<saída>
+exit: 0
+```
+
+### Pesquisas
+
+nenhuma
+
+### Decidido sem humano
+
+- <o que você decidiu sozinho, fora das pausas, e por quê>
+
+## Onde a corrente parou
+
+<a entrada da linha next do roadmap.sh, que vem a seguir, ou, com next: none, que a corrente terminou sem entrada desbloqueada>
+
+## O que ainda espera decisão
+
+- <cada item como pergunta>?
+````
+
+## O fim
+
+Com `next: none` no passo 1, a corrente terminou. Diga ao operador as specs que
+fecharam nesta execução, cada uma com o branch e o merge na `main`, o caminho do
+relatório e o commit dele. Termine a vez oferecendo um grill novo, com a lista de
+"o que ainda espera decisão" do relatório como pauta. A oferta é a última coisa da
+vez. Sem spec nesta execução, não há relatório novo: diga que nenhuma entrada
+estava desbloqueada e ofereça o grill do mesmo jeito.
+
+Aceita a oferta, volte à entrada, na `main`, que edita o mesmo roteiro e começa
+uma execução nova. Recusada, pare.
+
+## Fora do caminho feliz
+
+Qualquer passo da corrente que não sai como descrito acima para a corrente ali:
+uma recusa do `roadmap.sh`, o `new-spec.sh` que falha, um `halt` ou um ticket que
+sobra sem resolver no despacho, o `PASS` que não vem, a regra do projeto que não
+fecha por merge local, um merge bloqueado pela guarda ou um conflito fora do
+`docs/index.md`. Nesse caso, não faça archive nem merge, não contorne a guarda e
+não mexa no que ficou fora de commit. Termine a vez dizendo ao operador a
+entrada, o passo, o motivo, o branch em que a execução ficou e o que está
+commitado nele.
 
 ## Nunca
 
@@ -202,8 +448,13 @@ pronto", seguida do commit na `main` e da entrada da linha `next`.
 - Mostrar para confirmação um roteiro que o `roadmap.sh` recusa, ou que perdeu uma
   entrada inacabada sem o abandono explícito dela.
 - Tirar uma entrada inacabada do roteiro sem a resposta do operador sobre ela.
-- Escrever `Spec:` numa entrada, ou mudar o nome ou o `Spec:` de uma entrada que
-  fica.
+- Escrever `Spec:` fora do passo que abre a spec da entrada, ou mudar o nome ou o
+  `Spec:` de uma entrada que fica.
 - Usar um anexo de fora do repositório antes de ele estar em `docs/discovery/`.
 - Guardar, commitar ou descartar o que o operador deixou fora de commit na largada.
-- Trocar de branch.
+- Perguntar ao operador entre o sim e o fim, ou ler o `anvil-next` dentro da
+  execução.
+- Fazer archive ou merge sem `PASS`, ou contornar a guarda de merge.
+- Trocar de branch fora dos passos da corrente: a volta à `main` depois do
+  `new-spec.sh`, o `git checkout -B` do branch recém-criado e a ida à `main` para
+  o merge.
