@@ -116,22 +116,40 @@ bash ~/.claude/skills/anvil-update/scripts/migrate-project.sh --dry-run
 - **Árvore suja** → o script para sem tocar em nada. Peça commit ou stash, para o
   diff da migração mostrar só a remoção, e rode o dry-run de novo. A migração do
   mosk do passo 1, se houve, também precisa estar commitada antes.
-- **Ignorado pelo git** → o `.gitignore` de uma versão antiga ainda ignora o
-  toolkit, e a remoção não apareceria no `git status`; o script para sem tocar em
-  nada e nomeia o que está ignorado. Faça agora o passo 9, que tira essas linhas
-  com aprovação, peça o commit do que passar a aparecer e rode o dry-run de novo.
 - **Com `.claude/anvil.lock` no projeto** → o dry-run lista por nome o que sai,
   guiado pelo lock, e o que fica: skill, agente e arquivo de `.omp/` fora do lock,
   rules, `docs/`, o resto do settings e do `CLAUDE.md`. Diga isso numa frase e
   **espere aprovação**.
 - **Sem lock** → o script sai com código 3 e lista as skills e os agentes do
-  projeto sem apagar nada. Mostre a lista e **pergunte quais não vieram do
-  anvil**; rode o dry-run de novo com a resposta, e espere aprovação:
+  projeto sem apagar nada, com uma marca nos que têm conteúdo fora do git: se o
+  item sair, esse conteúdo não volta pelo git. Mostre a lista com as marcas e
+  **pergunte quais não vieram do anvil**; rode o dry-run de novo com a resposta, e
+  espere aprovação:
 
   ```bash
   bash ~/.claude/skills/anvil-update/scripts/migrate-project.sh --dry-run \
        --keep-skills "minha-skill outra-skill" --keep-agents "meu-agente"
   ```
+
+O que sai fica em duas partes. O que o git conhece aparece no `git status` depois
+da execução. O que está fora do git sai junto e aparece só no relatório, arquivo
+por arquivo, no grupo **"sai junto, fora do git, sem volta pelo git"**: o item sem
+nada versionado, como o toolkit que um `.gitignore` antigo, o `.git/info/exclude`
+ou o excludes global ignora, e o arquivo ignorado dentro de item versionado, como
+um `.DS_Store` ou um `__pycache__/`. Ao pedir a aprovação, nomeie esse grupo: o
+que está nele não volta com `git checkout`. A regra de ignore não faz a migração
+parar, venha de onde vier; o bloco `ANVIL:INSTALLED` do `.gitignore`, se houver,
+fica para o passo 9.
+
+O `CLAUDE.md` e o `.claude/settings.json` que são symlink com o alvo dentro do
+repositório, como o comum `CLAUDE.md → AGENTS.md`, têm o alvo editado pelas
+mesmas regras, e a mudança aparece no `git status`. O grupo **"passa por
+symlink"** lista o que ficou intocado: o item cujo caminho passa por diretório
+symlink e o `CLAUDE.md` ou o settings com o alvo fora do repositório. Diga ao
+usuário que o item ficou porque a migração não escreve fora do projeto. Se o
+alvo é do próprio projeto, ele tira à mão o bloco `ANVIL:DIRECTIVES` ou a entrada
+do hook da guarda; se é da instalação de usuário (`~/.claude/CLAUDE.md`,
+`~/.claude/settings.json`), deixa como está.
 
 Aprovado, execute, com os mesmos `--keep-*` quando houve a pergunta:
 
@@ -139,8 +157,8 @@ Aprovado, execute, com os mesmos `--keep-*` quando houve a pergunta:
 bash ~/.claude/skills/anvil-update/scripts/migrate-project.sh
 ```
 
-A remoção fica no `git status` para o usuário revisar e commitar; o boot não
-commita.
+A remoção do que era versionado fica no `git status` para o usuário revisar e
+commitar; o boot não commita.
 
 O dry-run também acusa com `BOOT PENDENTE` o perfil de `docs/agents/` que cita
 script pelo caminho da instalação por projeto, como

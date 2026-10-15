@@ -23,21 +23,37 @@
 #                                       o arquivo inteiro quando só tinha o bloco
 #
 # Sem lock, não há como saber o que veio do anvil: o script lista as skills e os
-# agentes do projeto e para, com saída 3, sem apagar nada. A resposta, o que NÃO
-# veio do anvil, volta em --keep-skills e --keep-agents, e o resto sai. Sem lock
-# não há linha `omp:`, e .omp/ fica.
+# agentes do projeto, marca os que têm conteúdo fora do git, e para, com saída 3,
+# sem apagar nada. A resposta, o que NÃO veio do anvil, volta em --keep-skills e
+# --keep-agents, e o resto sai. Sem lock não há linha `omp:`, e .omp/ fica.
 #
 # Fica: .claude/rules/, docs/, o settings fora da entrada do hook, o CLAUDE.md fora
-# do bloco, e skill, agente e arquivo de .omp/ fora do lock. Nada é apagado nem
-# escrito através de symlink: o item cujo caminho passa por um diretório que é
-# symlink fica intocado, e o CLAUDE.md e o settings que são symlink também. O item
-# que é ele mesmo symlink, como o do espelho, sai como link, sem tocar o alvo.
+# do bloco, e skill, agente e arquivo de .omp/ fora do lock.
 #
-# Exige repositório git com árvore limpa, e nada do que sai ignorado pelo
-# .gitignore, para que o diff da remoção seja revisável; nunca commita. Rodado em
-# qualquer projeto, confere também os perfis de docs/agents/: perfil que cita
-# script pelo caminho da instalação por projeto sai como BOOT PENDENTE, migrado ou
-# não.
+# O CLAUDE.md e o settings que são symlink, como o comum CLAUDE.md -> AGENTS.md,
+# são resolvidos. Se o alvo é arquivo comum dentro da raiz do repositório e o
+# caminho até ele não passa por diretório symlink, a edição vai no alvo, com as
+# mesmas regras: só o bloco, ou só a entrada, sai, e o alvo que ficaria só com
+# eles sai inteiro, com o symlink junto. A mudança aparece no git status. Com o
+# alvo fora do repositório, ou atrás de diretório symlink, o arquivo fica
+# intocado, no grupo "passa por symlink", e sozinho não faz o projeto contar como
+# instalação antiga: o CLAUDE.md que aponta para o ~/.claude/CLAUDE.md não migra
+# nada. Fora isso, nada é apagado nem escrito através de symlink: o item cujo
+# caminho passa por um diretório que é symlink fica intocado, e o item que é ele
+# mesmo symlink, como o do espelho, sai como link, sem tocar o alvo.
+#
+# Exige repositório git com árvore limpa e nunca commita. O que sai fica em duas
+# partes. O que o git conhece aparece no git status depois da execução, e o diff
+# da remoção é revisável. O que está fora do git — o item sem nada versionado e o
+# arquivo ignorado dentro de item versionado, como um .DS_Store — sai junto, sem
+# volta pelo git, e o relatório o lista arquivo por arquivo no grupo "sai junto,
+# fora do git, sem volta pelo git", no dry-run e na execução. A regra de ignore,
+# venha do .gitignore, do .git/info/exclude ou do excludes global, não faz a
+# migração parar.
+#
+# Rodado em qualquer projeto, confere também os perfis de docs/agents/: perfil que
+# cita script pelo caminho da instalação por projeto sai como BOOT PENDENTE,
+# migrado ou não.
 #
 #   migrate-project.sh [--dry-run] [--keep-skills "<nomes>" --keep-agents "<nomes>"]
 #
@@ -56,7 +72,7 @@ while [ $# -gt 0 ]; do
             [ $# -ge 2 ] || { echo "erro: $1 pede a lista de nomes, \"\" se nenhum" >&2; exit 2; }
             if [ "$1" = --keep-skills ]; then KEEP_SKILLS="$2"; KS=1; else KEEP_AGENTS="$2"; KA=1; fi
             shift 2 ;;
-        -h|--help) sed -n '2,47p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '2,63p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
     esac
 done
@@ -191,6 +207,38 @@ valid_name() { case "$1" in ""|.|..|*/*) return 1 ;; esac; }
 lock_lines() {  # <chave>
     tr -d '\r' < "$LOCK" | sed -n "s/^$1: *//p" | sed 's/[[:space:]]*$//'
 }
+# ignored_under <relativo>...: os arquivos fora do git abaixo dos caminhos, os que o
+# git ignora, venha a regra de onde vier. A árvore limpa garante que não há, no
+# caminho, arquivo não versionado e não ignorado.
+ignored_under() {
+    [ $# -gt 0 ] || return 0
+    git --literal-pathspecs -C "$ROOT" -c core.quotePath=false ls-files -o -i --exclude-standard -- "$@" | LC_ALL=C sort
+}
+# under <lista> <relativo>: algum caminho da lista é <relativo> ou fica abaixo dele
+under() { awk -v p="$2" '$0 == p || index($0, p "/") == 1 { f = 1; exit } END { exit !f }' <<< "$1"; }
+# in_repo_target <relativo>: o alvo do symlink <relativo>, relativo à raiz, quando é
+# arquivo comum dentro do repositório e o caminho até ele não passa por diretório
+# symlink; falha nos outros casos. Os `..` saem do caminho sem que ele suba por um link.
+in_repo_target() {
+    local t c rel="" IFS=/
+    t="$(readlink "$ROOT/$1")"
+    case "$t" in
+        "$ROOT"/*) t="${t#"$ROOT"/}" ;;
+        /*) return 1 ;;
+        *) case "$1" in */*) t="${1%/*}/$t" ;; esac ;;
+    esac
+    for c in $t; do
+        case "$c" in
+            ""|.) ;;
+            ..) [ -n "$rel" ] && safe "$rel/x" || return 1
+                case "$rel" in */*) rel="${rel%/*}" ;; *) rel="" ;; esac ;;
+            *) rel="$rel${rel:+/}$c" ;;
+        esac
+    done
+    [ -n "$rel" ] && safe "$rel" && [ -f "$ROOT/$rel" ] && [ ! -L "$ROOT/$rel" ] && printf '%s' "$rel"
+}
+# shown <relativo> <symlink>: o nome do arquivo no relatório, com o symlink que leva a ele
+shown() { printf '%s' "$1${2:+ (alvo do symlink $2)}"; }
 
 disk_skills=""; disk_agents=""
 if safe ".claude/skills/x"; then
@@ -201,6 +249,28 @@ if safe ".claude/agents/x"; then
 fi
 
 has_lock=0; [ -f "$LOCK" ] && has_lock=1
+# O CLAUDE.md e o settings que são symlink têm o alvo editado quando ele está no
+# repositório. Com o alvo fora, ou atrás de diretório symlink, escrever nele
+# escreveria em outro projeto ou na instalação de usuário: o item fica intocado, e
+# sozinho não faz o projeto contar como instalação antiga.
+claude_rel="CLAUDE.md"; claude_link=""; claude_out=0
+if [ -L "$CLAUDE_MD" ]; then
+    if t="$(in_repo_target CLAUDE.md)"; then
+        claude_link="CLAUDE.md"; claude_rel="$t"; CLAUDE_MD="$ROOT/$t"
+    else
+        claude_out=1
+    fi
+fi
+settings_rel=".claude/settings.json"; settings_link=""; settings_out=0
+if ! safe "$settings_rel"; then
+    settings_out=1
+elif [ -L "$SETTINGS" ]; then
+    if t="$(in_repo_target "$settings_rel")"; then
+        settings_link="$settings_rel"; settings_rel="$t"; SETTINGS="$ROOT/$t"
+    else
+        settings_out=1
+    fi
+fi
 block="$(block_lines || true)"
 # O CLAUDE.md que só tinha o bloco, como o boot antigo o criava, sai inteiro
 claude_md_gone=0
@@ -210,8 +280,8 @@ fi
 guard_in_settings=0
 [ -f "$SETTINGS" ] && grep -qF "$GUARD_REF" "$SETTINGS" && guard_in_settings=1
 legacy=$has_lock
-[ -n "$block" ] && legacy=1
-[ "$guard_in_settings" -eq 1 ] && legacy=1
+[ -n "$block" ] && [ "$claude_out" -eq 0 ] && legacy=1
+[ "$guard_in_settings" -eq 1 ] && [ "$settings_out" -eq 0 ] && legacy=1
 present "$GUARD_REF" && legacy=1
 for s in $disk_skills; do case "$s" in anvil-*) legacy=1 ;; esac; done
 
@@ -229,23 +299,23 @@ if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
     git -C "$ROOT" status --short >&2
     exit 2
 fi
-# Escrever num CLAUDE.md ou num settings que é symlink, ou que está atrás de um,
-# escreveria no alvo, que pode ser de outros projetos: o item fica intocado.
+# O CLAUDE.md e o settings com o alvo fora do repositório, ou atrás de diretório
+# symlink, ficam intocados; aparecem aqui só porque o projeto já é instalação antiga.
 behind_link=""
-if [ -n "$block" ] && [ -L "$CLAUDE_MD" ]; then
+if [ -n "$block" ] && [ "$claude_out" -eq 1 ]; then
     behind_link="${behind_link}CLAUDE.md, o bloco ANVIL:DIRECTIVES"$'\n'; block=""; claude_md_gone=0
 fi
-[ -L "$CLAUDE_MD" ] || markers_ok ||
-    { echo "erro: CLAUDE.md tem marcadores ANVIL:DIRECTIVES fora de um único par START..END — conserte à mão" >&2; exit 2; }
+[ "$claude_out" -eq 1 ] || markers_ok ||
+    { echo "erro: $(shown "$claude_rel" "$claude_link") tem marcadores ANVIL:DIRECTIVES fora de um único par START..END — conserte à mão" >&2; exit 2; }
 settings_state="none"
-if [ "$guard_in_settings" -eq 1 ] && { ! safe ".claude/settings.json" || [ -L "$SETTINGS" ]; }; then
+if [ "$guard_in_settings" -eq 1 ] && [ "$settings_out" -eq 1 ]; then
     behind_link="${behind_link}.claude/settings.json, a entrada do hook que chama $GUARD_REF"$'\n'
 elif [ "$guard_in_settings" -eq 1 ]; then
     command -v python3 >/dev/null 2>&1 ||
-        { echo "erro: sem python3 para tirar do .claude/settings.json a entrada que chama $GUARD_REF — tire-a à mão e rode de novo" >&2; exit 2; }
+        { echo "erro: sem python3 para tirar do $(shown "$settings_rel" "$settings_link") a entrada que chama $GUARD_REF — tire-a à mão e rode de novo" >&2; exit 2; }
     settings_state="$(settings_guard state)"
     [ "$settings_state" != invalid ] ||
-        { echo "erro: .claude/settings.json não é JSON válido — conserte-o, ou tire à mão a entrada que chama $GUARD_REF, e rode de novo" >&2; exit 2; }
+        { echo "erro: $(shown "$settings_rel" "$settings_link") não é JSON válido — conserte-o, ou tire à mão a entrada que chama $GUARD_REF, e rode de novo" >&2; exit 2; }
 fi
 
 # --- o que é do anvil -------------------------------------------------------------
@@ -261,10 +331,14 @@ else
     if [ "$ANSWERED" -eq 0 ] && [ -n "$disk_skills$disk_agents" ]; then
         echo "migrate-project: instalação antiga do anvil em $ROOT, sem .claude/anvil.lock"
         echo "Sem lock, não há como saber o que veio do anvil. Nada foi alterado."
+        # O item que tem conteúdo fora do git vem marcado: se sair, esse conteúdo não
+        # volta pelo git, e quem responde precisa saber disso antes
+        oog="$(ignored_under .claude/skills .claude/agents)"
+        mark="  (tem conteúdo fora do git: se sair, não volta pelo git)"
         echo "skills em .claude/skills ($(count "$disk_skills")):"
-        for s in $disk_skills; do echo "  $s"; done
+        for s in $disk_skills; do echo "  $s$(under "$oog" ".claude/skills/$s" && echo "$mark")"; done
         echo "agentes em .claude/agents ($(count "$disk_agents")):"
-        for a in $disk_agents; do echo "  .claude/agents/$a.md"; done
+        for a in $disk_agents; do echo "  .claude/agents/$a.md$(under "$oog" ".claude/agents/$a.md" && echo "$mark")"; done
         echo "Pergunte quais NÃO vieram do anvil e rode de novo com a resposta; o resto sai:"
         echo "  migrate-project.sh --dry-run --keep-skills \"<nomes>\" --keep-agents \"<nomes>\""
         report_profiles
@@ -301,21 +375,15 @@ done
 rm_lock=""; [ "$has_lock" -eq 1 ] && take rm_lock ".claude/anvil.lock"
 rm_guard=""; take rm_guard "$GUARD_REF"
 
-# O que o .gitignore ignora não aparece no git status, e a remoção não seria
-# revisável nem se desfaria pelo git. Conta só o item sem nada versionado: o
-# versionado com um ignorado solto dentro, como um .DS_Store, aparece no git
-# status ao sair, e o ignorado vai junto.
-ignored=""
-for x in $rm_skills $rm_agents $rm_mirror $rm_omp $rm_lock $rm_guard; do
-    [ -n "$(git -C "$ROOT" ls-files -- "$x")" ] && continue
-    [ -z "$(git -C "$ROOT" ls-files -o -i --exclude-standard -- "$x")" ] || ignored="$ignored$x"$'\n'
-done
-if [ -n "$ignored" ]; then
-    echo "erro: o .gitignore do projeto ignora parte do que a migração tiraria, e a remoção não apareceria no git status. Nada foi alterado. Ignorados ($(count "$ignored")):" >&2
-    printf '%s' "$ignored" | sed 's/^/  /' >&2
-    echo "Tire do .gitignore as linhas que ignoram o toolkit — o passo 9 do /anvil-boot faz isso, com aprovação —, commite o que passar a aparecer e rode de novo." >&2
-    exit 2
-fi
+# O que sai fica em duas partes. O que o git conhece aparece no git status depois
+# da execução. O que o git ignora sai junto sem aparecer lá: o item sem nada
+# versionado e o ignorado dentro de item versionado. Esse vai para o relatório,
+# arquivo por arquivo.
+gone="$rm_skills$rm_agents$rm_mirror$rm_omp$rm_lock$rm_guard"
+[ "$settings_state" = file ] && gone="$gone$settings_rel"$'\n'"$settings_link"$'\n'
+[ "$claude_md_gone" -eq 1 ] && gone="$gone$claude_rel"$'\n'"$claude_link"$'\n'
+out_of_git=""
+for f in $(ignored_under $gone); do out_of_git="$out_of_git$f"$'\n'; done
 
 kept_skills=""; kept_agents=""; kept_omp=""
 for s in $disk_skills; do in_list "$anvil_skills" "$s" || kept_skills="$kept_skills.claude/skills/$s"$'\n'; done
@@ -341,22 +409,24 @@ group "symlinks do espelho" "$rm_mirror"
 group "arquivos da camada omp, das linhas omp: do lock" "$rm_omp"
 [ -n "$rm_lock" ] && echo "  .claude/anvil.lock, o lock"
 [ -n "$rm_guard" ] && echo "  $GUARD_REF, a cópia da guarda"
+# O alvo que só tinha o bloco, ou só a entrada, sai inteiro, e o symlink sai com ele
 case "$settings_state" in
-    entry) echo "  .claude/settings.json: a entrada do hook que chama $GUARD_REF; o resto do conteúdo fica, regravado com indentação de 2 espaços" ;;
-    file)  echo "  .claude/settings.json inteiro: só tinha a entrada do hook que chama $GUARD_REF" ;;
+    entry) echo "  $(shown "$settings_rel" "$settings_link"): a entrada do hook que chama $GUARD_REF; o resto do conteúdo fica, regravado com indentação de 2 espaços" ;;
+    file)  echo "  $(shown "$settings_rel" "$settings_link") inteiro: só tinha a entrada do hook que chama $GUARD_REF${settings_link:+; o symlink sai junto}" ;;
 esac
 if [ "$claude_md_gone" -eq 1 ]; then
-    echo "  CLAUDE.md inteiro: só tinha o bloco ANVIL:DIRECTIVES"
+    echo "  $(shown "$claude_rel" "$claude_link") inteiro: só tinha o bloco ANVIL:DIRECTIVES${claude_link:+; o symlink sai junto}"
 elif [ -n "$block" ]; then
-    echo "  CLAUDE.md: o bloco ANVIL:DIRECTIVES, linhas ${block% *} a ${block#* }, marcadores inclusive; o resto do arquivo fica byte a byte"
+    echo "  $(shown "$claude_rel" "$claude_link"): o bloco ANVIL:DIRECTIVES, linhas ${block% *} a ${block#* }, marcadores inclusive; o resto do arquivo fica byte a byte"
 fi
+[ -z "$out_of_git" ] || group "sai junto, fora do git, sem volta pelo git" "$out_of_git"
 echo "fica no projeto:"
 group "skills que não vieram do anvil" "$kept_skills"
 group "agentes que não vieram do anvil" "$kept_agents"
 [ -z "$kept_omp" ] || group "em .omp/, fora das linhas omp:" "$kept_omp"
 [ -z "$behind_link" ] || group "do anvil, mas o caminho passa por symlink, intocados" "$behind_link"
 echo "  .claude/rules/, docs/ e o resto do projeto"
-echo "nada é commitado: revise a remoção com git status e commite"
+echo "nada é commitado: revise com git status a remoção do que era versionado e commite"
 report_profiles
 
 [ "$DRY" -eq 1 ] && exit 0
@@ -373,11 +443,15 @@ done
 for d in .claude/hooks .claude/skills .claude/agents .agents/skills .agents; do
     rmdir "$ROOT/$d" 2>/dev/null || true
 done
-[ "$settings_state" = none ] || settings_guard write
+if [ "$settings_state" != none ]; then
+    settings_guard write
+    [ "$settings_state" = entry ] || [ -z "$settings_link" ] || rm -f "${ROOT:?}/$settings_link"
+fi
 # Só as linhas do bloco saem. head e tail não mexem nos bytes das outras, o \r e a
 # falta de quebra no fim inclusive; cat em vez de mv mantém as permissões.
 if [ "$claude_md_gone" -eq 1 ]; then
     rm -f "$CLAUDE_MD"
+    [ -z "$claude_link" ] || rm -f "${ROOT:?}/$claude_link"
 elif [ -n "$block" ]; then
     start="${block% *}"; end="${block#* }"
     tmp="$(mktemp)"

@@ -197,10 +197,6 @@ bash "$TMP/.claude/skills/anvil-update/scripts/migrate-project.sh" --dry-run
   já migrado.
 - **Árvore suja** → o script para sem tocar em nada. Peça commit ou stash: o diff
   da migração precisa mostrar só a remoção. Depois, rode o dry-run de novo.
-- **Ignorado pelo git** → o `.gitignore` de uma versão antiga ainda ignora o
-  toolkit, e a remoção não apareceria no `git status`; o script para sem tocar em
-  nada e nomeia o que está ignorado. Quem tira essas linhas, com aprovação, é o
-  passo 9 do `/anvil-boot`: aponte o boot neste projeto, que migra depois disso.
 - **Com `.claude/anvil.lock` no projeto** → o dry-run lista por nome o que sai:
   as skills e os agentes do lock, o próprio lock, os symlinks de `.agents/skills`
   com nome de skill do lock, os arquivos de `.omp/` das linhas `omp:`, a entrada
@@ -209,14 +205,35 @@ bash "$TMP/.claude/skills/anvil-update/scripts/migrate-project.sh" --dry-run
   skill, agente e arquivo de `.omp/` fora do lock, rules, `docs/`, o resto do
   settings e do `CLAUDE.md`. Diga isso numa frase e **espere aprovação**.
 - **Sem lock** → o script sai com código 3 e lista as skills de `.claude/skills/`
-  e os agentes de `.claude/agents/` sem apagar nada. Mostre a lista e **pergunte
-  quais não vieram do anvil**. A resposta volta nos dois parâmetros, e tudo fora
-  deles sai: rode o dry-run de novo com eles e espere aprovação.
+  e os agentes de `.claude/agents/` sem apagar nada, com uma marca nos que têm
+  conteúdo fora do git: se o item sair, esse conteúdo não volta pelo git. Mostre a
+  lista com as marcas e **pergunte quais não vieram do anvil**. A resposta volta
+  nos dois parâmetros, e tudo fora deles sai: rode o dry-run de novo com eles e
+  espere aprovação.
 
   ```bash
   bash "$TMP/.claude/skills/anvil-update/scripts/migrate-project.sh" --dry-run \
        --keep-skills "minha-skill outra-skill" --keep-agents "meu-agente"
   ```
+
+O que sai fica em duas partes. O que o git conhece aparece no `git status` depois
+da execução. O que está fora do git sai junto e aparece só no relatório, arquivo
+por arquivo, no grupo **"sai junto, fora do git, sem volta pelo git"**: o item sem
+nada versionado, como o toolkit que um `.gitignore` antigo, o `.git/info/exclude`
+ou o excludes global ignora, e o arquivo ignorado dentro de item versionado, como
+um `.DS_Store` ou um `__pycache__/`. Ao pedir a aprovação, nomeie esse grupo: o
+que está nele não volta com `git checkout`. A regra de ignore não faz a migração
+parar, venha de onde vier, e o `.gitignore` fica como está.
+
+O `CLAUDE.md` e o `.claude/settings.json` que são symlink com o alvo dentro do
+repositório, como o comum `CLAUDE.md → AGENTS.md`, têm o alvo editado pelas
+mesmas regras, e a mudança aparece no `git status`. O grupo **"passa por
+symlink"** lista o que ficou intocado: o item cujo caminho passa por diretório
+symlink e o `CLAUDE.md` ou o settings com o alvo fora do repositório. Diga ao
+usuário que o item ficou porque a migração não escreve fora do projeto. Se o
+alvo é do próprio projeto, ele tira à mão o bloco `ANVIL:DIRECTIVES` ou a entrada
+do hook da guarda; se é da instalação de usuário (`~/.claude/CLAUDE.md`,
+`~/.claude/settings.json`), deixa como está.
 
 Aprovado, execute, com os mesmos `--keep-*` quando houve a pergunta:
 
@@ -224,8 +241,8 @@ Aprovado, execute, com os mesmos `--keep-*` quando houve a pergunta:
 bash "$TMP/.claude/skills/anvil-update/scripts/migrate-project.sh"
 ```
 
-A migração **nunca commita**: a remoção fica no `git status` para o usuário revisar
-e commitar.
+A migração **nunca commita**: a remoção do que era versionado fica no
+`git status` para o usuário revisar e commitar.
 
 Em qualquer projeto, migrado ou não, o dry-run também acusa com `BOOT PENDENTE` o
 perfil de `docs/agents/` que cita script pelo caminho da instalação por projeto,
@@ -236,8 +253,9 @@ sem a cópia: aponte o `/anvil-boot`, que traz o perfil do template.
 
 - órfãos removidos, **por nome**, inclusive os do espelho e da camada omp
 - as colisões que foram sobrescritas, por nome
-- o projeto migrado, se houve: o que saiu dele, e que o diff está no `git status`
-  esperando o commit do usuário
+- o projeto migrado, se houve: o que saiu dele; o que era versionado está no
+  `git status`, esperando o commit do usuário; o que estava fora do git foi
+  listado no dry-run
 - a camada omp: nova, mantida ou não instalada, e o sinal que decidiu
 - as diretivas: o bloco do `~/.claude/CLAUDE.md` criado, trocado ou em dia
 - a guarda de merge: o hook do `~/.claude/settings.json` registrado agora, já em
