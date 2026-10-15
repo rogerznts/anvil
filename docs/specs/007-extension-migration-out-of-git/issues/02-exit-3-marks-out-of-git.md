@@ -5,9 +5,16 @@
 **Blocked by:** 01
 
 **Status:** resolved
+**Review:** round=1; sha=2b3c66a; scope=full; verdict=pass; p1=none
 
 - [x] Sem lock e sem resposta, a lista de skills e agentes da saída 3 marca os que têm conteúdo fora do git e não marca os outros. Nada é alterado, como hoje.
 - [x] A resposta continua em `--keep-skills` e `--keep-agents`, juntos.
 - [x] Com a resposta, a migração chega ao dry-run e à execução sem outra parada, e o conteúdo fora do git do que sai aparece no grupo fora do git.
 - [x] Cenário `workspace/41-legacy-migration/s1.sh`, falhando antes da correção: sem lock, a saída 3 marca a skill que tem conteúdo fora do git, e depois uma rodada de resposta basta para migrar.
 - [x] O `vendor-sync.sh verify` sai limpo.
+
+## Comments
+
+- Review round=1 · P3 (Standards): a variável `oog` do ramo da saída 3 do `migrate-project.sh` repete a ideia que logo abaixo se chama `out_of_git` — quem lê perde um ciclo para decifrar o nome, sem mudança de comportamento.
+- Review round=1 · P3 (Standards): a função `marcados` do cenário `s1.sh` reconhece a marca pelo trecho literal "fora do git", contra o "nunca o texto exato de uma mensagem" das Testing Decisions — se a redação da marca mudar, o cenário quebra com o comportamento certo.
+- Review round=1 · P3 (Spec): uma skill que é ela mesma symlink ignorado recebe a marca "se sair, não volta pelo git", mas a migração apaga só o link e o alvo fica [inferência, não testado] — o aviso diz mais do que se perde, sem levar a perda nenhuma.
