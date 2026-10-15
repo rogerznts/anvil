@@ -2,7 +2,8 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=5dc530a; scope=full; verdict=fail; p1=open
 
 **What to build:** o operador, e mais tarde o piloto e o verbo `index`, roda o
 script de estado do roteiro na raiz de um projeto. O script lê
@@ -52,3 +53,12 @@ repositório e no `README` de `docs/specs/`. Esses três lugares registram que
   kebab-case entre as recusas. O script segue a lista da spec e não recusa; um
   nome com espaço quebraria a linha `frontier:` e o `--skip`, que separam nomes
   por espaço. Fica para decisão do operador se vira recusa.
+- Review round=1 · P1 (Standards): os laços usam `seq 1 "$count"`, e o `seq` do macOS devolve `1 0` para `seq 1 0`; com um `roadmap.md` sem nenhuma entrada, o script morre com `name[i]: unbound variable` e sai 1 — o piloto e o índice recebem erro do bash no lugar de `roadmap:`/`next:`.
+- Review round=1 · P2 (Standards): `read_blockers`, a leitura da última `Review:` e o fecho dos dependentes de travado copiam o `frontier.sh`, e `TYPES` copia o `VALID` do `new-spec.sh`, com a marca só do lado do `roadmap.sh` — quem mudar a regra no `frontier.sh` ou um tipo no `new-spec.sh` não sabe do gêmeo, e o roteiro passa a divergir da `anvil-run`.
+- Review round=1 · P3 (Standards): o array `tipo[]` e os nomes `tipo`/`dep` do awk estão em português, contra a regra de identificadores em inglês do `CLAUDE.md` — só forma.
+- Review round=1 · P3 (Standards): os globais de retorno `st`/`rs` e a constante `US` não dizem o que guardam — quem lê precisa abrir o corpo das funções.
+- Review round=1 · P3 (Standards): o cabeçalho lista a recusa por argumento inválido com saída 2 e omite a de fora de um repositório git — documentação incompleta, sem efeito no comportamento.
+- Review round=1 · P3 (Spec): o `--skip` aceita vírgula além de espaço, sintaxe que a spec não documenta — segunda forma de chamada sem contrato.
+- Review round=1 · P3 (Spec): a saída 2 da recusa só está no cabeçalho do script — o índice (ticket 02) precisa saber que a recusa sai com 2 para não tratá-la como falha.
+- Review round=1 · P3 (Spec): spec cujos únicos tickets têm `Type:` (decisões do wayfinder), todos `resolved`, sai `open … sem ticket de implementação`, e a tabela da spec diria `stopped` — o índice mostraria "em andamento" numa spec parada.
+- Review round=1 · P3 (Spec): o `docs/specs/README.md` diz que o roteiro é escrito "depois do sim do operador", e a spec manda escrevê-lo e mostrá-lo antes do sim, com só o commit depois — quem ler só o README acha que o arquivo não existe enquanto o roteiro espera confirmação.
