@@ -3,6 +3,7 @@
 **Blocked by:** 04
 
 **Status:** resolved
+**Review:** round=1; sha=aeedffd; scope=full; verdict=pass; p1=none
 
 **What to build:** depois do roteiro confirmado, o piloto executa a corrente sem
 pausa, num projeto que fecha sem PR. O laço segue a seção "Corrente" da spec,
@@ -88,3 +89,13 @@ um grill novo com a pauta de "o que ainda espera decisão".
   liberou os merges, que vieram depois do archive commitado. O caso da guarda
   bloqueando um merge indevido, da seção S2 da spec, fica para o ticket que trata
   as paradas.
+- Review round=1 · P2 (Standards): possível Duplicated Code, que já diverge. O "Despacho" reescreve o laço da `anvil-run` e perdeu o passo de rodar o script de novo com o `--skip` logo que um ticket é pulado: o passo 3 volta ao passo 1 com uma saída que ainda dá o pulado no `next` — o piloto pode despachar o pulado mais uma vez, e cada mudança no laço da `anvil-run` exige uma edição paralela aqui.
+- Review round=1 · P2 (Spec): laço do `--skip` incompleto ("pulados no `--skip`"). Sem rodar o `frontier.sh` de novo com o `--skip` antes de voltar ao passo 1, o `next` ainda aponta o ticket recém-pulado — o piloto, lido ao pé da letra, o despacha de novo, e nenhum caso do S2 passa por esse caminho.
+- Review round=1 · P3 (Standards): possível Duplicated Code — o `awk` que extrai o bloco de `## Comando de verificação` aparece na largada e no `PASS` — uma mudança numa cópia só faz a largada aceitar um comando diferente do que o `PASS` roda.
+- Review round=1 · P3 (Standards): o aviso de `isolation: misconfigured` da `anvil-run` não está no despacho do piloto — o operador não fica sabendo pelo relatório por que o omp integrou sem commit, e um `halt` por árvore suja aparece sem a causa.
+- Review round=1 · P3 (Standards): o molde do relatório tem títulos fixos em pt-BR, e o texto manda escrever no idioma de comunicação das rules — num projeto com outro idioma declarado, o `report.md` sai misturado, porque a skill não diz se os títulos se traduzem.
+- Review round=1 · P2 (Standards): a regra de juntar os dois lados do bloco custom, correção do `K-r2`, não foi vista rodando — um defeito nela só aparece no primeiro conflito real com texto custom dos dois lados.
+- Review round=1 · P2 (Spec): a regra do bloco custom passou sem efeito no `out/K` final ("primeira linha custom do branch: nenhuma") — a correção do que o `K-r2` mostrou continua sem prova.
+- Review round=1 · P2 (Spec): o caso da guarda de merge bloqueando, do S2 da spec, ficou sem dono: o critério de S2 do ticket 06 lista só travado, PR e retomada — nenhum ticket prova que um bloqueio da guarda conta como recusa, e não como sucesso.
+- Review round=1 · P2 (Spec): prova fraca de que o `PASS` rodou o bloco declarado. Em 2 das 5 rodadas (`C` final e `K-r1`), o modelo escapou as aspas internas, a extração do `awk` falhou e ele digitou o comando, e a conferência do `s2.sh` aceita qualquer `bash -n lib.sh` — um piloto que rode outro comando também passa no S2.
+- Review round=1 · P3 (Spec): no relatório do `C` final, toda pausa sai como "a mais conservadora", inclusive a dos seams do `anvil-to-spec`, que costuma trazer recomendação — o auditor não sabe se o piloto ignorou uma recomendação da skill.
