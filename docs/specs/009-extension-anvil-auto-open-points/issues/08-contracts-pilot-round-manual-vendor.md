@@ -3,6 +3,7 @@
 **Blocked by:** 01, 07
 
 **Status:** resolved
+**Review:** round=1; sha=82d9f609ea883e370cb9420e53669afe854c1ebf; scope=full; verdict=pass; p1=none
 
 **What to build:** quem lê o perfil do tracker, o manual `anvil-omp` ou o
 material do bench encontra o comportamento de hoje, e não o da 008 ou o do
@@ -43,3 +44,28 @@ do operador sobre os tickets 07 e 08 da spec 008: a mudança no implementer fica
   `diff` entre `docs/agents/issue-tracker.md` e
   `anvil/.claude/skills/anvil-docs/templates/issue-tracker-anvil.md` sai vazio, e
   `grep -rnE 'tr[eê]s tentativas|teto de tr[eê]s' anvil README.md` não acha nada.
+- Review round=1 · P3 (Standards): o formato da linha do piloto mora em três
+  textos, o perfil do tracker nas duas cópias, o `anvil-auto/SKILL.md` e o
+  `anvil-implementer.md`, e o do implementer usa marcadores mais curtos
+  (`` `<arquivo>` ``, "o que ela explica") — uma mudança futura no formato exige
+  três edições, e a diferença de marcador já existe.
+- Review round=1 · P3 (Standards): o template do perfil do tracker, que vai para
+  todo projeto, cita "a skill `anvil-auto`", que só existe na camada omp — quem lê
+  o perfil num projeto Claude Code procura uma skill que não tem, sem mudança de
+  comportamento, porque a linha nunca é gravada ali.
+- Review round=1 · P3 (Standards): sobraram linhas curtas sem realinhar no
+  `anvil-implementer.md` (l.31) e no `anvil-omp/SKILL.md` (a que termina em "O
+  Codex lê as skills") — só a leitura do Markdown cru piora.
+- Review round=1 · P3 (Spec): "a única rodada que não segue o orçamento" no perfil
+  do tracker só é exata com N 3 ou mais; com N 1 ou 2 a rodada do piloto cabe no
+  orçamento de `verification.md` — repete a moldura do piloto, e o implementer
+  mede N do mesmo jeito, então nada quebra.
+- Review round=1 · P3 (Spec): os marcadores da linha do piloto no implementer
+  diferem dos do piloto e do perfil, contra o "um formato só" da spec — a
+  estrutura é a mesma e a leitura não falha; um leitor que compare os três textos
+  acha que divergem.
+- Review round=1 · P3 (Spec): a troca no `README.md` da raiz, fora do payload, não
+  foi pedida pelo ticket — segue a razão do `VENDOR.md` e não quebra nada.
+- Review round=1 · P3 (Spec): o manual não cita o caso sem roteiro com spec
+  aberta, em que o bench constrói essa spec — quem lê "sem ela, a do `next:`" pode
+  esperar nada construído com `next: none`; o ticket não pede esse caso.
