@@ -2,7 +2,8 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=bda848e6e7e73e6cfd878ee3020addcaa7aa2b47; scope=full; verdict=fail; p1=open
 
 **What to build:** a largada e o `PASS` do piloto leem o mesmo bloco de
 `## Comando de verificação` de `.claude/rules/anvil.md` por um script da camada
@@ -43,3 +44,10 @@ comando declarado e a linha `exit:` que o script imprime.
 - O check 15 do `verify` não lê caminho com `~/`, e o `anvil-auto` cita o script só como `~/.omp/agent/skills/anvil-auto/verification.sh`. O check passa, mas não confere esse caminho: com o script renomeado numa worktree descartável, o `verify` saiu `limpo`. A lacuna é a do P3 do ticket 04 da 008, e a spec deixa o check 15 sobre `~/` fora de escopo. A conferência de que o caminho existe na camada está na seção 9 do S1.
 - Achado fora do ticket: na rodada 1 do S2, com o `claude-sonnet-4-5`, o piloto rodou a corrente sem pedir o sim sobre o roteiro que já existia, contra "a confirmação dele sobre o roteiro escrito é o único sim da execução". O S2 do 47 pararia aí; este S2 registra uma nota e mede a corrente no turno em que ela rodou.
 - `vendor-sync.sh verify`: `verify: limpo`, rc 0.
+- Review round=1 · P1 (Spec): no `awk` do `verification.sh`, o `section && /^## / { exit }` vem antes do `block { print }`, e uma linha `## …` dentro do bloco `bash`, comentário válido, corta o comando ali — o `run` roda o bloco truncado e sai `0` (`echo um` / `## comentario` / `false` dá `um` e `exit: 0`), e o `PASS` fecha a spec sem ter rodado o comando declarado inteiro.
+- Review round=1 · P3 (Spec): quando a saída do comando não termina em quebra de linha, o `exit:` sai colado nela (`printf sem-quebra` dá `sem-quebraexit: 0`) — quem procura a linha `exit:` no relatório não a acha sozinha.
+- Review round=1 · P3 (Spec): numa rule com fim de linha CRLF, a comparação exata do título falha e a recusa diz que a seção não existe — a recusa está certa, mas o motivo engana o operador.
+- Review round=1 · P3 (Standards): bloco sem a cerca de fechamento segue lendo até a próxima seção ou o fim do arquivo — um projeto com a cerca esquecida roda o que vier depois como parte do comando.
+- Review round=1 · P3 (Standards): o `check` imprime o comando cru, e não no formato `chave: valor` dos scripts irmãos — quem quiser ler a saída por chave não acha uma; é o que o ticket pede.
+- Review round=1 · P3 (Standards): no passo 3 da largada, "A mensagem diz onde e como declarar" vem logo depois de "Uma linha `refusal:` é recusa" e pode ser lida como a própria linha `refusal:` — um piloto pode repassar só o motivo ao operador, sem o modelo da seção.
+- Review round=1 · P3 (Standards): possível Mysterious Name em "o script do comando", no passo 3 da largada, que não diz o que o script faz antes de o nome aparecer no bloco — custa só leitura.
