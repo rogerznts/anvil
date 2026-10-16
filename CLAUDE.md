@@ -148,7 +148,9 @@ A cauda não dispara:
   gera o prompt da próxima sessão;
 - quando a skill para numa pergunta ao usuário: ela ainda não terminou;
 - quando a própria skill já invocou o `anvil-next` no fim, como o `anvil-run` faz
-  ao fechar a spec.
+  ao fechar a spec;
+- dentro de uma execução do `anvil-auto`: quem decide o próximo passo ali é o
+  piloto, que termina oferecendo um grill novo.
 
 Fora da lista — `tea-commit`, `anvil-tdd`, `anvil-code-review` e `anvil-handoff`,
 por exemplo —, o `anvil-next` roda só a pedido do usuário, e a skill termina sem

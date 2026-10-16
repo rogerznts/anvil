@@ -73,10 +73,11 @@ O bench é a exceção escopada à regra de que o toolkit pausa a cada decisão.
 fundamento é a **audiência**: um leigo não tem como responder "os testes de
 integração falharam, quer que eu ajuste o mock?".
 
-- Teto de **3 tentativas** de correção por tarefa.
+- Teto de **duas rodadas** de verificação por ticket, o orçamento do ADR-0010 (a
+  verificação tem critério de parada); a regra está no `GATE.md` do `anvil-bench`.
 - `PASS` exige smoke, testes acumulados de módulo e asserts de negócio, todos
   verdes.
-- Teto esgotado produz `CONCERNS`, e o loop para — não insiste.
+- Ticket travado na rodada 2 produz `CONCERNS`, e o loop para — não insiste.
 
 É o único lugar do anvil que grava `gate.yaml`, e é por isso: um loop headless,
 que dispara agentes isolados com o disco como fronteira de estado, precisa de

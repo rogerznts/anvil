@@ -20,7 +20,48 @@ Só fale se encontrar link quebrado ou entrada obsoleta.
    `ui/`, `qa/`, `project/`: se a pasta não existe, **não gere o link**. Índice
    que aponta para pasta ausente é pior que índice incompleto.
 
-3. **Specs ativas** — uma linha por pasta em `docs/specs/*/` que não esteja sob
+3. **Roteiro** — só quando `docs/specs/roadmap.md` existe. Sem ele, a seção
+   não sai, nem o título: o índice fica como sem este passo. O estado de cada
+   entrada sai do script, rodado da raiz do projeto, no checkout atual:
+
+   ```bash
+   bash ~/.claude/skills/anvil-docs/scripts/roadmap.sh
+   ```
+
+   A seção vem logo acima de "Specs ativas", com uma linha para cada `entry:`,
+   na ordem em que o script as devolve, que é a do roteiro:
+
+   ```markdown
+   - **<nome>** — <estado>[ — <spec>]
+   ```
+
+   | `state=` | `<estado>` |
+   |---|---|
+   | `pending` | pendente |
+   | `open` | em andamento |
+   | `closed` | fechada |
+   | `stopped` | parada: `<reason>`, o texto do `reason=` copiado como está |
+
+   `<spec>` só existe quando a linha tem `spec=` com número. Ele é o link da
+   pasta, `[NNN](./specs/{NNN}-{tipo}-{nome}/)` ou
+   `[NNN](./specs/archive/{NNN}-{tipo}-{nome}/)`, achada pelo prefixo numérico
+   no checkout atual. Sem a pasta no checkout, como a spec aberta que só existe no
+   branch dela, é `spec NNN`, sem link.
+
+   Quando `docs/specs/report.md` existe, a seção termina com esta linha; sem o
+   arquivo, ela não sai:
+
+   ```markdown
+   Relatório da execução: [report.md](./specs/report.md)
+   ```
+
+   **Recusa.** O script sai com `2` e linhas `refusal:` quando o roteiro não pode
+   terminar. Isso não é falha da geração: a seção sai sem linha de entrada, com
+   uma linha `> **Aviso:** o roadmap.sh recusou o roteiro: <motivo>` por linha
+   `refusal:`, e o resto do índice é gerado normalmente. A linha do relatório
+   segue a mesma regra de quando não há recusa.
+
+4. **Specs ativas** — uma linha por pasta em `docs/specs/*/` que não esteja sob
    `archive/`. O estado é derivado, não lido de campo:
 
    | condição | estado |
@@ -35,22 +76,22 @@ Só fale se encontrar link quebrado ou entrada obsoleta.
 
    Ordene por número, **decrescente**.
 
-4. **Specs arquivadas** — uma linha por pasta em `docs/specs/archive/*/`,
+5. **Specs arquivadas** — uma linha por pasta em `docs/specs/archive/*/`,
    ordenadas por número decrescente.
 
-5. **Conteúdo por domínio** — para cada domínio, liste os `.md` em ordem
+6. **Conteúdo por domínio** — para cada domínio, liste os `.md` em ordem
    alfabética, com o título tirado do primeiro `#` e uma descrição de uma ou duas
    linhas tirada do próprio conteúdo. `README.md` de domínio não entra na lista —
    ele já é a descrição da pasta.
 
-6. **Preservar o bloco custom.** Se `docs/index.md` já existir, leia o que está
+7. **Preservar o bloco custom.** Se `docs/index.md` já existir, leia o que está
    entre `<!-- custom -->` e `<!-- /custom -->` e reescreva idêntico no arquivo
    novo. É o único trecho que o usuário pode editar à mão.
 
-7. **Entradas obsoletas** — arquivo que estava no índice e não existe mais:
+8. **Entradas obsoletas** — arquivo que estava no índice e não existe mais:
    **pergunte** antes de remover a linha. Pode ser arquivo movido, não deletado.
 
-8. **Escrever**, com `Last updated` em ISO 8601 UTC.
+9. **Escrever**, com `Last updated` em ISO 8601 UTC.
 
 ## Regras
 

@@ -188,10 +188,38 @@ puro, sem frontmatter.
   camadas, convenções de pasta, como rodar os testes, fluxos comuns, e as regras
   que o agente deve seguir neste projeto.
 - **`anvil.md`** — sempre. A configuração resolvida: idioma de comunicação
-  (default pt-BR), comando de teste, a lista de modelos por papel que o
+  (default pt-BR), o comando de verificação, a lista de modelos por papel que o
   `anvil-arena`, o `anvil-how` e o `anvil-architect` leem, e a seção de
   instalação, para quem clona o projeto.
 - **`frontend.md`** — só se houver código de frontend.
+
+A seção de verificação do `anvil.md` é contrato com o piloto automático, a skill
+`anvil-auto`. Ele procura este título na largada e recusa o projeto que não o
+tem; depois, roda o bloco na raiz do projeto para provar uma spec antes de
+fechá-la, e só a saída `0` vale como prova:
+
+````markdown
+## Comando de verificação
+
+```bash
+npm test
+```
+````
+
+- O título é este, exato, e debaixo dele vai **um** bloco `bash`, com o comando
+  que roda a suíte inteira a partir da raiz do projeto, sem pedir nada no
+  terminal. Uma linha de prosa antes do bloco pode dizer o que ele cobre.
+- O comando sai da varredura do passo 3, com caminho verificado: o script de
+  teste do manifesto de pacote, o alvo do `Makefile`, o que o README ou o CI
+  rodam. Um comando que o projeto não tem sai diferente de `0`, e nenhuma spec
+  fecha.
+- Projeto sem suíte declara o que faz as vezes dela — um lint, um build, uma
+  checagem de sintaxe — e diz isso na linha de prosa: "Não há suíte de teste. O
+  que faz as vezes:".
+- **Sem comando conhecido**, pergunte ao usuário qual comando prova o projeto,
+  junto com o resto da proposta, e espere a resposta. Não grave a seção vazia,
+  nem com um comando inventado: sem resposta, ela fica de fora, e o relatório do
+  passo 10 a lista como pendente, porque sem ela o piloto recusa o projeto.
 
 A seção de modelos do `anvil.md`:
 
@@ -227,8 +255,10 @@ O segundo comando mostra o que entra e o que fica; o terceiro instala. Para
 trocar de versão depois, rode `/anvil-update`.
 ```
 
-Num `anvil.md` que já existe sem a lista de modelos ou sem a seção de instalação,
-proponha acrescentá-las; valor já configurado não se troca.
+Num `anvil.md` que já existe sem a seção de verificação, sem a lista de modelos
+ou sem a seção de instalação, proponha acrescentá-las; valor já configurado não
+se troca. O comando de teste que um boot antigo gravou sob outro título é o que a
+seção de verificação leva.
 
 Depois, **sugira** rules adicionais, cada uma com uma linha de evidência do
 código que a justifica, e **espere aprovação**: `coding-standards.md`,

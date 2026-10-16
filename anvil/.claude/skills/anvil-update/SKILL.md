@@ -48,9 +48,10 @@ Codex acha `SKILL.md` em subpasta de skill e só pula pasta oculta. Nesta versã
 ela traz o hook da guarda de merge em `hooks/pre/`, a rule `anvil-harness` em
 `rules/`, que traduz o vocabulário do Claude Code nas skills, a rule
 `anvil-directives`, gerada do `claude_boot.md`, o agente `anvil-implementer` em
-`agents/`, que implementa um ticket e roda o review, e três skills em `skills/`: os
-condutores `anvil-plan` e `anvil-run`, que encadeiam o fluxo e despacham o
-implementer, e o manual `anvil-omp`. Os seus arquivos em `~/.omp/agent/` —
+`agents/`, que implementa um ticket e roda o review, e quatro skills em `skills/`:
+os condutores `anvil-plan` e `anvil-run`, que encadeiam o fluxo e despacham o
+implementer, o piloto automático `anvil-auto`, que leva o roteiro de várias specs
+do grill ao fechamento, e o manual `anvil-omp`. Os seus arquivos em `~/.omp/agent/` —
 `config.yml`, agentes, rules, skills — ficam intocados. Para tirar a camada, siga
 o manual, em `~/.omp/agent/skills/anvil-omp/SKILL.md`.
 

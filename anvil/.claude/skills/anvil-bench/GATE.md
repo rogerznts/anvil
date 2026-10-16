@@ -39,16 +39,21 @@ da primeira. É isso que torna a série legível.
 
 ## A evidência
 
-O `gate.yaml` é o veredito. O que o produz é a **reexecução do ledger** que a
-fase 4 escreveu, nunca a leitura do que o agente disse ter feito:
+O `gate.yaml` é o veredito. O que o produz é a **reexecução dos ledgers** que a
+fase 4 escreveu, o da spec e o de cada spec do roteiro já fechada, nunca a leitura
+do que o agente disse ter feito. Rode no branch da spec, com o container de pé
+(`docker compose up -d app`, se não estiver):
 
 ```
+fechados="$(bash ~/.claude/skills/anvil-docs/scripts/roadmap.sh | sed -n 's/^entry: .* state=closed spec=\([0-9]*\) .*/\1/p' |
+  while read -r n; do ls docs/specs/archive/"$n"-*/gates.md 2>/dev/null; done)"
 docker compose cp ~/.claude/skills/anvil-bench/unlazy/scripts/. app:/tmp/anvil-gates
 docker compose exec -T app node /tmp/anvil-gates/gate-check.mjs \
-  --reverify --approve docs/specs/<id>/gates.md
+  --reverify --approve --cwd . docs/specs/<pasta>/gates.md $fechados; echo "exit: $?"
+[ -z "$fechados" ] || git checkout -- $fechados
 ```
 
-Três coisas nesse comando não são detalhe de digitação.
+Cinco coisas nesse comando não são detalhe de digitação.
 
 **`--reverify`, nunca `--status`.** O `--status` lê o ledger e acredita nele: um
 gate marcado à mão, com uma linha de evidência inventada, devolve `ALL MET` e sai
@@ -68,15 +73,27 @@ comando porque a aprovação do unlazy amarra o `PATH` inteiro e não sobrevive 
 recriação do container: em loop headless ela é registro, não consentimento. Quem
 lê os comandos antes de aprová-los é você, na fase 4, ao escrever o ledger.
 
+**Os ledgers das specs fechadas.** Uma spec nova não pode quebrar o que já foi
+entregue, e o `PASS` dela reexecuta também o ledger de cada spec do roteiro que o
+`roadmap.sh` dá como `closed`, arquivado em `docs/specs/archive/`. Um gate delas
+que cai é regressão, e segura a spec nova. O checker reescreve a evidência de cada
+ledger que reexecuta, e uma spec arquivada não muda: o `git checkout` devolve os
+ledgers dela como estavam, e o que vale é a saída. Sem roteiro, o ledger é só o da
+spec.
+
+**`--cwd .`** Os `CHECK:` são escritos como rodam da raiz do projeto, no
+container. Sem ele, o checker roda cada ledger ao lado de si, e o de uma spec
+arquivada fica um nível mais fundo que o de uma spec aberta.
+
 Contexto e limites do material adotado: [unlazy/VENDOR.md](unlazy/VENDOR.md).
 
 ## O veredito
 
 | veredito | quando | o loop |
 |---|---|---|
-| `PASS` | o `--reverify` do ledger sai `0`: smoke, testes de módulo acumulados e asserts de negócio, **todos** verdes | para, entrega |
-| `CONCERNS` | teto de 3 tentativas esgotado, ou defeito que não bloqueia | para, reporta o que falta |
-| `FAIL` | defeito bloqueante com tentativa ainda disponível | volta para o `anvil-implement` |
+| `PASS` | o `--reverify` dos ledgers sai `0`: smoke, testes de módulo acumulados e asserts de negócio, **todos** verdes, nesta spec e nas já fechadas | para, entrega |
+| `CONCERNS` | ticket travado em `round=2` — a rodada 2 dele não aprovou, e a última `Review:` está em `round=2` com `verdict=fail` —, ou defeito que não bloqueia | para, reporta o que falta |
+| `FAIL` | defeito bloqueante — P1 na `Review:` da rodada 1, ou gate derrubado pelo `--reverify` | volta para o `anvil-implement` se o ticket ainda tem rodada; no teto, para e reporta o que falta |
 | `WAIVED` | alguém aceitou explicitamente o defeito | para, com os quatro campos de waiver preenchidos |
 
 **Só o veredito decide.** O score não termina loop nenhum.
@@ -100,19 +117,53 @@ Ele existe para tornar a **trajetória** visível:
 
 - dois `FAIL` com score parado → estagnação. Hora de parar e devolver, não de
   tentar de novo.
-- dois `FAIL` com score subindo → convergência lenta. Vale a próxima volta.
+- dois `FAIL` com score subindo → convergência lenta. Vale a próxima volta, se o
+  ticket ainda tem rodada.
 
 `score_history` é acumulado: o arquivo é reescrito a cada volta, então score que
 não for anexado ali se perde.
 
-## O teto de três
+## O teto de duas rodadas
 
-Por ticket, não por spec. Esgotado, o veredito é `CONCERNS` e o loop **para** —
-não insiste, não tenta uma quarta com outra abordagem.
+Por ticket, não por spec. É o orçamento do ADR-0010 — a verificação tem critério
+de parada, e a terceira rodada é escolha declarada de um humano —, o mesmo que
+vale no resto do anvil, com as classes e a persistência de
+`docs/agents/verification.md`:
 
-O motivo é o mesmo que justifica o loop existir: quem está esperando a ferramenta
-não tem como julgar se a quarta tentativa vale a pena. Parar e dizer o que falta
-é mais honesto que continuar tentando.
+- a **rodada 1** mede o ticket inteiro;
+- a **rodada 2** mede o diff da correção: remede os achados da rodada 1 e o que a
+  correção pode ter quebrado.
+
+Cada rodada deixa uma linha `Review:` no ticket, e é por ela que se conta: o
+disco diz em que rodada o ticket está, não a memória da sessão. Um gate derrubado
+pelo `--reverify` também gasta a rodada em que caiu, e o ticket volta para a
+seguinte.
+
+A rodada 2 que não aprova **trava** o ticket: a última `Review:` dele fica em
+`round=2` com `verdict=fail`. O veredito é `CONCERNS`, e o loop **para** — não
+insiste, não abre uma terceira rodada com outra abordagem. O gate que cai depois
+da rodada 2 também esgota o teto: o veredito fica `FAIL`, e o loop para do mesmo
+jeito. Em qualquer dos dois casos, o que continua aberto vai para a entrega como
+pendência declarada; no ticket travado, os P1 ficam no `## Comments` dele.
+
+A terceira rodada não é do bench. O motivo é o mesmo que justifica o loop
+existir: quem está esperando a ferramenta não tem como julgar se ela vale a pena.
+Parar e dizer o que falta é mais honesto que continuar tentando.
+
+## Sob o piloto automático
+
+No omp, quando o bench é a entrada do piloto automático, a skill `anvil-auto`, o
+supervisor é o piloto. Ele roda o comando de "A evidência" no `PASS` de cada spec,
+depois que o despacho acabou, e lê a saída assim:
+
+- o gate manual aberto, sem `CHECK:`, deixa a spec parada à espera de quem
+  confere, e vai para o relatório como pergunta. Nem o piloto nem o implementer o
+  marcam: a evidência dele é de quem conferiu;
+- o gate com `CHECK:` que cai, nesta spec ou numa fechada, é o `FAIL` no teto:
+  nenhum ticket volta ao despacho sem a rodada extra, e o piloto pesquisa em fontes
+  primárias antes de travar. A rodada extra que a pesquisa abre, com evidência
+  nova, é a exceção que o piloto declara no ticket, e não uma terceira rodada do
+  bench.
 
 ## Nova evidência
 

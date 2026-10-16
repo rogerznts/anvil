@@ -110,6 +110,67 @@ caiba. O hook bloqueia o `tea pr create` e o `git merge` enquanto a spec não
 estiver arquivada no commit do branch — o `git merge` disparado da `main`
 inclusive, porque a spec do branch mesclado também é conferida.
 
+## Roteiro e relatório
+
+Dois arquivos moram direto em `docs/specs/`, fora das pastas de spec, porque
+cobrem mais de uma spec. Nenhum dos dois é spec, e a guarda de merge não os lê.
+
+- `docs/specs/roadmap.md` — o **roteiro**: o plano de várias specs que o piloto
+  automático, a skill `anvil-auto`, executa. Há um roteiro ativo por projeto.
+  Quem o escreve é o piloto, no fim do grill, ou o `anvil-bench`, no fim da
+  entrevista, e o commita na `main` depois do sim sobre o texto, que no bench é a
+  versão em português simples. Depois disso, só se acrescenta a linha `Spec:` de
+  uma entrada quando a spec dela nasce. O histórico do roteiro fica no git, sem
+  arquivo de versão.
+- `docs/specs/report.md` — o **relatório** da execução do piloto: o que foi
+  feito, o que foi decidido sem humano, onde a corrente parou e, por último, o
+  que ainda espera decisão, cada item como pergunta. O piloto o escreve à medida
+  que a corrente avança e o commita na `main` a cada fronteira de spec.
+
+No roteiro, cada entrada é uma seção de segundo nível cujo título é o **nome**
+da entrada, em kebab-case e único no arquivo. O nome é o `--short-name` do
+`new-spec.sh` e é o que as outras entradas citam em `Depende de:`. As chaves são
+linhas `Chave: valor` no começo da linha, com ou sem negrito, como o `Status:`
+dos tickets:
+
+```markdown
+# Roteiro
+
+## cadastro-de-clientes
+
+Tipo: feature
+Depende de:
+Spec: 009
+
+Entra: cadastro, busca e edição de clientes.
+Fica de fora: importação de planilha.
+Pronto quando: um atendente cadastra, encontra e corrige um cliente.
+
+## pedidos
+
+Tipo: feature
+Depende de: cadastro-de-clientes
+
+Entra: …
+Fica de fora: …
+Pronto quando: …
+```
+
+- `Tipo:` é um dos tipos do `new-spec.sh`.
+- `Depende de:` é uma lista de nomes separados por vírgula. Vazia ou ausente,
+  a entrada não tem dependência.
+- `Cobre:` traz os ids do `docs/qa/checklist.yaml` e só existe no bench.
+- `Spec:` não existe enquanto a spec não nasce, e só quem abre a spec da entrada
+  o escreve: o piloto, ou o bench chamado direto.
+- `Entra:`, `Fica de fora:` e `Pronto quando:` vêm do grill, e o piloto nunca os
+  edita.
+- A ordem das seções é a ordem do roteiro.
+- O roteiro não tem `Status:`. O estado de cada entrada (`pending`, `open`,
+  `closed` ou `stopped`) e a próxima a construir saem do disco, pelo script
+  `bash ~/.claude/skills/anvil-docs/scripts/roadmap.sh`, da raiz do projeto. Ele
+  recusa, com o motivo, o roteiro com nome repetido, `Depende de:` para nome
+  inexistente, ciclo ou `Tipo:` inválido.
+
 ## Wayfinding operations
 
 Usadas pelo `/anvil-wayfinder`. O **mapa** é um arquivo com um **filho** por

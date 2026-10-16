@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-15T18:57:45Z
+Last updated: 2026-10-16T05:28:58Z
 
 ## Visão geral
 
@@ -27,6 +27,7 @@ Nenhuma.
 
 ## Specs arquivadas
 
+- [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/archive/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, 11 tickets
 - [007 — Migração lista o que está fora do git e edita o alvo de symlink no repositório](./specs/archive/007-extension-migration-out-of-git/spec.md) — `extension/007-migration-out-of-git`, 4 tickets
 - [006 — Instalação por usuário, idioma no chat e cauda do `anvil-next`](./specs/archive/006-feature-user-install-language-next/spec.md) — `feature/006-user-install-language-next`, 7 tickets
 - [004 — Robustez e isolamento da camada omp](./specs/archive/004-extension-omp-layer-hardening/spec.md) — `extension/004-omp-layer-hardening`, 11 tickets
@@ -51,8 +52,8 @@ Nenhuma.
 - [context.md](./architecture/context.md) — o glossário: curadoria, referências,
   tickets e harness, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
-  impõe, como o estado é lido do disco, os três harnesses e a camada omp, e a
-  herança do mosk.
+  impõe, como o estado é lido do disco, os três harnesses e a camada omp, com o
+  piloto automático, e a herança do mosk.
 - **ADRs**
   - [adr-0001](./architecture/adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md)
     — skills vendorizadas seguem o padrão original; o anvil impõe só o caminho em `docs/`
@@ -80,6 +81,8 @@ Nenhuma.
     — o frontier roda em paralelo sob pedido, só com a isolação do omp no modo branch
   - [adr-0013](./architecture/adr/adr-0013-toolkit-instalado-por-usuario.md)
     — o toolkit é instalado uma vez por usuário; o projeto fica só com rules e `docs/`
+  - [adr-0014](./architecture/adr/adr-0014-piloto-automatico-fecha-sem-humano.md)
+    — o piloto automático leva o roteiro ao fechamento sem humano; revê em parte o adr-0010 e o adr-0011
 
 ### Project
 

@@ -183,8 +183,9 @@ skills:
   # FORA, deliberadamente: tests, .github, .gitignore, README, CHANGELOG,
   # CONTRIBUTING, package.json e agents/ (infraestrutura de repositório), mais
   # scripts/install-hooks.mjs e scripts/stop-hook.mjs — o Stop hook solta depois
-  # de 6 bloqueios sem progresso e o bench para no teto de 3 tentativas: duas
-  # condições de parada rivais na mesma sessão. O motivo está no VENDOR.md.
+  # de 6 bloqueios sem progresso e o bench para no teto de duas rodadas por
+  # ticket: duas condições de parada rivais na mesma sessão. O motivo está no
+  # VENDOR.md.
   - name: anvil-bench
     source: unlazy
     pin: 16671491f6679ad9378f52604d3bc2415b4120c7
@@ -221,7 +222,7 @@ skills:
 #   tea-commit · tea-open-pr · tea-open-fast-pr · tea-prune-branches
 #
 # Camada omp, autoral e sem upstream, dentro da anvil-update em .omp-layer/:
-#   skills anvil-plan · anvil-run · anvil-omp · agente anvil-implementer
+#   skills anvil-plan · anvil-run · anvil-auto · anvil-omp · agente anvil-implementer
 #
 # O anvil-bench é autoral E tem entrada no sync: o SKILL.md e o GATE.md são
 # nossos (protegidos por `keep`), e o material do unlazy embaixo de unlazy/ vem
