@@ -2,7 +2,8 @@
 
 **Blocked by:** 06
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=9fdf41d; scope=full; verdict=fail; p1=open
 
 **What to build:** numa parada técnica (ticket travado em `round=2`,
 verificação que falha no `PASS` ou implementer bloqueado por fato desconhecido),
@@ -78,3 +79,12 @@ O `FAIL` no teto do bench usa esta mesma pesquisa, e quem o liga é o ticket 10.
   casos T e V, o implementer da rodada extra registrou que o fixed point não
   resolve e mediu a partir do `HEAD` do começo da vez dele.
 - O `FAIL` no teto do bench não foi ligado: é do ticket 10.
+- Review round=1 · P1 (Spec): a condição "uma por parada" vive na memória da conversa ("nesta execução"), e numa retomada o mesmo ticket travado de novo pode ganhar uma segunda rodada extra com outra URL — o teto do ADR-0010 vira uma rodada a mais por execução, contra o "uma só" da spec.
+- Review round=1 · P2 (Spec): os critérios das três paradas técnicas e do gate manual estão marcados sem prova executada do implementer bloqueado nem do gate manual — quem lê só as caixas acredita que as três paradas foram exercitadas.
+- Review round=1 · P3 (Standards): "a exceção declarada ao ADR-0010" cita o id sem glosa e sem "do anvil" — num projeto de usuário o agente pode abrir o ADR-0010 do projeto, que trata de outra coisa.
+- Review round=1 · P3 (Standards): a condição 1 roda o `grep -F` no ticket que só a condição 2 identifica — com "Ticket que ela aponta: nenhum", o relatório pode dar "sem evidência nova" em vez de "a evidência não aponta ticket".
+- Review round=1 · P3 (Standards): possível Mysterious Name — o título "Uma por parada" e o "Nunca" falam de parada, e a regra conta por ticket — editar só um dos dois diverge a unidade da contagem.
+- Review round=1 · P3 (Standards): possível Shotgun Surgery — o relatório mantém "### Travados em round=2" com a rodada 3 agora possível — um ticket travado em `round=3` sai sob um título que mente sobre a rodada.
+- Review round=1 · P3 (Standards): possível Duplicated Code — os quatro sinais de laço foram copiados de `docs/agents/verification.md` — se o perfil mudar, a skill fica com a cópia velha.
+- Review round=1 · P3 (Standards): a seção "Pesquisa antes de travar", com cerca de 110 linhas só do caminho de parada, ficou inline e a skill passou de 740 linhas — o caminho feliz fica mais diluído.
+- Review round=1 · P3 (Standards): no `anvil-implementer`, "a rodada seguinte é escolha do operador" não diz que a linha do piloto, testada antes, é a outra via — quem lê só o item não a acha.
