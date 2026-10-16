@@ -2,7 +2,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=bda848e6e7e73e6cfd878ee3020addcaa7aa2b47; scope=full; verdict=fail; p1=open
 
 **What to build:** a largada e o `PASS` do piloto leem o mesmo bloco de
@@ -51,3 +51,4 @@ comando declarado e a linha `exit:` que o script imprime.
 - Review round=1 · P3 (Standards): o `check` imprime o comando cru, e não no formato `chave: valor` dos scripts irmãos — quem quiser ler a saída por chave não acha uma; é o que o ticket pede.
 - Review round=1 · P3 (Standards): no passo 3 da largada, "A mensagem diz onde e como declarar" vem logo depois de "Uma linha `refusal:` é recusa" e pode ser lida como a própria linha `refusal:` — um piloto pode repassar só o motivo ao operador, sem o modelo da seção.
 - Review round=1 · P3 (Standards): possível Mysterious Name em "o script do comando", no passo 3 da largada, que não diz o que o script faz antes de o nome aparecer no bloco — custa só leitura.
+- Correção do P1 da rodada 1: o título `## ` só encerra a seção fora do bloco (`section && !block && /^## /`), e dentro do bloco a linha é do comando. Caso novo no S1, o 3b: o bloco `echo um` / `## comentário do bash` / `false` sai inteiro no `check`, e o `run` dá `um`, `exit: 1` e sai `1`. Vermelho antes da correção, com as duas conferências do 3b em `FALHA`; depois, `S1: tudo passou` com 53 checks, nos dois bash. Os P3 da rodada 1 ficam como estão. O S2 não rodou de novo: o bloco dele não tem linha `## `, e a leitura dele não muda.

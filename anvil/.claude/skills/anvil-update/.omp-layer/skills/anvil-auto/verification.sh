@@ -28,10 +28,11 @@ rule=.claude/rules/anvil.md
 title='## Comando de verificação'
 [ -f "$rule" ] || refuse "não há $rule, onde mora a seção '$title'"
 
-# awk sai com 3 sem a secao, com 4 sem bloco bash nela.
+# awk sai com 3 sem a secao, com 4 sem bloco bash nela. Dentro do bloco, uma linha
+# "## " e comentario do bash, e nao titulo.
 command="$(awk -v title="$title" '
     $0 == title { section = 1; next }
-    section && /^## / { exit }
+    section && !block && /^## / { exit }
     section && $0 == "```bash" { block = 1; next }
     block && $0 == "```" { exit }
     block { print }
