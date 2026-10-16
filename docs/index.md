@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-15T19:45:00Z
+Last updated: 2026-10-16T05:11:59Z
 
 ## Visão geral
 
@@ -23,7 +23,7 @@ Last updated: 2026-10-15T19:45:00Z
 
 ## Specs ativas
 
-- [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, em andamento — 0/11
+- [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, pronto para arquivar, 11/11 tickets resolvidos
 
 ## Specs arquivadas
 
@@ -51,8 +51,8 @@ Last updated: 2026-10-15T19:45:00Z
 - [context.md](./architecture/context.md) — o glossário: curadoria, referências,
   tickets e harness, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
-  impõe, como o estado é lido do disco, os três harnesses e a camada omp, e a
-  herança do mosk.
+  impõe, como o estado é lido do disco, os três harnesses e a camada omp, com o
+  piloto automático, e a herança do mosk.
 - **ADRs**
   - [adr-0001](./architecture/adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md)
     — skills vendorizadas seguem o padrão original; o anvil impõe só o caminho em `docs/`
@@ -80,6 +80,8 @@ Last updated: 2026-10-15T19:45:00Z
     — o frontier roda em paralelo sob pedido, só com a isolação do omp no modo branch
   - [adr-0013](./architecture/adr/adr-0013-toolkit-instalado-por-usuario.md)
     — o toolkit é instalado uma vez por usuário; o projeto fica só com rules e `docs/`
+  - [adr-0014](./architecture/adr/adr-0014-piloto-automatico-fecha-sem-humano.md)
+    — o piloto automático leva o roteiro ao fechamento sem humano; revê em parte o adr-0010 e o adr-0011
 
 ### Project
 
