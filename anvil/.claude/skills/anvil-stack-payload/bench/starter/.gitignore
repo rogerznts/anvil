@@ -9,6 +9,12 @@ dist
 .next
 build
 
+# Gerados ao subir o app no container: o Next escreve os dois primeiros, e o pnpm
+# cria o store na raiz do volume montado. Fora do git, a árvore fica limpa.
+next-env.d.ts
+*.tsbuildinfo
+.pnpm-store/
+
 # Payload
 payload-types.ts
 
