@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-16T05:28:58Z
+Last updated: 2026-10-16T12:11:33Z
 
 ## Visão geral
 
@@ -23,7 +23,7 @@ Last updated: 2026-10-16T05:28:58Z
 
 ## Specs ativas
 
-Nenhuma.
+- [009 — Pontos em aberto do piloto automático](./specs/009-extension-anvil-auto-open-points/spec.md) — `extension/009-anvil-auto-open-points`, especificado
 
 ## Specs arquivadas
 
