@@ -154,8 +154,9 @@ Parar e dizer o que falta é mais honesto que continuar tentando.
 
 No omp, quando o bench é a entrada do piloto automático, a skill `anvil-auto`, o
 supervisor é o piloto. Ele roda o comando de "A evidência" no `PASS` de cada spec,
-depois que o despacho acabou, e lê a saída por esta regra. Ela é a única do gate
-manual sob o piloto: o `anvil-auto` e o [SKILL.md](SKILL.md) apontam para cá.
+depois que o despacho acabou, e de novo sobre o merge preparado na `main`, quando
+ela andou desde o corte do branch, e lê a saída por esta regra. Ela é a única do
+gate manual sob o piloto: o `anvil-auto` e o [SKILL.md](SKILL.md) apontam para cá.
 
 O id que o checker imprime, `gates:<id do item>`, é único no checklist e diz de
 que ledger é o gate. Um gate sem `CHECK:` é manual.

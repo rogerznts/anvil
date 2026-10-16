@@ -113,7 +113,11 @@ do roteiro e só quando as dependências da entrada fecharam:
   `Review:` em `verdict=pass; p1=none`, e o comando de verificação rodado por ele
   saindo `0`. No bench, é o `--reverify` dos gates desta spec e das já fechadas;
 - fecha com o archive e, pela regra do projeto, o merge local na `main` ou o PR
-  aberto;
+  aberto. No merge local, quando a `main` andou desde o corte do branch, como
+  quando uma spec irmã fechou nesse meio-tempo, ele prepara o merge sem commitá-lo
+  e roda a verificação sobre o estado combinado: o comando de verificação ou, no
+  bench, o `--reverify`. Saindo `0`, commita o merge; senão, aborta o merge, e a
+  spec fica parada, já arquivada no branch, com a pergunta de qual spec cede;
 - numa parada técnica, como ticket travado em `round=2`, verificação que falha ou
   implementer bloqueado por fato desconhecido, pesquisa em fontes primárias antes
   de desistir. Com evidência nova, abre uma rodada a mais, uma só por ticket, e a

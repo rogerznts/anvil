@@ -100,7 +100,11 @@ escreva, não commite e não se ofereça para fazer o trabalho por conta própri
    outro branch, a linha `do:` do script é da `anvil-plan` e não vale aqui: você
    não propõe etapa nem termina a vez por ela. Decida assim:
    - com `next: none`, o branch é de uma spec arquivada, a da linha `spec`: recuse
-     e aponte a `main`;
+     e aponte a `main`. Quando `git merge-base --is-ancestor HEAD main` sai
+     diferente de `0`, a spec está arquivada no branch e ainda sem merge na
+     `main`, como a que a conferência do merge parou: a recusa diz esse motivo, e
+     que o piloto não retoma a spec nem refaz o merge dela, porque qual spec cede
+     é decisão do operador;
    - com `spec: none`, retome pela seção "Retomada" quando o branch tem número,
      `{tipo}/{NNN}-{nome}`, e esse número está no `Spec:` de uma entrada do
      roteiro: a spec nasceu e ainda não tem pasta commitada. Senão, recuse, aponte
@@ -566,30 +570,91 @@ como `git pull`, `git rebase`, `git reset` ou `git cherry-pick`, e nada de
 
 #### Merge local
 
-Com a árvore limpa, mescle da `main`:
+Com a árvore limpa, vá à `main` e confira se ela tem commits que o branch não
+tem:
 
 ```bash
 git checkout main
+git rev-list --count <branch>..main
+```
+
+Com `0`, a `main` não andou desde o corte do branch, e o `PASS` já rodou sobre a
+árvore que o merge dá. Mescle sem conferir de novo:
+
+```bash
 git merge --no-ff --no-edit <branch>
 ```
 
+Com mais de `0`, a `main` andou, como quando uma spec irmã fechou depois do
+corte, e o `PASS` do branch não rodou sobre o código dela. Prepare o merge sem
+commitá-lo e siga "Conferir o merge":
+
+```bash
+git merge --no-ff --no-commit <branch>
+```
+
+A guarda confere esse `git merge` como confere o outro, e passa, porque a spec já
+está arquivada no branch. O `git commit` que conclui o merge não é verbo de merge.
+
 Com o merge parado em conflito, liste os arquivos com
 `git diff --name-only --diff-filter=U`. Se o único é `docs/index.md`, gere o
-índice de novo pelo verbo `index` do `anvil-docs` e conclua o merge. O bloco
-custom é o único trecho escrito à mão, e nenhum lado o perde: leia o da `main`,
-em `git show HEAD:docs/index.md`, e o do branch, em
+índice de novo pelo verbo `index` do `anvil-docs`. O bloco custom é o único
+trecho escrito à mão, e nenhum lado o perde: leia o da `main`, em
+`git show HEAD:docs/index.md`, e o do branch, em
 `git show MERGE_HEAD:docs/index.md`. Iguais, o bloco fica como está; com um deles
 vazio, vale o outro; diferentes, o bloco novo traz o texto da `main` e, depois
 dele, o do branch. Depois:
 
 ```bash
 git add docs/index.md
-git commit --no-edit
 ```
+
+No merge preparado com `--no-commit`, siga "Conferir o merge" com o índice já
+resolvido; no outro, conclua o merge com `git commit --no-edit`.
 
 Com qualquer outro arquivo na lista, o conflito não é seu: aborte o merge com
 `git merge --abort`, sem resolver nada, e a spec fica parada, como diz "Parada",
 com os arquivos em conflito no motivo.
+
+##### Conferir o merge
+
+Com o merge preparado e sem conflito aberto, na `main`, rode a verificação sobre
+o estado combinado:
+
+- fora do bench, o script do comando, como no `PASS`, com `check` e depois `run`.
+  A conferência sai `0` com a linha `exit: 0`; uma linha `refusal:` conta como
+  diferente de `0`;
+- no bench, o comando de "A evidência" do `GATE.md` sem o
+  `docs/specs/<pasta>/gates.md`. Com o merge preparado, a pasta desta spec está em
+  `docs/specs/archive/`, o `roadmap.sh` a dá como `closed`, e o `$fechados` já traz
+  o ledger dela, junto dos das specs `closed`, inclusive a que fechou na `main`
+  depois do corte. A saída que vale o `PASS` pela regra de "Sob o piloto
+  automático" conta como `0`; qualquer outra, como diferente de `0`. Antes de
+  concluir ou abortar, `git diff --name-only` mostra o que o checker reescreveu
+  fora do merge: devolva esses ledgers com `git checkout -- <arquivos>`, porque
+  uma spec arquivada não muda.
+
+Guarde o comando, a saída e a linha `exit:` para o relatório, junto dos do `PASS`.
+
+Saindo `0`, conclua o merge com a mensagem padrão:
+
+```bash
+git commit --no-edit
+```
+
+Saindo diferente de `0`, esta spec e o que já fechou na `main` não passam juntos.
+Aborte o merge, sem corrigir nada:
+
+```bash
+git merge --abort
+```
+
+A spec fica parada, como diz "Parada", já arquivada no branch. É parada por
+decisão: sem pesquisa e sem rodada extra. Na seção dela no relatório, o `Estado:`
+diz que a verificação falhou sobre o merge com a `main`, e a seção do comando de
+verificação, ou do `--reverify`, leva a saída da conferência. Em "o que ainda
+espera decisão", a pergunta é qual spec cede: esta ou as que fecharam na `main`
+depois do corte, as que a saída aponta.
 
 #### PR
 
@@ -652,8 +717,9 @@ a parada pode ser falta de uma informação pública. São três as paradas téc
 
 A parada por decisão não pesquisa e vai direto para "Parada": o gate manual desta
 spec aberto, o PR aberto, a contradição com o roteiro, a decisão aberta do
-`map.md`, o merge bloqueado pela guarda ou abortado por conflito, e o ticket que
-só depende de um travado, que espera a pesquisa do travado.
+`map.md`, o merge bloqueado pela guarda, abortado por conflito ou abortado pela
+conferência do merge, e o ticket que só depende de um travado, que espera a
+pesquisa do travado.
 
 A rodada extra é uma só por ticket, em qualquer execução, e o registro dela é o
 disco: a linha `- Piloto · rodada` no `## Comments` do ticket. O ticket que já tem
@@ -755,7 +821,8 @@ aqui a spec que:
 - tem gate manual desta spec aberto, no bench;
 - esbarra numa contradição incumprível, ou numa decisão aberta do `map.md`;
 - não fecha no fechamento: o merge bloqueado pela guarda, o merge abortado por
-  conflito fora do `docs/index.md`, ou o PR aberto, à espera do merge do operador.
+  conflito fora do `docs/index.md` ou pela conferência do merge, ou o PR aberto, à
+  espera do merge do operador.
 
 Depois disso, não faça archive nem merge dela e não mexa no que está commitado no
 branch. No bench, commite antes no branch o `decisions-log.md` da spec, se ele
@@ -911,6 +978,7 @@ opera o anvil, como na entrega do bench chamado direto.
   o `anvil-next` dentro da execução.
 - Começar uma entrada que não saiu no `next` do `roadmap.sh`.
 - Fazer archive ou merge sem `PASS`, ou contornar a guarda de merge.
+- Concluir o merge preparado sem a conferência do merge saindo `0`.
 - Pesquisar numa parada por decisão, ou deixar uma spec parada por motivo técnico
   sem a pesquisa dela.
 - Abrir rodada extra sem ticket apontado, sem evidência nova, com dois sinais de
