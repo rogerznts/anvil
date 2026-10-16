@@ -2,17 +2,18 @@
 
 O `checklist.yaml` é a última pergunta da entrevista escrita em arquivo: **como a
 pessoa vai saber que está funcionando.** Ele nasce na fase 3, é congelado na fase
-4, e é dele que saem os testes e o ledger.
+4, e é dele que saem os testes e o ledger de cada spec.
 
 Formato mínimo de propósito. Cada campo a mais é um campo que alguém tem que
 manter sincronizado com a conversa, e a conversa é a fonte.
 
 ## O arquivo
 
-`docs/specs/{id}/checklist.yaml`
+`docs/qa/checklist.yaml` — da ferramenta, e não de uma spec: todas as specs do
+roteiro leem o mesmo combinado.
 
 ```yaml
-# O critério de pronto, na fala de quem pediu. Vira gates.md na fase 4.
+# O critério de pronto, na fala de quem pediu. Cada item vai para o gates.md da spec que o cobre.
 version: 1
 items:
   - id: C1
@@ -55,8 +56,10 @@ lugar a mais para mentir.
 
 ## A conversão para o ledger
 
-Um item, um gate. `id` e `outcome` atravessam sem tradução — o gate é lido por
-quem escreveu o checklist:
+Um item, um gate. Cada item está no `Cobre:` de exatamente uma entrada do
+roteiro, e o `gates.md` de uma spec leva só os itens do `Cobre:` da entrada dela.
+`id` e `outcome` atravessam sem tradução — o gate é lido por quem escreveu o
+checklist:
 
 ```markdown
 - [ ] C1: cadastrar um contrato com número, cliente, valor e vencimento
@@ -103,7 +106,7 @@ o veredito está em [GATE.md](GATE.md).
 
 ## Evoluir uma ferramenta
 
-A spec nova é aditiva, e o checklist dela também: os itens anteriores continuam
-valendo, com os mesmos ids, e os novos seguem a numeração. O ledger da volta nova
-carrega os dois conjuntos — é assim que a regressão inteira roda, velha e nova
-junto, como a fase *Evoluir* exige.
+A spec nova é aditiva, e o checklist também: os itens anteriores continuam
+valendo, com os mesmos ids, e os novos seguem a numeração. Cada item novo entra no
+`Cobre:` de uma entrada nova do roteiro, e o ledger da spec dela leva só esses
+itens novos; os anteriores continuam nos ledgers das specs que os cobriram.
