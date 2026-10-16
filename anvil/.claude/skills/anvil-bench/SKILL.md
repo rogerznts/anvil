@@ -47,8 +47,26 @@ Projeto que já tem alocação: **reuse**, não reprovisione.
 
 ### 2. Reconhecer
 
-Starter presente mais a rule da stack indicam projeto existente. Nesse caso vá
-direto ao delta — ver *Evoluir uma ferramenta*, abaixo.
+Starter presente mais a rule da stack indicam projeto existente. Nele, o disco
+decide o ramo:
+
+- **Ferramenta que o bench construiu**, com o `checklist.yaml` e o `gates.md` da
+  fase 4: vá direto ao delta — ver *Evoluir uma ferramenta*, abaixo.
+- **Construção começada fora do bench**, sem `checklist.yaml` nem `gates.md`, com
+  uma spec aberta, fora de `docs/specs/archive/`: **retome refazendo só a fase
+  4**, a partir da spec e dos tickets que existem. A fase 3 não roda: o
+  `briefing.md` e o `checklist.yaml` saem do que a spec e os tickets já dizem,
+  com o critério de pronto deles escrito como resultado, como pede o
+  [CHECKLIST.md](CHECKLIST.md). Na fase 5, o que existe não se refaz: a spec e os
+  tickets ficam, e a construção segue pelos tickets ainda não `resolved`.
+- **Construção começada fora do bench, sem spec aberta**: a fase 3 vira
+  **entrevista do delta**. Leia o código e os documentos que o projeto já tem, e
+  pergunte só o que eles não respondem. Depois, as fases 4 e 5 seguem como num
+  projeto novo.
+
+Numa retomada, o ponto em que ela entrou — a fase 4 sobre a spec existente, ou a
+fase 3 como entrevista do delta — vai para o `decisions-log.md`, com a spec de
+onde partiu quando há uma, e para a entrega da fase 6.
 
 Projeto novo: copie o starter **as-is**, sem regenerar, inicialize o git,
 materialize o `.env` com a alocação, e gere `.claude/rules/payload.md` a partir
@@ -111,16 +129,22 @@ Nada disto aparece para quem pediu a ferramenta (INV-6).
 ```
 anvil-to-spec  →  anvil-to-tickets  →  [ anvil-implement + anvil-tdd ]  →  anvil-code-review  →  gate
                                           ↑                                        │
-                                          └──────── até 3 tentativas ──────────────┘
+                                          └──────── até 2 rodadas ─────────────────┘
 ```
 
 Este é o único lugar do anvil que roda sem parar a cada decisão. O fundamento é
 a **audiência**: quem está do outro lado não tem como responder "os testes de
 integração falharam, quer que eu ajuste o mock?".
 
-A condição de parada é mecânica e está em [GATE.md](GATE.md). Teto de **três**
-tentativas por ticket; esgotado, para e reporta. O `gate` do diagrama reexecuta o
-ledger da fase 4 — ele não lê o que o agente disse ter feito.
+A condição de parada é mecânica e está em [GATE.md](GATE.md). Teto de **duas
+rodadas** por ticket, o orçamento do ADR-0010 — a verificação tem critério de
+parada, e a terceira rodada é escolha declarada de um humano —, que vale no
+resto do anvil: a rodada 1 mede o ticket inteiro, a rodada 2 mede o diff da
+correção, e cada uma deixa a sua linha `Review:` no ticket. A rodada 2 que não
+aprova trava o ticket: o veredito é `CONCERNS`, o loop para e reporta, e o ticket
+entra na entrega como pendência. A terceira rodada não é do bench. O `gate` do
+diagrama reexecuta o ledger da fase 4 — ele não lê o que o agente disse ter
+feito.
 
 Uma linha visível de progresso por fase. Detalhe vai para `build-log.md`, e toda
 decisão que você tomou sozinha vai para `decisions-log.md` — é o que permite
@@ -132,6 +156,12 @@ Com `PASS`: o endereço, as credenciais e um resumo do que a ferramenta faz, em
 linguagem de negócio.
 
 Com `CONCERNS` ou `FAIL`: diga o que falta, em uma frase, **sem despejar log**.
+Ticket travado na rodada 2 entra aqui como pendência declarada, dita como o que a
+pessoa ainda não consegue fazer na ferramenta.
+
+Numa retomada, a entrega diz também, com qualquer veredito e em uma frase
+simples, de onde a construção partiu: do que já estava combinado por escrito, ou
+de uma conversa só sobre o que faltava.
 
 Publicar é opt-in e não faz parte deste fluxo —
 `~/.claude/skills/anvil-stack-payload/bench/deploy.sh`, no diretório do projeto.
