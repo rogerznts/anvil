@@ -2,7 +2,7 @@
 
 **Blocked by:** 02, 04, 05
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=e1b60ea9e9475ff1598e20fbecce35743949716f; scope=full; verdict=fail; p1=open
 
 **What to build:** quando a `main` tem commits que o branch da spec não tem, como
@@ -61,3 +61,4 @@ já foi entregue sem nada que segure o fechamento.
 - Review round=1 · P3 (Spec): o `GATE.md` diz que o comando de "A evidência" roda de novo sobre o merge preparado, sem dizer que nessa vez ele sai sem o `docs/specs/<pasta>/gates.md`, que já foi para o archive — quem seguir só o `GATE.md` passa um caminho que não existe; o piloto lê a forma certa no `anvil-auto`.
 - Review round=1 · P3 (Spec): o vermelho de F (`s2-red-F.out`) foi medido antes da correção da conferência da segunda vez no `s2.sh` — o par vermelho/verde do F usou checkers diferentes nessa conferência; a conclusão não muda.
 - Review round=1 · P3 (Spec): a prova do bench usa a fixture do `workspace/56-manual-gate-rule/`, derivada do `workspace/51-auto-bench/` — o "caso de `workspace/51-auto-bench/`" do ticket é lido por derivação.
+- Correção do P1 da rodada 1: o `GATE.md`, em "Sob o piloto automático", volta a dizer que a regra lê a saída do `PASS` e ganha um parágrafo depois da lista: no merge local com a `main` adiantada, o piloto roda o mesmo comando sobre o merge preparado, sem o `docs/specs/<pasta>/gates.md`; ali a regra só diz que saída vale o `PASS`, e qualquer outra aborta o merge e deixa a spec parada por decisão, sem pesquisa e sem rodada extra, como diz o `anvil-auto`. O mesmo parágrafo fecha o P3 do caminho que não existe. O S2 do bench, refeito com o texto novo (`out-bench-r2`, `s2-bench-r2.out`), dá `S2: tudo passou`; respondeu `anthropic/claude-sonnet-4-5`. `vendor-sync.sh verify`: `verify: limpo`.
