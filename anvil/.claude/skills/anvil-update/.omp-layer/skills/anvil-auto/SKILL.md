@@ -508,10 +508,10 @@ aberto, a contradição com o roteiro, a decisão aberta do `map.md`, o merge
 bloqueado pela guarda ou abortado por conflito, e o ticket que só depende de um
 travado, que espera a pesquisa do travado.
 
-Cada parada pesquisa uma vez por execução: a verificação, uma vez por spec; o
-ticket travado ou bloqueado, uma vez por ticket. O ticket que já recebeu a rodada
-extra nesta execução não recebe outra, e a parada que volta depois dela não
-pesquisa de novo: a spec fica parada.
+A rodada extra é uma só por ticket, em qualquer execução, e o registro dela é o
+disco: a linha `- Piloto · rodada` no `## Comments` do ticket. O ticket que já tem
+essa linha não recebe outra rodada, e a parada dele não pesquisa de novo: a spec
+fica parada. A verificação que falha pesquisa uma vez por spec em cada execução.
 
 #### Pesquisar
 
@@ -557,11 +557,11 @@ git commit -m "docs(spec): record the research on <ticket NN | the verification>
 Leia a `## Conclusão`. A rodada extra só abre com as quatro condições, conferidas
 nesta ordem, e a primeira que falta é o motivo de não abrir:
 
-1. **Evidência nova.** Há fonte que explica a falha, e ela ainda não está no
-   ticket que aponta: `grep -F '<URL>' <ticket>` não acha nada. Fonte já citada
-   no ticket não é nova.
-2. **Ticket apontado.** A conclusão aponta um ticket do `issues/` desta spec. Sem
+1. **Ticket apontado.** A conclusão aponta um ticket do `issues/` desta spec. Sem
    ticket, não há rodada.
+2. **Evidência nova.** Há fonte que explica a falha, e ela ainda não está no
+   ticket apontado: `grep -F '<URL>' <ticket>` não acha nada. Fonte já citada no
+   ticket não é nova.
 3. **Sem laço.** O histórico desse ticket, com as linhas `Review:` e as linhas
    `Review round=N · …` do `## Comments`, não mostra dois dos sinais de laço de
    `docs/agents/verification.md`: a rodada N+1 acha o que a rodada N criou; a
@@ -569,7 +569,8 @@ nesta ordem, e a primeira que falta é o motivo de não abrir:
    muda; mesmo custo por rodada, achado menor. Com menos de duas linhas `Review:`,
    não há rodada com que comparar, e nenhum sinal está presente. Com dois sinais, a
    rodada não abre mesmo com evidência, e o motivo nomeia os dois.
-4. **Uma por parada.** O ticket ainda não recebeu rodada extra nesta execução.
+4. **Uma só.** O `## Comments` do ticket apontado ainda não tem linha
+   `- Piloto · rodada`, de nenhuma execução.
 
 Sem rodada, a spec fica parada, como diz "Parada". O relatório leva o arquivo e o
 motivo, e a pergunta de "o que ainda espera decisão" cita o ticket e o arquivo.
@@ -577,8 +578,8 @@ motivo, e a pergunta de "o que ainda espera decisão" cita o ticket e o arquivo.
 #### Abrir a rodada
 
 A rodada extra é a seguinte à última `Review:` do ticket apontado: `round=N+1`,
-ou `round=1` quando ele não tem `Review:`. É a exceção declarada ao ADR-0010, e a
-declaração fica no ticket:
+ou `round=1` quando ele não tem `Review:`. É a exceção declarada ao ADR-0010 do
+anvil, o que fecha a verificação em duas rodadas, e a declaração fica no ticket:
 
 1. Acrescente ao fim do `## Comments` do ticket apontado, que é a única linha de
    ticket que você escreve:
@@ -673,7 +674,7 @@ exit: 0
 
 ### Pesquisas
 
-- `<caminho do arquivo>` — parada: <ticket NN travado em round=N | comando de verificação saindo <exit> | ticket NN bloqueado: <a pergunta>>. Rodada: <aberta, round=<N> no ticket NN, com a última Review: dele depois do despacho | não aberta: <sem evidência nova | a evidência não aponta ticket | sinais de laço: <os dois> | o ticket já teve a rodada extra nesta execução>>
+- `<caminho do arquivo>` — parada: <ticket NN travado em round=N | comando de verificação saindo <exit> | ticket NN bloqueado: <a pergunta>>. Rodada: <aberta, round=<N> no ticket NN, com a última Review: dele depois do despacho | não aberta: <a evidência não aponta ticket | sem evidência nova | sinais de laço: <os dois> | o ticket já teve a rodada extra, pela linha do piloto no ## Comments>>
 
 ### Decidido sem humano
 
@@ -737,8 +738,8 @@ está commitado nele.
 - Fazer archive ou merge sem `PASS`, ou contornar a guarda de merge.
 - Pesquisar numa parada por decisão, ou deixar uma spec parada por motivo técnico
   sem a pesquisa dela.
-- Abrir rodada extra sem evidência nova, sem ticket apontado, com dois sinais de
-  laço, ou mais de uma por parada.
+- Abrir rodada extra sem ticket apontado, sem evidência nova, com dois sinais de
+  laço, ou num ticket que já tem a linha `- Piloto · rodada`.
 - Resolver conflito de merge fora do `docs/index.md`, ou fazer o merge de um PR.
 - Trocar de branch fora dos passos da corrente: a volta à `main` depois do
   `new-spec.sh`, o `git checkout -B` do branch recém-criado, a ida à `main` para
