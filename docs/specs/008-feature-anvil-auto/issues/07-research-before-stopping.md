@@ -4,6 +4,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=9fdf41d; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=5c41dee; scope=diff:9fdf41d..5c41dee; verdict=pass; p1=none
 
 **What to build:** numa parada técnica (ticket travado em `round=2`,
 verificação que falha no `PASS` ou implementer bloqueado por fato desconhecido),
@@ -99,3 +100,10 @@ O `FAIL` no teto do bench usa esta mesma pesquisa, e quem o liga é o ticket 10.
   rodada 1, está em `s2-red-X.out`: o piloto pesquisou de novo, e gravou
   `research-ticket-01-2.md`. Com a correção, X passa sem pesquisa e sem rodada 4,
   e T, L, V e P passam de novo.
+- Review round=2 · P2 (Spec): o P2 da rodada 1 persiste — as caixas das três paradas técnicas e do gate manual seguem marcadas sem prova executada do implementer bloqueado nem do gate manual — quem lê só as caixas acredita que as três paradas foram exercitadas.
+- Review round=2 · P2 (Spec): o caso X não mede a condição 4 — o vermelho já não abria a rodada 4, e no verde a pesquisa é pulada antes de a condição ser lida; a trava do ticket que já tem a linha do piloto, apontado pela pesquisa de outra parada (como a verificação que falha numa retomada), fica sem prova — uma regressão nela passa no S2.
+- Review round=2 · P2 (Standards): o S2 diz sonnet, mas toda sessão em `out/` e `out-red/` caiu por fallback no `openai-codex/gpt-6.1-sol` depois de erro no `claude-sonnet-4-0` — quem calibra o piloto por esta prova acredita que o sonnet seguiu a skill.
+- Review round=2 · P3 (Spec, Standards): o "Nunca" ainda proíbe "deixar uma spec parada por motivo técnico sem a pesquisa dela", a "Parada" diz "depois da pesquisa quando a parada é técnica", e o modelo de "Pesquisas" não tem forma para a parada que não pesquisa de novo — um agente que pese o "Nunca" pesquisa outra vez, como o vermelho do X, a custo de uma pesquisa, com a rodada ainda segura pela condição 4.
+- Review round=2 · P3 (Spec): com "Ticket apontado" primeiro, uma conclusão sem fonte e sem ticket sai como "a evidência não aponta ticket" — o operador lê que havia fonte.
+- Review round=2 · P3 (Standards): duas entradas antigas do `## Comments` foram reescritas em vez de anexadas, contra o "anexados ao fim" do perfil do tracker, e a entrada "Implementação" ficou com a ordem antiga das condições — o ticket descreve duas ordens, e o P1 da rodada 1 cita um "nesta execução" que não está mais no texto.
+- Review round=2 · P3 (Standards): "Na rodada 2, a fixture passou a gravar commits reais" usa "rodada 2" no sentido da correção — quem lê procura uma `round=2` com esse conteúdo.
