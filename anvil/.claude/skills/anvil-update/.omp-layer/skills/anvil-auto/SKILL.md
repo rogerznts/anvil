@@ -69,15 +69,18 @@ escreva, não commite e não se ofereça para fazer o trabalho por conta própri
    `git clean`.
 
 3. **Comando de verificação.** No modo bench, pule este passo: o `PASS` do bench é
-   o `--reverify` dos ledgers, e não o comando. Fora dele, rode:
+   o `--reverify` dos ledgers, e não o comando. Fora dele, rode o script do
+   comando, da instalação de usuário, na operação `check`:
 
    ```bash
-   awk '$0 == "## Comando de verificação" {s=1; next} s && /^## /{exit} s && /^```bash$/{b=1; next} b && /^```$/{exit} b' .claude/rules/anvil.md
+   bash ~/.omp/agent/skills/anvil-auto/verification.sh check
    ```
 
-   Saída vazia, ou erro porque o arquivo não existe, é recusa: o piloto só fecha uma
-   spec com o comando de verificação do projeto rodado por ele saindo `0`, e sem
-   comando nenhuma spec fecha. A mensagem diz onde e como declarar: em
+   O script lê o bloco `bash` da seção de título exato `## Comando de verificação`
+   de `.claude/rules/anvil.md` e, saindo `0`, imprime o comando. Uma linha
+   `refusal:` é recusa, com o motivo dela: o piloto só fecha uma spec com o comando
+   de verificação do projeto rodado por ele saindo `0`, e sem comando nenhuma spec
+   fecha. A mensagem diz onde e como declarar: em
    `.claude/rules/anvil.md`, uma seção com o título exato
    `## Comando de verificação` e, nela, um bloco `bash` com o comando que roda a
    verificação do projeto na raiz e sai `0` quando passa, assim:
@@ -466,12 +469,19 @@ A spec só fecha com `PASS`, que é, tudo junto:
 
 - a última saída do `frontier.sh` com `all_resolved: yes` e sem linha `halt`;
 - a última linha `Review:` de cada ticket de `issues/` em `verdict=pass; p1=none`;
-- fora do bench, o bloco de `## Comando de verificação`, rodado por você na raiz,
-  saindo `0`:
+- fora do bench, o bloco de `## Comando de verificação`, rodado pelo script na
+  operação `run`, saindo `0`. O script roda o bloco da raiz do projeto, imprime a
+  saída do comando e, por último, a linha `exit:` com o código dele. Antes, a
+  operação `check` imprime o comando que vai para o relatório:
 
   ```bash
-  bash -c "$(awk '$0 == "## Comando de verificação" {s=1; next} s && /^## /{exit} s && /^```bash$/{b=1; next} b && /^```$/{exit} b' .claude/rules/anvil.md)"; echo "exit: $?"
+  bash ~/.omp/agent/skills/anvil-auto/verification.sh check
+  bash ~/.omp/agent/skills/anvil-auto/verification.sh run
   ```
+
+  Rode o bloco só pelo script, e nunca um comando digitado por você. Uma linha
+  `refusal:` no lugar da linha `exit:` conta como o comando saindo diferente de
+  `0`.
 
 - no bench, o `--reverify` acumulado saindo `0`, como diz a seção seguinte.
 
