@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=a64fe68be8d2fdff791ac9ca46f9e76e00bfb160; scope=full; verdict=pass; p1=none
 
 **What to build:** o projeto novo do bench nasce com `docs/agents/issue-tracker.md`
 e `docs/agents/verification.md`, os perfis que o bench e as skills de fluxo citam.
@@ -42,3 +43,11 @@ roteiro* constrói a spec aberta em vez de parar no `next: none`.
   - E, ferramenta construída pelo bench, a 001 arquivada na `main`, sem spec aberta, com a manutenção pedida: verde (`out/E`), a vez termina na primeira pergunta da entrevista do delta, sobre a manutenção, sem construir e sem branch novo. Respondeu `anthropic/claude-sonnet-4-5`. Nessa vez o modelo não carregou o `anvil-grilling` (em uma das três vezes verdes, carregou); a pergunta saiu sem ele, o que é aderência da fase 3, fora deste ticket.
   - `B1: tudo passou (claude-sonnet-4-5, N R E)`. A alocação de infra das fixtures é real e idempotente: o `registry.yaml` da máquina ganhou `anvil58_r` e `anvil58_e`, e a tentativa descartada do haiku registrou `r`.
 - `vendor-sync.sh verify`: `verify: limpo`, rc 0.
+- Review round=1 · P2 (Spec): o vermelho de R não caiu em *Evoluir* com esta fixture e este modelo, e a busca da spec aberta antes dos ramos só tem prova verde — se alguém tirar essa busca, o B1 não garante reprovar.
+- Review round=1 · P2 (Spec): o verde de R não rodou o `roadmap.sh`; foi da fase 2 direto ao `anvil-implement`, e o passo 1 novo de *Uma entrada do roteiro* com `roadmap: none` não foi percorrido — não há prova positiva do texto alterado, só o sintoma antigo no vermelho (o roteiro escrito pelo modelo).
+- Review round=1 · P3 (Standards, Spec): o bench diz "É a regra do `scaffold` do `anvil-docs`: … divergente, não sobrescreva e não pergunte", e o passo 4 do `scaffold` manda mostrar o diff e esperar aprovação, e o passo 3 escreve o perfil do tracker pelo `anvil-setup` — quem conferir a citação acha o contrário; o comportamento prescrito no bench está explícito e certo para quem não programa.
+- Review round=1 · P3 (Standards): possível Duplicated Code — a escolha "sem `gates.md`, fase 4; senão, tickets não `resolved`" está na fase 2 e no passo 1 de *Uma entrada do roteiro*, e as duas já diferem no caso "falta a spec" — uma mudança no ponto de retomada precisa ser feita duas vezes.
+- Review round=1 · P3 (Standards): possível Shotgun Surgery — a lista do que entra no commit do piloto está na seção "Sob o piloto automático" do bench, no "Projeto novo" e no "Com o sim" do `anvil-auto`; com o `git add -A` nada muda de comportamento, mas as listas podem divergir em silêncio.
+- Review round=1 · P3 (Standards): "spec aberta" ganhou na fase 2 o sentido de spec com ticket não `resolved`, e o ramo "Construção começada fora do bench … com uma spec aberta", sob "Sem essa spec", segue com o termo e com "os tickets ainda não `resolved`" — o sentido que vale ali, spec sem ticket por resolver, só está neste `## Comments`.
+- Review round=1 · P3 (Spec): sob o piloto, o perfil do tracker já está commitado na largada, porque o `stage.sh` o exige e a árvore está limpa; "os perfis entram no commit do piloto" só vale para o `verification.md`, e a skill não diz isso.
+- Review round=1 · P3 (Spec): o B1 manda um prompt em texto ("The operator invoked /skill:anvil-bench … Read skill://anvil-bench"), como o prior art do S2, e não o comando de barra; e não cobre a retomada sem `gates.md` com o checklist presente, o caminho da fase 4.
