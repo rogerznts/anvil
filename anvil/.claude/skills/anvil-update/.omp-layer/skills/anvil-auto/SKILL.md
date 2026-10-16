@@ -459,9 +459,14 @@ bash ~/.omp/agent/skills/anvil-run/frontier.sh [--skip "NN NN"]
    é bloqueante: não chame outra ferramenta na mesma mensagem, e não leia o
    ticket, não investigue nem termine o trabalho dele.
 3. Rode o script de novo e compare a linha do ticket com a de antes. Se `status`,
-   `reviews` e `last` estão iguais, o ticket é pulado nesta execução: daí em
-   diante, toda chamada leva o `--skip` com todos os pulados, e ele não é
-   despachado de novo. Volte ao passo 1 com a última saída do script.
+   `reviews` e `last` estão iguais, o implementer terminou sem mudar o estado: anote
+   o ticket como pulado nesta execução e, com o pulado novo, rode o script mais uma
+   vez, já com o `--skip` de todos os pulados. Daí em diante, toda chamada leva o
+   `--skip` com todos os pulados, e o pulado não é despachado de novo nesta
+   execução, nem quando o implementer caiu, abortou ou devolveu erro. Só a
+   "Contradição com o roteiro" e o "Abrir a rodada" o tiram do `--skip`. Volte ao
+   passo 1 com a última saída do script: com pulado novo, a do `--skip`, cujo
+   `next` nunca aponta um pulado.
 
 ### `PASS`
 
