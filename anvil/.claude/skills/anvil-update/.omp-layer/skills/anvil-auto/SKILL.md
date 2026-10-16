@@ -242,7 +242,8 @@ próximo passo é você: quando uma skill de etapa termina, siga a corrente, sem
 `anvil-next`.
 
 Guarde na conversa, para o relatório, o que cada spec deixar: as pausas que você
-respondeu, a saída do comando de verificação e, quando ela para, o motivo.
+respondeu, a saída do comando de verificação, as pesquisas e, quando ela para, o
+motivo.
 
 O laço, a partir da `main`:
 
@@ -368,7 +369,9 @@ bash ~/.omp/agent/skills/anvil-run/frontier.sh [--skip "NN NN"]
    `all_resolved: yes`, siga para o `PASS`. Senão, sobrou ticket sem resolver:
    travado, dependente de travado, pulado ou sem como despachar. Leia o
    `## Comments` de cada um: uma contradição entre o código e a entrada segue
-   "Contradição com o roteiro"; o resto para a spec, como diz "Parada".
+   "Contradição com o roteiro"; o ticket da linha `locked`, e o pulado em que o
+   implementer parou numa pergunta de fato, seguem "Pesquisa antes de travar"; o
+   resto para a spec, como diz "Parada".
 2. Despache o ticket da linha `next` com o `task`, numa chamada só, com um item:
    `agent` é `anvil-implementer`, `task` é o caminho do ticket e, com a linha
    `isolation` em `on` ou `misconfigured`, o item leva `isolated: true`. No
@@ -393,8 +396,9 @@ A spec só fecha com `PASS`, que é, tudo junto:
   ```
 
 Guarde o comando, a saída e a linha `exit:` para o relatório. O `PASS` é o que o
-disco e a execução mostram, e não o que o implementer disse. Sem `PASS`, a spec
-fica parada, como diz "Parada".
+disco e a execução mostram, e não o que o implementer disse. Com os tickets em
+ordem e o comando saindo diferente de `0`, siga "Pesquisa antes de travar". Nos
+outros casos, sem `PASS`, a spec fica parada, como diz "Parada".
 
 ### Fechamento
 
@@ -485,13 +489,121 @@ régua da conferência da entrada:
 - Com o critério incumprível, a spec fica parada, como diz "Parada", e a
   contradição vai para "o que ainda espera decisão".
 
+### Pesquisa antes de travar
+
+Antes de deixar uma spec parada por motivo técnico, pesquise em fontes primárias:
+a parada pode ser falta de uma informação pública. São três as paradas técnicas:
+
+- **ticket travado**: o ticket da linha `locked` do `frontier.sh`, com a última
+  `Review:` em `round` 2 ou mais e `verdict=fail`;
+- **verificação que falha**: no `PASS`, o comando de verificação sai diferente de
+  `0`;
+- **implementer bloqueado por fato desconhecido**: o ticket pulado no despacho em
+  que o implementer registrou no `## Comments` uma pergunta que uma fonte pública
+  responde, como o comportamento de uma ferramenta, de uma biblioteca, de uma API
+  ou de um formato. A pergunta sobre o que o operador quer é decisão.
+
+A parada por decisão não pesquisa e vai direto para "Parada": o gate manual, o PR
+aberto, a contradição com o roteiro, a decisão aberta do `map.md`, o merge
+bloqueado pela guarda ou abortado por conflito, e o ticket que só depende de um
+travado, que espera a pesquisa do travado.
+
+Cada parada pesquisa uma vez por execução: a verificação, uma vez por spec; o
+ticket travado ou bloqueado, uma vez por ticket. O ticket que já recebeu a rodada
+extra nesta execução não recebe outra, e a parada que volta depois dela não
+pesquisa de novo: a spec fica parada.
+
+#### Pesquisar
+
+O arquivo da pesquisa fica na pasta da spec, no branch dela:
+`docs/specs/<pasta>/discovery/research-<parada>.md`, com `ticket-<NN>` ou
+`verification` no lugar de `<parada>`, e `-2`, `-3` no fim do nome quando o
+arquivo já existe.
+
+Carregue o `anvil-research` e siga-o. O agente que ele manda abrir é um item do
+`task`, com o agente padrão, e você espera o resultado antes de seguir: a corrente
+depende dele. O brief leva:
+
+- a pergunta: o que explica a falha, e o que a corrige;
+- o material da parada: do ticket travado, o caminho dele, as linhas `Review:` e
+  as linhas `open_p1` do `frontier.sh`; da verificação, o comando, a saída, a linha
+  `exit:` e os caminhos dos tickets da spec; do implementer bloqueado, o caminho do
+  ticket e a pergunta dele;
+- as fontes: primárias e na web, como documentação oficial, código-fonte,
+  especificação e API de primeira mão, cada afirmação com a URL que a sustenta;
+- o caminho do arquivo, e que o agente grava só esse arquivo, sem commitar;
+- que o arquivo termina nesta seção, preenchida:
+
+  ```markdown
+  ## Conclusão
+
+  - Fonte que explica a falha: <URL> | nenhuma
+  - Ticket que ela aponta: <caminho do ticket em issues/> | nenhum
+  - Correção: <o que mudar, numa frase> | nenhuma
+  ```
+
+- o idioma de saída, o de comunicação das rules.
+
+Se o agente voltou sem gravar o arquivo, grave você o que ele devolveu no mesmo
+caminho, com a mesma `## Conclusão`. Commite no branch da spec:
+
+```bash
+git add docs/specs/<pasta>/discovery/<arquivo>
+git commit -m "docs(spec): record the research on <ticket NN | the verification> of spec <number>"
+```
+
+#### Decidir a rodada
+
+Leia a `## Conclusão`. A rodada extra só abre com as quatro condições, conferidas
+nesta ordem, e a primeira que falta é o motivo de não abrir:
+
+1. **Evidência nova.** Há fonte que explica a falha, e ela ainda não está no
+   ticket que aponta: `grep -F '<URL>' <ticket>` não acha nada. Fonte já citada
+   no ticket não é nova.
+2. **Ticket apontado.** A conclusão aponta um ticket do `issues/` desta spec. Sem
+   ticket, não há rodada.
+3. **Sem laço.** O histórico desse ticket, com as linhas `Review:` e as linhas
+   `Review round=N · …` do `## Comments`, não mostra dois dos sinais de laço de
+   `docs/agents/verification.md`: a rodada N+1 acha o que a rodada N criou; a
+   classe dos achados desce em vez de subir; nenhum achado nomeia uma decisão que
+   muda; mesmo custo por rodada, achado menor. Com menos de duas linhas `Review:`,
+   não há rodada com que comparar, e nenhum sinal está presente. Com dois sinais, a
+   rodada não abre mesmo com evidência, e o motivo nomeia os dois.
+4. **Uma por parada.** O ticket ainda não recebeu rodada extra nesta execução.
+
+Sem rodada, a spec fica parada, como diz "Parada". O relatório leva o arquivo e o
+motivo, e a pergunta de "o que ainda espera decisão" cita o ticket e o arquivo.
+
+#### Abrir a rodada
+
+A rodada extra é a seguinte à última `Review:` do ticket apontado: `round=N+1`,
+ou `round=1` quando ele não tem `Review:`. É a exceção declarada ao ADR-0010, e a
+declaração fica no ticket:
+
+1. Acrescente ao fim do `## Comments` do ticket apontado, que é a única linha de
+   ticket que você escreve:
+
+   ```markdown
+   - Piloto · rodada <N+1> aberta por `docs/specs/<pasta>/discovery/<arquivo>`: <a fonte e o que ela explica da falha>.
+   ```
+
+   Commite no branch da spec com
+   `docs(spec): open round <N+1> of ticket <NN> of spec <number>`.
+2. Despache um `anvil-implementer` para esse ticket, como no passo 2 do
+   "Despacho", com o caminho do arquivo da pesquisa no `context`, junto da pasta da
+   spec, do branch e do idioma de saída. O ticket sai do `--skip`, se estava nele.
+3. Volte ao passo 1 do "Despacho". Com o ticket resolvido, o despacho segue e o
+   `PASS` é conferido de novo; com ele parado outra vez, a spec fica parada.
+
 ### Parada
 
 A spec que não fecha sozinha fica aberta no branch dela, e a corrente segue. Para
 aqui a spec que:
 
-- termina o despacho com ticket sem resolver;
-- não tem `PASS`;
+- termina o despacho com ticket sem resolver, depois da pesquisa quando a parada é
+  técnica;
+- não tem `PASS`, depois da pesquisa quando o que falha é o comando de
+  verificação;
 - esbarra numa contradição incumprível, ou numa decisão aberta do `map.md`;
 - não fecha no fechamento: o merge bloqueado pela guarda, o merge abortado por
   conflito fora do `docs/index.md`, ou o PR aberto, à espera do merge do operador.
@@ -561,7 +673,7 @@ exit: 0
 
 ### Pesquisas
 
-nenhuma
+- `<caminho do arquivo>` — parada: <ticket NN travado em round=N | comando de verificação saindo <exit> | ticket NN bloqueado: <a pergunta>>. Rodada: <aberta, round=<N> no ticket NN, com a última Review: dele depois do despacho | não aberta: <sem evidência nova | a evidência não aponta ticket | sinais de laço: <os dois> | o ticket já teve a rodada extra nesta execução>>
 
 ### Decidido sem humano
 
@@ -578,7 +690,7 @@ nenhuma
 
 ## O que ainda espera decisão
 
-- <cada item como pergunta: o que destrava cada spec parada, cada PR aberto e cada contradição>?
+- <cada item como pergunta: o que destrava cada spec parada, cada PR aberto e cada contradição; a da parada técnica cita o ticket e o arquivo da pesquisa>?
 ````
 
 ## O fim
@@ -623,6 +735,10 @@ está commitado nele.
   o `anvil-next` dentro da execução.
 - Começar uma entrada que não saiu no `next` do `roadmap.sh`.
 - Fazer archive ou merge sem `PASS`, ou contornar a guarda de merge.
+- Pesquisar numa parada por decisão, ou deixar uma spec parada por motivo técnico
+  sem a pesquisa dela.
+- Abrir rodada extra sem evidência nova, sem ticket apontado, com dois sinais de
+  laço, ou mais de uma por parada.
 - Resolver conflito de merge fora do `docs/index.md`, ou fazer o merge de um PR.
 - Trocar de branch fora dos passos da corrente: a volta à `main` depois do
   `new-spec.sh`, o `git checkout -B` do branch recém-criado, a ida à `main` para

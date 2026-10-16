@@ -24,8 +24,15 @@ operador na conversa.
 2. Anote o `HEAD`. Ele é o fixed point da rodada 1 do review.
 3. Decida pelo estado gravado no ticket:
    - algum ticket do `Blocked by` não está `resolved`: pare sem mudar nada;
+   - o `## Comments` tem a linha `- Piloto · rodada <N> aberta por <arquivo>`, e
+     nenhuma linha `Review:` tem `round=<N>`: o piloto automático abriu a rodada N
+     com a pesquisa desse arquivo, e o `context` o traz. Leia o arquivo antes de
+     tudo: ele é a evidência do que corrigir. Corrija o que ele aponta, junto dos P1
+     registrados no `## Comments`, e meça a rodada N, com qualquer `Status:`. Com N
+     igual a 1, é a rodada 1 de sempre. Com N 2 ou mais, o fixed point é o `sha` da
+     última `Review:`, e a rodada N segue a regra da rodada 2;
    - a última linha `Review:` tem `round` 2 ou mais e `verdict=fail`: o ticket está
-     travado, e a terceira rodada é escolha do operador. Pare sem mudar nada;
+     travado, e a rodada seguinte é escolha do operador. Pare sem mudar nada;
    - `Status: resolved` com a última `Review:` em `verdict=pass`: não há o que fazer;
    - a última `Review:` é `round=1` com `verdict=fail`: corrija os P1 registrados no
      `## Comments` e siga para a rodada 2;
@@ -87,8 +94,9 @@ operador na conversa.
 - Sem P1, grave `verdict=pass`, mantenha `Status: resolved` e commite o registro.
 - Com P1 na rodada 1, mude para `Status: claimed`, commite o registro, corrija,
   commite, e abra a rodada 2 sobre o diff.
-- Com P1 na rodada 2, grave a linha, deixe `Status: claimed`, commite e pare. Nunca
-  abra a terceira rodada.
+- Com P1 na rodada 2, ou numa rodada 2 ou maior aberta pelo piloto, grave a linha,
+  deixe `Status: claimed`, commite e pare. Nunca abra você a rodada seguinte: além
+  da 2, só o piloto abre uma rodada, pela linha no `## Comments`.
 
 ## O que devolver
 
