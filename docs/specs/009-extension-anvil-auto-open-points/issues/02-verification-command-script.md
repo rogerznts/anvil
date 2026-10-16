@@ -4,6 +4,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=bda848e6e7e73e6cfd878ee3020addcaa7aa2b47; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=997cf436625f9d5ca439ff01fc938ff6641e4d61; scope=diff:bda848e..997cf43; verdict=pass; p1=none
 
 **What to build:** a largada e o `PASS` do piloto leem o mesmo bloco de
 `## Comando de verificação` de `.claude/rules/anvil.md` por um script da camada
@@ -52,3 +53,7 @@ comando declarado e a linha `exit:` que o script imprime.
 - Review round=1 · P3 (Standards): no passo 3 da largada, "A mensagem diz onde e como declarar" vem logo depois de "Uma linha `refusal:` é recusa" e pode ser lida como a própria linha `refusal:` — um piloto pode repassar só o motivo ao operador, sem o modelo da seção.
 - Review round=1 · P3 (Standards): possível Mysterious Name em "o script do comando", no passo 3 da largada, que não diz o que o script faz antes de o nome aparecer no bloco — custa só leitura.
 - Correção do P1 da rodada 1: o título `## ` só encerra a seção fora do bloco (`section && !block && /^## /`), e dentro do bloco a linha é do comando. Caso novo no S1, o 3b: o bloco `echo um` / `## comentário do bash` / `false` sai inteiro no `check`, e o `run` dá `um`, `exit: 1` e sai `1`. Vermelho antes da correção, com as duas conferências do 3b em `FALHA`; depois, `S1: tudo passou` com 53 checks, nos dois bash. Os P3 da rodada 1 ficam como estão. O S2 não rodou de novo: o bloco dele não tem linha `## `, e a leitura dele não muda.
+- Review round=2 · P1 da rodada 1 remedido: com o bloco `echo um` / `## comentario do bash` / `false`, o script de `bda848e` dá `exit: 0`, e o atual imprime as três linhas no `check` e dá `exit: 1` no `run`. Sem regressão nas recusas: o `## ` da seção seguinte ainda encerra uma seção sem bloco, e sem seção, prosa, bloco `sh`, bloco vazio e bloco em branco seguem recusados.
+- Review round=2 · P2 (Spec): a correção alargou o P3 do bloco sem cerca de fechamento. Antes, o bloco aberto parava no `## ` seguinte; agora atravessa as seções até o fim do arquivo, e a linha ```` ```bash ```` de outra seção é engolida. A primeira nota deste `## Comments` e o cabeçalho do script, que dizem "até o título `## ` seguinte", não valem para esse caso, e a nota da correção diz que os P3 "ficam como estão". Num projeto com a cerca esquecida, o `PASS` pode fechar a spec com um comando que não é o da seção, e o S1 não tem caso que cubra isso.
+- Review round=2 · P3 (Standards): o mesmo bloco sem cerca, medido pelo eixo: o `check` do `HEAD` imprime o resto do arquivo, e no `.claude/rules/anvil.md` deste repositório o `## Modelos por papel`, que vem depois, rodaria como bash. A prosa tende a dar erro de comando, e não um falso `0`, e a largada mostra o comando inteiro no `check`; quem esquecer a cerca roda o resto do arquivo como parte do comando.
+- Review round=2 · P3 (Standards): o S1 e o S2 usam diretórios fixos em `/tmp`, e duas execuções ao mesmo tempo colidem (`rm: … Directory not empty` deu uma `FALHA` falsa no `reset-install`) — quem rodar as provas em paralelo lê um vermelho que não é do script.
