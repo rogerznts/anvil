@@ -3,6 +3,7 @@
 **Blocked by:** 05
 
 **Status:** resolved
+**Review:** round=1; sha=33f3dc1; scope=full; verdict=pass; p1=none
 
 **What to build:** o piloto trata as paradas que não são técnicas. Uma spec sem
 `PASS`, com ticket travado ou com conflito de merge fora do `docs/index.md` fica
@@ -97,3 +98,17 @@ para o relatório.
   merge como "espera o merge do PR", também quando o merge local foi abortado por
   conflito, num projeto sem PR. No caso M, o piloto corrigiu o motivo no
   relatório, mas o índice mostra o motivo do script.
+- Review round=1 · P2 (Standards): possível Duplicated Code que já diverge — o roteamento da parada está no próprio passo, em "Parada" e em "Fora do caminho feliz", e o "PR" e o merge local de sucesso voltam à `main` sem o `git status --porcelain` que "Parada" exige — se o `tea-open-pr` deixar arquivo fora de commit, o piloto o leva para a `main` e segue, em vez de parar.
+- Review round=1 · P2 (Standards): o relatório manda copiar o estado e o motivo do `roadmap.sh`, e a skill não manda corrigir o "espera o merge do PR" do merge local abortado por conflito — o relatório commitado pode dizer que há PR num projeto que não fecha por PR.
+- Review round=1 · P2 (Standards): o critério da contradição achada depois que a spec nasceu está marcado `[x]` sem caso no S2, como a decisão aberta do `map.md` e o bloqueio da guarda — uma regressão nesses caminhos não aparece em prova nenhuma.
+- Review round=1 · P2 (Spec): no caso T, o ticket travado para a spec antes do `PASS`, e o piloto nunca roda o `verifica.sh` que sai `1` no branch — um piloto que arquive depois de a verificação falhar passa no S2, e o "Limite do S2" não registra a lacuna.
+- Review round=1 · P2 (Spec): o critério da contradição depois de a spec nascer (linhas 36–38) e a decisão aberta do `map.md` não são exercitados por nenhum caso — uma regressão na adaptação, como o piloto editar o roteiro ou não devolver o ticket ao despacho, passa sem ser vista.
+- Review round=1 · P2 (Spec): a contradição incumprível achada enquanto o piloto escreve a spec deixa o rascunho dele fora de commit, e "Parada" exige a árvore limpa, sem dizer o que fazer com esse rascunho — a corrente inteira pode parar por "Fora do caminho feliz", e não só a spec.
+- Review round=1 · P3 (Standards): a mensagem `docs(spec): adapt spec <number> to <o que mudou>` tem um placeholder em pt-BR que pede texto livre — o commit tende a sair em pt-BR, contra a regra de commit em inglês do `CLAUDE.md`.
+- Review round=1 · P3 (Standards): a description do `anvil-auto` subiu de 332 para 532 caracteres e virou resumo do fluxo, contra o resumo de uma linha que o `SKILL-MECHANICS.md` pede a skill com trava — só pesa mais no catálogo que o humano lê.
+- Review round=1 · P3 (Standards): na "Retomada", um roteiro recusado pelo `roadmap.sh` não tem linha `entry:`, e o piloto recusa dizendo que a spec não é do roteiro — o operador vai para a `anvil-plan` ou a `anvil-run` em vez de consertar o roteiro.
+- Review round=1 · P3 (Standards): "sai do `--skip` e volta ao despacho" não vale para ticket travado, que o `frontier.sh` nunca põe no frontier — o efeito é só cair em "Parada".
+- Review round=1 · P3 (Standards): possível Shotgun Surgery — o "Nunca" lista cada ponto em que o piloto troca de branch — todo ponto novo obriga a editar a lista, como este diff precisou fazer.
+- Review round=1 · P3 (Spec): a spec, na Largada passo 4, manda retomar qualquer spec aberta, e não registra a recusa da spec fora do roteiro decidida aqui — o manual do ticket 11 pode copiar a regra da spec e prometer uma retomada que a skill recusa.
+- Review round=1 · P3 (Spec): "a base do PR é a `main`" conflita com o `tea-open-pr`, que abre dois PRs para hotfix — uma entrada `hotfix` pode sair sem o PR do branch estável.
+- Review round=1 · P3 (Spec): a prova vermelha só separa a largada, porque os quatro casos recusam ali — ela não mostra que a prosa nova da "Parada", do PR ou do merge abortado é o que muda o comportamento.
