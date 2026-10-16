@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=cb53c81; scope=full; verdict=pass; p1=none
 
 **What to build:** quem escreve um roteiro com uma entrada chamada, por exemplo,
 `Cadastro de clientes` recebe do `roadmap.sh` uma recusa com o nome e o formato
@@ -48,3 +49,6 @@ recusado.
   `Estado:`; a "Onde a corrente parou" copiava o motivo do script, que levava o
   "espera o merge do PR", e passa a pedir também a causa do `Estado:` da entrada
   parada nesta execução.
+- Review round=1 · P2 (Spec): a "Onde a corrente parou" do `anvil-auto` só pede a causa da entrada que parou nesta execução; uma entrada com PR aberto de uma execução anterior sai só com o motivo neutro, e o operador de projeto que fecha por PR não lê ali que o merge é dele (US6), embora a linha `PR:` dos tickets do branch dê a causa.
+- Review round=1 · P3 (Standards): a definição de kebab-case está escrita na constante `KEBAB` do `roadmap.sh` e nas duas cópias do perfil do tracker; se a regra mudar num lugar só, a mensagem de recusa passa a descrever um formato diferente do documentado.
+- Review round=1 · P3 (Standards): a constante `KEBAB` é usada uma vez só, na mensagem de recusa; é um nome a mais sem abstração, sem efeito no comportamento.
