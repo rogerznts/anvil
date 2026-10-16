@@ -128,10 +128,13 @@ cobrem mais de uma spec. Nenhum dos dois é spec, e a guarda de merge não os l�
   que a corrente avança e o commita na `main` a cada fronteira de spec.
 
 No roteiro, cada entrada é uma seção de segundo nível cujo título é o **nome**
-da entrada, em kebab-case e único no arquivo. O nome é o `--short-name` do
-`new-spec.sh` e é o que as outras entradas citam em `Depende de:`. As chaves são
-linhas `Chave: valor` no começo da linha, com ou sem negrito, como o `Status:`
-dos tickets:
+da entrada, em kebab-case e único no arquivo. Kebab-case aqui é letras minúsculas
+ASCII e dígitos, em grupos separados por um hífen, sem hífen no começo nem no
+fim: `a`, `cadastro-de-clientes` e `fase-2-relatorios` valem; `Cadastro de
+clientes`, `cadastro_de_clientes`, `-cadastro` e `cadastro--clientes`, não. O
+nome é o `--short-name` do `new-spec.sh` e é o que as outras entradas citam em
+`Depende de:`. As chaves são linhas `Chave: valor` no começo da linha, com ou
+sem negrito, como o `Status:` dos tickets:
 
 ```markdown
 # Roteiro
@@ -168,8 +171,8 @@ Pronto quando: …
 - O roteiro não tem `Status:`. O estado de cada entrada (`pending`, `open`,
   `closed` ou `stopped`) e a próxima a construir saem do disco, pelo script
   `bash ~/.claude/skills/anvil-docs/scripts/roadmap.sh`, da raiz do projeto. Ele
-  recusa, com o motivo, o roteiro com nome repetido, `Depende de:` para nome
-  inexistente, ciclo ou `Tipo:` inválido.
+  recusa, com o motivo, o roteiro com nome fora de kebab-case, nome repetido,
+  `Depende de:` para nome inexistente, ciclo ou `Tipo:` inválido.
 
 ## Wayfinding operations
 

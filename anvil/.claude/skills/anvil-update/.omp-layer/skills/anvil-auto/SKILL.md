@@ -815,7 +815,7 @@ exit: 0
 
 ## Onde a corrente parou
 
-<cada entrada que não fechou, com o estado e o motivo do roadmap.sh, e as entradas que esperam por ela; depois, a entrada da linha next, que vem a seguir, ou, com next: none, que a corrente terminou sem entrada desbloqueada>
+<cada entrada que não fechou, com o estado e o motivo do roadmap.sh e, se ela parou nesta execução, a causa do `Estado:` da seção dela, como o PR aberto ou o merge abortado, porque o motivo do script não diz a causa; e as entradas que esperam por ela; depois, a entrada da linha next, que vem a seguir, ou, com next: none, que a corrente terminou sem entrada desbloqueada>
 
 ## O que ainda espera decisão
 
