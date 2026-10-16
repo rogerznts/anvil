@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=b847c41; scope=full; verdict=pass; p1=none
 
 **What to build:** o piloto, no bench, recebe uma regra só para o gate manual
 aberto: o gate manual desta spec deixa a spec parada e vai para o relatório como
@@ -51,3 +52,8 @@ segura esta. Hoje o `GATE.md` diz que todo gate manual aberto para a spec, e o
   archive — defeito anterior a este ticket, fora do que a spec 009 lista.
 - O `anvil-bench` e o `anvil-stack-payload` foram ligados por symlink em
   `~/.claude/skills` e `~/.agents/skills` só durante as vezes, e desligados depois.
+- Review round=1 · P2 (Standards): regra sem precedência na saída mista — com um gate manual desta spec aberto e um gate com `CHECK:` caído juntos, a saída cabe no item do gate manual do `GATE.md` (parada sem pesquisa) e no do `FAIL` no teto (pesquisa), e o `anvil-auto` dispensa a pesquisa "no gate manual aberto desta spec" — o piloto pode parar a spec sem pesquisar a regressão do `CHECK:`; a spec não fecha em nenhum dos dois caminhos.
+- Review round=1 · P3 (Spec): a regra não cobre toda saída — sumiu o "qualquer outra saída" do `anvil-auto`, e a saída mista acima e o `HANDOFF REQUIRED` de um gate abandonado ficam sem desfecho no `GATE.md` — o piloto escolhe sozinho nesses casos, raros porque o bench não escreve `ABANDON`.
+- Review round=1 · P3 (Spec): a prova não separa antes e depois — o vermelho do caso F já passava nas conferências do gate manual, então o S2 não mostra efeito observável da mudança, que só tira a regra rival.
+- Review round=1 · P3 (Standards): possível Duplicated Code — "nem você nem o implementer o marcam" (`anvil-auto`, no `--reverify` do bench e no "Nunca") repete o "Nem o piloto nem o implementer o marcam" do `GATE.md`, que ainda repete "ninguém o marca" no item da spec fechada — mudar essa proibição continua pedindo três edições.
+- Review round=1 · P3 (Standards): "S2" sem glosa nos `## Comments` deste ticket — quem lê sem abrir `workspace/51-auto-bench/` não sabe que é a sessão headless do omp com `/skill:anvil-auto` da spec.
