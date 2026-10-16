@@ -209,10 +209,11 @@ série. O relatório traz quantos tickets estavam prontos a cada rodada, na linh
 Nos dois, a lista de skills é a mesma de sempre e nenhum comando acima existe. O
 fluxo segue à mão: `/anvil-grill`, `/anvil-to-spec`, `/anvil-to-tickets`, e depois
 uma sessão de `/anvil-implement` por ticket, um de cada vez. O `/anvil-bench`
-chamado direto, no Claude Code ou no omp sem o piloto, constrói a primeira entrada
-do roteiro e para no fim da construção, com o archive e o merge listados no
-relatório para você. O Claude Code tem a guarda de merge pelo hook do
-`~/.claude/settings.json`, que o `/anvil-update` registra. O Codex lê as skills
+chamado direto, no Claude Code ou no omp sem o piloto, constrói uma entrada do
+roteiro, a que está em andamento ou, sem ela, a do `next:`, e para no fim da
+construção, com o archive e o merge listados na entrega para você. O Claude Code
+tem a guarda de merge pelo hook do `~/.claude/settings.json`, que o
+`/anvil-update` registra. O Codex lê as skills
 pelo espelho `~/.agents/skills` e não tem guarda.
 
 ## Limites

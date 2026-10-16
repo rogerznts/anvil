@@ -29,7 +29,7 @@ upstream, que não faz nada dentro de um payload instalado.
 `scripts/install-hooks.mjs` e `scripts/stop-hook.mjs`: **o Stop hook não entra no
 bench.** Ele bloqueia o fim da sessão enquanto houver gate aberto e solta sozinho
 depois de seis bloqueios sem progresso (`MAX_BLOCKS = 6`). O bench já tem
-condição de parada — teto de três tentativas por ticket, em [../GATE.md](../GATE.md)
+condição de parada — teto de duas rodadas por ticket, em [../GATE.md](../GATE.md)
 — e duas condições de parada rivais na mesma sessão brigam pelo mesmo desfecho.
 O `UNLAZY.md` continua descrevendo o hook, porque não editamos texto do autor;
 esta é a nota que diz que aqui ele não é instalado.
