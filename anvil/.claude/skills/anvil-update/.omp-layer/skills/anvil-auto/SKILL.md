@@ -347,8 +347,12 @@ nada de `--no-verify`.
 
 Com o merge parado em conflito, liste os arquivos com
 `git diff --name-only --diff-filter=U`. Se o único é `docs/index.md`, gere o
-índice de novo pelo verbo `index` do `anvil-docs`, com o bloco custom da versão
-da `main`, `git show HEAD:docs/index.md`, e conclua o merge:
+índice de novo pelo verbo `index` do `anvil-docs` e conclua o merge. O bloco
+custom é o único trecho escrito à mão, e nenhum lado o perde: leia o da `main`,
+em `git show HEAD:docs/index.md`, e o do branch, em
+`git show MERGE_HEAD:docs/index.md`. Iguais, o bloco fica como está; com um deles
+vazio, vale o outro; diferentes, o bloco novo traz o texto da `main` e, depois
+dele, o do branch. Depois:
 
 ```bash
 git add docs/index.md
