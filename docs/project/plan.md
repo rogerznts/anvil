@@ -38,6 +38,10 @@ delegando para `grilling`, e viram no-op.
 `anvil-boot` · `anvil-update` · `anvil-bench` · `tea-commit` · `tea-open-pr` ·
 `tea-open-fast-pr` · `tea-prune-branches`
 
+**Camada omp (4, fora da contagem)** `anvil-plan` · `anvil-run` · `anvil-auto` ·
+`anvil-omp` — autorais, dentro da `anvil-update` em `.omp-layer/`, e instaladas só
+onde há omp.
+
 ### Fora do roster, e por quê
 
 - **`why`** (pstack, 13 arq) — amarrado a MCPs corporativos: Datadog, Linear,
