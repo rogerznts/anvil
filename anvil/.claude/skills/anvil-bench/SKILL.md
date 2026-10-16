@@ -27,6 +27,23 @@ ferramenta".
 As invariantes completas do produto gerado (INV-1..6) estão na skill
 `anvil-stack-payload`, arquivo `bench/INVARIANTS.md`. Carregue antes de começar.
 
+## Sob o piloto automático
+
+No omp, o piloto automático, a skill `anvil-auto`, entra pelo bench quando o
+projeto tem a rule da stack com a seção das invariantes do bench, ou quando é
+chamado com `--bench`. Ele carrega esta skill para a entrada e conduz o resto:
+
+- As fases 1 a 3 rodam como estão, até a pessoa confirmar o roteiro em português
+  simples. O projeto já é um repositório git, que a largada do piloto exige: a
+  fase 2 não roda o `git init`, e nem ela nem a fase 4 commitam. O commit do
+  starter, da rule da stack e do combinado é do piloto, um só, depois do sim, com
+  a rule já atualizada com os módulos e os papéis reais.
+- O ledger de cada spec, da fase 4, é o piloto que roda, no começo de cada spec,
+  e ele também escreve o `decisions-log.md` de cada uma.
+- A fase 5 é a corrente do piloto: ele despacha os tickets, roda o comando do
+  [GATE.md](GATE.md) como supervisor e fecha a spec. *Uma entrada do roteiro* não
+  roda, e a fase 6 é o fim do piloto, em português simples.
+
 ## Fluxo
 
 ### 1. Preparar
@@ -75,7 +92,8 @@ Projeto novo: copie o starter **as-is**, sem regenerar, inicialize o git com o
 branch `main` (`git init -b main`), materialize o `.env` com a alocação, gere
 `.claude/rules/payload.md` a partir do `RULE.md` da stack mais a seção de
 invariantes, e commite isso na `main` como o primeiro commit. O `.env` fica fora
-dele, pelo `.gitignore` do starter.
+dele, pelo `.gitignore` do starter. Sob o piloto automático, sem o `git init` e
+sem o commit, como diz a seção dele.
 
 ### 3. Entender
 
@@ -189,7 +207,8 @@ conteúdo dele aparecem para quem pediu (INV-6).
 
 Com o sim, atualize a rule da stack com os módulos e papéis reais, e commite na
 `main`, num commit só, o que a entrevista escreveu: o `briefing.md`, o
-`checklist.yaml`, o `roadmap.md` e as cópias de anexo em `docs/discovery/`.
+`checklist.yaml`, o `roadmap.md` e as cópias de anexo em `docs/discovery/`. Sob o
+piloto automático, o commit é dele.
 
 ```
 git add docs/discovery docs/qa docs/specs/roadmap.md .claude/rules
@@ -253,8 +272,8 @@ resto do anvil: a rodada 1 mede o ticket inteiro, a rodada 2 mede o diff da
 correção, e cada uma deixa a sua linha `Review:` no ticket. A rodada 2 que não
 aprova trava o ticket: o veredito é `CONCERNS`, o loop para e reporta, e o ticket
 entra na entrega como pendência. A terceira rodada não é do bench. O `gate` do
-diagrama reexecuta o ledger da fase 4 — ele não lê o que o agente disse ter
-feito.
+diagrama reexecuta o ledger da spec e o de cada spec do roteiro já fechada — ele
+não lê o que o agente disse ter feito.
 
 Uma linha visível de progresso por fase. Detalhe vai para `build-log.md`, e toda
 decisão que você tomou sozinha vai para `decisions-log.md` — é o que permite

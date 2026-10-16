@@ -1,7 +1,7 @@
 ---
 name: anvil-auto
-description: Piloto automático do anvil no omp. Recusa a largada indevida, conduz o grill sobre o plano inteiro de várias specs, escreve o roteiro em docs/specs/roadmap.md e o commita na main com o único sim do operador. Depois, sem pausa, leva cada entrada do roteiro da spec ao fechamento, por merge local ou PR; a spec que não fecha fica aberta no branch dela, e a corrente segue pelo que não depende dela, com relatório em docs/specs/report.md. Chamado no branch de uma spec aberta do roteiro, retoma a spec e segue a corrente.
-argument-hint: "o pedido, que vai para o grill"
+description: Piloto automático do anvil no omp. Recusa a largada indevida, conduz o grill sobre o plano inteiro de várias specs, ou a entrevista do anvil-bench quando o projeto tem a rule da stack do bench ou o argumento traz --bench, escreve o roteiro em docs/specs/roadmap.md e o commita na main com o único sim do operador. Depois, sem pausa, leva cada entrada do roteiro da spec ao fechamento, por merge local ou PR; no bench, o PASS é o --reverify do ledger da spec e dos das specs já fechadas. A spec que não fecha fica aberta no branch dela, e a corrente segue pelo que não depende dela, com relatório em docs/specs/report.md. Chamado no branch de uma spec aberta do roteiro, retoma a spec e segue a corrente.
+argument-hint: "[--bench] o pedido, que vai para o grill ou para a entrevista do bench"
 disable-model-invocation: true
 ---
 
@@ -17,7 +17,31 @@ que não dependem dela. A execução termina oferecendo um grill novo. Chamado n
 branch de uma spec aberta, você retoma a spec e depois segue a corrente. Carregar
 uma skill é lê-la com o `read` em `skill://<nome>` e segui-la.
 
-O argumento, se veio, é o pedido.
+O argumento, se veio, é o pedido. Um `--bench` no argumento não é parte do pedido:
+é o sinal do modo bench, e sai do pedido.
+
+## Modo bench
+
+A execução está no **modo bench** quando o projeto tem a rule da stack do bench ou
+quando o argumento traz `--bench`, e só nesses dois casos. A rule da stack do bench
+é a que a fase 2 do `anvil-bench` gera, com a seção das invariantes do bench. Ela
+existe quando isto sai com algum arquivo:
+
+```bash
+grep -l 'Invariantes do bench' .claude/rules/*.md 2>/dev/null
+```
+
+Nenhum outro sinal liga o modo: nem o pedido falar de ferramenta interna ou de
+quem não programa, nem uma rule de stack sem essa seção, como a que o
+`anvil-boot` escreve. Decida o modo na largada, antes do passo 3, e ele vale a
+execução inteira. Fora do modo bench, não carregue o `anvil-bench`.
+
+No modo bench, quem conversa com você não programa. O que muda está em cada seção,
+nos trechos que começam por "No bench". Uma regra vale em todas: da entrada ao fim,
+tudo o que você escreve no chat segue o INV-6 do bench, em português simples, sem
+log, comando, caminho de arquivo, id, nome de branch nem nome de tecnologia. O
+detalhe técnico vai para os arquivos: o roteiro, os tickets, o `decisions-log.md`
+e o relatório.
 
 ## Largada
 
@@ -44,7 +68,8 @@ escreva, não commite e não se ofereça para fazer o trabalho por conta própri
    roda `git stash`, `git commit`, `git checkout`, `git restore`, `git reset` nem
    `git clean`.
 
-3. **Comando de verificação.** Rode:
+3. **Comando de verificação.** No modo bench, pule este passo: o `PASS` do bench é
+   o `--reverify` dos ledgers, e não o comando. Fora dele, rode:
 
    ```bash
    awk '$0 == "## Comando de verificação" {s=1; next} s && /^## /{exit} s && /^```bash$/{b=1; next} b && /^```$/{exit} b' .claude/rules/anvil.md
@@ -84,8 +109,9 @@ escreva, não commite e não se ofereça para fazer o trabalho por conta própri
 
 ## Entrada
 
-Na `main`, a entrada é o `anvil-grill`, com o pedido como ponto de partida. Sem
-pedido no argumento e sem nada do plano nesta conversa, peça o pedido e pare.
+Na `main`, a entrada é o `anvil-grill` ou, no modo bench, a entrevista do
+`anvil-bench`, com o pedido como ponto de partida. Sem pedido no argumento e sem
+nada do plano nesta conversa, peça o pedido e pare.
 
 ### O roteiro que já existe
 
@@ -109,7 +135,9 @@ operador abandona, e uma entrada por vez: vale a resposta dele a uma pergunta do
 grill que nomeia a entrada e pergunta se ela sai do roteiro. Um pedido de roteiro
 novo, ou de esquecer o plano anterior, não abandona nenhuma entrada sozinho. A
 entrada que fica guarda o nome e a linha `Spec:`, se tiver: o nome é o branch da
-spec, e o `Spec:` liga a entrada à pasta dela.
+spec, e o `Spec:` liga a entrada à pasta dela. No bench, a pergunta nomeia a parte
+da ferramenta que a entrada constrói, em português simples, e não o nome da
+entrada.
 
 ### Anexo
 
@@ -138,6 +166,17 @@ e, para cada entrada:
 Quando o frontier do grill esvazia, não peça a confirmação do entendimento em
 abstrato. Escreva o roteiro e peça a confirmação sobre ele, como dizem as seções
 seguintes. Essa é a confirmação que fecha o grill.
+
+### A entrevista do bench
+
+No modo bench, a entrada não é o grill. Carregue o `anvil-bench` e siga as fases 1
+a 3 dele, como ele é, com o que a seção dele "Sob o piloto automático" diz: o
+ambiente, o reconhecimento do projeto e a entrevista, que lê o que o projeto já tem
+antes de perguntar e cobre a ferramenta inteira. O roteiro que já existe, o
+abandono e o anexo seguem as seções acima. A entrevista termina com o
+`docs/discovery/briefing.md`, o `docs/qa/checklist.yaml` e o
+`docs/specs/roadmap.md` escritos, com `Cobre:` em cada entrada, e daí vale o que
+segue.
 
 ### Escrever e validar
 
@@ -179,12 +218,20 @@ Depois de escrever, rode o `roadmap.sh` de novo e confira, na ordem:
    está recusado: não o mostre. Volte ao grill com uma pergunta por entrada que
    falta, pelo nome: ela fica ou sai do roteiro?
 
+No bench, quem escreve o roteiro é a entrevista, e a conferência 1 é a do bench: a
+recusa do `roadmap.sh` e a cobertura do checklist que não fecha são erro seu, e
+você corrige os arquivos sem perguntar, como a fase 3 dele manda. A conferência 2
+vale como está, com a pergunta da entrevista.
+
 ### Mostrar e confirmar
 
 Só o roteiro que passou nas duas conferências é mostrado. Leia o arquivo do disco e
 mostre-o inteiro, como está escrito, e termine a vez perguntando se este é o
-roteiro que o piloto vai executar. A pergunta é a última coisa da vez. A resposta
-decide:
+roteiro que o piloto vai executar. No bench, o arquivo não aparece: mostre a versão
+dele em português simples, como a fase 3 do bench diz, com as partes na ordem em
+que vão ser feitas, o que entra e o que fica de fora de cada uma e como a pessoa
+vai saber que cada uma está pronta, e pergunte se é isso que vai ser feito. A
+pergunta é a última coisa da vez. A resposta decide:
 
 - sim: siga para a seção seguinte;
 - uma correção ou uma pergunta: responda e volte ao grill no ponto que ela abriu.
@@ -196,7 +243,12 @@ decide:
 
 Commite na `main`, num commit só, tudo o que a entrada escreveu: o roteiro, as
 cópias de anexo em `docs/discovery/`, e os ADRs e o glossário do grill. A árvore
-estava limpa na largada, então tudo o que está fora de commit veio da entrada:
+estava limpa na largada, então tudo o que está fora de commit veio da entrada.
+
+No bench, antes do commit, atualize a rule da stack com os módulos e os papéis
+reais, como diz "O combinado, uma vez", da fase 4 do bench. O commit leva também o
+briefing, o checklist e, num projeto novo, o starter e a rule da stack que a fase 2
+escreveu: o bench não commita sob o piloto.
 
 ```bash
 git add -A
@@ -228,6 +280,9 @@ do `stage.sh` da largada:
   operador. A spec fica parada, como diz "Parada", com a decisão em "o que ainda
   espera decisão".
 
+No bench, a pasta da spec sem `gates.md` pede o "Ledger da spec" antes de qualquer
+um desses pontos.
+
 O que o disco já tem não se refaz: a spec, os tickets resolvidos e os commits do
 branch ficam como estão. Daí em diante, a spec segue os passos da corrente como
 qualquer outra, até fechar ou parar, e o relatório dela é o primeiro desta
@@ -242,8 +297,14 @@ próximo passo é você: quando uma skill de etapa termina, siga a corrente, sem
 `anvil-next`.
 
 Guarde na conversa, para o relatório, o que cada spec deixar: as pausas que você
-respondeu, a saída do comando de verificação, as pesquisas e, quando ela para, o
-motivo.
+respondeu, a saída do comando de verificação ou do `--reverify`, as pesquisas e,
+quando ela para, o motivo.
+
+No bench, o que você decide sozinho numa spec, as pausas respondidas e o que vai
+para "Decidido sem humano", vai também para o `decisions-log.md` na raiz da pasta
+da spec, como o bench faz na construção: uma linha por decisão, com o porquê. Ele
+é commitado no branch da spec junto do commit seguinte, e o `PASS` e a "Parada"
+não deixam o branch sem ele.
 
 O laço, a partir da `main`:
 
@@ -257,7 +318,7 @@ O laço, a partir da `main`:
    Com `next: none`, vá para o fim. Senão, a entrada desta volta é a da linha
    `next`: leia a seção dela no `roadmap.md`.
 2. Confira a entrada contra o código.
-3. Abra a spec.
+3. Abra a spec e, no bench, escreva o ledger dela.
 4. Escreva a spec e os tickets.
 5. Despache os tickets.
 6. Confira o `PASS`.
@@ -325,6 +386,22 @@ Então, nesta ordem:
    Assim o `Spec:` está na `main` antes de qualquer commit da spec, e o branch o
    contém.
 
+### Ledger da spec
+
+No bench, no branch da spec e antes do `anvil-to-spec`, rode "O ledger de cada
+spec", da fase 4 do `anvil-bench`, para a entrada desta volta: os testes derivados
+só dos itens do `Cobre:` dela, o `gates.md` na raiz da pasta da spec, a do
+`spec_dir` do JSON do `new-spec.sh`, e o `gate-lint` sobre ele. Commite os testes e
+o ledger no branch:
+
+```bash
+git add -A
+git commit -m "test(<nome>): add the ledger of spec <number>"
+```
+
+O ledger nasce antes da spec, como no bench: o `Pronto quando:` da entrada já tem,
+no `gates.md`, o que decide o `PASS` dela.
+
 ### Spec e tickets
 
 No branch da spec, carregue o `anvil-to-spec` com a entrada do roteiro como
@@ -389,16 +466,57 @@ A spec só fecha com `PASS`, que é, tudo junto:
 
 - a última saída do `frontier.sh` com `all_resolved: yes` e sem linha `halt`;
 - a última linha `Review:` de cada ticket de `issues/` em `verdict=pass; p1=none`;
-- o bloco de `## Comando de verificação`, rodado por você na raiz, saindo `0`:
+- fora do bench, o bloco de `## Comando de verificação`, rodado por você na raiz,
+  saindo `0`:
 
   ```bash
   bash -c "$(awk '$0 == "## Comando de verificação" {s=1; next} s && /^## /{exit} s && /^```bash$/{b=1; next} b && /^```$/{exit} b' .claude/rules/anvil.md)"; echo "exit: $?"
   ```
 
+- no bench, o `--reverify` acumulado saindo `0`, como diz a seção seguinte.
+
 Guarde o comando, a saída e a linha `exit:` para o relatório. O `PASS` é o que o
 disco e a execução mostram, e não o que o implementer disse. Com os tickets em
-ordem e o comando saindo diferente de `0`, siga "Pesquisa antes de travar". Nos
-outros casos, sem `PASS`, a spec fica parada, como diz "Parada".
+ordem e o comando, ou o `--reverify`, saindo diferente de `0`, siga "Pesquisa
+antes de travar", menos no gate manual aberto, que é decisão. Nos outros casos,
+sem `PASS`, a spec fica parada, como diz "Parada".
+
+#### O `--reverify` do bench
+
+No bench, no branch da spec, leia o `GATE.md` do bench, em
+`skill://anvil-bench/GATE.md`, e rode você o comando da seção "A evidência". Ele
+reexecuta o `gates.md` desta spec e o de cada spec do roteiro já `closed`, que o
+`roadmap.sh` lê no checkout do branch, e devolve os ledgers das specs fechadas como
+estavam: uma spec arquivada não muda. Leia a saída e a linha `exit:`:
+
+O id que o checker imprime é `gates:<id do item>`, e o id do item é único no
+checklist: ele diz de que ledger é o gate. Um gate sem `CHECK:` é manual.
+
+- `exit: 0`, com `ALL MET`: o `PASS` do bench.
+- `exit: 1`, e todo id da linha abaixo de `UNMET:` é de gate manual: os gates
+  manuais desta spec abertos são o **gate manual aberto**, e a spec fica parada,
+  como diz "Parada", sem pesquisa, porque gate manual é decisão. Cada um vai para
+  "o que ainda espera decisão" com a pergunta formulada: quem confere que <o título
+  do gate>, e com que evidência, para marcar o gate `<id>` no `gates.md` da spec.
+  Um gate manual aberto no ledger de uma spec fechada é dela e não segura esta: ele
+  vai para "o que ainda espera decisão" do mesmo jeito, e, sem gate manual desta
+  spec aberto, a saída vale o `PASS`.
+- qualquer outra saída: um gate com `CHECK:` caiu, nesta spec ou numa fechada, ou o
+  checker não rodou. É o `FAIL` no teto do bench: sob o piloto, o `--reverify` só
+  roda depois que o despacho acabou, e nenhum ticket volta ao despacho sem a rodada
+  extra. Siga "Pesquisa antes de travar", como a verificação que falha. O gate de
+  uma spec fechada que caiu é regressão: esta spec não fecha enquanto ele não
+  voltar a passar.
+
+Um gate manual se marca só com a evidência de quem conferiu: nem você nem o
+implementer o marcam. Depois de ler a saída, commite no branch o que mudou na
+pasta da spec, como o que o checker escreveu no ledger dela e o
+`decisions-log.md`, se mudou alguma coisa:
+
+```bash
+git add docs/specs/<pasta>
+git commit -m "docs(spec): record the gate run of spec <number>"
+```
 
 ### Fechamento
 
@@ -497,7 +615,7 @@ a parada pode ser falta de uma informação pública. São três as paradas téc
 - **ticket travado**: o ticket da linha `locked` do `frontier.sh`, com a última
   `Review:` em `round` 2 ou mais e `verdict=fail`;
 - **verificação que falha**: no `PASS`, o comando de verificação sai diferente de
-  `0`;
+  `0` ou, no bench, o `--reverify` dá o `FAIL` no teto;
 - **implementer bloqueado por fato desconhecido**: o ticket pulado no despacho em
   que o implementer registrou no `## Comments` uma pergunta que uma fonte pública
   responde, como o comportamento de uma ferramenta, de uma biblioteca, de uma API
@@ -527,8 +645,8 @@ depende dele. O brief leva:
 - a pergunta: o que explica a falha, e o que a corrige;
 - o material da parada: do ticket travado, o caminho dele, as linhas `Review:` e
   as linhas `open_p1` do `frontier.sh`; da verificação, o comando, a saída, a linha
-  `exit:` e os caminhos dos tickets da spec; do implementer bloqueado, o caminho do
-  ticket e a pergunta dele;
+  `exit:` e os caminhos dos tickets da spec, e, no bench, os `gates.md`
+  reexecutados; do implementer bloqueado, o caminho do ticket e a pergunta dele;
 - as fontes: primárias e na web, como documentação oficial, código-fonte,
   especificação e API de primeira mão, cada afirmação com a URL que a sustenta;
 - o caminho do arquivo, e que o agente grava só esse arquivo, sem commitar;
@@ -604,17 +722,20 @@ aqui a spec que:
 - termina o despacho com ticket sem resolver, depois da pesquisa quando a parada é
   técnica;
 - não tem `PASS`, depois da pesquisa quando o que falha é o comando de
-  verificação;
+  verificação ou o `--reverify`;
+- tem gate manual aberto, no bench;
 - esbarra numa contradição incumprível, ou numa decisão aberta do `map.md`;
 - não fecha no fechamento: o merge bloqueado pela guarda, o merge abortado por
   conflito fora do `docs/index.md`, ou o PR aberto, à espera do merge do operador.
 
 Depois disso, não faça archive nem merge dela e não mexa no que está commitado no
-branch. Confira com `git status --porcelain` que a árvore está limpa: com linha na
-saída, a execução para, como diz "Fora do caminho feliz". Com a árvore limpa, volte
-à `main` com `git checkout main`, se ainda não está nela, e siga para o relatório.
-Guarde para ele o passo em que a spec parou, o motivo, como a saída do
-`frontier.sh` ou do comando de verificação, e a pergunta que a destrava.
+branch. No bench, commite antes no branch o `decisions-log.md` da spec, se ele
+mudou desde o último commit. Confira com `git status --porcelain` que a árvore está
+limpa: com linha na saída, a execução para, como diz "Fora do caminho feliz". Com a
+árvore limpa, volte à `main` com `git checkout main`, se ainda não está nela, e siga
+para o relatório. Guarde para ele o passo em que a spec parou, o motivo, como a
+saída do `frontier.sh`, do comando de verificação ou do `--reverify`, e a pergunta
+que a destrava.
 
 Na volta ao passo 1, o `roadmap.sh` dá a entrada como `stopped` ou `open`, e
 nenhuma entrada que depende dela entra no frontier: a corrente segue pelas que não
@@ -635,7 +756,10 @@ git commit -m "docs(report): record <nome da entrada> in the autopilot report"
 ```
 
 O relatório tem esta forma, com uma seção de segundo nível por entrada tocada na
-execução, na ordem, e as seções sem conteúdo ficam com "nenhum":
+execução, na ordem, e as seções sem conteúdo ficam com "nenhum". No bench, a seção
+de cada spec traz o `decisions-log.md` dela, lido do branch com
+`git show <branch>:<caminho>`, e o `--reverify` no lugar do comando de
+verificação:
 
 ````markdown
 # Relatório do piloto automático
@@ -664,7 +788,7 @@ Roteiro: `docs/specs/roadmap.md`, <confirmado no commit <commit do sim> | execu�
 
 nenhum
 
-### Comando de verificação
+### <Comando de verificação | --reverify do bench>
 
 ```text
 $ <comando>
@@ -672,9 +796,13 @@ $ <comando>
 exit: 0
 ```
 
+### decisions-log.md
+
+<no bench, o decisions-log.md da spec, como está no branch; fora do bench, a seção não existe>
+
 ### Pesquisas
 
-- `<caminho do arquivo>` — parada: <ticket NN travado em round=N | comando de verificação saindo <exit> | ticket NN bloqueado: <a pergunta>>. Rodada: <aberta, round=<N> no ticket NN, com a última Review: dele depois do despacho | não aberta: <a evidência não aponta ticket | sem evidência nova | sinais de laço: <os dois> | o ticket já teve a rodada extra, pela linha do piloto no ## Comments>>
+- `<caminho do arquivo>` — parada: <ticket NN travado em round=N | comando de verificação saindo <exit> | --reverify com gate caído: <ids> | ticket NN bloqueado: <a pergunta>>. Rodada: <aberta, round=<N> no ticket NN, com a última Review: dele depois do despacho | não aberta: <a evidência não aponta ticket | sem evidência nova | sinais de laço: <os dois> | o ticket já teve a rodada extra, pela linha do piloto no ## Comments>>
 
 ### Decidido sem humano
 
@@ -691,7 +819,7 @@ exit: 0
 
 ## O que ainda espera decisão
 
-- <cada item como pergunta: o que destrava cada spec parada, cada PR aberto e cada contradição; a da parada técnica cita o ticket e o arquivo da pesquisa>?
+- <cada item como pergunta: o que destrava cada spec parada, cada PR aberto, cada contradição e cada gate manual aberto; a da parada técnica cita o ticket e o arquivo da pesquisa>?
 ````
 
 ## O fim
@@ -705,6 +833,15 @@ do relatório como pauta. A oferta é a última coisa da vez. Sem nenhuma entrad
 tocada nesta execução, não há relatório novo: diga que nenhuma entrada estava
 desbloqueada e ofereça o grill do mesmo jeito.
 
+No bench, quem lê o chat não programa, e o relatório fica para quem opera o anvil.
+A mensagem do fim é, no lugar dessa, a versão dele em português simples, que
+termina a vez: o que cada parte pronta da ferramenta já deixa fazer, com o
+endereço e o acesso da ferramenta, como na entrega do bench; o que ainda não dá
+para fazer, pela parte que parou; e cada pergunta de "o que ainda espera decisão"
+em linguagem de negócio. Sem log, comando, caminho de arquivo, id, nome de branch,
+de commit ou de tecnologia. No lugar do grill novo, ofereça uma conversa nova
+sobre essas perguntas, que volta à entrevista do bench.
+
 Aceita a oferta, volte à entrada, na `main`, que edita o mesmo roteiro e começa
 uma execução nova. Recusada, pare.
 
@@ -716,7 +853,9 @@ falha, um `halt` do `frontier.sh`, caminho fora de commit quando a spec para ou
 fecha, e a volta à `main` que não sai. Nesse caso, não faça archive nem merge, não
 contorne a guarda e não mexa no que ficou fora de commit. Termine a vez dizendo ao
 operador a entrada, o passo, o motivo, o branch em que a execução ficou e o que
-está commitado nele.
+está commitado nele. No bench, diga isso primeiro em português simples, pela parte
+da ferramenta que parou, e o detalhe técnico vai num bloco à parte, para quem
+opera o anvil, como na entrega do bench chamado direto.
 
 ## Nunca
 
@@ -732,6 +871,13 @@ está commitado nele.
   para adaptar a uma contradição.
 - Usar um anexo de fora do repositório antes de ele estar em `docs/discovery/`.
 - Guardar, commitar ou descartar o que o operador deixou fora de commit na largada.
+- Ligar o modo bench por outro sinal que não a rule da stack do bench ou o
+  `--bench`, ou carregar o `anvil-bench` fora dele.
+- No bench, mostrar no chat o `roadmap.md`, log, comando, caminho de arquivo, id
+  ou nome de tecnologia, fora do bloco para quem opera o anvil numa parada da
+  execução inteira.
+- Marcar um gate manual, ou deixar commitada uma mudança no ledger de uma spec
+  arquivada.
 - Perguntar ao operador entre o sim, ou a largada de uma retomada, e o fim, ou ler
   o `anvil-next` dentro da execução.
 - Começar uma entrada que não saiu no `next` do `roadmap.sh`.
