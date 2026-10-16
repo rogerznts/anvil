@@ -53,9 +53,10 @@ O `FAIL` no teto do bench usa esta mesma pesquisa, e quem o liga é o ticket 10.
   sem `Review:` de `round=<N>` abre a rodada N: o implementer lê o arquivo,
   corrige e mede, e P1 numa rodada aberta pelo piloto com N 2 ou mais para o
   ticket como na rodada 2.
-- Decisão tomada pelo repositório, sem operador: o ticket que já recebeu a rodada
-  extra nesta execução não recebe outra, e a parada que volta depois dela não
-  pesquisa de novo; a verificação pesquisa uma vez por spec na execução.
+- Decisão tomada pelo repositório, sem operador: a rodada extra é uma só por
+  ticket, em qualquer execução, e o registro dela é a linha `- Piloto · rodada`
+  no `## Comments`; o ticket que já a tem não recebe outra e não pesquisa de novo.
+  A verificação que falha pesquisa uma vez por spec em cada execução.
 - S2 em `workspace/49-auto-research/s2.sh`, sobre fixtures em `/tmp`, com
   `MODELO=sonnet`, em retomada no branch da spec 001. O `conta.sh` da fixture usa
   `grep -c ""`, e o teste falha. A prova vermelha, com a skill do ticket 06, está
@@ -75,9 +76,10 @@ O `FAIL` no teto do bench usa esta mesma pesquisa, e quem o liga é o ticket 10.
 - Limite do S2: nenhum caso exercita o implementer bloqueado por fato
   desconhecido, nem o gate manual, nem a parada que volta depois da rodada extra.
   Essas regras estão na skill e não foram vistas rodando.
-- Limite do S2: os `sha` das linhas `Review:` da fixture não são commits. Nos
-  casos T e V, o implementer da rodada extra registrou que o fixed point não
-  resolve e mediu a partir do `HEAD` do começo da vez dele.
+- Limite do S2, na primeira medição: os `sha` das linhas `Review:` da fixture não
+  eram commits, e nos casos T e V o implementer da rodada extra parou ou mediu a
+  partir do `HEAD` do começo da vez dele. Na rodada 2, a fixture passou a gravar
+  commits reais, e o T fechou com `round=3` em `verdict=pass`.
 - O `FAIL` no teto do bench não foi ligado: é do ticket 10.
 - Review round=1 · P1 (Spec): a condição "uma por parada" vive na memória da conversa ("nesta execução"), e numa retomada o mesmo ticket travado de novo pode ganhar uma segunda rodada extra com outra URL — o teto do ADR-0010 vira uma rodada a mais por execução, contra o "uma só" da spec.
 - Review round=1 · P2 (Spec): os critérios das três paradas técnicas e do gate manual estão marcados sem prova executada do implementer bloqueado nem do gate manual — quem lê só as caixas acredita que as três paradas foram exercitadas.
@@ -88,3 +90,12 @@ O `FAIL` no teto do bench usa esta mesma pesquisa, e quem o liga é o ticket 10.
 - Review round=1 · P3 (Standards): possível Duplicated Code — os quatro sinais de laço foram copiados de `docs/agents/verification.md` — se o perfil mudar, a skill fica com a cópia velha.
 - Review round=1 · P3 (Standards): a seção "Pesquisa antes de travar", com cerca de 110 linhas só do caminho de parada, ficou inline e a skill passou de 740 linhas — o caminho feliz fica mais diluído.
 - Review round=1 · P3 (Standards): no `anvil-implementer`, "a rodada seguinte é escolha do operador" não diz que a linha do piloto, testada antes, é a outra via — quem lê só o item não a acha.
+- Correção da rodada 1: a condição "uma por parada" virou "uma só", lida do disco
+  pela linha `- Piloto · rodada` no `## Comments` do ticket apontado, e o ticket
+  que já a tem não pesquisa de novo. Na mesma seção, as condições passaram a
+  conferir o ticket apontado antes da evidência nova, e o ADR-0010 ganhou a glosa.
+  O S2 ganhou o caso X: o ticket 01 em `round=3 verdict=fail`, com a linha do
+  piloto e o arquivo de pesquisa já commitados. A prova vermelha, com a skill da
+  rodada 1, está em `s2-red-X.out`: o piloto pesquisou de novo, e gravou
+  `research-ticket-01-2.md`. Com a correção, X passa sem pesquisa e sem rodada 4,
+  e T, L, V e P passam de novo.
