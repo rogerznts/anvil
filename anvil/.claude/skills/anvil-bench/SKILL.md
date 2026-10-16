@@ -41,8 +41,10 @@ chamado com `--bench`. Ele carrega esta skill para a entrada e conduz o resto:
 - O ledger de cada spec, da fase 4, é o piloto que roda, no começo de cada spec,
   e ele também escreve o `decisions-log.md` de cada uma.
 - A fase 5 é a corrente do piloto: ele despacha os tickets, roda o comando do
-  [GATE.md](GATE.md) como supervisor e fecha a spec. *Uma entrada do roteiro* não
-  roda, e a fase 6 é o fim do piloto, em português simples.
+  [GATE.md](GATE.md) como supervisor, lê a saída pela seção "Sob o piloto
+  automático" de lá, onde mora a regra do gate manual aberto, e fecha a spec.
+  *Uma entrada do roteiro* não roda, e a fase 6 é o fim do piloto, em português
+  simples.
 
 ## Fluxo
 
