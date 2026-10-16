@@ -3,6 +3,7 @@
 **Blocked by:** 07, 09
 
 **Status:** resolved
+**Review:** round=1; sha=3a5490d788827b61ca76c7b6affb4e5e0a3c1e82; scope=full; verdict=pass; p1=none
 
 **What to build:** o piloto entra pela entrevista do bench quando o projeto tem a
 rule da stack do bench ou quando é chamado com `--bench`, e pelo `anvil-grill`
@@ -94,3 +95,13 @@ traz o `decisions-log.md`, e o chat recebe a versão em português simples.
   nesse roteiro: o gate manual ficou provado só no caso G do S2.
 - As rodadas do S2 (E1, E2) e do ponta a ponta provisionaram as fixtures na infra
   compartilhada, em `~/projects/.anvil-infra/registry.yaml`, como no ticket 09.
+- Review round=1 · P2 (Standards): possível Shotgun Surgery / Duplicated Code — a regra do piloto sob o bench está no `anvil-auto`, no `GATE.md` ("Sob o piloto automático") e no `SKILL.md` do bench, e as cópias já divergem: o `GATE.md` diz que todo gate manual aberto deixa a spec parada, e o `anvil-auto` exclui o de spec fechada — o piloto, que lê os dois, recebe duas regras para o mesmo caso.
+- Review round=1 · P2 (Spec): as specs `closed` do `--reverify` saem do `roadmap.sh` no checkout do branch — numa retomada de spec parada depois que uma irmã fechou na `main`, o ledger da irmã não é reexecutado, e o merge local pode quebrá-la sem que nada segure o fechamento (história 58).
+- Review round=1 · P3 (Standards): possível Feature Envy / Divergent Change — o bench, skill do Claude Code, passou a descrever o `anvil-auto`, que só existe no omp — cada mudança no piloto obriga a editar o bench também.
+- Review round=1 · P3 (Standards): o `--reverify` acumulado e o `docker compose up -d app` passaram a valer também no bench chamado direto — o contrato do bench direto muda sem um critério deste ticket que o cubra (o ticket 09, l.63-66, o deixou para o 10).
+- Review round=1 · P3 (Standards): na fase 2 do `SKILL.md` do bench, "como diz a seção dele" não diz de quem — o leitor adivinha que é "Sob o piloto automático".
+- Review round=1 · P3 (Standards): a regra de commitar o `decisions-log.md` aparece três vezes no `anvil-auto` (corrente, `--reverify`, "Parada"), e o "Nunca" repete o modo bench — cada cópia é um ponto a mais para divergir.
+- Review round=1 · P3 (Spec): o item do `PASS` diz "`--reverify` acumulado saindo `0`", e a subseção aceita a saída `1` com só gate manual aberto de spec fechada — quem lê só o item para a spec sem necessidade.
+- Review round=1 · P3 (Spec): a linha abaixo de `UNMET:` corta em 12 ids com `, +N more` — com mais de 12 gates manuais abertos, o teste "todo id é de gate manual" falha, e uma parada por decisão vira pesquisa.
+- Review round=1 · P3 (Spec): na saída mista, gate manual aberto e gate com `CHECK:` caído, a skill não manda a pergunta do gate manual para "o que ainda espera decisão" quando a spec para depois da pesquisa sem rodada extra — a pergunta some do relatório.
+- Review round=1 · P3 (Spec): em "Mostrar e confirmar", a correção manda "voltar ao grill" sem o recorte "No bench" — um leitor literal carrega o grill, com perguntas técnicas, contra a história 52.
