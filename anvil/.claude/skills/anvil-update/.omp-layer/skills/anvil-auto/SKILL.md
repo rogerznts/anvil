@@ -254,8 +254,8 @@ estava limpa na largada, então tudo o que está fora de commit veio da entrada.
 
 No bench, antes do commit, atualize a rule da stack com os módulos e os papéis
 reais, como diz "O combinado, uma vez", da fase 4 do bench. O commit leva também o
-briefing, o checklist e, num projeto novo, o starter e a rule da stack que a fase 2
-escreveu: o bench não commita sob o piloto.
+briefing, o checklist e, num projeto novo, o starter, a rule da stack e os perfis do
+tracker e de verificação que a fase 2 escreveu: o bench não commita sob o piloto.
 
 ```bash
 git add -A
