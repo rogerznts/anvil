@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-16T05:11:59Z
+Last updated: 2026-10-16T05:28:58Z
 
 ## Visão geral
 
@@ -23,10 +23,11 @@ Last updated: 2026-10-16T05:11:59Z
 
 ## Specs ativas
 
-- [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, pronto para arquivar, 11/11 tickets resolvidos
+Nenhuma.
 
 ## Specs arquivadas
 
+- [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/archive/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, 11 tickets
 - [007 — Migração lista o que está fora do git e edita o alvo de symlink no repositório](./specs/archive/007-extension-migration-out-of-git/spec.md) — `extension/007-migration-out-of-git`, 4 tickets
 - [006 — Instalação por usuário, idioma no chat e cauda do `anvil-next`](./specs/archive/006-feature-user-install-language-next/spec.md) — `feature/006-user-install-language-next`, 7 tickets
 - [004 — Robustez e isolamento da camada omp](./specs/archive/004-extension-omp-layer-hardening/spec.md) — `extension/004-omp-layer-hardening`, 11 tickets
