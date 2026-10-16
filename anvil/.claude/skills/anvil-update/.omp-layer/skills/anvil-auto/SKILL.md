@@ -262,16 +262,20 @@ Então, nesta ordem:
 No branch da spec, carregue o `anvil-to-spec` com a entrada do roteiro como
 contexto: o `Entra:` e o `Fica de fora:` são o escopo da spec, o `Pronto quando:`
 é o critério de pronto dela, e o que o grill decidiu sobre a entrada também vale.
-A skill publica na pasta do branch, como o perfil do tracker manda para quem já
-está num branch de spec. Com a spec escrita, commite no branch:
+A spec cita o `Pronto quando:` como está, com os nomes de comando, arquivo ou tela
+que ele traz, mesmo onde a skill evita caminho de arquivo: é por ele que a entrada
+se mede, e um nome que some da spec some dos tickets. A skill publica na pasta do
+branch, como o perfil do tracker manda para quem já está num branch de spec. Com a
+spec escrita, commite no branch:
 
 ```bash
 git add -A
 git commit -m "docs(spec): add spec <number>"
 ```
 
-Depois carregue o `anvil-to-tickets` sobre a spec e commite os tickets do mesmo
-jeito, com `docs(spec): add the tickets of spec <number>`.
+Depois carregue o `anvil-to-tickets` sobre a spec, com o `Pronto quando:` como
+critério de aceite de algum ticket, e commite os tickets do mesmo jeito, com
+`docs(spec): add the tickets of spec <number>`.
 
 As duas skills param para perguntar ao operador, como na checagem dos seams do
 `anvil-to-spec` e na da granularidade do `anvil-to-tickets`. Na corrente, quem
