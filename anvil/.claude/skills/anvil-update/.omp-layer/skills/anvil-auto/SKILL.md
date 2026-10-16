@@ -543,6 +543,13 @@ git add -A
 git commit -m "docs(spec): archive spec <number>"
 ```
 
+Antes de toda volta à `main` do fechamento, confira a árvore: no merge local, logo
+depois do commit do archive; no PR, depois do push da linha `PR:`. Rode
+`git status --porcelain`. Com qualquer linha na saída, a execução para, como diz
+"Fora do caminho feliz", com os arquivos no motivo: não volte à `main`, não faça o
+merge e não mexa nesses arquivos. O que o archive ou o `tea-open-pr` deixou fora de
+commit iria para a `main` com você.
+
 O fechamento segue a regra do projeto. Decida, nesta ordem:
 
 1. Rode `git remote`. Com a saída vazia, o projeto não tem remoto, e a spec fecha
@@ -562,7 +569,7 @@ como `git pull`, `git rebase`, `git reset` ou `git cherry-pick`, e nada de
 
 #### Merge local
 
-Mescle da `main`:
+Com a árvore limpa, mescle da `main`:
 
 ```bash
 git checkout main
@@ -603,9 +610,9 @@ commita a linha `PR:` nos tickets, leve esse commit ao remoto com `git push`, e
 guarde a URL do PR.
 
 Não faça o merge, nem o do PR nem um local: a revisão do PR é do operador. A
-entrada fica `stopped` até o merge do PR, e as que dependem dela esperam. Volte à
-`main` com `git checkout main` e siga para o relatório, com o PR em "o que ainda
-espera decisão".
+entrada fica `stopped` até o merge do PR, e as que dependem dela esperam. Confira a
+árvore, como diz "Fechamento", e, limpa, volte à `main` com `git checkout main` e
+siga para o relatório, com o PR em "o que ainda espera decisão".
 
 ### Contradição com o roteiro
 
@@ -620,7 +627,17 @@ régua da conferência da entrada:
   humano" o que mudou e por quê. O ticket que o implementer deixou sem resolver por
   causa dela sai do `--skip` e volta ao despacho uma vez.
 - Com o critério incumprível, a spec fica parada, como diz "Parada", e a
-  contradição vai para "o que ainda espera decisão".
+  contradição vai para "o que ainda espera decisão". Achada antes de os tickets
+  estarem completos, ao escrever a spec ou os tickets, ela deixa o rascunho fora de
+  commit. Commite no branch da spec o que você escreveu na pasta dela, só essa
+  pasta, e só então siga a "Parada":
+
+  ```bash
+  git add docs/specs/<pasta>
+  git commit -m "docs(spec): stop spec <number> at a draft"
+  ```
+
+  Sem nada novo na pasta, não há o que commitar.
 
 ### Pesquisa antes de travar
 
