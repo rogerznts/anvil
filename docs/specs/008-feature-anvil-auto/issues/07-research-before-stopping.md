@@ -2,7 +2,7 @@
 
 **Blocked by:** 06
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=9fdf41d; scope=full; verdict=fail; p1=open
 
 **What to build:** numa parada técnica (ticket travado em `round=2`,
@@ -74,8 +74,8 @@ O `FAIL` no teto do bench usa esta mesma pesquisa, e quem o liga é o ticket 10.
   - P: projeto que fecha por PR. Archive e PR, sem `anvil-research` e sem
     arquivo em `discovery/`.
 - Limite do S2: nenhum caso exercita o implementer bloqueado por fato
-  desconhecido, nem o gate manual, nem a parada que volta depois da rodada extra.
-  Essas regras estão na skill e não foram vistas rodando.
+  desconhecido, nem o gate manual, nem a verificação que falha de novo depois da
+  rodada extra. Essas regras estão na skill e não foram vistas rodando.
 - Limite do S2, na primeira medição: os `sha` das linhas `Review:` da fixture não
   eram commits, e nos casos T e V o implementer da rodada extra parou ou mediu a
   partir do `HEAD` do começo da vez dele. Na rodada 2, a fixture passou a gravar
