@@ -62,7 +62,7 @@ tocado.
   tickets do frontier. Sem número, usa o do branch atual, e fora do branch da spec
   se recusa. Para quando tudo está resolvido ou quando o que sobra está travado, e
   diz o próximo passo. Rodar de novo retoma pelo que está no disco.
-- `/skill:anvil-auto [--bench] <pedido>` é o piloto automático: leva um plano de
+- `/skill:anvil-auto [--bench] <pedido>` é o piloto automático: leva um roteiro de
   várias specs do grill ao fechamento, com um sim seu só. Ver "Piloto automático".
 - `/skill:anvil-browser-qa` faz o QA de browser. O `anvil-run` o recomenda quando a
   spec tem tela e nunca o dispara, assim como nunca dispara archive nem PR.
@@ -92,7 +92,7 @@ uma spec aberta do roteiro, ele retoma a spec do ponto que o disco indica e depo
 segue a corrente. Em outro branch, como o de uma spec arquivada ou o de uma spec
 que não é de entrada do roteiro, ele recusa.
 
-**O único sim.** O grill, ou a entrevista, cobre o plano inteiro: as specs, a
+**O único sim.** O grill, ou a entrevista, cobre o trabalho inteiro: as specs, a
 ordem, o escopo, o que fica de fora e o critério de pronto de cada uma. No fim, o
 piloto escreve o **roteiro** em `docs/specs/roadmap.md`, valida e mostra o texto,
 que no bench é a versão em português simples. A sua confirmação sobre esse texto
@@ -109,15 +109,18 @@ do roteiro e só quando as dependências da entrada fecharam:
   opção recomendada pela skill ou, sem recomendação, a mais conservadora;
 - despacha os tickets em série, um `anvil-implementer` por ticket, pelo
   `frontier.sh` da `anvil-run`;
-- fecha a spec só com `PASS`. Fora do bench, é todo ticket `resolved`, com a última
-  `Review:` em `verdict=pass; p1=none`, e o comando de verificação rodado por ele
-  saindo `0`. No bench, é o `--reverify` dos gates desta spec e das já fechadas;
+- fecha a spec só com `PASS`: todo ticket `resolved`, com a última `Review:` em
+  `verdict=pass; p1=none`, e o comando de verificação rodado por ele saindo `0`.
+  No bench, o `--reverify` dos gates desta spec e das já fechadas toma o lugar
+  do comando;
 - fecha com o archive e, pela regra do projeto, o merge local na `main` ou o PR
   aberto;
 - numa parada técnica, como ticket travado em `round=2`, verificação que falha ou
   implementer bloqueado por fato desconhecido, pesquisa em fontes primárias antes
-  de desistir. Com evidência nova, abre uma rodada a mais, uma só por ticket, e a
-  registra no `## Comments` dele.
+  de desistir. Abre uma rodada a mais só quando a pesquisa aponta um ticket desta
+  spec com evidência que ainda não está nele, o histórico do ticket não mostra
+  dois sinais de laço e ele ainda não teve a rodada extra, de nenhuma execução. A
+  rodada é registrada no `## Comments` do ticket.
 
 A spec que não fecha sozinha fica aberta no branch dela, e a corrente segue pelas
 entradas que não dependem dela. A corrente termina quando não sobra entrada
