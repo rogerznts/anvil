@@ -278,8 +278,11 @@ As cinco decisões do operador ficam registradas aqui:
   2. com o merge preparado, o piloto roda a verificação sobre o estado combinado:
      fora do bench, o script do comando; no bench, o `--reverify` do `GATE.md`, com o
      ledger desta spec, agora em `docs/specs/archive/`, e os das specs `closed`;
-  3. saindo `0`, o piloto commita o merge, com a mensagem padrão;
-  4. saindo diferente de `0`, o piloto devolve os ledgers que o checker reescreveu,
+  3. com a saída que passa — fora do bench, `0`; no bench, a que vale o `PASS` pela
+     regra de "Sob o piloto automático" do `GATE.md`, porque um gate manual aberto de
+     uma spec fechada dá `exit: 1` e não segura esta —, o piloto commita o merge,
+     com a mensagem padrão;
+  4. com qualquer outra saída, o piloto devolve os ledgers que o checker reescreveu,
      aborta o merge com `git merge --abort`, e a spec fica parada, já arquivada no
      branch. É parada por decisão: sem pesquisa e sem rodada extra. O relatório leva
      a saída, e "o que ainda espera decisão" leva a pergunta de qual spec cede.
