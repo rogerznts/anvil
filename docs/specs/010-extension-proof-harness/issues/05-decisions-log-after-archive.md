@@ -3,6 +3,7 @@
 **Blocked by:** 02
 
 **Status:** resolved
+**Review:** round=1; sha=f40a15c; scope=full; verdict=pass; p1=none
 
 **What to build:** no relatório do piloto, a seção de cada spec do bench traz o
 `decisions-log.md` dela lido do branch pelo caminho que ele tem lá: depois do
@@ -56,3 +57,9 @@ fechada, o `git show` falha e o relatório diz "nenhum".
   `/Users/admin/Projects/open-maestri/.claude/skills/anvil-bench/` (`out-off/`) e num
   temporário alheio (`out-red-off/`). O checker que roda não é sempre o do payload
   sob prova; o B1 do ticket 09 depende dele.
+- Review round=1 · P2 (Standards): o critério 1, marcado `[x]`, diz "o da spec parada em `docs/specs/<pasta>/`", e a skill lê do archive a spec parada depois do archive; a divergência com a spec (`spec.md:239-241`, história 25) está só neste `## Comments` — arquivada assim, a spec dá o caminho errado da parada no fechamento a quem a ler.
+- Review round=1 · P2 (Standards): o vermelho só aparece com pensamento `off`, e só um dos três verdes `off` mediu o relatório — a prova mostra que o texto novo basta, mas não que a mudança é necessária no pensamento padrão do omp.
+- Review round=1 · P3 (Standards): "parada no fechamento depois do archive" (`anvil-auto/SKILL.md:856-861`) é um terceiro nome para o caso que a "Parada" chama "não fecha no fechamento" e o "Conferir o merge" chama "parada, já arquivada no branch" (Mysterious Name) — o leitor casa três nomes para um caso só.
+- Review round=1 · P2 (Spec): nos dois vermelhos `off` a sessão não tentou ler o `decisions-log.md`, nem por `git show` nem por `read`, e escreveu "nenhum(a)" direto; o verde `off` leu pelo `read` da árvore, e não pelo `git show <branch>:` — o vermelho não reproduz o mecanismo do defeito, o `git show` que falha, que só aparece em `s2-red-1`, que se recuperou, e a diferença entre vermelho e verde pode vir de o modelo pular o passo, com n=2 contra n=1.
+- Review round=1 · P2 (Spec): a regra nova lê do archive a spec que para no fechamento depois do archive, contra a letra da spec ("em `docs/specs/<pasta>/` quando parou", linhas 239-241, e a história 25) e do critério 1 — quem escrever um teste ou uma regra pela spec espera `docs/specs/<pasta>/` numa parada depois do archive e acha o arquivo ausente; o critério podia ganhar a ressalva "antes do archive", por decisão do operador.
+- Review round=1 · P3 (Spec): "o `verification.sh check` rodou junto do grep da rule do bench" só vale para `out-off-3`; em `out-off-2` a sessão nem rodou o grep da rule do bench — a explicação da recusa fica imprecisa para metade dos casos que ela cobre.
