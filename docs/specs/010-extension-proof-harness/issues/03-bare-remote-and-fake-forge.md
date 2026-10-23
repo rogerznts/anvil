@@ -3,6 +3,7 @@
 **Blocked by:** 01
 
 **Status:** resolved
+**Review:** round=1; sha=3fdc448; scope=full; verdict=pass; p1=none
 
 **What to build:** duas opções do helper para provas que passam por remoto e por
 PR, sem servidor. A fixture ganha um `origin` local, e a sessão encontra um `gh` e
@@ -45,3 +46,11 @@ um `tea` que gravam cada chamada e respondem como no sucesso.
   a ferramenta de shell do omp achou o `gh` e o `tea` falsos antes dos de
   `/opt/homebrew/bin`, o `git push` chegou ao bare e o `gh pr create` respondeu a
   URL; código do helper `0`, respondida por `anthropic/claude-sonnet-4-5`.
+- Review round=1 · P2 (Spec): o `_proof_cleanup` apaga o bare, mas não tira o `origin` nem o upstream que o `_proof_publish` grava no `.git/config` da fixture, e o cabeçalho não diz isso — uma fixture reaproveitada entre execuções fica com `origin` para um caminho apagado e a execução seguinte sai `2` com "a fixture já tem um origin".
+- Review round=1 · P3 (Spec): vão além do pedido as recusas `2` para fixture fora da raiz, sem commit ou com outro `origin`, o `symbolic-ref HEAD` no bare, o `--repo` honrado e a numeração dos PRs por ferramenta, e o `rm -f` do `forge.jsonl` velho sem `--forge` — nada quebra, mas o contrato que a 011 herda fica um pouco maior.
+- Review round=1 · P3 (Standards): no `proof-forge.py`, o padrão `'fake/fixture'` aparece duas vezes (Duplicated Code) — trocar um e esquecer o outro dá URLs de repositórios diferentes ao `gh` e ao `tea` na mesma prova.
+- Review round=1 · P3 (Standards): o caminho do log sai da estrutura de `$PROOF_RUN` nos dois lados, `dirname(dirname(argv[0]))/forge.jsonl` no `proof-forge.py` e `$PROOF_RUN/forge.jsonl` com os links em `forge/` no `proof.sh` (Shotgun Surgery) — mudar a estrutura exige mexer nos dois, e o falso quebra com `FileNotFoundError` em vez de recusar com o motivo.
+- Review round=1 · P3 (Standards): sem `--forge`, o `proof_session` apaga um `forge.jsonl` antigo de `<saídas>`, e o cabeçalho não diz — quem lê só o cabeçalho não sabe que o arquivo some.
+- Review round=1 · P3 (Standards): `local fx` no `_proof_publish` destoa do `cwd` do `proof_session` e da "fixture" da prosa (Mysterious Name) — só custa leitura.
+- Review round=1 · P3 (Standards): o `SKILL.md` diz que os falsos "gravam cada chamada no `forge.jsonl` das saídas", mas eles gravam em `$PROOF_RUN/forge.jsonl` e o helper copia para as saídas depois da sessão; e o comportamento do forge está descrito em três lugares (`SKILL.md`, cabeçalho do `proof.sh`, docstring do `proof-forge.py`) — três superfícies a manter em sincronia.
+- Review round=1 · P3 (Standards): o `option()` do `proof-forge.py` aceita as formas curtas (`-R`, `-r`, `-t`, `-b`, `-o`) e `--x=y`, enquanto o comentário de implementação declara leitura literal e deixa os aliases do `tea` (`pulls`, `c`) sem resposta (Speculative Generality leve) — o critério fica inconsistente, sem mudar decisão.
