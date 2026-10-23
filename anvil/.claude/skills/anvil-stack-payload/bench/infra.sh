@@ -11,6 +11,9 @@
 #   - índice Redis livre      (0-15, fallback prefixo "<slug>:")
 #   - porta livre do admin    (bind-test a partir de 3000)
 #
+# Modo --teardown: só com o prefixo de execução de uma prova (ANVIL_INFRA_PREFIX),
+# derruba a infra do prefixo; sem ele, recusa sem tocar em nada.
+#
 # Idempotente. Suporta --help e --dry-run.
 
 set -e
@@ -25,17 +28,34 @@ STARTER_INFRA="$SCRIPT_DIR/starter/.anvil-infra/docker-compose.yml"
 
 # Diretório de projetos do usuário (overridable para testes).
 PROJECTS_DIR="${ANVIL_PROJECTS_DIR:-$HOME/projects}"
-INFRA_DIR="$PROJECTS_DIR/.anvil-infra"
+
+# Prefixo de execução, só para prova (ADR-0017): com ele, o projeto do compose, a
+# rede e o diretório do registro levam o prefixo, e os volumes ficam no projeto do
+# compose prefixado. Sem ele, a infra é a compartilhada, como sempre.
+INFRA_PREFIX="${ANVIL_INFRA_PREFIX:-}"
+COMPOSE_PROJECT=""
+if [[ -n "$INFRA_PREFIX" ]]; then
+    if [[ ! "$INFRA_PREFIX" =~ ^[a-z0-9][a-z0-9_-]*$ ]]; then
+        echo "ERRO: ANVIL_INFRA_PREFIX inválido: '$INFRA_PREFIX' (use [a-z0-9][a-z0-9_-]*)." >&2
+        exit 1
+    fi
+    COMPOSE_PROJECT="$INFRA_PREFIX-anvil-infra"
+    INFRA_DIR="$PROJECTS_DIR/.$INFRA_PREFIX-anvil-infra"
+    NETWORK_NAME="$INFRA_PREFIX-anvil-net"
+else
+    INFRA_DIR="$PROJECTS_DIR/.anvil-infra"
+    NETWORK_NAME="anvil-net"
+fi
 INFRA_COMPOSE="$INFRA_DIR/docker-compose.yml"
 REGISTRY="$INFRA_DIR/registry.yaml"
 
-NETWORK_NAME="anvil-net"
 PORT_START=3000
 PORT_MAX=3999
 REDIS_MAX_INDEX=15
 
 DRY_RUN=false
 PROVISION=""
+TEARDOWN=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -50,15 +70,24 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             ;;
+        --teardown)
+            TEARDOWN=true
+            ;;
         --help|-h)
             cat <<'EOF'
 Usage:
   infra.sh [--dry-run]                    # detecta/cria/reusa a infra + health gate
   infra.sh --provision <projeto> [--dry-run]  # aloca db/porta/redis do projeto
+  ANVIL_INFRA_PREFIX=<prefixo> infra.sh --teardown [--dry-run]  # derruba a infra do prefixo
 
 Infra compartilhada por máquina (ADR-0001): Postgres + Redis + rede anvil-net,
 uma vez só, reusada por todos os projetos. Fonte da verdade da alocação:
 ~/projects/.anvil-infra/registry.yaml.
+
+A única exceção, e só para prova, é o prefixo de execução em ANVIL_INFRA_PREFIX:
+com ele, a infra é outra, com projeto do compose <prefixo>-anvil-infra (e os
+volumes dele), rede <prefixo>-anvil-net e registro em
+~/projects/.<prefixo>-anvil-infra/.
 
 Modo padrão:
   - Se a rede anvil-net não existe: copia o compose da infra para
@@ -73,6 +102,14 @@ Modo --provision <projeto>, chamado do diretório do projeto:
   - Índice Redis livre: 0-15; se todos ocupados, cai para prefixo "<slug>:".
   - Porta livre: bind-test a partir de 3000.
   - Grava tudo em registry.yaml (idempotente: projeto já provisionado é reusado).
+  - A alocação impressa (ALLOC_*) traz a rede em ALLOC_NETWORK, que vai para o
+    ANVIL_NETWORK do .env do projeto.
+
+Modo --teardown, só com ANVIL_INFRA_PREFIX:
+  - Remove os containers do compose do prefixo e os que estão na rede dele, os
+    volumes do compose, a rede e o diretório do registro.
+  - Sem o prefixo, recusa e não toca em nada: a infra compartilhada não se
+    derruba por aqui.
 
 OPTIONS:
   --dry-run   Mostra o que faria; não sobe containers nem escreve no registry.
@@ -80,6 +117,7 @@ OPTIONS:
 
 Env:
   ANVIL_PROJECTS_DIR  Sobrescreve ~/projects (padrão) — útil para testes.
+  ANVIL_INFRA_PREFIX  Prefixo de execução de uma prova, [a-z0-9][a-z0-9_-]*.
 
 O script é idempotente: rodar 2x não corrompe o estado.
 EOF
@@ -93,7 +131,22 @@ EOF
     shift
 done
 
-compose_infra() { docker compose -f "$INFRA_COMPOSE" "$@"; }
+if $TEARDOWN; then
+    if [[ -z "$INFRA_PREFIX" ]]; then
+        echo "ERRO: --teardown só derruba a infra de um prefixo de execução, e ANVIL_INFRA_PREFIX está vazio; a infra compartilhada não se derruba por aqui. Nada foi tocado." >&2
+        exit 1
+    fi
+    if [[ -n "$PROVISION" ]]; then
+        echo "ERRO: --teardown não se combina com --provision." >&2
+        exit 1
+    fi
+fi
+
+# O compose da infra lê o nome da rede de ANVIL_NETWORK; o projeto prefixado vem
+# do -p, que vale sobre o name: do arquivo.
+compose_infra() {
+    ANVIL_NETWORK="$NETWORK_NAME" docker compose -f "$INFRA_COMPOSE" ${COMPOSE_PROJECT:+-p "$COMPOSE_PROJECT"} "$@"
+}
 
 # ---------- infra compartilhada (FR-005/006) ----------
 
@@ -351,11 +404,39 @@ emit_allocation() {
     echo "ALLOC_REDIS_PREFIX=$prefix"
     echo "ALLOC_DATABASE_URI=postgresql://anvil:anvil@postgres:5432/$db"
     echo "ALLOC_REDIS_URL=redis://redis:6379/$idx"
+    echo "ALLOC_NETWORK=$NETWORK_NAME"
+}
+
+# ---------- derrubada do prefixo ----------
+
+# Só roda sob o prefixo, que o fluxo de argumentos já exigiu. Os containers da rede
+# do prefixo, como o app de uma prova, saem junto: estão numa rede que só existe
+# para ela, e prenderiam a rede.
+teardown_infra() {
+    local ids vols
+    ids="$( { docker ps -aq --filter "label=com.docker.compose.project=$COMPOSE_PROJECT"
+              docker ps -aq --filter "network=$NETWORK_NAME"; } | sort -u)"
+    vols="$(docker volume ls -q --filter "label=com.docker.compose.project=$COMPOSE_PROJECT")"
+    if $DRY_RUN; then
+        echo "would  remover containers:" $ids
+        echo "would  remover volumes:" $vols
+        echo "would  remover a rede $NETWORK_NAME e o diretório $INFRA_DIR"
+        return 0
+    fi
+    [[ -z "$ids" ]] || docker rm -fv $ids >/dev/null
+    [[ -z "$vols" ]] || docker volume rm $vols >/dev/null
+    if network_exists; then
+        docker network rm "$NETWORK_NAME" >/dev/null
+    fi
+    rm -rf "$INFRA_DIR"
+    echo "infra do prefixo $INFRA_PREFIX derrubada (compose $COMPOSE_PROJECT, rede $NETWORK_NAME, $INFRA_DIR)."
 }
 
 # ---------- fluxo principal ----------
 
-if [[ -n "$PROVISION" ]]; then
+if $TEARDOWN; then
+    teardown_infra
+elif [[ -n "$PROVISION" ]]; then
     # Provisionar pressupõe a infra de pé (a menos que dry-run).
     if ! $DRY_RUN; then
         ensure_infra

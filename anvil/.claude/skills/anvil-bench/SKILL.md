@@ -107,10 +107,11 @@ existente, ou a fase 3 como entrevista do delta — vai para o `decisions-log.md
 com a spec de onde partiu quando há uma, e para a entrega da fase 6.
 
 Projeto novo: copie o starter **as-is**, sem regenerar, inicialize o git com o
-branch `main` (`git init -b main`), materialize o `.env` com a alocação, gere
-`.claude/rules/payload.md` a partir do `RULE.md` da stack mais a seção de
-invariantes, e instale os dois perfis que o bench e as skills de fluxo leem, a
-partir dos templates do `anvil-docs`, da instalação de usuário:
+branch `main` (`git init -b main`), materialize o `.env` com a alocação, nas
+chaves do `.env.example` do starter — a rede de `ALLOC_NETWORK` vai para o
+`ANVIL_NETWORK` —, gere `.claude/rules/payload.md` a partir do `RULE.md` da stack
+mais a seção de invariantes, e instale os dois perfis que o bench e as skills de
+fluxo leem, a partir dos templates do `anvil-docs`, da instalação de usuário:
 
 | Perfil | Template |
 |---|---|

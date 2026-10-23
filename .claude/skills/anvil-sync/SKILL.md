@@ -59,7 +59,9 @@ respondeu. Para provas que passam por remoto e por PR, sem servidor, o
 `proof_session` liga como `origin` da fixture, com o branch dela publicado, e o
 `proof_prepare --forge` põe um `gh` e um `tea` falsos à frente do `PATH` da sessão,
 que gravam cada chamada no `forge.jsonl` das saídas e respondem como no sucesso,
-por `scripts/proof-forge.py`.
+por `scripts/proof-forge.py`. Para provas do bench com a stack de pé, o
+`proof_prepare --infra` liga o prefixo de execução do `infra.sh` com o id da
+execução, no script da prova e na sessão, e a limpeza derruba essa infra no fim.
 As operações, as saídas e os códigos de saída estão no cabeçalho do `proof.sh`.
 
 ```bash
