@@ -854,8 +854,11 @@ git commit -m "docs(report): record <nome da entrada> in the autopilot report"
 O relatório tem esta forma, com uma seção de segundo nível por entrada tocada na
 execução, na ordem, e as seções sem conteúdo ficam com "nenhum". No bench, a seção
 de cada spec traz o `decisions-log.md` dela, lido do branch com
-`git show <branch>:<caminho>`, e o `--reverify` no lugar do comando de
-verificação:
+`git show <branch>:<caminho>` pelo caminho que ele tem lá: com o archive da spec
+commitado no branch, como na spec fechada e na parada no fechamento depois do
+archive, o caminho é `docs/specs/archive/<pasta>/decisions-log.md`; na spec parada
+antes do archive, `docs/specs/<pasta>/decisions-log.md`. No bench também, o
+`--reverify` vem no lugar do comando de verificação:
 
 ````markdown
 # Relatório do piloto automático
