@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=a2a6905; scope=full; verdict=pass; p1=none
 
 **What to build:** o helper de prova, junto da ferramenta de manutenção do
 repositório (a `anvil-sync`), como uma biblioteca de shell que o script da prova
@@ -52,3 +53,12 @@ operador digita, isolada do resto da máquina, e deixa as saídas em `workspace/
 - Implementação · o preparo recusa com `2` também sem `python3`, que o condutor
   (`proof-rpc.py`) usa, além de omp, git e docker. O docker é exigido sempre,
   como o ticket pede, mesmo antes da opção de infra do ticket 04.
+- Review round=1 · P3 (Standards): em `proof.sh`, o `case` de fora casa `--model|--cwd|--out` e um `case` de dentro decide de novo entre os três (Repeated Switches) — uma opção nova tem de ser escrita nos dois lugares.
+- Review round=1 · P3 (Standards): o status `local`, que o `proof-rpc.py` imprime quando o omp completa o turno sem agente, sai misturado aos status do protocolo (`completed`, `aborted`, `error`) na linha `proof: turno N: …` — quem lê o stderr o toma por status que o `rpc.md` não define.
+- Review round=1 · P3 (Standards): no `proof-rpc.py`, o parâmetro `waiting` de `next_frame`/`until` é só o rótulo da mensagem de erro, e `p`, `a` e `s` em `main` não dizem o que guardam — quem lê `until(waiting, matches)` acha que `waiting` controla a espera.
+- Review round=1 · P3 (Standards): a mensagem `o omp saiu (rc=…) …; veja omp.err` se repete em `send`, `next_frame` e `close`, e a gravação do frame em `next_frame` e `close` — mudar o formato exige três edições.
+- Review round=1 · P3 (Standards): o caminho `anvil-update/.omp-layer/skills` está escrito à mão no `proof.sh` e no `dev-link.sh` (`CAMADA`) — mover a camada omp quebra o helper sem aviso.
+- Review round=1 · P3 (Standards): o prefixo de erro do helper é `proof:`, e o `dev-link.sh` e o `vendor-sync.sh` usam `erro:` — só a uniformidade se perde; o prefixo diz de onde vem a linha dentro do script da prova.
+- Review round=1 · P3 (Standards): `. proof.sh` sem barra faz `_PROOF_SCRIPTS` cair no `pwd`, e o cabeçalho diz "biblioteca de shell" mas o arquivo depende de bash (`BASH_SOURCE`, `local`) — quem o carregar de outro diretório, ou de `sh`/`zsh`, recebe o caminho das skills errado.
+- Review round=1 · P3 (Spec): o `frames.jsonl` grava só o que o omp escreveu, sem os comandos que o helper mandou (`prompt`, `get_state`) — quem investiga uma falha reconstrói o lado de entrada pelos turnos.
+- Review round=1 · P3 (Spec): a S1 manda o sinal só ao pid do bash, num grupo próprio (`set -m`), e não exercita o Ctrl-C real, que chega ao grupo inteiro — uma regressão que só aparece com o sinal no grupo passaria sem a prova acusar.
