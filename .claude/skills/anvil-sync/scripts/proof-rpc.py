@@ -2,16 +2,19 @@
 """Condutor da sessão rpc do omp, chamado pelo proof_session do helper de prova
 (proof.sh). Não se roda à mão.
 
-Abre o omp em --mode rpc --no-ui, com o overlay de config, o modelo e a fixture.
-Manda cada turno como frame prompt e espera o prompt_result dele e, quando o turno
-chegou ao agente, o session_settled; só então manda o seguinte. Depois do último,
-pede o get_state, fecha o stdin e copia o sessionFile para <out>/session.jsonl.
-Grava em <out>/frames.jsonl todo frame que o omp escreveu, e em <out>/omp.err o
-stderr dele.
+Abre o omp em --mode rpc --no-ui, com o overlay de config, o modelo e a fixture, e
+assina os frames de subagente (set_subagent_subscription "progress"). Manda cada
+turno como frame prompt e espera o prompt_result dele e, quando o turno chegou ao
+agente, o session_settled; só então manda o seguinte. Depois do último, pede o
+get_state, fecha o stdin e copia o sessionFile para <out>/session.jsonl, e o
+sessionFile de cada subagente que os frames subagent_lifecycle e
+subagent_progress disseram para <out>/subagents/<nome do arquivo>. Grava em
+<out>/frames.jsonl todo frame que o omp escreveu, e em <out>/omp.err o stderr
+dele. As cópias de subagente de uma execução anterior saem no começo.
 
 Sai 0 com a sessão assentada e copiada; 1 quando o omp sai, recusa um comando ou
-não diz o sessionFile, com o motivo no stderr. Num sinal, encerra o omp antes de
-sair.
+não diz o sessionFile, ou quando um jsonl a copiar não existe, com o motivo no
+stderr. Num sinal, encerra o omp antes de sair.
 """
 import argparse
 import json
@@ -30,6 +33,7 @@ class Rpc:
     def __init__(self, proc, frames):
         self.proc = proc
         self.frames = frames
+        self.subagent_files = []
 
     def send(self, command):
         try:
@@ -39,22 +43,39 @@ class Rpc:
             raise SessionError('o omp saiu (rc=%s) antes de receber %s; veja omp.err'
                                % (self.proc.wait(), command['type']))
 
+    def record(self, line):
+        """Grava o frame em frames.jsonl, guarda o sessionFile de subagente que ele
+        traz e o devolve decodificado."""
+        self.frames.write(line)
+        self.frames.flush()
+        try:
+            frame = json.loads(line)
+        except ValueError:
+            return {}
+        if frame.get('type') in ('subagent_lifecycle', 'subagent_progress'):
+            path = (frame.get('payload') or {}).get('sessionFile')
+            if path and path not in self.subagent_files:
+                self.subagent_files.append(path)
+        return frame
+
     def next_frame(self, waiting):
         line = self.proc.stdout.readline()
         if not line:
             raise SessionError('o omp saiu (rc=%s) esperando %s; veja omp.err' % (self.proc.wait(), waiting))
-        self.frames.write(line)
-        self.frames.flush()
-        try:
-            return json.loads(line)
-        except ValueError:
-            return {}
+        return self.record(line)
 
     def until(self, waiting, matches):
         while True:
             frame = self.next_frame(waiting)
             if matches(frame):
                 return frame
+
+    def subscribe_subagents(self):
+        self.send({'id': 'subagents', 'type': 'set_subagent_subscription', 'level': 'progress'})
+        frame = self.until('a resposta do set_subagent_subscription',
+                           lambda f: f.get('id') == 'subagents' and f.get('type') == 'response')
+        if not frame.get('success'):
+            raise SessionError('o omp recusou o set_subagent_subscription: %s' % frame.get('error'))
 
     def turn(self, n, message):
         """Manda o turno n e devolve (agentInvoked, status) do prompt_result dele."""
@@ -85,7 +106,7 @@ class Rpc:
         """Fecha o stdin e lê o resto do stdout até o omp sair."""
         self.proc.stdin.close()
         for line in self.proc.stdout:
-            self.frames.write(line)
+            self.record(line)
         rc = self.proc.wait()
         if rc != 0:
             raise SessionError('o omp saiu com rc=%d ao encerrar a sessão; veja omp.err' % rc)
@@ -118,6 +139,8 @@ def main():
         signal.signal(s, exit_on_signal)
 
     out = os.path.abspath(a.out)
+    subagents_out = os.path.join(out, 'subagents')
+    shutil.rmtree(subagents_out, ignore_errors=True)
     cwd = os.path.abspath(a.cwd)
     command = ['omp', '--mode', 'rpc', '--no-ui', '--config', a.config, '--model', a.model,
                '--cwd', cwd, '--session-dir', os.path.abspath(a.session_dir)]
@@ -127,6 +150,7 @@ def main():
         rpc = Rpc(proc, frames)
         try:
             rpc.until('o ready', lambda f: f.get('type') == 'ready')
+            rpc.subscribe_subagents()
             for n, message in enumerate(a.turns, 1):
                 invoked, status = rpc.turn(n, message)
                 print('proof: turno %d: %s' % (n, status), file=sys.stderr)
@@ -137,6 +161,11 @@ def main():
             if not os.path.isfile(path):
                 raise SessionError('o sessionFile do get_state não existe: %s' % path)
             shutil.copyfile(path, os.path.join(out, 'session.jsonl'))
+            for sub in rpc.subagent_files:
+                if not os.path.isfile(sub):
+                    raise SessionError('o jsonl do subagente, dito pelos frames, não existe: %s' % sub)
+                os.makedirs(subagents_out, exist_ok=True)
+                shutil.copyfile(sub, os.path.join(subagents_out, os.path.basename(sub)))
         except SessionError as e:
             print('proof: %s' % e, file=sys.stderr)
             return 1

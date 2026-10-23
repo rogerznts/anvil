@@ -50,13 +50,19 @@ conflito. O script sinaliza o que falta, sempre.
 carrega, pelo ADR-0017: cria o diretório da execução, carrega as skills do payload
 e da camada omp na sessão sem ligar nada em `~/.claude` nem em `~/.agents`, desliga
 o fallback de modelo só nela, e conduz a sessão pelo rpc do omp, com o `/skill:`
-real no primeiro turno, por `scripts/proof-rpc.py`. As operações, as saídas e os
-códigos de saída estão no cabeçalho do `proof.sh`.
+real no primeiro turno, por `scripts/proof-rpc.py`. Depois das conferências da
+prova, o `proof_verdict` confere o modelo de toda mensagem do assistente, na
+sessão principal e nas de subagente, por `scripts/proof-verdict.py`, e sai com o
+código da prova: `0` verde, `1` vermelho, `3` inválida, quando outro modelo
+respondeu. As operações, as saídas e os códigos de saída estão no cabeçalho do
+`proof.sh`.
 
 ```bash
 . .claude/skills/anvil-sync/scripts/proof.sh
 proof_prepare
 proof_session --model <modelo> --cwd <fixture> --out <saídas> -- "/skill:<nome> …" "<turno 2>"
+# … as conferências da prova sobre a fixture e <saídas>, com o código em $rc (0 ou 1)
+proof_verdict --model <modelo> --out <saídas> "$rc"
 ```
 
 ## Adotar uma skill nova

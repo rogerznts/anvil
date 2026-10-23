@@ -15,15 +15,30 @@
 #   proof_session --model <modelo> --cwd <fixture> --out <saídas> -- <turno>...
 #       Conduz a sessão pelo rpc do omp (proof-rpc.py): o primeiro turno é
 #       "/skill:<nome> …", como o operador digita; cada turno seguinte vai depois
-#       do prompt_result e do session_settled do anterior. Em <saídas>, que fica
-#       fora de $PROOF_RUN — o diretório da prova em workspace/ —, ficam
-#       frames.jsonl, os frames do rpc; session.jsonl, a cópia do jsonl da sessão
-#       principal, achado pelo sessionFile do get_state; e omp.err.
+#       do prompt_result e do session_settled do anterior. Os frames de subagente
+#       vão assinados. Em <saídas>, que fica fora de $PROOF_RUN — o diretório da
+#       prova em workspace/ —, ficam frames.jsonl, os frames do rpc;
+#       session.jsonl, a cópia do jsonl da sessão principal, achado pelo
+#       sessionFile do get_state; subagents/<id>.jsonl, a cópia do jsonl de cada
+#       sessão de subagente que ela abriu, achado pelos frames de subagente; e
+#       omp.err.
 #
-# Saída 2: ambiente ou uso recusado — omp, git, docker ou python3 fora do PATH,
-# opção inválida, ou a sessão que não se conduz —, com o motivo no stderr. Nada
-# é escrito em ~/.claude, ~/.agents nem no config de usuário do omp; a sessão
-# guarda o jsonl dela em $PROOF_RUN.
+#   proof_verdict --model <modelo> --out <saídas> <código das conferências>
+#       Confere o modelo de toda mensagem do assistente em session.jsonl e em
+#       subagents/*.jsonl de <saídas> (proof-verdict.py), e sai com o código da
+#       prova. <modelo> casa com o <provider>/<model> da mensagem ou só com o
+#       <model>; o código das conferências é 0, verde, ou 1, vermelho. Imprime, e
+#       grava em <saídas>/verdict.txt, cada modelo que respondeu com quantas
+#       mensagens deu, por sessão e no total, e a sessão que terminou em erro do
+#       provedor, com a mensagem de erro. Não pede proof_prepare: a prova o
+#       chama por último, com as saídas de proof_session.
+#
+# Códigos de saída: 0 verde e 1 vermelho, os das conferências; 2 ambiente ou uso
+# recusado — omp, git, docker ou python3 fora do PATH, opção inválida, ou a
+# sessão que não se conduz —, com o motivo no stderr; 3 prova inválida, quando
+# alguma mensagem é de outro modelo, que vale sobre o verde e sobre o vermelho.
+# Nada é escrito em ~/.claude, ~/.agents nem no config de usuário do omp; a
+# sessão guarda o jsonl dela em $PROOF_RUN.
 
 case "${BASH_SOURCE[0]}" in
     */*) _PROOF_SCRIPTS="$(cd "${BASH_SOURCE[0]%/*}" && pwd)" ;;
@@ -97,4 +112,25 @@ proof_session() {
     wait "$_PROOF_PID"; rc=$?
     _PROOF_PID=""
     [ "$rc" -eq 0 ] || exit 2
+}
+
+proof_verdict() {
+    local model="" out="" code
+    while [ $# -gt 1 ]; do
+        case "$1" in
+            --model) model="$2"; shift 2 ;;
+            --out) out="$2"; shift 2 ;;
+            *) _proof_refuse "opção inválida: $1" ;;
+        esac
+    done
+    code="${1:-}"
+    [ -n "$model" ] || _proof_refuse "proof_verdict pede --model"
+    [ -n "$out" ] && [ -f "$out/session.jsonl" ] || _proof_refuse "proof_verdict pede --out com as saídas da sessão, e $out/session.jsonl não existe"
+    case "$code" in
+        0|1) ;;
+        *) _proof_refuse "o código das conferências é 0 ou 1: $code" ;;
+    esac
+    command -v python3 >/dev/null 2>&1 || _proof_refuse "python3 não está no PATH"
+    python3 "$_PROOF_SCRIPTS/proof-verdict.py" "$model" "$out" "$code"
+    exit $?
 }
