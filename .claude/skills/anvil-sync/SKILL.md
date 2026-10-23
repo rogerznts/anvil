@@ -54,8 +54,13 @@ real no primeiro turno, por `scripts/proof-rpc.py`. Depois das conferências da
 prova, o `proof_verdict` confere o modelo de toda mensagem do assistente, na
 sessão principal e nas de subagente, por `scripts/proof-verdict.py`, e sai com o
 código da prova: `0` verde, `1` vermelho, `3` inválida, quando outro modelo
-respondeu. As operações, as saídas e os códigos de saída estão no cabeçalho do
-`proof.sh`.
+respondeu. Para provas que passam por remoto e por PR, sem servidor, o
+`proof_prepare --remote` cria um repositório bare na execução, que o
+`proof_session` liga como `origin` da fixture, com o branch dela publicado, e o
+`proof_prepare --forge` põe um `gh` e um `tea` falsos à frente do `PATH` da sessão,
+que gravam cada chamada no `forge.jsonl` das saídas e respondem como no sucesso,
+por `scripts/proof-forge.py`.
+As operações, as saídas e os códigos de saída estão no cabeçalho do `proof.sh`.
 
 ```bash
 . .claude/skills/anvil-sync/scripts/proof.sh
