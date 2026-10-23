@@ -3,6 +3,7 @@
 **Blocked by:** 01
 
 **Status:** resolved
+**Review:** round=1; sha=510f139; scope=full; verdict=pass; p1=none
 
 **What to build:** depois da sessão, o helper confere o modelo de toda mensagem do
 assistente, na sessão principal e nas de subagente que ela abriu, como a do
@@ -53,3 +54,13 @@ que não conta como verde nem como vermelho.
   ordem exata dos comandos que o omp falso recebe; a conferência ganhou o
   `set_subagent_subscription` antes do turno 1, e o resto dela não mudou. Passou
   inteiro de novo.
+- Review round=1 · P2 (Standards): `proof_verdict` repassa sem filtro o código do `proof-verdict.py` (`exit $?`), enquanto o `proof_session` converte toda falha do Python em `2` — um traceback no veredito (jsonl que não é UTF-8, `verdict.txt` sem permissão) sai `1` e a prova lê vermelho onde houve falha de ambiente.
+- Review round=1 · P2 (Spec): o subagente aninhado, como o revisor que o `anvil-implementer` abre, só foi provado com o omp falso (`Impl.Review` no `s1.sh`); o `s3.sh` real abriu um subagente direto — se o omp deixar de repassar os frames aninhados, as sessões dos revisores ficam fora da conferência sem aviso.
+- Review round=1 · P2 (Spec): o condutor sai com erro, e o helper com `2`, quando o jsonl que os frames de subagente apontam não existe, e o omp só grava o jsonl de uma sessão depois da primeira mensagem do assistente — um subagente cancelado antes de responder faz uma prova que mediu direito sair como ambiente, e o mantenedor a repete à toa (nunca dá verde falso).
+- Review round=1 · P3 (Spec): o mesmo traceback do `proof-verdict.py` contradiz o cabeçalho do `proof.sh`, que reserva o `2` para ambiente — quem lê só o cabeçalho espera `2` e recebe `1`.
+- Review round=1 · P3 (Spec): o `--model` vai separado ao `proof_session` e ao `proof_verdict`, e o cabeçalho não diz que um apelido que o omp aceita, como `sonnet`, sempre dá `3` — isso só está nos `## Comments` deste ticket, e quem usa o apelido repete a prova inválida sem saber por quê.
+- Review round=1 · P3 (Standards): `proof_verdict` reescreve a leitura de `--model`/`--out` do `proof_session` com outra regra (`while [ $# -gt 1 ]`, sem "`--x` pede um valor") (Duplicated Code) — `proof_verdict --out o --model 0` recusa pelo código das conferências em vez do valor de `--model` que falta, e cada opção nova se escreve em dois analisadores.
+- Review round=1 · P3 (Standards): os códigos e a regra de casamento do modelo estão no cabeçalho do `proof.sh`, na docstring do `proof-verdict.py` e no `SKILL.md`, que lista `0`, `1` e `3` sem o `2` que o `proof_verdict` também devolve (Shotgun Surgery) — mudar um código exige três edições, e o `SKILL.md` já dá uma lista incompleta.
+- Review round=1 · P3 (Standards): o `proof-verdict.py` monta `'%s/%s' % (provider, model)` e desfaz com `split('/', 1)` (Primitive Obsession) — sem provedor, o relatório mostra `None/<model>`.
+- Review round=1 · P3 (Standards): `record(line)` no `proof-rpc.py` não diz que também guarda o `sessionFile` de subagente (Mysterious Name) — quem lê `close()` não percebe que o resto do stdout ainda alimenta as cópias.
+- Review round=1 · P3 (Standards): com `--out` vazio, a recusa do `proof_verdict` diz "e /session.jsonl não existe" — a mensagem cita um caminho absoluto que ninguém pediu.
