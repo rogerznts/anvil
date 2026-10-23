@@ -44,6 +44,21 @@ O script faz o **mecânico**: mover bytes, rodar `merge-file`, aplicar o `rename
 gravar o pin. Você faz o **julgamento**: `docs-remap`, `decursor` e `tracker-profile`, e resolver
 conflito. O script sinaliza o que falta, sempre.
 
+## Helper de prova
+
+`scripts/proof.sh` é a biblioteca que o script de uma prova nova em `workspace/`
+carrega, pelo ADR-0017: cria o diretório da execução, carrega as skills do payload
+e da camada omp na sessão sem ligar nada em `~/.claude` nem em `~/.agents`, desliga
+o fallback de modelo só nela, e conduz a sessão pelo rpc do omp, com o `/skill:`
+real no primeiro turno, por `scripts/proof-rpc.py`. As operações, as saídas e os
+códigos de saída estão no cabeçalho do `proof.sh`.
+
+```bash
+. .claude/skills/anvil-sync/scripts/proof.sh
+proof_prepare
+proof_session --model <modelo> --cwd <fixture> --out <saídas> -- "/skill:<nome> …" "<turno 2>"
+```
+
 ## Adotar uma skill nova
 
 1. **Registre no manifesto** `anvil-skills.yaml`, com `state: planned` e as
