@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-16T12:47:28Z
+Last updated: 2026-10-23T18:51:52Z
 
 ## Visão geral
 
@@ -23,10 +23,11 @@ Last updated: 2026-10-16T12:47:28Z
 
 ## Specs ativas
 
-- [009 — Pontos em aberto do piloto automático](./specs/009-extension-anvil-auto-open-points/spec.md) — `extension/009-anvil-auto-open-points`, em andamento, 0/8 tickets resolvidos
+Nenhuma.
 
 ## Specs arquivadas
 
+- [009 — Pontos em aberto do piloto automático](./specs/archive/009-extension-anvil-auto-open-points/spec.md) — `extension/009-anvil-auto-open-points`, 8 tickets
 - [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/archive/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, 11 tickets
 - [007 — Migração lista o que está fora do git e edita o alvo de symlink no repositório](./specs/archive/007-extension-migration-out-of-git/spec.md) — `extension/007-migration-out-of-git`, 4 tickets
 - [006 — Instalação por usuário, idioma no chat e cauda do `anvil-next`](./specs/archive/006-feature-user-install-language-next/spec.md) — `feature/006-user-install-language-next`, 7 tickets
