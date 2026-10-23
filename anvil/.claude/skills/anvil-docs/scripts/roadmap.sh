@@ -14,10 +14,11 @@
 #          arquivo, menos as do --skip; "-" quando nao ha
 #   next: a primeira do frontier, ou none
 #   refusal: <motivo>, uma por problema, quando o roteiro nao pode terminar: nome
-#          repetido, Depende de: para nome inexistente, ciclo, Tipo: fora dos tipos
-#          do new-spec.sh. Com recusa nao ha entry nem frontier, o next e none e o
-#          script sai com 2, como o frontier.sh. Argumento invalido e chamada fora
-#          de um repositorio git saem so com a linha refusal:, tambem com 2
+#          fora de kebab-case, nome repetido, Depende de: para nome inexistente,
+#          ciclo, Tipo: fora dos tipos do new-spec.sh. Com recusa nao ha entry nem
+#          frontier, o next e none e o script sai com 2, como o frontier.sh.
+#          Argumento invalido e chamada fora de um repositorio git saem so com a
+#          linha refusal:, tambem com 2
 #
 # Estado, lido do checkout atual e, para spec aberta, do commit do branch local
 # de spec com o mesmo numero, sem trocar de checkout:
@@ -27,7 +28,7 @@
 #            a despachar; ou o branch dela ainda sem a pasta commitada
 #   stopped  spec achada e nao fechada sem ticket a despachar (todos resolved, ou
 #            os nao resolvidos travados ou dependentes de travado), spec arquivada
-#            no branch e sem merge (PR aberto), ou Spec: sem pasta nem branch
+#            no branch e sem merge na main, ou Spec: sem pasta nem branch
 set -u
 
 roadmap=docs/specs/roadmap.md
@@ -96,14 +97,26 @@ index_of() {  # <nome>: o indice da primeira entrada com o nome, ou nada
 has() { case " $1 " in *" $2 "*) return 0 ;; esac; return 1; }
 
 # --- recusas ------------------------------------------------------------------
-# Um roteiro que nao pode terminar: nome repetido, Tipo: fora dos tipos do
-# new-spec.sh, Depende de: que aponta para nome inexistente, ciclo. Sai uma linha
-# refusal: por problema, sem frontier.
+# Um roteiro que nao pode terminar: nome fora de kebab-case, nome repetido, Tipo:
+# fora dos tipos do new-spec.sh, Depende de: que aponta para nome inexistente,
+# ciclo. Sai uma linha refusal: por problema, sem frontier. O nome e o
+# --short-name do new-spec.sh e o que o frontier: e o --skip separam por espaco.
+KEBAB="minúsculas ASCII e dígitos, em grupos separados por um hífen, sem hífen no começo nem no fim"
+# Letras escritas uma a uma, e nao a faixa a-z, que depende do locale.
+kebab() {
+    case "$1" in
+        ""|-*|*-|*--*|*[!abcdefghijklmnopqrstuvwxyz0123456789-]*) return 1 ;;
+    esac
+}
 refusals=""
 add_refusal() { refusals="$refusals$1"$'\n'; }
 for i in $entries; do
-    [ "$(index_of "${name[i]}")" = "$i" ] ||
+    if [ "$(index_of "${name[i]}")" = "$i" ]; then
+        kebab "${name[i]}" ||
+            add_refusal "a entrada '${name[i]}' não está em kebab-case: o nome usa $KEBAB, como 'cadastro-de-clientes'"
+    else
         add_refusal "nome repetido: a entrada '${name[i]}' aparece mais de uma vez"
+    fi
     case "${entry_type[i]}" in *[[:space:]]*) false ;; *) has "$TYPES" "${entry_type[i]}" ;; esac ||
         add_refusal "a entrada '${name[i]}' tem Tipo: '${entry_type[i]}', e o new-spec.sh aceita: $TYPES"
     for d in ${deps[i]}; do
@@ -281,7 +294,7 @@ entry_state() {  # <Spec:>: o estado da entrada em found_state e found_reason
     if [ -n "$src" ]; then
         dir="$(spec_dir_in "$src" docs/specs/archive "$num")"
         if [ -n "$dir" ]; then
-            found_state=stopped; found_reason="arquivada no branch $br e ainda sem merge: espera o merge do PR"; return
+            found_state=stopped; found_reason="arquivada no branch $br e ainda sem merge na main"; return
         fi
     fi
     dir="$(spec_dir_in "$src" docs/specs "$num")"

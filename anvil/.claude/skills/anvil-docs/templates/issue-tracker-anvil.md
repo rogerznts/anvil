@@ -54,6 +54,22 @@ P1 reabre o trabalho: grave `verdict=fail`, mude `Status:` de `resolved` para
 `claimed` e corrija. Sem P1, grave `verdict=pass` e mantenha `resolved`. Assim a
 guarda de merge não libera um ticket que a revisão reprovou.
 
+A única rodada que não segue o orçamento de `docs/agents/verification.md` é a
+rodada extra do piloto automático, a skill `anvil-auto`, que ele declara no
+ticket como exceção ao ADR-0010 do anvil. A declaração é uma linha no
+`## Comments`:
+
+```markdown
+- Piloto · rodada <N> aberta por `docs/specs/<pasta>/discovery/<arquivo>`: <a fonte e o que ela explica da falha>.
+```
+
+Só o piloto automático escreve essa linha, uma vez por ticket, em qualquer
+execução, no fim do `## Comments`: o caminho do arquivo da pesquisa entre crases,
+dois-pontos, a fonte e o que ela explica. O `N` é a rodada seguinte à última
+`Review:` do ticket, ou `1` sem `Review:`. O `anvil-implementer` que encontra a
+linha e nenhuma `Review:` com `round=<N>` lê o arquivo e mede a rodada N, com
+qualquer `Status:`.
+
 Os tickets são **arquivo**, não issue de servidor, então não existe `#47` para
 fechar. A ligação com o PR é feita nos dois sentidos: o corpo do PR lista os
 caminhos dos tickets que fecha, e cada ticket ganha a URL do PR. Os dois lados
@@ -128,10 +144,13 @@ cobrem mais de uma spec. Nenhum dos dois é spec, e a guarda de merge não os l�
   que a corrente avança e o commita na `main` a cada fronteira de spec.
 
 No roteiro, cada entrada é uma seção de segundo nível cujo título é o **nome**
-da entrada, em kebab-case e único no arquivo. O nome é o `--short-name` do
-`new-spec.sh` e é o que as outras entradas citam em `Depende de:`. As chaves são
-linhas `Chave: valor` no começo da linha, com ou sem negrito, como o `Status:`
-dos tickets:
+da entrada, em kebab-case e único no arquivo. Kebab-case aqui é letras minúsculas
+ASCII e dígitos, em grupos separados por um hífen, sem hífen no começo nem no
+fim: `a`, `cadastro-de-clientes` e `fase-2-relatorios` valem; `Cadastro de
+clientes`, `cadastro_de_clientes`, `-cadastro` e `cadastro--clientes`, não. O
+nome é o `--short-name` do `new-spec.sh` e é o que as outras entradas citam em
+`Depende de:`. As chaves são linhas `Chave: valor` no começo da linha, com ou
+sem negrito, como o `Status:` dos tickets:
 
 ```markdown
 # Roteiro
@@ -168,8 +187,8 @@ Pronto quando: …
 - O roteiro não tem `Status:`. O estado de cada entrada (`pending`, `open`,
   `closed` ou `stopped`) e a próxima a construir saem do disco, pelo script
   `bash ~/.claude/skills/anvil-docs/scripts/roadmap.sh`, da raiz do projeto. Ele
-  recusa, com o motivo, o roteiro com nome repetido, `Depende de:` para nome
-  inexistente, ciclo ou `Tipo:` inválido.
+  recusa, com o motivo, o roteiro com nome fora de kebab-case, nome repetido,
+  `Depende de:` para nome inexistente, ciclo ou `Tipo:` inválido.
 
 ## Wayfinding operations
 

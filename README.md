@@ -267,7 +267,7 @@ Ele entra como material, não como skill, porque a `description` do upstream
 dispara em *"long or multi-part task"* e se auto-invocaria dentro do
 `/anvil-implement`. O que ficou de fora, e por quê, está em
 `anvil-bench/unlazy/VENDOR.md` — inclusive o Stop hook, que competiria com o teto
-de três tentativas do próprio bench.
+de duas rodadas do próprio bench.
 
 ---
 

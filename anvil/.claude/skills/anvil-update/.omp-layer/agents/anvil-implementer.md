@@ -24,9 +24,11 @@ operador na conversa.
 2. Anote o `HEAD`. Ele é o fixed point da rodada 1 do review.
 3. Decida pelo estado gravado no ticket:
    - algum ticket do `Blocked by` não está `resolved`: pare sem mudar nada;
-   - o `## Comments` tem a linha `- Piloto · rodada <N> aberta por <arquivo>`, e
-     nenhuma linha `Review:` tem `round=<N>`: o piloto automático abriu a rodada N
-     com a pesquisa desse arquivo, e o `context` o traz. Leia o arquivo antes de
+   - o `## Comments` tem a linha que o piloto grava,
+     ``- Piloto · rodada <N> aberta por `<arquivo>`: <a fonte e o que ela explica>.``,
+     com o caminho do arquivo entre crases, e nenhuma linha `Review:` tem
+     `round=<N>`: o piloto automático abriu a rodada N com a pesquisa desse
+     arquivo, e o `context` o traz. Leia o arquivo antes de
      tudo: ele é a evidência do que corrigir. Corrija o que ele aponta, junto dos P1
      registrados no `## Comments`, e meça a rodada N, com qualquer `Status:`. Com N
      igual a 1, é a rodada 1 de sempre. Com N 2 ou mais, o fixed point é o `sha` da

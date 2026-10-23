@@ -36,13 +36,15 @@ chamado com `--bench`. Ele carrega esta skill para a entrada e conduz o resto:
 - As fases 1 a 3 rodam como estão, até a pessoa confirmar o roteiro em português
   simples. O projeto já é um repositório git, que a largada do piloto exige: a
   fase 2 não roda o `git init`, e nem ela nem a fase 4 commitam. O commit do
-  starter, da rule da stack e do combinado é do piloto, um só, depois do sim, com
-  a rule já atualizada com os módulos e os papéis reais.
+  starter, da rule da stack, dos perfis e do combinado é do piloto, um só, depois
+  do sim, com a rule já atualizada com os módulos e os papéis reais.
 - O ledger de cada spec, da fase 4, é o piloto que roda, no começo de cada spec,
   e ele também escreve o `decisions-log.md` de cada uma.
 - A fase 5 é a corrente do piloto: ele despacha os tickets, roda o comando do
-  [GATE.md](GATE.md) como supervisor e fecha a spec. *Uma entrada do roteiro* não
-  roda, e a fase 6 é o fim do piloto, em português simples.
+  [GATE.md](GATE.md) como supervisor, lê a saída pela seção "Sob o piloto
+  automático" de lá, onde mora a regra do gate manual aberto, e fecha a spec.
+  *Uma entrada do roteiro* não roda, e a fase 6 é o fim do piloto, em português
+  simples.
 
 ## Fluxo
 
@@ -65,7 +67,23 @@ Projeto que já tem alocação: **reuse**, não reprovisione.
 ### 2. Reconhecer
 
 Starter presente mais a rule da stack indicam projeto existente. Nele, o disco
-decide o ramo:
+decide o ramo.
+
+Antes de qualquer ramo, procure uma **spec aberta**: uma pasta de
+`docs/specs/`, fora de `docs/specs/archive/`, com algum ticket em `issues/` cujo
+`Status:` não é `resolved`. Achou, a construção segue por ela, sem entrevista,
+com ou sem `docs/qa/checklist.yaml`, e nenhum dos ramos abaixo vale:
+
+- sem o `gates.md` na pasta da spec, retome pela fase 4: o ledger dessa spec e,
+  se ainda não há o `docs/qa/checklist.yaml`, antes dele o briefing e o checklist,
+  como no ramo da construção começada fora do bench;
+- com o `gates.md`, siga direto para a fase 5, pelos tickets ainda não
+  `resolved`.
+
+O checklist que uma retomada já commitou no branch da spec não faz dela uma
+ferramenta a evoluir.
+
+Sem essa spec:
 
 - **Ferramenta que o bench construiu**, com o `docs/qa/checklist.yaml` da fase 4:
   vá direto ao delta — ver *Evoluir uma ferramenta*, abaixo.
@@ -84,16 +102,26 @@ decide o ramo:
   pergunte só o que eles não respondem. Depois, as fases 4 e 5 seguem como num
   projeto novo.
 
-Numa retomada, o ponto em que ela entrou — a fase 4 sobre a spec existente, ou a
-fase 3 como entrevista do delta — vai para o `decisions-log.md`, com a spec de
-onde partiu quando há uma, e para a entrega da fase 6.
+Numa retomada, o ponto em que ela entrou — a fase 4 ou a fase 5 sobre a spec
+existente, ou a fase 3 como entrevista do delta — vai para o `decisions-log.md`,
+com a spec de onde partiu quando há uma, e para a entrega da fase 6.
 
 Projeto novo: copie o starter **as-is**, sem regenerar, inicialize o git com o
 branch `main` (`git init -b main`), materialize o `.env` com a alocação, gere
 `.claude/rules/payload.md` a partir do `RULE.md` da stack mais a seção de
-invariantes, e commite isso na `main` como o primeiro commit. O `.env` fica fora
-dele, pelo `.gitignore` do starter. Sob o piloto automático, sem o `git init` e
-sem o commit, como diz a seção dele.
+invariantes, e instale os dois perfis que o bench e as skills de fluxo leem, a
+partir dos templates do `anvil-docs`, da instalação de usuário:
+
+| Perfil | Template |
+|---|---|
+| `docs/agents/issue-tracker.md` | `~/.claude/skills/anvil-docs/templates/issue-tracker-anvil.md` |
+| `docs/agents/verification.md` | `~/.claude/skills/anvil-docs/templates/verification-anvil.md` |
+
+É a regra do `scaffold` do `anvil-docs`: ausente, copie; idêntico, siga; divergente,
+não sobrescreva e não pergunte, que o perfil do projeto fica. Commite tudo isso na
+`main` como o primeiro commit. O `.env` fica fora dele, pelo `.gitignore` do
+starter. Sob o piloto automático, sem o `git init` e sem o commit, como diz a seção
+dele: os perfis entram no commit do piloto, depois do sim.
 
 ### 3. Entender
 
@@ -296,7 +324,12 @@ opera o anvil, e a entrega diz isso.
    entrada é ela, no branch da spec dela, e a construção segue do ponto que o
    disco indica — o ledger, se falta o `gates.md`; o `anvil-to-spec`, se falta a
    spec; os tickets ainda não `resolved`. Sem ela, a entrada é a da linha `next:`,
-   a primeira do frontier. Com `next: none`, não há entrada a construir: diga na
+   a primeira do frontier.
+
+   Com `roadmap: none`, não há roteiro, e o `next: none` que vem junto não segura
+   nada: com a spec aberta da fase 2, a entrada é essa spec, no branch dela, e a
+   construção segue do ponto que o disco indica, como na linha `state=open`. Só
+   com roteiro o `next: none` quer dizer que não há entrada a construir: diga na
    entrega o que segura o resto, sem construir nada.
 2. Para a entrada do `next:`, abra a spec dela, da `main`, com o `Tipo:` e o
    nome da entrada:

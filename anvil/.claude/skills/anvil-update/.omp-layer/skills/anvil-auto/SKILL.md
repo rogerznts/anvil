@@ -69,15 +69,18 @@ escreva, não commite e não se ofereça para fazer o trabalho por conta própri
    `git clean`.
 
 3. **Comando de verificação.** No modo bench, pule este passo: o `PASS` do bench é
-   o `--reverify` dos ledgers, e não o comando. Fora dele, rode:
+   o `--reverify` dos ledgers, e não o comando. Fora dele, rode o script do
+   comando, da instalação de usuário, na operação `check`:
 
    ```bash
-   awk '$0 == "## Comando de verificação" {s=1; next} s && /^## /{exit} s && /^```bash$/{b=1; next} b && /^```$/{exit} b' .claude/rules/anvil.md
+   bash ~/.omp/agent/skills/anvil-auto/verification.sh check
    ```
 
-   Saída vazia, ou erro porque o arquivo não existe, é recusa: o piloto só fecha uma
-   spec com o comando de verificação do projeto rodado por ele saindo `0`, e sem
-   comando nenhuma spec fecha. A mensagem diz onde e como declarar: em
+   O script lê o bloco `bash` da seção de título exato `## Comando de verificação`
+   de `.claude/rules/anvil.md` e, saindo `0`, imprime o comando. Uma linha
+   `refusal:` é recusa, com o motivo dela: o piloto só fecha uma spec com o comando
+   de verificação do projeto rodado por ele saindo `0`, e sem comando nenhuma spec
+   fecha. A mensagem diz onde e como declarar: em
    `.claude/rules/anvil.md`, uma seção com o título exato
    `## Comando de verificação` e, nela, um bloco `bash` com o comando que roda a
    verificação do projeto na raiz e sai `0` quando passa, assim:
@@ -97,7 +100,11 @@ escreva, não commite e não se ofereça para fazer o trabalho por conta própri
    outro branch, a linha `do:` do script é da `anvil-plan` e não vale aqui: você
    não propõe etapa nem termina a vez por ela. Decida assim:
    - com `next: none`, o branch é de uma spec arquivada, a da linha `spec`: recuse
-     e aponte a `main`;
+     e aponte a `main`. Quando `git merge-base --is-ancestor HEAD main` sai
+     diferente de `0`, a spec está arquivada no branch e ainda sem merge na
+     `main`, como a que a conferência do merge parou: a recusa diz esse motivo, e
+     que o piloto não retoma a spec nem refaz o merge dela, porque qual spec cede
+     é decisão do operador;
    - com `spec: none`, retome pela seção "Retomada" quando o branch tem número,
      `{tipo}/{NNN}-{nome}`, e esse número está no `Spec:` de uma entrada do
      roteiro: a spec nasceu e ainda não tem pasta commitada. Senão, recuse, aponte
@@ -247,8 +254,8 @@ estava limpa na largada, então tudo o que está fora de commit veio da entrada.
 
 No bench, antes do commit, atualize a rule da stack com os módulos e os papéis
 reais, como diz "O combinado, uma vez", da fase 4 do bench. O commit leva também o
-briefing, o checklist e, num projeto novo, o starter e a rule da stack que a fase 2
-escreveu: o bench não commita sob o piloto.
+briefing, o checklist e, num projeto novo, o starter, a rule da stack e os perfis do
+tracker e de verificação que a fase 2 escreveu: o bench não commita sob o piloto.
 
 ```bash
 git add -A
@@ -456,9 +463,14 @@ bash ~/.omp/agent/skills/anvil-run/frontier.sh [--skip "NN NN"]
    é bloqueante: não chame outra ferramenta na mesma mensagem, e não leia o
    ticket, não investigue nem termine o trabalho dele.
 3. Rode o script de novo e compare a linha do ticket com a de antes. Se `status`,
-   `reviews` e `last` estão iguais, o ticket é pulado nesta execução: daí em
-   diante, toda chamada leva o `--skip` com todos os pulados, e ele não é
-   despachado de novo. Volte ao passo 1 com a última saída do script.
+   `reviews` e `last` estão iguais, o implementer terminou sem mudar o estado: anote
+   o ticket como pulado nesta execução e, com o pulado novo, rode o script mais uma
+   vez, já com o `--skip` de todos os pulados. Daí em diante, toda chamada leva o
+   `--skip` com todos os pulados, e o pulado não é despachado de novo nesta
+   execução, nem quando o implementer caiu, abortou ou devolveu erro. Só a
+   "Contradição com o roteiro" e o "Abrir a rodada" o tiram do `--skip`. Volte ao
+   passo 1 com a última saída do script: com pulado novo, a do `--skip`, cujo
+   `next` nunca aponta um pulado.
 
 ### `PASS`
 
@@ -466,20 +478,28 @@ A spec só fecha com `PASS`, que é, tudo junto:
 
 - a última saída do `frontier.sh` com `all_resolved: yes` e sem linha `halt`;
 - a última linha `Review:` de cada ticket de `issues/` em `verdict=pass; p1=none`;
-- fora do bench, o bloco de `## Comando de verificação`, rodado por você na raiz,
-  saindo `0`:
+- fora do bench, o bloco de `## Comando de verificação`, rodado pelo script na
+  operação `run`, saindo `0`. O script roda o bloco da raiz do projeto, imprime a
+  saída do comando e, por último, a linha `exit:` com o código dele. Antes, a
+  operação `check` imprime o comando que vai para o relatório:
 
   ```bash
-  bash -c "$(awk '$0 == "## Comando de verificação" {s=1; next} s && /^## /{exit} s && /^```bash$/{b=1; next} b && /^```$/{exit} b' .claude/rules/anvil.md)"; echo "exit: $?"
+  bash ~/.omp/agent/skills/anvil-auto/verification.sh check
+  bash ~/.omp/agent/skills/anvil-auto/verification.sh run
   ```
 
-- no bench, o `--reverify` acumulado saindo `0`, como diz a seção seguinte.
+  Rode o bloco só pelo script, e nunca um comando digitado por você. Uma linha
+  `refusal:` no lugar da linha `exit:` conta como o comando saindo diferente de
+  `0`.
+
+- no bench, o `--reverify` acumulado com a saída que vale o `PASS` pela regra do
+  `GATE.md`, como diz a seção seguinte.
 
 Guarde o comando, a saída e a linha `exit:` para o relatório. O `PASS` é o que o
 disco e a execução mostram, e não o que o implementer disse. Com os tickets em
-ordem e o comando, ou o `--reverify`, saindo diferente de `0`, siga "Pesquisa
-antes de travar", menos no gate manual aberto, que é decisão. Nos outros casos,
-sem `PASS`, a spec fica parada, como diz "Parada".
+ordem e o comando saindo diferente de `0`, ou o `--reverify` sem valer o `PASS`,
+siga "Pesquisa antes de travar", menos no gate manual aberto desta spec, que é
+decisão. Nos outros casos, sem `PASS`, a spec fica parada, como diz "Parada".
 
 #### O `--reverify` do bench
 
@@ -487,26 +507,22 @@ No bench, no branch da spec, leia o `GATE.md` do bench, em
 `skill://anvil-bench/GATE.md`, e rode você o comando da seção "A evidência". Ele
 reexecuta o `gates.md` desta spec e o de cada spec do roteiro já `closed`, que o
 `roadmap.sh` lê no checkout do branch, e devolve os ledgers das specs fechadas como
-estavam: uma spec arquivada não muda. Leia a saída e a linha `exit:`:
+estavam: uma spec arquivada não muda.
 
-O id que o checker imprime é `gates:<id do item>`, e o id do item é único no
-checklist: ele diz de que ledger é o gate. Um gate sem `CHECK:` é manual.
+A seção "Sob o piloto automático" do mesmo `GATE.md` é a regra que lê a saída e a
+linha `exit:`, e dá o desfecho de cada gate. O que você faz com cada desfecho:
 
-- `exit: 0`, com `ALL MET`: o `PASS` do bench.
-- `exit: 1`, e todo id da linha abaixo de `UNMET:` é de gate manual: os gates
-  manuais desta spec abertos são o **gate manual aberto**, e a spec fica parada,
-  como diz "Parada", sem pesquisa, porque gate manual é decisão. Cada um vai para
-  "o que ainda espera decisão" com a pergunta formulada: quem confere que <o título
-  do gate>, e com que evidência, para marcar o gate `<id>` no `gates.md` da spec.
-  Um gate manual aberto no ledger de uma spec fechada é dela e não segura esta: ele
-  vai para "o que ainda espera decisão" do mesmo jeito, e, sem gate manual desta
-  spec aberto, a saída vale o `PASS`.
-- qualquer outra saída: um gate com `CHECK:` caiu, nesta spec ou numa fechada, ou o
-  checker não rodou. É o `FAIL` no teto do bench: sob o piloto, o `--reverify` só
-  roda depois que o despacho acabou, e nenhum ticket volta ao despacho sem a rodada
-  extra. Siga "Pesquisa antes de travar", como a verificação que falha. O gate de
-  uma spec fechada que caiu é regressão: esta spec não fecha enquanto ele não
-  voltar a passar.
+- **a saída que vale o `PASS`**: é o item do bench no `PASS`, e a spec segue para
+  o "Fechamento" com os outros itens dele.
+- **gate manual aberto desta spec**: a spec fica parada, como diz "Parada", sem
+  pesquisa, porque gate manual é decisão. Cada um vai para "o que ainda espera
+  decisão" com a pergunta formulada: quem confere que <o título do gate>, e com que
+  evidência, para marcar o gate `<id>` no `gates.md` da spec.
+- **gate manual aberto de spec fechada**: vai para "o que ainda espera decisão"
+  com a mesma pergunta, sobre o `gates.md` da spec dele, e não para esta.
+- **o `FAIL` no teto**: siga "Pesquisa antes de travar", como a verificação que
+  falha. O gate de uma spec fechada que caiu é regressão: esta spec não fecha
+  enquanto ele não voltar a passar.
 
 Um gate manual se marca só com a evidência de quem conferiu: nem você nem o
 implementer o marcam. Depois de ler a saída, commite no branch o que mudou na
@@ -528,6 +544,13 @@ git add -A
 git commit -m "docs(spec): archive spec <number>"
 ```
 
+Antes de toda volta à `main` do fechamento, confira a árvore: no merge local, logo
+depois do commit do archive; no PR, depois do push da linha `PR:`. Rode
+`git status --porcelain`. Com qualquer linha na saída, a execução para, como diz
+"Fora do caminho feliz", com os arquivos no motivo: não volte à `main`, não faça o
+merge e não mexa nesses arquivos. O que o archive ou o `tea-open-pr` deixou fora de
+commit iria para a `main` com você.
+
 O fechamento segue a regra do projeto. Decida, nesta ordem:
 
 1. Rode `git remote`. Com a saída vazia, o projeto não tem remoto, e a spec fecha
@@ -547,30 +570,91 @@ como `git pull`, `git rebase`, `git reset` ou `git cherry-pick`, e nada de
 
 #### Merge local
 
-Mescle da `main`:
+Com a árvore limpa, vá à `main` e confira se ela tem commits que o branch não
+tem:
 
 ```bash
 git checkout main
+git rev-list --count <branch>..main
+```
+
+Com `0`, a `main` não andou desde o corte do branch, e o `PASS` já rodou sobre a
+árvore que o merge dá. Mescle sem conferir de novo:
+
+```bash
 git merge --no-ff --no-edit <branch>
 ```
 
+Com mais de `0`, a `main` andou, como quando uma spec irmã fechou depois do
+corte, e o `PASS` do branch não rodou sobre o código dela. Prepare o merge sem
+commitá-lo e siga "Conferir o merge":
+
+```bash
+git merge --no-ff --no-commit <branch>
+```
+
+A guarda confere esse `git merge` como confere o outro, e passa, porque a spec já
+está arquivada no branch. O `git commit` que conclui o merge não é verbo de merge.
+
 Com o merge parado em conflito, liste os arquivos com
 `git diff --name-only --diff-filter=U`. Se o único é `docs/index.md`, gere o
-índice de novo pelo verbo `index` do `anvil-docs` e conclua o merge. O bloco
-custom é o único trecho escrito à mão, e nenhum lado o perde: leia o da `main`,
-em `git show HEAD:docs/index.md`, e o do branch, em
+índice de novo pelo verbo `index` do `anvil-docs`. O bloco custom é o único
+trecho escrito à mão, e nenhum lado o perde: leia o da `main`, em
+`git show HEAD:docs/index.md`, e o do branch, em
 `git show MERGE_HEAD:docs/index.md`. Iguais, o bloco fica como está; com um deles
 vazio, vale o outro; diferentes, o bloco novo traz o texto da `main` e, depois
 dele, o do branch. Depois:
 
 ```bash
 git add docs/index.md
-git commit --no-edit
 ```
+
+No merge preparado com `--no-commit`, siga "Conferir o merge" com o índice já
+resolvido; no outro, conclua o merge com `git commit --no-edit`.
 
 Com qualquer outro arquivo na lista, o conflito não é seu: aborte o merge com
 `git merge --abort`, sem resolver nada, e a spec fica parada, como diz "Parada",
 com os arquivos em conflito no motivo.
+
+##### Conferir o merge
+
+Com o merge preparado e sem conflito aberto, na `main`, rode a verificação sobre
+o estado combinado:
+
+- fora do bench, o script do comando, como no `PASS`, com `check` e depois `run`.
+  A conferência sai `0` com a linha `exit: 0`; uma linha `refusal:` conta como
+  diferente de `0`;
+- no bench, o comando de "A evidência" do `GATE.md` sem o
+  `docs/specs/<pasta>/gates.md`. Com o merge preparado, a pasta desta spec está em
+  `docs/specs/archive/`, o `roadmap.sh` a dá como `closed`, e o `$fechados` já traz
+  o ledger dela, junto dos das specs `closed`, inclusive a que fechou na `main`
+  depois do corte. A saída que vale o `PASS` pela regra de "Sob o piloto
+  automático" conta como `0`; qualquer outra, como diferente de `0`. Antes de
+  concluir ou abortar, `git diff --name-only` mostra o que o checker reescreveu
+  fora do merge: devolva esses ledgers com `git checkout -- <arquivos>`, porque
+  uma spec arquivada não muda.
+
+Guarde o comando, a saída e a linha `exit:` para o relatório, junto dos do `PASS`.
+
+Saindo `0`, conclua o merge com a mensagem padrão:
+
+```bash
+git commit --no-edit
+```
+
+Saindo diferente de `0`, esta spec e o que já fechou na `main` não passam juntos.
+Aborte o merge, sem corrigir nada:
+
+```bash
+git merge --abort
+```
+
+A spec fica parada, como diz "Parada", já arquivada no branch. É parada por
+decisão: sem pesquisa e sem rodada extra. Na seção dela no relatório, o `Estado:`
+diz que a verificação falhou sobre o merge com a `main`, e a seção do comando de
+verificação, ou do `--reverify`, leva a saída da conferência. Em "o que ainda
+espera decisão", a pergunta é qual spec cede: esta ou as que fecharam na `main`
+depois do corte, as que a saída aponta.
 
 #### PR
 
@@ -588,9 +672,9 @@ commita a linha `PR:` nos tickets, leve esse commit ao remoto com `git push`, e
 guarde a URL do PR.
 
 Não faça o merge, nem o do PR nem um local: a revisão do PR é do operador. A
-entrada fica `stopped` até o merge do PR, e as que dependem dela esperam. Volte à
-`main` com `git checkout main` e siga para o relatório, com o PR em "o que ainda
-espera decisão".
+entrada fica `stopped` até o merge do PR, e as que dependem dela esperam. Confira a
+árvore, como diz "Fechamento", e, limpa, volte à `main` com `git checkout main` e
+siga para o relatório, com o PR em "o que ainda espera decisão".
 
 ### Contradição com o roteiro
 
@@ -605,7 +689,17 @@ régua da conferência da entrada:
   humano" o que mudou e por quê. O ticket que o implementer deixou sem resolver por
   causa dela sai do `--skip` e volta ao despacho uma vez.
 - Com o critério incumprível, a spec fica parada, como diz "Parada", e a
-  contradição vai para "o que ainda espera decisão".
+  contradição vai para "o que ainda espera decisão". Achada antes de os tickets
+  estarem completos, ao escrever a spec ou os tickets, ela deixa o rascunho fora de
+  commit. Commite no branch da spec o que você escreveu na pasta dela, só essa
+  pasta, e só então siga a "Parada":
+
+  ```bash
+  git add docs/specs/<pasta>
+  git commit -m "docs(spec): stop spec <number> at a draft"
+  ```
+
+  Sem nada novo na pasta, não há o que commitar.
 
 ### Pesquisa antes de travar
 
@@ -621,10 +715,11 @@ a parada pode ser falta de uma informação pública. São três as paradas téc
   responde, como o comportamento de uma ferramenta, de uma biblioteca, de uma API
   ou de um formato. A pergunta sobre o que o operador quer é decisão.
 
-A parada por decisão não pesquisa e vai direto para "Parada": o gate manual, o PR
-aberto, a contradição com o roteiro, a decisão aberta do `map.md`, o merge
-bloqueado pela guarda ou abortado por conflito, e o ticket que só depende de um
-travado, que espera a pesquisa do travado.
+A parada por decisão não pesquisa e vai direto para "Parada": o gate manual desta
+spec aberto, o PR aberto, a contradição com o roteiro, a decisão aberta do
+`map.md`, o merge bloqueado pela guarda, abortado por conflito ou abortado pela
+conferência do merge, e o ticket que só depende de um travado, que espera a
+pesquisa do travado.
 
 A rodada extra é uma só por ticket, em qualquer execução, e o registro dela é o
 disco: a linha `- Piloto · rodada` no `## Comments` do ticket. O ticket que já tem
@@ -723,10 +818,11 @@ aqui a spec que:
   técnica;
 - não tem `PASS`, depois da pesquisa quando o que falha é o comando de
   verificação ou o `--reverify`;
-- tem gate manual aberto, no bench;
+- tem gate manual desta spec aberto, no bench;
 - esbarra numa contradição incumprível, ou numa decisão aberta do `map.md`;
 - não fecha no fechamento: o merge bloqueado pela guarda, o merge abortado por
-  conflito fora do `docs/index.md`, ou o PR aberto, à espera do merge do operador.
+  conflito fora do `docs/index.md` ou pela conferência do merge, ou o PR aberto, à
+  espera do merge do operador.
 
 Depois disso, não faça archive nem merge dela e não mexa no que está commitado no
 branch. No bench, commite antes no branch o `decisions-log.md` da spec, se ele
@@ -815,7 +911,7 @@ exit: 0
 
 ## Onde a corrente parou
 
-<cada entrada que não fechou, com o estado e o motivo do roadmap.sh, e as entradas que esperam por ela; depois, a entrada da linha next, que vem a seguir, ou, com next: none, que a corrente terminou sem entrada desbloqueada>
+<cada entrada que não fechou, com o estado e o motivo do roadmap.sh e, se ela parou nesta execução, a causa do `Estado:` da seção dela, como o PR aberto ou o merge abortado, porque o motivo do script não diz a causa; e as entradas que esperam por ela; depois, a entrada da linha next, que vem a seguir, ou, com next: none, que a corrente terminou sem entrada desbloqueada>
 
 ## O que ainda espera decisão
 
@@ -882,6 +978,7 @@ opera o anvil, como na entrega do bench chamado direto.
   o `anvil-next` dentro da execução.
 - Começar uma entrada que não saiu no `next` do `roadmap.sh`.
 - Fazer archive ou merge sem `PASS`, ou contornar a guarda de merge.
+- Concluir o merge preparado sem a conferência do merge saindo `0`.
 - Pesquisar numa parada por decisão, ou deixar uma spec parada por motivo técnico
   sem a pesquisa dela.
 - Abrir rodada extra sem ticket apontado, sem evidência nova, com dois sinais de

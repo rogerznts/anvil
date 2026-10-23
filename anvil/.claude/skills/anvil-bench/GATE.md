@@ -154,16 +154,33 @@ Parar e dizer o que falta é mais honesto que continuar tentando.
 
 No omp, quando o bench é a entrada do piloto automático, a skill `anvil-auto`, o
 supervisor é o piloto. Ele roda o comando de "A evidência" no `PASS` de cada spec,
-depois que o despacho acabou, e lê a saída assim:
+depois que o despacho acabou, e lê a saída por esta regra. Ela é a única do gate
+manual sob o piloto: o `anvil-auto` e o [SKILL.md](SKILL.md) apontam para cá.
 
-- o gate manual aberto, sem `CHECK:`, deixa a spec parada à espera de quem
+O id que o checker imprime, `gates:<id do item>`, é único no checklist e diz de
+que ledger é o gate. Um gate sem `CHECK:` é manual.
+
+- o gate manual aberto no ledger desta spec deixa a spec parada à espera de quem
   confere, e vai para o relatório como pergunta. Nem o piloto nem o implementer o
   marcam: a evidência dele é de quem conferiu;
-- o gate com `CHECK:` que cai, nesta spec ou numa fechada, é o `FAIL` no teto:
-  nenhum ticket volta ao despacho sem a rodada extra, e o piloto pesquisa em fontes
-  primárias antes de travar. A rodada extra que a pesquisa abre, com evidência
-  nova, é a exceção que o piloto declara no ticket, e não uma terceira rodada do
-  bench.
+- o gate manual aberto no ledger de uma spec fechada é dela e não segura esta: vai
+  para "o que ainda espera decisão", também como pergunta, e ninguém o marca;
+- o gate com `CHECK:` que cai, nesta spec ou numa fechada, ou o checker que não
+  roda, é o `FAIL` no teto: nenhum ticket volta ao despacho sem a rodada extra, e
+  o piloto pesquisa em fontes primárias antes de travar. A rodada extra que a
+  pesquisa abre, com evidência nova, é a exceção que o piloto declara no ticket, e
+  não uma terceira rodada do bench;
+- sem gate manual desta spec aberto e sem gate com `CHECK:` caído, a saída vale o
+  `PASS`: o `exit: 0` com `ALL MET`, ou o `exit: 1` em que todo id abaixo de
+  `UNMET:` é de gate manual de spec fechada.
+
+O piloto roda o mesmo comando de novo no merge local, quando a `main` andou desde
+o corte do branch: sobre o merge preparado, sem o `docs/specs/<pasta>/gates.md`,
+porque a pasta da spec já está em `docs/specs/archive/` e o ledger dela vem no
+`$fechados`. Ali, a regra acima só diz que saída vale o `PASS`. Qualquer outra
+aborta o merge e deixa a spec parada por decisão, já arquivada no branch, sem
+pesquisa e sem rodada extra, como diz o `anvil-auto`: a spec não volta ao
+despacho, e quem decide qual spec cede é o operador.
 
 ## Nova evidência
 
