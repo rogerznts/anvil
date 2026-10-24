@@ -41,7 +41,9 @@ skills, só o roster de fluxo é ligado, não o payload inteiro — `--all` liga
 `--dry-run` mostra sem alterar. Os agentes do payload e os arquivos da camada omp
 são ligados todos. Symlink com o nome de uma peça do payload que aponta para outro
 lugar é refeito; diretório ou arquivo real é pulado, e numa máquina com a
-instalação publicada tirá-la para ligar a fonte é à mão.
+instalação publicada tirá-la para ligar a fonte é à mão. O symlink para o payload
+cujo alvo saiu dele — a skill renomeada ou tirada — sai de `~/.claude/skills` e de
+`~/.agents/skills`; o pendurado de outro toolkit fica.
 
 O `--unlink` tira só os symlinks que apontam para o payload deste repositório, e
 deixa a máquina pronta para receber a instalação publicada. Ao ligar e no
