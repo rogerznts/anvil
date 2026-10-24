@@ -498,10 +498,9 @@ A spec só fecha com `PASS`, que é, tudo junto:
 Guarde o comando, a saída e a linha `exit:` para o relatório. O `PASS` é o que o
 disco e a execução mostram, e não o que o implementer disse. Com os tickets em
 ordem e o comando saindo diferente de `0`, ou o `--reverify` sem valer o `PASS`,
-siga "Pesquisa antes de travar". No bench, a pesquisa só fica dispensada quando
-nenhum `CHECK:` caiu e o que segura o `PASS` é o gate manual aberto desta spec,
-que é decisão, pela regra do `GATE.md`. Nos outros casos, sem `PASS`, a spec fica
-parada, como diz "Parada".
+siga "Pesquisa antes de travar", menos quando a regra do `GATE.md` dá à saída do
+`--reverify` a spec parada por decisão, como diz a seção seguinte. Nos outros
+casos, sem `PASS`, a spec fica parada, como diz "Parada".
 
 #### O `--reverify` do bench
 
@@ -512,22 +511,20 @@ reexecuta o `gates.md` desta spec e o de cada spec do roteiro já `closed`, que 
 estavam: uma spec arquivada não muda.
 
 A seção "Sob o piloto automático" do mesmo `GATE.md` é a regra que lê a saída e a
-linha `exit:`, e dá o desfecho de cada gate, inclusive qual vale quando um
-`CHECK:` caiu e um gate manual desta spec segue aberto. O que você faz com cada
-desfecho:
+linha `exit:`, e dá o desfecho, inclusive qual vale quando mais de um gate segura
+o `PASS`. Tire o desfecho só dela. O que você faz com cada um:
 
 - **a saída que vale o `PASS`**: é o item do bench no `PASS`, e a spec segue para
   o "Fechamento" com os outros itens dele.
-- **gate manual aberto desta spec**: com `CHECK:` caído, o desfecho é o `FAIL` no
-  teto, como diz o `GATE.md`; sem ele, a spec fica parada, como diz "Parada", sem
-  pesquisa, porque gate manual é decisão. Nos dois casos, cada um vai para "o que
-  ainda espera decisão" com a pergunta formulada: quem confere que <o título do
-  gate>, e com que evidência, para marcar o gate `<id>` no `gates.md` da spec.
-- **gate manual aberto de spec fechada**: vai para "o que ainda espera decisão"
-  com a mesma pergunta, sobre o `gates.md` da spec dele, e não para esta.
 - **o `FAIL` no teto**: siga "Pesquisa antes de travar", como a verificação que
   falha. O gate de uma spec fechada que caiu é regressão: esta spec não fecha
   enquanto ele não voltar a passar.
+- **a spec parada por decisão**: a spec fica parada, como diz "Parada", sem
+  pesquisa.
+
+Cada gate manual aberto que a regra manda para "o que ainda espera decisão" vai
+com a pergunta formulada: quem confere que <o título do gate>, e com que
+evidência, para marcar o gate `<id>` no `gates.md` da spec dele.
 
 Um gate manual se marca só com a evidência de quem conferiu: nem você nem o
 implementer o marcam. Depois de ler a saída, commite no branch o que mudou na
@@ -720,11 +717,11 @@ a parada pode ser falta de uma informação pública. São três as paradas téc
   responde, como o comportamento de uma ferramenta, de uma biblioteca, de uma API
   ou de um formato. A pergunta sobre o que o operador quer é decisão.
 
-A parada por decisão não pesquisa e vai direto para "Parada": o gate manual desta
-spec aberto sem `CHECK:` caído, o PR aberto, a contradição com o roteiro, a
-decisão aberta do `map.md`, o merge bloqueado pela guarda, abortado por conflito
-ou abortado pela conferência do merge, e o ticket que só depende de um travado,
-que espera a pesquisa do travado.
+A parada por decisão não pesquisa e vai direto para "Parada": a spec que a regra
+do `GATE.md` deixa parada por decisão no `--reverify`, o PR aberto, a contradição
+com o roteiro, a decisão aberta do `map.md`, o merge bloqueado pela guarda,
+abortado por conflito ou abortado pela conferência do merge, e o ticket que só
+depende de um travado, que espera a pesquisa do travado.
 
 A rodada extra é uma só por ticket, em qualquer execução, e o registro dela é o
 disco: a linha `- Piloto · rodada` no `## Comments` do ticket. O ticket que já tem
@@ -823,7 +820,7 @@ aqui a spec que:
   técnica;
 - não tem `PASS`, depois da pesquisa quando o que falha é o comando de
   verificação ou o `--reverify`;
-- tem gate manual desta spec aberto e nenhum `CHECK:` caído, no bench;
+- fica parada por decisão pela regra do `GATE.md`, no `--reverify` do bench;
 - esbarra numa contradição incumprível, ou numa decisão aberta do `map.md`;
 - não fecha no fechamento: o merge bloqueado pela guarda, o merge abortado por
   conflito fora do `docs/index.md` ou pela conferência do merge, ou o PR aberto, à
