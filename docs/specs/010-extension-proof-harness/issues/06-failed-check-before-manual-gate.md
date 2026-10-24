@@ -4,6 +4,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=5a46779; scope=full; verdict=pass; p1=none
+**Review:** round=2; sha=c206fc0; scope=diff:5a46779..c206fc0; verdict=pass; p1=none
 
 **What to build:** uma saída do `--reverify` com gate manual desta spec aberto e
 gate de `CHECK:` caído segue o caminho do `CHECK:` caído, com pesquisa, em vez de
@@ -136,3 +137,7 @@ aberto desta spec deixa a spec parada por decisão. A regra mora no `GATE.md`.
   `--reverify` vem depois da lista de desfechos, e o `FAIL` no teto manda para
   "Pesquisa antes de travar" antes dele: em `s2-fechada.out` o ledger ficou fora de
   commit e o `frontier.sh` parou a execução. A ordem é anterior a este ticket.
+- Review round=2 · P3 (Standards): "o B1 do ticket 09", na observação da rodada 1 sobre o checker, segue sem glosa — quem lê abre o ticket 09 para saber se a dependência importa.
+- Review round=2 · P3 (Standards): "as onze sessões… pesquisaram" segue enumerando dez arquivos, com o `s2-red-low-2.out` de código `3` fora do "todas com código `0`, ou `1`" — quem confere arquivo por arquivo acha dez nomes e um código fora da frase; com o vermelho aceito como limite, não pesa em critério.
+- Review round=2 · P3 (Spec): o `spec.md:333` ainda pede "O vermelho, com o texto de antes, para sem pesquisar", e a aceitação do limite ficou só no ticket — quem lê só a spec acha uma S2 que pede um vermelho que a rodada 1 não reproduziu.
+- Review round=2 · P3 (Spec): o `passos()` do `workspace/68-failed-check-manual-gate-r2/s2.sh` marca `D` em qualquer `bash` com `>`, e em `out/` um `ls …/research-verification*.md 2>/dev/null` virou o `D` antes do `P` — o resultado se mantém (o commit da pesquisa vem antes do despacho), mas uma ordem errada passaria na conferência "o 01 foi despachado depois da pesquisa".
