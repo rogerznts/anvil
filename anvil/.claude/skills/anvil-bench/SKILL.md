@@ -128,7 +128,22 @@ fluxo leem, a partir dos templates do `anvil-docs`, da instalação de usuário:
 | `docs/agents/issue-tracker.md` | `~/.claude/skills/anvil-docs/templates/issue-tracker-anvil.md` |
 | `docs/agents/verification.md` | `~/.claude/skills/anvil-docs/templates/verification-anvil.md` |
 
-É a regra do `scaffold` do `anvil-docs`: ausente, copie; idêntico, siga; divergente,
+Escreva também `.claude/rules/anvil.md` com a seção abaixo, antes do primeiro
+commit; se o arquivo já existe, acrescente só a seção ausente, mantendo o resto:
+
+```markdown
+## Git
+
+branch base: main
+forge: nenhum
+```
+
+Sob o piloto automático, o repositório já existe: em vez desses defaults do
+`git init`, use o branch base e o forge que o `resolve-git.sh` da instalação de
+usuário do `anvil-docs` resolve na raiz do projeto. Preserve uma seção Git já
+configurada. O arquivo entra no commit do piloto, junto dos perfis.
+
+Para os dois perfis, é a regra do `scaffold` do `anvil-docs`: ausente, copie; idêntico, siga; divergente,
 não sobrescreva e não pergunte, que o perfil do projeto fica. Commite tudo isso na
 `main` como o primeiro commit. O `.env` fica fora dele, pelo `.gitignore` do
 starter. Sob o piloto automático, sem o `git init` e sem o commit, como diz a seção
