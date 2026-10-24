@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=47198d5; scope=full; verdict=pass; p1=none
 
 **What to build:** a renomeação mecânica das quatro skills de git, sem mudar o que
 elas fazem: `tea-commit` → `anvil-commit`, `tea-open-pr` → `anvil-open-pr`,
@@ -61,3 +62,7 @@ editem as skills pelo nome novo.
 - Implementação · o roster do `dev-link.sh` tinha só a `tea-commit`, porque este
   repositório fecha sem PR; a renomeação mantém a mesma curadoria, com a
   `anvil-commit` no lugar dela, e não acrescenta as outras três.
+- Review round=1 · P3 (Standards): `com_nome_novo()` em `reset-install.sh` é identificador em pt-BR, contra a seção Idioma do `CLAUDE.md`, seguindo o estilo do arquivo (`lista`, `conta`, `espelho`) — só aumenta a dívida de idioma do arquivo, sem efeito de comportamento.
+- Review round=1 · P3 (Standards): possível Duplicated Code / Shotgun Surgery — o mapa `tea-*` → `anvil-*` está escrito à mão no `sed` do `reset-install.sh` e a lista das quatro skills se repete no `anvil-boot`, na `project.md`, no manifesto, no README e no overview — uma renomeação futura volta a editar esses lugares, e um `sed` desatualizado deixaria a órfã sem o aviso do nome novo.
+- Review round=1 · P3 (Standards): o cabeçalho do `reset-install.sh` (linhas 25-26) usa as `tea-*` como exemplo de skill fora do padrão de nome, e hoje toda skill do payload é `anvil-*` — quem ler pode achar que o lock só se justifica pelo legado.
+- Review round=1 · P3 (Standards): o comentário de implementação cita "as provas S2 dos tickets 05 e 06" sem glosa — quem lê precisa abrir os tickets 05 (o `anvil-open-pr` no GitHub e no Gitea) e 06 (PR rápido e limpeza pelo branch base) para saber que são as provas por sessão que dependem dos links das `anvil-*`.
