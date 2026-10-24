@@ -1,5 +1,5 @@
 ---
-name: tea-prune-branches
+name: anvil-prune-branches
 description: Fetches with prune and removes local branches whose remote tracking branch has been deleted.
 ---
 

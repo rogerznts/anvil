@@ -35,7 +35,7 @@ encontrar e tentar usar:
 | `.claude/agents/mosk-*.md` | as doze personas. Só elas: o diretório fica |
 | `.claude/mosk/` | o core: tasks, templates, checklists, scripts, schemas |
 | `.claude/skills/mosk-*` | os wrappers de agente e as skills soltas |
-| `.claude/skills/tea-*` | as cópias do mosk. As do anvil vêm da instalação de usuário, e a cópia do mosk no projeto as sombrearia no omp |
+| `.claude/skills/tea-*` | as cópias do mosk das skills de git. As do anvil se chamam `anvil-commit`, `anvil-open-pr`, `anvil-open-fast-pr` e `anvil-prune-branches` e vêm da instalação de usuário; a cópia do mosk deixaria no projeto o nome antigo, com o comportamento antigo |
 | `.claude/hooks/guard-spec-merge.sh` | a guarda do mosk. A do anvil vem da instalação de usuário |
 | em `.claude/settings.json`, só a entrada do hook que chama `.claude/hooks/guard-spec-merge.sh` | chamaria um script apagado a cada comando. O resto do arquivo, hooks do projeto inclusive, fica |
 

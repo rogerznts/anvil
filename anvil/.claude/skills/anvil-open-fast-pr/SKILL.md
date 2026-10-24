@@ -1,11 +1,11 @@
 ---
-name: tea-open-fast-pr
+name: anvil-open-fast-pr
 description: "Full flow from scratch using `tea` CLI: asks branch type, creates and checkouts the branch (from stable branch for hotfix, from integration branch otherwise), commits pending changes, pushes, and opens a PR on Gitea."
 ---
 
 # Open Fast PR (tea)
 
-Your goal is to guide the user through the **full flow**: branch creation → commit → push → Pull Request, all in a single command. This extends `/tea-open-pr` by handling everything from the branch creation onward.
+Your goal is to guide the user through the **full flow**: branch creation → commit → push → Pull Request, all in a single command. This extends `/anvil-open-pr` by handling everything from the branch creation onward.
 
 ## Prerequisites
 
@@ -122,7 +122,7 @@ Replace `origin` with the actual remote name. Confirm push succeeded before proc
 
 ### Step 6.5 — Resolve the spec, if the branch has one
 
-Same resolution as `/tea-open-pr`, **by numeric prefix** — branch is
+Same resolution as `/anvil-open-pr`, **by numeric prefix** — branch is
 `{type}/{NNN}-{name}`, folder is `{NNN}-{type}-{name}`, two different strings:
 
 ```bash
@@ -138,7 +138,7 @@ Branch criado neste fluxo raramente tem spec: o Step 1 pergunta tipo e nome
 livres, sem número. Quando não há número, a seção `## Spec` do Step 8 e o Step
 11.5 são pulados inteiros.
 
-Quando **há** spec, o padrão é o mesmo do `/tea-open-pr`: **um PR por spec**, com
+Quando **há** spec, o padrão é o mesmo do `/anvil-open-pr`: **um PR por spec**, com
 todos os tickets fechados e a spec já arquivada. A guarda de merge impõe isso —
 ela bloqueia o `tea pr create` enquanto houver ticket aberto, e também enquanto a
 spec não estiver sob `archive/`. O `/anvil-docs archive` roda **antes** do PR, no

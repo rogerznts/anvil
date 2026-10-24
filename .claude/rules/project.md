@@ -95,7 +95,8 @@ O julgamento está em `.claude/skills/anvil-sync/SKILL.md`, o catálogo em
 nada disso aqui — são a fonte, isto é o ponteiro.
 
 Skill autoral — `anvil-boot`, `anvil-update`, `anvil-docs`, `anvil-ui`,
-`anvil-distill`, `anvil-bench` e as `tea-*` — não tem upstream, e se
+`anvil-distill`, `anvil-bench`, `anvil-commit`, `anvil-open-pr`,
+`anvil-open-fast-pr` e `anvil-prune-branches` — não tem upstream, e se
 edita direto no payload. A ressalva é o
 `anvil-bench`: o que está em `anvil-bench/unlazy/` é material do
 `unlazy`, que vem de upstream com pin e registro no manifesto, e segue a regra de
@@ -121,7 +122,7 @@ Trabalho com spec vai num branch `{tipo}/{NNN}-{nome}`. Fecha com
 Trabalho sem spec vai direto na `main`.
 
 O fechamento segue o perfil do tracker, `docs/agents/issue-tracker.md`, menos o
-passo `/tea-open-pr`: aqui não há PR, e a spec fecha com o merge local. O que a
+passo `/anvil-open-pr`: aqui não há PR, e a spec fecha com o merge local. O que a
 guarda de merge exige para liberar está no mesmo perfil. Ela confere o `git
 merge` disparado da `main` ou do branch da spec, e é um hook do Claude Code: só vê
 comando do agente, não o que se digita no terminal.

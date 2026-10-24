@@ -435,7 +435,7 @@ responde é você, na mesma vez: escolha a opção que a skill recomenda ou, sem
 recomendação, a mais conservadora, que mantém o que a skill propôs e não amplia o
 escopo da entrada. Guarde a skill, a pergunta, a resposta e se ela era a
 recomendada ou a mais conservadora. A mesma regra vale para as pausas do
-`archive` e do `tea-open-pr`, no fechamento.
+`archive` e do `anvil-open-pr`, no fechamento.
 
 Se, ao escrever a spec ou os tickets, o código contradiz a entrada, siga
 "Contradição com o roteiro".
@@ -550,8 +550,8 @@ Antes de toda volta à `main` do fechamento, confira a árvore: no merge local, 
 depois do commit do archive; no PR, depois do push da linha `PR:`. Rode
 `git status --porcelain`. Com qualquer linha na saída, a execução para, como diz
 "Fora do caminho feliz", com os arquivos no motivo: não volte à `main`, não faça o
-merge e não mexa nesses arquivos. O que o archive ou o `tea-open-pr` deixou fora de
-commit iria para a `main` com você.
+merge e não mexa nesses arquivos. O que o archive ou o `anvil-open-pr` deixou
+fora de commit iria para a `main` com você.
 
 O fechamento segue a regra do projeto. Decida, nesta ordem:
 
@@ -560,9 +560,9 @@ O fechamento segue a regra do projeto. Decida, nesta ordem:
    remoto, não há onde abrir o PR.
 2. Com remoto, leia a seção de fechar a spec do perfil do tracker,
    `docs/agents/issue-tracker.md`, e as rules de `.claude/rules/`. A spec fecha por
-   PR quando a sequência do perfil tem o `/tea-open-pr` e nenhuma rule o tira. Ela
-   fecha por merge local quando uma rule diz que o projeto fecha sem PR, ou quando
-   o perfil não tem esse passo.
+   PR quando a sequência do perfil tem o `/anvil-open-pr` e nenhuma rule o tira.
+   Ela fecha por merge local quando uma rule diz que o projeto fecha sem PR, ou
+   quando o perfil não tem esse passo.
 
 A guarda de merge confere o `git merge` e o `tea pr create` como confere os do
 operador, e um bloqueio dela é recusa, não sucesso: a spec fica parada, como diz
@@ -660,14 +660,14 @@ depois do corte, as que a saída aponta.
 
 #### PR
 
-Leve o branch ao remoto, abra o PR pelo `tea-open-pr` e pare ali, sem merge. O
+Leve o branch ao remoto, abra o PR pelo `anvil-open-pr` e pare ali, sem merge. O
 remoto é o da saída de `git remote`, o `origin` quando há mais de um:
 
 ```bash
 git push -u <remoto> <branch>
 ```
 
-No branch da spec, carregue o `tea-open-pr` e siga-o. As pausas dele seguem a
+No branch da spec, carregue o `anvil-open-pr` e siga-o. As pausas dele seguem a
 regra das pausas: a base do PR é a `main`, de onde a corrente parte, e, sem
 responsável indicado nas rules, o PR sai sem responsável. Depois que a skill
 commita a linha `PR:` nos tickets, leve esse commit ao remoto com `git push`, e

@@ -149,7 +149,7 @@ anvil-unslop
 anvil-writing-for-agents
 anvil-browser-qa
 anvil-next
-tea-commit"
+anvil-commit"
 
 MODO="roster"; DRY=0
 while [ $# -gt 0 ]; do

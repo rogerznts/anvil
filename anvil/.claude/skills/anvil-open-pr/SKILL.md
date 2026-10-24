@@ -1,5 +1,5 @@
 ---
-name: tea-open-pr
+name: anvil-open-pr
 description: Opens a Pull Request on Gitea using the `tea` CLI. Auto-detects branch type, generates PR text, applies label and assignee automatically.
 ---
 

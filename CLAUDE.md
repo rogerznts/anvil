@@ -139,8 +139,8 @@ lista de skills do contexto, que o harness pode cortar.
 - `anvil-diagnose`
 - `anvil-prototype`
 - `anvil-docs`, só no verbo `archive`
-- `tea-open-pr`
-- `tea-open-fast-pr`
+- `anvil-open-pr`
+- `anvil-open-fast-pr`
 
 A cauda não dispara:
 
@@ -152,7 +152,7 @@ A cauda não dispara:
 - dentro de uma execução do `anvil-auto`: quem decide o próximo passo ali é o
   piloto, que termina oferecendo um grill novo.
 
-Fora da lista — `tea-commit`, `anvil-tdd`, `anvil-code-review` e `anvil-handoff`,
+Fora da lista — `anvil-commit`, `anvil-tdd`, `anvil-code-review` e `anvil-handoff`,
 por exemplo —, o `anvil-next` roda só a pedido do usuário, e a skill termina sem
 prompt nem sugestão de próxima sessão. Esta lista é o único lugar a editar para
 mudar quais skills têm cauda, com uma exceção: o `anvil-run` invoca o

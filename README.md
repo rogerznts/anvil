@@ -100,7 +100,7 @@ flowchart TD
     I --> J{"todos os tickets<br/>Status: resolved?"}
     J -->|não| G
     J -->|sim| P["/anvil-docs archive<br/>promove ADR · move p/ archive/"]
-    P --> K["/tea-open-pr<br/>UM PR por spec"]
+    P --> K["/anvil-open-pr<br/>UM PR por spec"]
     K --> L{"hook: issues/ fechados<br/>e spec arquivada?"}
     L -->|"ticket aberto ou<br/>spec não arquivada"| M["bloqueia · exit 2"]
     L -->|sim| N["PR aberto<br/>corpo lista a spec e os tickets<br/>cada ticket ganha a URL de volta"]
@@ -246,9 +246,9 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 | `anvil-docs` | onde o documento mora, como a spec se chama, e o que acontece quando fecha | autoral |
 | `anvil-setup` | escreve o perfil do issue tracker que o fluxo lê | mattpocock |
 | `anvil-wizard` | gera um wizard em bash para o passo que só um humano pode fazer | mattpocock |
-| `tea-commit` | commit em Conventional Commits, sem pular hook | autoral |
-| `tea-open-pr` · `tea-open-fast-pr` | PR no Gitea, **um por spec**: o corpo lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
-| `tea-prune-branches` | remove branch local cujo remoto sumiu | autoral |
+| `anvil-commit` | commit em Conventional Commits, sem pular hook | autoral |
+| `anvil-open-pr` · `anvil-open-fast-pr` | PR no Gitea, **um por spec**: o corpo lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
+| `anvil-prune-branches` | remove branch local cujo remoto sumiu | autoral |
 
 ### Stack e bench
 

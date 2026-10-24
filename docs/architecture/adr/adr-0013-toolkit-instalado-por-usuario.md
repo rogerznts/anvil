@@ -93,9 +93,10 @@ execuções por caso; método e números no `## Comments` do
 
 - **o idioma melhorou** — rules em `English.` com pedido em pt-BR saem em inglês em
   2 de 3; antes, com a diretiva no `CLAUDE.md` do projeto, em nenhuma;
-- **a cauda não se sustenta** — no `tea-open-pr`, 0 de 3, igual a antes; no
-  `anvil-diagnose`, 0 de 3, antes 3 de 3; no `diagnose-en`, 1 de 3. Quando falha,
-  a sessão fecha com um prompt de próxima sessão escrito de memória.
+- **a cauda não se sustenta** — no `tea-open-pr`, hoje `anvil-open-pr`, 0 de 3,
+  igual a antes; no `anvil-diagnose`, 0 de 3, antes 3 de 3; no `diagnose-en`, 1
+  de 3. Quando falha, a sessão fecha com um prompt de próxima sessão escrito de
+  memória.
 
 A user story 57 da spec 006 — a cauda funcionando no omp como no Claude Code —
 fica sem cumprimento estável no omp. Um mecanismo próprio de cauda no omp fica

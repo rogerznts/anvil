@@ -27,7 +27,7 @@ Remaining triggers:
 - Docs, RFCs, readmes, PR descriptions, or commit messages → the **technical-writing** skill (`/technical-writing`).
 - Before review → the **no-comments** skill (`/no-comments`).
 - Shipping UI / IDE / CLI → exercise the real surface yourself before handing anything over. For bug fixes, reproduce on the same surface first. Hand to the user only under the narrow Bug fix step 1 exception.
-- Asked to land or ship a green stack → the **Shipping** playbook (the **tea-open-pr** skill). Green is not safe. Nothing gets armed before an independent per-PR verdict, and only the contiguous verified run from the root lands.
+- Asked to land or ship a green stack → the **Shipping** playbook (the **anvil-open-pr** skill). Green is not safe. Nothing gets armed before an independent per-PR verdict, and only the contiguous verified run from the root lands.
 - An automated reviewer or security bot commented → skeptical posture. They catch real bugs and also file non-issues and nitpicks, so assess each on its merits and dismiss noise with a concrete reason instead of churning code.
 - Broken skill mid-task → fix it in its own PR. Don't block. Don't silently work around it.
 - Long, autonomous, or multi-phase work, or any task the user steps away from to review later ("going to bed", "trust it when i'm back", "/loop until X") → leave a decision trail as you go: what you tried, what it showed, what you chose. Commit it when stakes need an auditable record. Keep it local otherwise.
@@ -127,6 +127,6 @@ No bundled playbook fits? Design one for the task before starting, using the sam
 > **Nota de adaptação.** O upstream traz 23 playbooks. O anvil vendoriza seis: os
 > que não dependem de Graphite, de agente cloud do Cursor, de scripts em
 > TypeScript ou de skills de outro plugin. O que ficou de fora tem cobertura
-> equivalente aqui — PR pelas skills `tea-*`, protótipo pelo `anvil-prototype`,
-> autoria de skill pelo `anvil-writing-for-agents` — ou não se aplica a este
-> ambiente.
+> equivalente aqui — PR pelas skills `anvil-open-pr` e `anvil-open-fast-pr`,
+> protótipo pelo `anvil-prototype`, autoria de skill pelo
+> `anvil-writing-for-agents` — ou não se aplica a este ambiente.
