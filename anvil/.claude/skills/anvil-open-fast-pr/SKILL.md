@@ -20,16 +20,18 @@ bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
 ```
 
 It reads the `## Git` section of `.claude/rules/anvil.md` and detects what the
-section doesn't declare. The answer comes in `key: value` lines; this skill uses
-`base:` (the branch base) and `forge:` (`github`, `gitea` or `nenhum`).
+section doesn't declare. The answer comes in `key: value` lines: `base:` (the
+branch base), `forge:` (`github`, `gitea` or `nenhum`), `repo:` and, on Gitea,
+`login:`, among others.
 
 - **Exit `2`, with `refusal:` lines:** stop here. Tell the user each reason as it
   came — it says what to declare or fix. Nothing was stashed, checked out or
   committed: the pending changes stay where they are.
 - **`forge: nenhum`:** there is no forge to open a PR on. Stop and say so, with
   nothing stashed: the project closes by local merge into the branch base.
-- **`forge: github`** or **`forge: gitea`:** keep `<base>`. The remote below is
-  `origin`, the one the resolver reads.
+- **`forge: github`** or **`forge: gitea`:** keep `<base>`, `<repo>` and, on Gitea,
+  `<login>`. The new branch comes out of `<base>`, and Step 6 opens the PR to the
+  same `<base>`. The remote below is `origin`, the one the resolver reads.
 
 ---
 
@@ -109,12 +111,17 @@ Confirm push succeeded before proceeding.
 
 ### Step 6 — Open the PR as `/anvil-open-pr` does
 
-Load the `anvil-open-pr` skill and follow it from its Step 0, on the branch just
-pushed. The PR is written there once, for both forges: the resolver's `--repo`
-and, on Gitea, `--login`; the PR text; the label from the forge's list; the
-assignee; the `pr create` command and where its URL comes from; the `PR:` line in
-the tickets; and the URL returned to the user. One PR, to `<base>`, whatever the
-type, hotfix included.
+Load the `anvil-open-pr` skill and follow it on the branch just pushed, with one
+change: its Step 0 takes `<base>`, `<repo>` and `<login>` from Step 0 here, and
+doesn't run the resolver again. The fetch of Step 2 may have created
+`origin/HEAD` — git 2.48 and newer do —, and a second run could answer a branch
+base other than the one the new branch came out of.
+
+Everything else about the PR is written there once, for both forges: the `--repo`
+and, on Gitea, `--login` on every call; the PR text; the label from the forge's
+list; the assignee; the `pr create` command and where its URL comes from; the
+`PR:` line in the tickets; and the URL returned to the user. One PR, to `<base>`,
+whatever the type, hotfix included.
 
 A branch created in this flow rarely carries a spec: Step 1 asks for a free name,
 with no number, and the `anvil-open-pr` skips the spec parts. When it does carry
@@ -125,7 +132,7 @@ the `pr create` until the spec is archived.
 
 ## Notes
 
-- The resolver decides the branch base and the forge, before the stash; the skill never guesses them, and never stashes when it refuses.
+- The resolver runs once, before the stash, and its `base:`, `repo:` and `login:` serve the whole flow, the PR included; the skill never guesses them, and never stashes when it refuses.
 - Never skip the branch base checkout/pull before creating the new branch.
 - Never use `--no-verify` on commits.
 - If the working tree is clean after branch creation, stop and inform the user — there is nothing to commit.
