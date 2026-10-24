@@ -3,6 +3,7 @@
 **Blocked by:** 02, 04
 
 **Status:** resolved
+**Review:** round=1; sha=62e0026; scope=full; verdict=pass; p1=none
 
 **What to build:** o B1 da fase 2 do bench roda pelo helper, com `/skill:anvil-bench`
 e a stack subindo na infra isolada, sem `docker` falso. O caso R, projeto com spec
@@ -90,3 +91,17 @@ aberta.
   `dev-link.sh` é da 011; dar à sessão da prova um `HOME` próprio, com os links,
   mudaria o helper, e fica com o operador. Até lá, N depende de o modelo achar a
   fonte, e pode ir a uma cópia velha, que o B1 acusa.
+- Review round=1 · P2 (Standards): o critério de N e E sai marcado, mas o N reprovou em `b1.out` com o texto final pelo caminho `~/.claude/skills/anvil-stack-payload` sem link, contado como `1` e não como `2` de ambiente pelo ADR-0017, e o placar de N com o texto de hoje é 1 de 2 — quem lê só a caixa toma N como provado; a falha está só na Observação.
+- Review round=1 · P2 (Standards): a regra nova do `anvil-bench` — a mudança pedida espera a spec aberta fechar — é decisão de produto sem registro na spec 010 nem em ADR, só com "o operador decide se ela fica" — no archive, a decisão fica perdida num comentário de ticket.
+- Review round=1 · P3 (Standards): "Essa mudança não tem entrevista nesta vez, nem depois da construção" guia pela proibição (Negation do `anvil-writing-for-agents`) — pode deixar a entrevista mais lembrada, embora a metade positiva esteja ao lado e a medição dê 3 de 3.
+- Review round=1 · P3 (Standards): a abertura nova de *Evoluir* repete a regra de *2. Reconhecer* (Duplicated Code, fonte única do Pruning) — mudar a regra exige duas edições; a medição sustenta a repetição (2 de 3 sem ela).
+- Review round=1 · P3 (Standards): "a vez" e "nesta vez" só aparecem nesse trecho da skill, sem definição (possível Mysterious Name) — um modelo pode ler "vez" como turno, e não como a chamada inteira do bench.
+- Review round=1 · P3 (Standards): no `b1.sh`, `ok`, `nok`, `checa`, `fatos` e `infra_foto` são cópias da 58 e da 64 (possível Duplicated Code) — um conserto na foto da infra compartilhada se repete em cada prova; a `infra_foto` caberia no helper.
+- Review round=1 · P3 (Standards): "antes" é a função `antes()`, o `$ANTES` e o `FASE2=antes` no `b1.sh` (possível Mysterious Name) — quem mantiver o script confunde os três.
+- Review round=1 · P3 (Standards): as âncoras literais de `texto_antes` (`"\nProjeto novo:"`, `"\n- A entrevista cobre"`) prendem o `b1.sh` à prosa da skill (possível Shotgun Surgery) — mudar o texto quebra o vermelho, com mensagem clara.
+- Review round=1 · P2 (Spec): com o texto de HEAD, N deu verde 1 vez em 2 e o `b1.out` final sai `1`, e no `b1-comando` o N rodou o `infra.sh` velho de `workspace/22-distill-url-tester/` com `--provision`, e a história 19 se manteve só porque o slug já estava registrado — rodar o B1 de novo não dá verde reproduzível em N; o prior art da 58 (symlinks temporários em `~/.claude/skills`) não aparece como opção no `## Comments`.
+- Review round=1 · P2 (Spec): o `6650850` vai além do critério ao decidir que a mudança pedida fica para outra ativação e que a entrega avisa, sem registro na spec 010, e a prova não confere a frase do adiamento (presente nas três entregas finais) — quem lê a spec não sabe que o bench mudou, e a decisão pendente fica sem dono.
+- Review round=1 · P3 (Spec): `b1-red-colheita` é descrito como "o mesmo desfecho", mas a sessão foi à `main`, escreveu o briefing e o checklist lá e perguntou sem ❓, e não tem `verdict.txt` — são 6 vermelhos com veredito do helper, não 7, e o vermelho continua firme.
+- Review round=1 · P3 (Spec): "com um pedido igual ao ticket 02… também (`b1-r.out`…)" cita uma saída da fase 2 de hoje — o vermelho que construiu com esse pedido não está no disco.
+- Review round=1 · P3 (Spec): "(`b1-comando*`; o vermelho pulou a busca)" chama de vermelho o verde que falhou em `b1-comando-3` — quem lê confunde as duas rodadas.
+- Review round=1 · P3 (Spec): rodar os casos um por vez evita colisão de porta entre os casos, mas não o P3 do ticket 04, a colisão com um projeto real parado que suba durante a prova, e o comentário sugere que resolve.
