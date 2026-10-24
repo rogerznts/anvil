@@ -71,8 +71,15 @@ decide o ramo.
 
 Antes de qualquer ramo, procure uma **spec aberta**: uma pasta de
 `docs/specs/`, fora de `docs/specs/archive/`, com algum ticket em `issues/` cujo
-`Status:` não é `resolved`. Achou, a construção segue por ela, sem entrevista,
-com ou sem `docs/qa/checklist.yaml`, e nenhum dos ramos abaixo vale:
+`Status:` não é `resolved`. A busca roda também quando a pessoa pediu uma mudança,
+e este comando lista esses tickets:
+
+```
+grep -LE '^\**Status:\** *resolved' docs/specs/*/issues/*.md 2>/dev/null
+```
+
+Achou, a construção segue por ela, sem entrevista, com ou sem
+`docs/qa/checklist.yaml`, e nenhum dos ramos abaixo vale:
 
 - sem o `gates.md` na pasta da spec, retome pela fase 4: o ledger dessa spec e,
   se ainda não há o `docs/qa/checklist.yaml`, antes dele o briefing e o checklist,
