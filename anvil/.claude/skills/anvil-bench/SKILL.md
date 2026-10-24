@@ -81,7 +81,10 @@ com ou sem `docs/qa/checklist.yaml`, e nenhum dos ramos abaixo vale:
   `resolved`.
 
 O checklist que uma retomada já commitou no branch da spec não faz dela uma
-ferramenta a evoluir.
+ferramenta a evoluir, nem a mudança que a pessoa pediu ao chamar o bench. Essa
+mudança não tem entrevista nesta vez, nem depois da construção: a vez termina no
+fim da construção da spec aberta, e a entrega diz que a mudança fica para quando
+o bench for chamado de novo, depois que essa spec fechar.
 
 Sem essa spec:
 
