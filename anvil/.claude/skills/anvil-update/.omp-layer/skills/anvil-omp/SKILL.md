@@ -115,8 +115,11 @@ do roteiro e só quando as dependências da entrada fecharam:
   `verdict=pass; p1=none`, e o comando de verificação rodado por ele saindo `0`.
   No bench, o `--reverify` dos gates desta spec e das já fechadas toma o lugar
   do comando;
-- fecha com o archive e, pela regra do projeto, o merge local no branch base ou o
-  PR aberto. No merge local, quando o branch base andou desde o corte do branch, como
+- fecha com o archive e, pelo forge que o resolvedor dá e pela regra do projeto, o
+  merge local no branch base ou o PR aberto pelo `/anvil-open-pr`, no GitHub ou no
+  Gitea. Sem remoto ou com `forge: nenhum`, o merge é local; depois do PR, ele envia
+  a linha `PR:` ao remoto, confere a árvore e só então volta ao branch base. No
+  merge local, quando o branch base andou desde o corte do branch, como
   quando uma spec irmã fechou nesse meio-tempo, ele prepara o merge sem commitá-lo
   e roda a verificação sobre o estado combinado: o comando de verificação ou, no
   bench, o `--reverify`. Com o comando saindo `0` fora do bench, ou, no bench, com

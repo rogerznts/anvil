@@ -558,22 +558,31 @@ diz "Fora do caminho feliz", com os arquivos no motivo: não volte ao branch bas
 não faça o merge e não mexa nesses arquivos. O que o archive ou o `anvil-open-pr`
 deixou fora de commit iria para o branch base com você.
 
-O fechamento segue a regra do projeto. Decida, nesta ordem:
+O fechamento segue o forge do projeto e as rules. Rode o resolvedor, da instalação
+de usuário, o mesmo que deu o branch base na largada:
 
-1. Rode `git remote`. Com a saída vazia, o projeto não tem remoto, e a spec fecha
-   por merge local, mesmo que o perfil do tracker ou as rules falem de PR: sem
-   remoto, não há onde abrir o PR.
-2. Com remoto, leia a seção de fechar a spec do perfil do tracker,
-   `docs/agents/issue-tracker.md`, e as rules de `.claude/rules/`. A spec fecha por
-   PR quando a sequência do perfil tem o `/anvil-open-pr` e nenhuma rule o tira.
-   Ela fecha por merge local quando uma rule diz que o projeto fecha sem PR, ou
-   quando o perfil não tem esse passo.
+```bash
+bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
+```
 
-A guarda de merge confere o `git merge` e o `tea pr create` como confere os do
-operador, e um bloqueio dela é recusa, não sucesso: a spec fica parada, como diz
-"Parada". Ela não tem contorno: nenhum outro verbo leva o branch para o branch base,
-como `git pull`, `git rebase`, `git reset` ou `git cherry-pick`, e nada de
-`--no-verify`.
+Decida, nesta ordem:
+
+1. Com linhas `refusal:`, a spec fica parada, como diz "Parada", com essas linhas
+   no motivo, copiadas como estão: elas dizem o que declarar ou corrigir.
+2. Com `forge: nenhum`, a spec fecha por merge local, mesmo que o perfil do
+   tracker ou as rules falem de PR: sem remoto, ou com um remoto sem forge, não há
+   onde abrir o PR.
+3. Com `forge: github` ou `forge: gitea`, leia a seção de fechar a spec do perfil do
+   tracker, `docs/agents/issue-tracker.md`, e as rules de `.claude/rules/`. A spec
+   fecha por PR quando a sequência do perfil tem o `/anvil-open-pr` e nenhuma rule o
+   tira. Ela fecha por merge local quando uma rule diz que o projeto fecha sem PR,
+   ou quando o perfil não tem esse passo.
+
+A guarda de merge confere o `git merge`, o `gh pr create` e o `tea pr create` como
+confere os do operador, e um bloqueio dela é recusa, não sucesso: a spec fica
+parada, como diz "Parada". Ela não tem contorno: nenhum outro verbo leva o branch
+para o branch base, como `git pull`, `git rebase`, `git reset` ou
+`git cherry-pick`, e nada de `--no-verify`.
 
 #### Merge local
 
@@ -666,17 +675,17 @@ no branch base depois do corte, as que a saída aponta.
 #### PR
 
 Leve o branch ao remoto, abra o PR pelo `anvil-open-pr` e pare ali, sem merge. O
-remoto é o da saída de `git remote`, o `origin` quando há mais de um:
+remoto é o `origin`, o que o resolvedor leu:
 
 ```bash
-git push -u <remoto> <branch>
+git push -u origin <branch>
 ```
 
-No branch da spec, carregue o `anvil-open-pr` e siga-o. As pausas dele seguem a
-regra das pausas: a base do PR é o branch base, de onde a corrente parte, e, sem
-responsável indicado nas rules, o PR sai sem responsável. Depois que a skill
-commita a linha `PR:` nos tickets, leve esse commit ao remoto com `git push`, e
-guarde a URL do PR.
+No branch da spec, carregue o `anvil-open-pr` e siga-o: ele abre o PR no forge do
+resolvedor, com o `gh` ou o `tea`. As pausas dele seguem a regra das pausas, e a
+base do PR é o branch base, de onde a corrente parte. Depois que a skill commita a
+linha `PR:` nos tickets, leve esse commit ao remoto com `git push`, e guarde a URL
+do PR.
 
 Não faça o merge, nem o do PR nem um local: a revisão do PR é do operador. A
 entrada fica `stopped` até o merge do PR, e as que dependem dela esperam. Confira a
@@ -828,9 +837,9 @@ aqui a spec que:
   verificação ou o `--reverify`;
 - fica parada por decisão pela regra do `GATE.md`, no `--reverify` do bench;
 - esbarra numa contradição incumprível, ou numa decisão aberta do `map.md`;
-- não fecha no fechamento: o merge bloqueado pela guarda, o merge abortado por
-  conflito fora do `docs/index.md` ou pela conferência do merge, ou o PR aberto, à
-  espera do merge do operador.
+- não fecha no fechamento: o resolvedor que recusa, o merge bloqueado pela guarda,
+  o merge abortado por conflito fora do `docs/index.md` ou pela conferência do
+  merge, ou o PR aberto, à espera do merge do operador.
 
 Depois disso, não faça archive nem merge dela e não mexa no que está commitado no
 branch. No bench, commite antes no branch o `decisions-log.md` da spec, se ele
