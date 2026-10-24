@@ -19,7 +19,8 @@ move e o ADR promovido entram no diff que o revisor já vai olhar.
 
 A guarda impõe a ordem: `validate.sh ship-ready` sai 1 enquanto a spec do branch
 não estiver sob `docs/specs/archive/` no commit, e o hook bloqueia o `git merge` e
-o `tea pr create`. O move só conta depois de commitado.
+a criação do PR, pelo `gh` (`gh pr create` e `gh api` com `POST` em `pulls`) ou
+pelo `tea` (`tea pr create`). O move só conta depois de commitado.
 
 ## Pré-condição
 

@@ -68,8 +68,9 @@ tocado.
   spec tem tela e nunca o dispara, assim como nunca dispara archive nem PR.
 
 A guarda de merge age sozinha: `git merge` de spec com ticket aberto ou sem archive,
-e `tea pr create` sem archive, são bloqueados com o mesmo motivo que o Claude Code
-mostra. Ela só age em projeto anvil, o que tem `.claude/rules/anvil.md`, e chama o
+e PR aberto pelo `gh` ou pelo `tea` sem archive, são bloqueados com o mesmo motivo
+que o Claude Code mostra. Ela só age em projeto anvil, o que tem
+`.claude/rules/anvil.md`, e chama o
 `guard-spec-merge.sh` da instalação de usuário, em
 `~/.claude/skills/anvil-docs/scripts/`. Se ele faltar num projeto anvil, cada
 comando do `bash` traz um aviso de que a guarda está desligada, até um

@@ -122,8 +122,9 @@ merge
 
 O `archive` vem **antes** do PR, não depois do merge: mover a pasta é mudança em
 arquivo e precisa de um commit, e depois do merge não sobra branch onde ele
-caiba. O hook bloqueia o `tea pr create` e o `git merge` enquanto a spec não
-estiver arquivada no commit do branch — o `git merge` disparado da `main`
+caiba. O hook bloqueia o `git merge` e a criação do PR, pelo `gh` (`gh pr create`
+e `gh api` com `POST` em `pulls`) ou pelo `tea` (`tea pr create`), enquanto a spec
+não estiver arquivada no commit do branch — o `git merge` disparado da `main`
 inclusive, porque a spec do branch mesclado também é conferida.
 
 ## Roteiro e relatório
