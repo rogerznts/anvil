@@ -3,6 +3,7 @@
 **Blocked by:** 02, 04
 
 **Status:** resolved
+**Review:** round=1; sha=5a46779; scope=full; verdict=pass; p1=none
 
 **What to build:** uma saída do `--reverify` com gate manual desta spec aberto e
 gate de `CHECK:` caído segue o caminho do `CHECK:` caído, com pesquisa, em vez de
@@ -74,3 +75,12 @@ aberto desta spec deixa a spec parada por decisão. A regra mora no `GATE.md`.
 - Observação · em `out-red-low-2/` o agente da pesquisa, um item do `task`,
   respondeu com `anthropic/claude-haiku-5-5`, e o helper deu `3`: o modelo de um
   subagente pode não ser o pedido mesmo com o fallback desligado.
+- Review round=1 · P2 (Standards): o ticket fica `resolved` com a caixa da prova S2 desmarcada, e a guarda de merge lê só o `Status:` — a spec fecha sem prova vermelha, e a prova mostra que o texto novo segue o caminho do `CHECK:` caído, mas não que a mudança altera o comportamento.
+- Review round=1 · P3 (Standards): a precedência do `CHECK:` caído aparece em cinco lugares do `anvil-auto` (`SKILL.md:501-503`, `515-516`, `521-525`, `724`, `826`), contra a fonte única do `anvil-writing-for-agents/SKILL.md:78` e o "aponta para o `GATE.md`" do critério 2; o excesso está no item da linha 521 — se a precedência mudar e um dos cinco ficar para trás, o piloto lê duas regras contrárias.
+- Review round=1 · P3 (Standards): o `## Comments` cita "o B1 do ticket 09" e "o caso G da 56" sem glosa — quem lê abre o ticket 09 e o `workspace/56-manual-gate-rule/` para saber se a dependência importa.
+- Review round=1 · P3 (Standards): o cabeçalho do `s2.sh` (linhas 18-19) descreve o vermelho como "a spec para sem pesquisar", e o vermelho não tem conferência própria — quem abre só um `s2-red-*.out` lê o "código do helper: 0" como prova vermelha aprovada, quando ele mostra que a hipótese do vermelho não se confirmou.
+- Review round=1 · P3 (Standards): "as onze sessões… pesquisaram" enumera dez arquivos, e "todas com código `0`, ou `1`" só vale sem o `s2-red-low-2.out`, que saiu `3` — quem confere arquivo por arquivo acha dez nomes e um código `3` fora da frase.
+- Review round=1 · P2 (Spec): o vermelho da saída mista não foi visto ("o vermelho, com o texto de antes, para sem pesquisar", critério 3 e `spec.md:304`), e o ticket está `resolved` — nada mostra que o texto antigo erra, a guarda deixa a spec fechar com o critério aberto, e aceitar o limite deveria ser escolha declarada do operador.
+- Review round=1 · P2 (Spec): o `anvil-auto` repete a condição pela metade: o `GATE.md` diz "o gate com `CHECK:` que cai … ou o checker que não roda … haja ou não gate manual", e as cópias em `SKILL.md:501-503`, `521-523`, `724` e `826` dizem só "sem `CHECK:` caído" — com o checker fora do ar e o C3 aberto, as linhas 724 e 826 classificam a parada como decisão, sem pesquisa, contra o `GATE.md`.
+- Review round=1 · P3 (Spec): "`s2-red-low-2.out` … foi repetida por `s2-red-low-1.out`" — as duas rodaram em paralelo, e a `low-1` terminou antes da `low-2`; a regra de repetir a prova inválida está atendida no mérito, mas quem lê pensa que houve uma repetição feita depois do código `3`.
+- Review round=1 · P3 (Spec): em `s2-fechada` o checker não rodou nenhuma vez (`out-fechada/passos`: `P D I 01`), e não só "no primeiro `--reverify`" — o lado "numa fechada" da regra nova não tem observação verde, só foi visto com o texto antigo.
