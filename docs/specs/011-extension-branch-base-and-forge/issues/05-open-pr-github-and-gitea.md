@@ -3,6 +3,7 @@
 **Blocked by:** 01, 02, 04
 
 **Status:** resolved
+**Review:** round=1; sha=25e1a15; scope=full; verdict=pass; p1=none
 
 **What to build:** o `anvil-open-pr` lê o resolvedor no começo e abre o PR no forge
 dele, para o branch base, com o texto, o rótulo e a linha `PR:` escritos uma vez e
@@ -56,3 +57,13 @@ integração some; o hotfix abre um PR só.
   falhas de antes, do roster do `dev-link` depois da renomeação, já vistas antes do
   ticket 04 em `workspace/72-forge-logins-labels/s1-anteriores.out`; os de 61, 67 e
   72 passam (`s1-anteriores.out`).
+- Review round=1 · P2 (Spec): a linha do README já diz "PR no GitHub ou no Gitea, para o branch base" também para o `anvil-open-fast-pr`, que até o ticket 06 (PR rápido e limpeza pelo branch base) é só `tea` com o par estável e integração — quem ler o README neste branch roda o PR rápido no GitHub e ele falha; vira mentira publicada só se o 06 sair do recorte.
+- Review round=1 · P2 (Spec): a regra nova do helper — a fixture com o bare como URL de push do `origin` fica como está — está só no cabeçalho do `proof.sh` e no `anvil-sync/SKILL.md` — quem escreve outra prova com forge precisa conhecê-la para não esbarrar na recusa do `origin`.
+- Review round=1 · P2 (Standards, observação ao eixo Spec): o `s2.sh` não confere o responsável no Gitea (o `user` do login, `assignee=prova` no resumo) — uma regressão do Step 5 no Gitea passa sem a prova ver.
+- Review round=1 · P3 (Spec): no Gitea, o responsável passou a ser quem abre o PR, e a skill deixou de perguntar — quem atribuía o PR a outra pessoa perde a escolha; a spec cobre com "o responsável […] fica escrito uma vez".
+- Review round=1 · P3 (Spec): no caso `gitea`, a resposta final saiu em inglês, com a fixture em pt-BR — desvio do modelo, não do texto; o operador às vezes recebe o chat no idioma errado.
+- Review round=1 · P3 (Spec): no caso `github`, a conferência exige `--repo` só no `pr create`, e não em toda chamada do `gh`, como o caso Gitea faz com `--login` e `--repo` — uma regressão que tire o `--repo` do `gh label list` passa sem a prova ver.
+- Review round=1 · P3 (Standards): possível Repeated Switches — o ramo GitHub/Gitea se repete nos Steps 4, 5 e 6 (rótulos, responsável, comando, URL), e a frase "only the command block changes between the forges" diz menos do que o texto faz — quem lê a frase espera um bloco só.
+- Review round=1 · P3 (Standards): no `anvil-sync/SKILL.md`, o reflow deixou uma linha só com "bare. O" — forma; o Markdown renderiza igual.
+- Review round=1 · P3 (Standards): possível Divergent Change no commit 824a992, um `feat(anvil-open-pr)` que traz também a mudança do helper de prova — um `git log` do helper não acha o commit pelo assunto.
+- Review round=1 · P3 (Standards): o comentário sobre o `workspace/59-proof-helper` cita o ticket 04 sem a glosa (o do forge falso com logins e rótulos) — quem lê precisa abrir o ticket para saber se importa.
