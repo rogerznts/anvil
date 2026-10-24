@@ -23,7 +23,7 @@ Last updated: 2026-10-24T17:50:42Z
 
 ## Specs ativas
 
-Nenhuma.
+- [011 — Branch base e forge neutro](./specs/011-extension-branch-base-and-forge/spec.md) — `extension/011-branch-base-and-forge`, especificado
 
 ## Specs arquivadas
 
