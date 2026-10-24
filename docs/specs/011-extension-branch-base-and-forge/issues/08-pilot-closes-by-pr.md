@@ -3,6 +3,7 @@
 **Blocked by:** 05, 07
 
 **Status:** resolved
+**Review:** round=1; sha=61e8508; scope=full; verdict=pass; p1=none
 
 **What to build:** o piloto decide entre PR e merge local pelo `forge:` do
 resolvedor e pelas rules, e fecha por PR pelo `/anvil-open-pr`, nos dois forges. A
@@ -73,3 +74,10 @@ base.
   na main" num projeto com `master`: o estado está certo, só o texto fixa a `main`.
   Fora deste ticket.
 - `vendor-sync.sh verify`: `verify: limpo`, rc 0 (`workspace/76-pilot-closes-by-pr/verify.out`).
+- Review round=1 · P2 (Spec): nenhum caso da S2 combina `forge: github` com uma rule que diz que o projeto fecha sem PR, e a precedência da rule sobre o forge (passo 3 do "Fechamento") fica sem prova de sessão — uma regressão em que o piloto abre PR num projeto que fecha localmente passaria verde.
+- Review round=1 · P3 (Spec): a "Parada" ganhou "o resolvedor que recusa", mas a lista das paradas por decisão em "Pesquisa antes de travar" não — a recusa não dispara pesquisa porque a lista técnica é fechada, e só a enumeração fica incompleta para quem lê.
+- Review round=1 · P3 (Spec): o `roadmap.sh` dá "ainda sem merge na main" num projeto com `master`, e o texto vai para o relatório do piloto — nenhum ticket da 011 fica com o assunto; só a prosa do relatório sai errada.
+- Review round=1 · P3 (Standards): possível Duplicated Code — no fechamento por PR o resolvedor roda na largada (pelo `stage.sh`), no "Fechamento" e de novo no Step 0 do `anvil-open-pr`; se o `## Git` ou o login do `tea` mudar no meio da execução, a decisão e o PR divergem, e o branch fica publicado pelo `git push -u origin` sem PR.
+- Review round=1 · P3 (Standards): possível Shotgun Surgery — o manual `anvil-omp` repete a regra de decisão do fechamento ("Sem remoto ou com `forge: nenhum`…", redundante porque sem `origin` o resolvedor já dá `nenhum`), e cada mudança no fechamento pede editar os dois lugares; o bullet também mistura PR e merge local antes de "No merge local…".
+- Review round=1 · P3 (Standards): o comentário dos vermelhos cita "o 67f6c9b (o ticket 04 da 009)" sem a glosa — o ticket 04 da 009 trouxe a conferência da árvore antes de toda volta à `main` no fechamento — e quem lê precisa abrir a 009 para saber o que o `red-suja.patch` tira.
+- Review round=1 · P3 (Standards): o comentário do `vendor-sync.sh verify` não leva o prefixo "Implementação ·" dos outros — sem efeito, só quebra a leitura uniforme do histórico.
