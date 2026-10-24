@@ -11,6 +11,11 @@
 # etapa que o disco aponta e retomada, e retomada se propoe, nunca se carrega: o
 # do diz isso ao modelo, porque na prosa o haiku carregou a etapa sem o sim.
 #
+# Depois da linha branch sai a base: o branch base do projeto, o que o
+# resolve-git.sh do anvil-docs da (ADR-0015), para quem compara o branch atual com
+# ele, como a largada do anvil-auto. Quando o resolvedor recusa, sai base: none e
+# uma linha base_refusal: por motivo dele; a etapa nao depende disso.
+#
 #   perfil do tracker ausente ou outro          -> refused
 #   sem spec no branch                          -> anvil-grill
 #   spec do branch em docs/specs/archive/       -> none
@@ -53,6 +58,20 @@ tracker_refusal() {
     echo "o perfil do tracker em $profile é '${title:-sem título}', e os condutores só funcionam com o perfil docs/specs do anvil. O fluxo segue à mão, uma skill por vez, como no Claude Code."
 }
 
+# O branch base pelo resolvedor do anvil-docs, da instalacao de usuario: base:
+# <branch> ou, na recusa, base: none e os motivos em base_refusal:.
+base_lines() {
+    local out base
+    out="$(bash "$HOME/.claude/skills/anvil-docs/scripts/resolve-git.sh" 2>&1)"
+    base="$(printf '%s\n' "$out" | sed -n 's/^base: //p')"
+    if [ -n "$base" ]; then echo "base: $base"; return; fi
+    echo "base: none"
+    case "$out" in
+        "refusal: "*) printf '%s\n' "$out" | sed -n 's/^refusal: /base_refusal: /p' ;;
+        *) echo "base_refusal: o resolve-git.sh do anvil-docs não deu o branch base: ${out:-sem saída}" ;;
+    esac
+}
+
 root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
     echo "branch: -"; echo "spec: none"
     emit anvil-grill "fora de um repositório git"
@@ -65,6 +84,7 @@ if [ -n "$reason" ]; then emit refused "$reason"; exit 0; fi
 branch="$(git branch --show-current)"
 num="$(printf '%s\n' "$branch" | sed -n 's|^[^/]*/\([0-9][0-9]*\)-.*|\1|p')"
 echo "branch: ${branch:-HEAD destacado}"
+base_lines
 
 spec_dir_in() {  # <diretorio pai>: a pasta de spec com o numero do branch
     local d p
