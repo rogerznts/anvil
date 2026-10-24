@@ -330,7 +330,9 @@ Prior art: o caso F de `workspace/56-manual-gate-rule/` e as fixtures de
   arquivada, e não "nenhum".
 - **Saída mista.** Gate manual desta spec aberto e gate de `CHECK:` caído: o piloto
   segue o caminho do `CHECK:` caído, com pesquisa, e só depois para pela pergunta
-  do gate manual. O vermelho, com o texto de antes, para sem pesquisar.
+  do gate manual. Só o verde é exigido: com o texto de antes, o
+  `claude-sonnet-4-5` já pesquisava nas sessões válidas, e o operador aceitou a
+  falta do vermelho como limite, registrado no ticket 06.
 
 ### B1 — o bench pelo helper, com infra isolada (existente, ampliado)
 
