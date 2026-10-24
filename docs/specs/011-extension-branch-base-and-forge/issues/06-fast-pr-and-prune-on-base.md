@@ -2,8 +2,9 @@
 
 **Blocked by:** 05
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=c6548ff; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=9d273c6; scope=diff:c6548ff..9d273c6; verdict=pass; p1=none
 
 **What to build:** o `anvil-open-fast-pr` consulta o resolvedor antes de qualquer
 `git stash`, cria o branch novo a partir do branch base e abre o PR como o
@@ -65,3 +66,7 @@ e não uma `main` fixa.
 - Review round=1 · P3 (Standards): possível Divergent Change no commit 0a979ec, `feat(anvil-open-fast-pr)` que muda também o `anvil-prune-branches` e o README — um `git log` pelo escopo do prune não acha o commit.
 - Review round=1 · P3 (Standards): o último comentário de implementação cita o ticket 05 sem a glosa (o `anvil-open-pr` no GitHub e no Gitea) — quem lê precisa abrir o ticket para saber que a semelhança é a resposta final em inglês.
 - Correção do P1 da rodada 1 (5e4958a) · o resolvedor roda uma vez só, no Step 0 do PR rápido, e o Step 6 segue o `anvil-open-pr` com o Step 0 dele tomando o `<base>`, o `<repo>` e o `<login>` de lá, sem rodar o resolvedor de novo. Prova no caso novo `origin-head` de `workspace/74-fast-pr-prune/` — `main` e `develop`, sem `origin/HEAD` local, o HEAD do remoto no `develop`: o resolvedor dá `main` antes do fetch e `develop` depois (`s2.sh --so-fixture`). O vermelho, com o texto de c6548ff, saiu `0` (`s2-red-origin-head.out`): o modelo pulou o Step 0 do `anvil-open-pr` e não rodou o resolvedor de novo, então o defeito era do texto seguido à letra, e não apareceu na sessão. O verde saiu `0` nos casos `origin-head`, `master`, `hotfix` e `recusa`, com uma chamada do resolvedor por sessão; o `prune` não mudou desde a rodada 1.
+- Review round=2 · P2 (Spec): o vermelho do `origin-head` saiu `0`, e o `s2.sh` não conta as chamadas do resolvedor — um texto que volte a mandar rodar o resolvedor duas vezes passa na prova enquanto o modelo ignorar a instrução; "uma chamada do resolvedor por sessão" foi contada à mão.
+- Review round=2 · P3 (Spec): o Step 6 do PR rápido lista `<base>`, `<repo>` e `<login>` como o que o Step 0 do `anvil-open-pr` toma, mas não o `forge:`, pelo qual o Step 6 do `anvil-open-pr` escolhe o bloco de comando ("Run the block of the resolver's forge") — quem seguir à letra deduz o forge do contexto; hoje nada quebra.
+- Review round=2 · P3 (Standards): possível Data Clumps no repasse do Step 6 — a resposta do resolvedor é um grupo (`base`, `forge`, `repo`, `login`) e a correção repassa só parte dele, e a nota deixou de citar o forge — o mesmo achado do eixo Spec acima; a correção é pôr `<forge>` nos dois lugares.
+- Review round=2 · P3 (Standards): o Duplicated Code da rodada 1 mudou — a execução dupla sumiu, e a cópia do tratamento do resolvedor no Step 0 do PR rápido ficou como o único tratamento executado no fluxo, justificada por vir antes do stash — se o tratamento de recusa mudar no `anvil-open-pr`, a cópia pode ficar para trás. Os outros achados da rodada 1 sobre o `anvil-prune-branches` e o comentário do ticket 05 continuam como estão.
