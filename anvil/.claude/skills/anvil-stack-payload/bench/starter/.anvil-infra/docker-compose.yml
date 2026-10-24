@@ -2,7 +2,8 @@
 # Sobe UMA vez; todos os projetos criados pelo modo /anvil-bench reusam.
 # infra.sh copia este arquivo para ~/projects/.anvil-infra/ e sobe com `up -d`.
 #
-# - É esta infra que CRIA a rede `anvil-net` (name: anvil-net).
+# - É esta infra que CRIA a rede `anvil-net` (name: anvil-net). O infra.sh passa o
+#   nome em ANVIL_NETWORK, que só muda sob o prefixo de execução de uma prova.
 # - Postgres e Redis NÃO publicam portas no host: só são acessíveis dentro da
 #   `anvil-net`, pelos containers `app` de cada projeto (por nome de serviço).
 # - Dados persistem em volumes nomeados mesmo derrubando a infra.
@@ -47,4 +48,4 @@ volumes:
 
 networks:
   anvil-net:
-    name: anvil-net
+    name: ${ANVIL_NETWORK:-anvil-net}

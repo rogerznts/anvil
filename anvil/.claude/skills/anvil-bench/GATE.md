@@ -160,19 +160,24 @@ manual sob o piloto: o `anvil-auto` e o [SKILL.md](SKILL.md) apontam para cá.
 O id que o checker imprime, `gates:<id do item>`, é único no checklist e diz de
 que ledger é o gate. Um gate sem `CHECK:` é manual.
 
-- o gate manual aberto no ledger desta spec deixa a spec parada à espera de quem
-  confere, e vai para o relatório como pergunta. Nem o piloto nem o implementer o
-  marcam: a evidência dele é de quem conferiu;
-- o gate manual aberto no ledger de uma spec fechada é dela e não segura esta: vai
-  para "o que ainda espera decisão", também como pergunta, e ninguém o marca;
 - o gate com `CHECK:` que cai, nesta spec ou numa fechada, ou o checker que não
-  roda, é o `FAIL` no teto: nenhum ticket volta ao despacho sem a rodada extra, e
-  o piloto pesquisa em fontes primárias antes de travar. A rodada extra que a
-  pesquisa abre, com evidência nova, é a exceção que o piloto declara no ticket, e
-  não uma terceira rodada do bench;
+  roda, é o `FAIL` no teto, haja ou não gate manual desta spec aberto: nenhum
+  ticket volta ao despacho sem a rodada extra, e o piloto pesquisa em fontes
+  primárias antes de travar. A rodada extra que a pesquisa abre, com evidência
+  nova, é a exceção que o piloto declara no ticket, e não uma terceira rodada do
+  bench;
+- sem gate com `CHECK:` caído, o gate manual aberto no ledger desta spec deixa a
+  spec parada por decisão, à espera de quem confere;
+- o gate manual aberto no ledger de uma spec fechada é dela e não segura esta;
 - sem gate manual desta spec aberto e sem gate com `CHECK:` caído, a saída vale o
   `PASS`: o `exit: 0` com `ALL MET`, ou o `exit: 1` em que todo id abaixo de
   `UNMET:` é de gate manual de spec fechada.
+
+Cada gate manual aberto, desta spec ou de uma fechada, vai para "o que ainda
+espera decisão", no relatório, como pergunta, também quando um `CHECK:` caiu e a
+spec seguiu o caminho do `FAIL` no teto: a pesquisa e a rodada extra não o
+respondem. Nem o piloto nem o implementer o marcam: a evidência dele é de quem
+conferiu.
 
 O piloto roda o mesmo comando de novo no merge local, quando a `main` andou desde
 o corte do branch: sobre o merge preparado, sem o `docs/specs/<pasta>/gates.md`,

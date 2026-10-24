@@ -79,6 +79,17 @@ e dependências, que o piloto automático executa. O estado de cada entrada sai 
 disco.
 _Avoid_: plano, plano principal, backlog
 
+### Git e forge
+
+**Forge**:
+O serviço que hospeda o remoto do projeto e recebe o PR: hoje, Gitea ou GitHub.
+_Avoid_: provedor, host, plataforma
+
+**Branch base**:
+O branch de onde todo trabalho sai e para onde volta, pelo merge local ou pelo
+PR: a `main` ou a `master`, ou outro que o projeto declarar.
+_Avoid_: main, branch principal, trunk, branch de integração, branch estável
+
 ### Referências
 
 **Upstream vendorizado**:
@@ -100,3 +111,15 @@ _Avoid_: port, análise, estudo
 **Frontier**:
 Os tickets cujos bloqueadores já estão todos resolvidos.
 _Avoid_: fila, backlog, próximos
+
+### Verificação
+
+**Prova**:
+A execução que mostra um comportamento do toolkit acontecendo, com o vermelho
+medido antes da mudança e o verde depois.
+_Avoid_: teste, smoke, cenário
+
+**Prova inválida**:
+A prova cuja sessão não foi respondida pelo modelo pedido. Não conta como verde
+nem como vermelho, e se repete.
+_Avoid_: prova falha, prova inconclusiva

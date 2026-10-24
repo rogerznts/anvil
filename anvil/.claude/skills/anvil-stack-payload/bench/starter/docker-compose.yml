@@ -1,6 +1,7 @@
 # Compose do PROJETO — sobe APENAS o serviço `app` (Payload/Next), sem build (ADR-0003, FR-010).
 # Postgres, Redis e a rede `anvil-net` vêm da infra COMPARTILHADA
-# (~/projects/.anvil-infra/), provisionada por infra.sh (ADR-0001).
+# (~/projects/.anvil-infra/), provisionada por infra.sh (ADR-0001). O nome da rede
+# vem de ANVIL_NETWORK no .env, com `anvil-net` como padrão.
 #
 # INVARIANTE (INV-4): imagem pinada, zero build local. O código é montado
 # como volume; a primeira subida roda `pnpm install --frozen-lockfile` (demora
@@ -32,6 +33,7 @@ volumes:
   node_modules:
 
 networks:
-  # A rede é criada pela infra compartilhada (.anvil-infra); aqui só entramos nela.
+  # A rede é criada pela infra (.anvil-infra); aqui só entramos nela.
   anvil-net:
+    name: ${ANVIL_NETWORK:-anvil-net}
     external: true

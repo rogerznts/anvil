@@ -71,8 +71,15 @@ decide o ramo.
 
 Antes de qualquer ramo, procure uma **spec aberta**: uma pasta de
 `docs/specs/`, fora de `docs/specs/archive/`, com algum ticket em `issues/` cujo
-`Status:` não é `resolved`. Achou, a construção segue por ela, sem entrevista,
-com ou sem `docs/qa/checklist.yaml`, e nenhum dos ramos abaixo vale:
+`Status:` não é `resolved`. A busca roda também quando a pessoa pediu uma mudança,
+e este comando lista esses tickets:
+
+```
+grep -LE '^\**Status:\** *resolved' docs/specs/*/issues/*.md 2>/dev/null
+```
+
+Achou, a construção segue por ela, sem entrevista, com ou sem
+`docs/qa/checklist.yaml`, e nenhum dos ramos abaixo vale:
 
 - sem o `gates.md` na pasta da spec, retome pela fase 4: o ledger dessa spec e,
   se ainda não há o `docs/qa/checklist.yaml`, antes dele o briefing e o checklist,
@@ -81,7 +88,10 @@ com ou sem `docs/qa/checklist.yaml`, e nenhum dos ramos abaixo vale:
   `resolved`.
 
 O checklist que uma retomada já commitou no branch da spec não faz dela uma
-ferramenta a evoluir.
+ferramenta a evoluir, nem a mudança que a pessoa pediu ao chamar o bench. Essa
+mudança não tem entrevista nesta vez, nem depois da construção: a vez termina no
+fim da construção da spec aberta, e a entrega diz que a mudança fica para quando
+o bench for chamado de novo, depois que essa spec fechar.
 
 Sem essa spec:
 
@@ -107,10 +117,11 @@ existente, ou a fase 3 como entrevista do delta — vai para o `decisions-log.md
 com a spec de onde partiu quando há uma, e para a entrega da fase 6.
 
 Projeto novo: copie o starter **as-is**, sem regenerar, inicialize o git com o
-branch `main` (`git init -b main`), materialize o `.env` com a alocação, gere
-`.claude/rules/payload.md` a partir do `RULE.md` da stack mais a seção de
-invariantes, e instale os dois perfis que o bench e as skills de fluxo leem, a
-partir dos templates do `anvil-docs`, da instalação de usuário:
+branch `main` (`git init -b main`), materialize o `.env` com a alocação, nas
+chaves do `.env.example` do starter — a rede de `ALLOC_NETWORK` vai para o
+`ANVIL_NETWORK` —, gere `.claude/rules/payload.md` a partir do `RULE.md` da stack
+mais a seção de invariantes, e instale os dois perfis que o bench e as skills de
+fluxo leem, a partir dos templates do `anvil-docs`, da instalação de usuário:
 
 | Perfil | Template |
 |---|---|
@@ -378,7 +389,9 @@ Publicar é opt-in e não faz parte deste fluxo —
 
 ## Evoluir uma ferramenta
 
-Reative o bench no projeto existente e descreva a mudança.
+Reative o bench no projeto existente e descreva a mudança. Evoluir só vale sem
+spec aberta: a busca da fase 2 vem antes, e com a spec aberta a mudança espera,
+como diz *2. Reconhecer*.
 
 - A entrevista cobre **só o delta**, e parte do roteiro e do checklist que já
   existem: acrescenta entradas ao roteiro e itens ao checklist, com os ids

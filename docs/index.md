@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-23T18:51:52Z
+Last updated: 2026-10-24T17:50:42Z
 
 ## Visão geral
 
@@ -27,6 +27,7 @@ Nenhuma.
 
 ## Specs arquivadas
 
+- [010 — Helper de prova e sobras da 009](./specs/archive/010-extension-proof-harness/spec.md) — `extension/010-proof-harness`, 10 tickets
 - [009 — Pontos em aberto do piloto automático](./specs/archive/009-extension-anvil-auto-open-points/spec.md) — `extension/009-anvil-auto-open-points`, 8 tickets
 - [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/archive/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, 11 tickets
 - [007 — Migração lista o que está fora do git e edita o alvo de symlink no repositório](./specs/archive/007-extension-migration-out-of-git/spec.md) — `extension/007-migration-out-of-git`, 4 tickets
@@ -50,8 +51,8 @@ Nenhuma.
 
 ### Architecture
 
-- [context.md](./architecture/context.md) — o glossário: curadoria, referências,
-  tickets e harness, com os termos a evitar.
+- [context.md](./architecture/context.md) — o glossário: curadoria, harness, git
+  e forge, referências, tickets e verificação, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
   impõe, como o estado é lido do disco, os três harnesses e a camada omp, com o
   piloto automático, e a herança do mosk.
@@ -83,7 +84,13 @@ Nenhuma.
   - [adr-0013](./architecture/adr/adr-0013-toolkit-instalado-por-usuario.md)
     — o toolkit é instalado uma vez por usuário; o projeto fica só com rules e `docs/`
   - [adr-0014](./architecture/adr/adr-0014-piloto-automatico-fecha-sem-humano.md)
-    — o piloto automático leva o roteiro ao fechamento sem humano; revê em parte o adr-0010 e o adr-0011
+    — o piloto automático leva o roteiro ao fechamento sem humano; revê em parte o adr-0010 e o adr-0011; **revisto em parte pelo adr-0015**
+  - [adr-0015](./architecture/adr/adr-0015-branch-base-declarado-ou-detectado.md)
+    — um branch base só, declarado nas rules ou detectado, de onde todo trabalho sai e para onde volta
+  - [adr-0016](./architecture/adr/adr-0016-skills-de-git-servem-gitea-e-github.md)
+    — as skills `tea-*` viram `anvil-*` e servem Gitea e GitHub, com remoto ssh ou https
+  - [adr-0017](./architecture/adr/adr-0017-prova-pelo-caminho-real-com-resultado-invalido.md)
+    — a prova roda pelo `/skill:` real, isolada, e sai inválida quando outro modelo responde
 
 ### Project
 
