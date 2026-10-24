@@ -73,7 +73,12 @@ Para provas que passam por remoto e por PR, sem servidor, o
 `proof_session` liga como `origin` da fixture, com o branch dela publicado, e o
 `proof_prepare --forge` põe um `gh` e um `tea` falsos à frente do `PATH` da sessão,
 que gravam cada chamada no `forge.jsonl` das saídas e respondem como no sucesso,
-por `scripts/proof-forge.py`. Para provas do bench com a stack de pé, o
+por `scripts/proof-forge.py`. Com o `--forge`, a prova configura o que as skills
+perguntam antes de abrir o PR: `--tea-login <nome>,<url>,<ssh_host>,<padrão>`, uma
+vez por login, dá a lista que o `tea login list --output json` devolve, no formato
+do `tea` real; `--labels <rótulo>,<rótulo>…` dá os rótulos que o `gh label list` e
+o `tea labels list` devolvem, e, sem ele, são os de um repositório novo do GitHub.
+Para provas do bench com a stack de pé, o
 `proof_prepare --infra` liga o prefixo de execução do `infra.sh` com o id da
 execução, no script da prova e na sessão, e a limpeza derruba essa infra no fim.
 

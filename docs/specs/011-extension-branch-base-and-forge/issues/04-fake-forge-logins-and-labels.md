@@ -2,24 +2,50 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 **What to build:** o forge falso do helper de prova passa a responder o que as
 skills neutras perguntam antes de abrir o PR: a lista de logins do `tea`, que a
 prova configura, e a lista de rótulos dos dois CLIs.
 
-- [ ] A prova configura os logins do `tea` falso (nome, `url`, `ssh_host`, padrão),
+- [x] A prova configura os logins do `tea` falso (nome, `url`, `ssh_host`, padrão),
       e o `tea login list --output json` os devolve no formato do `tea` real, com
       `name`, `url`, `ssh_host`, `user` e `default`.
-- [ ] O `gh label list` e o `tea labels list` falsos devolvem uma lista de rótulos
+- [x] O `gh label list` e o `tea labels list` falsos devolvem uma lista de rótulos
       que a prova configura, com um padrão quando ela não configura.
-- [ ] Cada chamada continua no log do forge, com argumentos e diretório.
-- [ ] O cabeçalho do helper e a seção "Helper de prova" da `anvil-sync` dizem as
+- [x] Cada chamada continua no log do forge, com argumentos e diretório.
+- [x] O cabeçalho do helper e a seção "Helper de prova" da `anvil-sync` dizem as
       opções novas.
-- [ ] Prova S1, num diretório novo de `workspace/`, com
+- [x] Prova S1, num diretório novo de `workspace/`, com
       `workspace/61-bare-remote-forge/` como prior art: os logins configurados no
       formato do `tea`; os rótulos dos dois CLIs; as S1 dos tickets 01 a 04 e 10 da
       010 continuam passando.
-- [ ] `vendor-sync.sh verify` sai `0`.
+- [x] `vendor-sync.sh verify` sai `0`.
 
 ## Comments
+
+- Implementação · as opções novas do `proof_prepare` são `--tea-login
+  <nome>,<url>,<ssh_host>,<padrão>`, uma vez por login, e `--labels
+  <rótulo>,<rótulo>…`, uma vez só e vazia para o repositório sem rótulo; as duas
+  pedem `--forge`, e a forma errada sai `2` antes de criar o diretório da execução.
+  O formato do `tea` real foi medido no `tea` 0.16.0 da máquina, num `HOME`
+  temporário e com um servidor http local no lugar do Gitea
+  (`workspace/72-forge-logins-labels/real/capturar.sh`): o `default` sai como
+  string `"true"`/`"false"`, e o login sem `ssh_host` sai com o host:porta do `url`
+  — o falso faz o mesmo. O `user`, que o ticket não manda configurar, é `prova`.
+- Implementação · o `tea labels list` falso dá a tabela do `tea` real (o formato
+  padrão, sem `--output`) e o `--output json`; o `gh label list` dá a saída sem TTY
+  (nome, descrição e `#cor` por tabulação) e o `--json` com `name`, `color` e
+  `description`. A forma que o falso não sabe dar — `--jq`, `--template` e `--web`
+  do `gh`, outro campo do `--json`, outro `--output` do `tea` — sai `1` com o motivo,
+  em vez de uma resposta que o CLI real não daria. O formato do `gh` vem do código do
+  `gh label list`, e não de captura: sem servidor do GitHub, não se mede aqui. Sem
+  `--labels`, os rótulos são os de um repositório novo do GitHub, nos dois CLIs.
+- Implementação · S1 em `workspace/72-forge-logins-labels/`, no bash 5.2 e no
+  `/bin/bash` 3.2: vermelho antes, em `s1-red.out`; verde depois, em `s1.out`. A
+  tabela e o JSON do `tea` esperados são as saídas do `tea` real em `real/`. As S1 da
+  010 estão em `s1-anteriores.out`, antes e depois: 60, 61, 62 e 67 passam; a do
+  ticket 01 (`workspace/59-proof-helper/`) falha a mesma conferência antes e depois
+  deste ticket, a que exige `tea-open-pr` no payload, nome que o ticket 02 desta spec
+  trocou por `anvil-open-pr`. A falha não é deste ticket, e reescrever a prova antiga
+  fica fora do escopo da spec.
