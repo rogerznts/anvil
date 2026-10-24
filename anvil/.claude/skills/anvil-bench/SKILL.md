@@ -389,7 +389,9 @@ Publicar é opt-in e não faz parte deste fluxo —
 
 ## Evoluir uma ferramenta
 
-Reative o bench no projeto existente e descreva a mudança.
+Reative o bench no projeto existente e descreva a mudança. Evoluir só vale sem
+spec aberta: a busca da fase 2 vem antes, e com a spec aberta a mudança espera,
+como diz *2. Reconhecer*.
 
 - A entrevista cobre **só o delta**, e parte do roteiro e do checklist que já
   existem: acrescenta entradas ao roteiro e itens ao checklist, com os ids
