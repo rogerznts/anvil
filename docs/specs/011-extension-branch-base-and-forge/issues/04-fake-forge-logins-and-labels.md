@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=e1aab35; scope=full; verdict=pass; p1=none
 
 **What to build:** o forge falso do helper de prova passa a responder o que as
 skills neutras perguntam antes de abrir o PR: a lista de logins do `tea`, que a
@@ -49,3 +50,12 @@ prova configura, e a lista de rótulos dos dois CLIs.
   deste ticket, a que exige `tea-open-pr` no payload, nome que o ticket 02 desta spec
   trocou por `anvil-open-pr`. A falha não é deste ticket, e reescrever a prova antiga
   fica fora do escopo da spec.
+- Review round=1 · P2 (Spec): o critério das S1 da 010 está marcado, mas a S1 de `workspace/59-proof-helper/` falha antes e depois deste diff, pela troca de `tea-open-pr` do ticket 02 — quem ler só a caixa acha que as cinco passam, e a prova 59 segue quebrada sem ticket que a corrija.
+- Review round=1 · P2 (Spec): o formato do `gh label list` falso vem do código do `gh`, não de captura, e o S1 o compara com um valor que ele mesmo declara — se o `gh` real divergir, as S2 validam as skills contra uma resposta que o GitHub não dá.
+- Review round=1 · P3 (Spec): `--search` e `--limit` do `gh label list` são ignorados sem aviso, apesar da regra de sair `1` na forma que o falso não sabe dar — uma prova futura que os use passaria contra uma resposta impossível.
+- Review round=1 · P3 (Spec/Standards): `gh label list --json` sem campos sai `1` com a mensagem "não tem ;", com o campo vazio — quem lê o stderr não descobre o que errou.
+- Review round=1 · P3 (Standards): o `except FileNotFoundError` de `tea_logins` nunca roda, porque o `--forge` sempre grava `forge-tea-logins`, enquanto `forge-labels` só existe com `--labels` — duas convenções para "configurado ou não" confundem quem mantém.
+- Review round=1 · P3 (Standards): `has_flag` e `option` repetem a regra de reconhecer uma opção (Duplicated Code) — mudar a forma aceita num só lugar faz o falso detectar a flag e ler o valor de jeitos diferentes.
+- Review round=1 · P3 (Standards): o `--json` e as seis recusas do `gh label list` vão além do que alguma skill chama hoje (Speculative Generality, aceitável pelo ticket) — superfície a manter sem prova fora da S1.
+- Review round=1 · P3 (Standards): a docstring do `proof-forge.py` não diz que `tea logins` e `tea login ls` também respondem — o contrato descreve menos do que o código faz.
+- Review round=1 · P3 (Standards): a cascata de `tool == … and args[:1] in …` no `main` repete o mesmo despacho (Repeated Switches), uma linha passa de 150 colunas — cada verbo novo do forge a alonga.
