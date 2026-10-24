@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=9bb8cc0; scope=full; verdict=pass; p1=none
 
 **What to build:** a guarda de merge passa a conferir o PR criado por `gh api` com
 `POST` sobre um caminho de `pulls`, além do `gh pr` e do `tea pr`, e as mensagens e
@@ -43,3 +44,11 @@ o filtro rápido citam `gh` e `tea`.
   `workspace/11-merge-target/run.sh` em `antigos.sh`, que os roda na guarda de hoje
   (com a rule `anvil.md`, sem a qual a guarda sai 0 desde a 006); o
   `workspace/40-global-guard/s1.sh` também passa. `vendor-sync.sh verify` limpo.
+- Review round=1 · P3 (Standards): `gh_api_abre_pr`, `incognita`, `GH_API_VALOR` e `GH_API_PARAMETRO` em pt-BR contrariam a seção Idioma do `CLAUDE.md` (identificador em inglês), seguindo o estilo do arquivo (`nome`, `redireciona`) — só aumenta a dívida de idioma do script.
+- Review round=1 · P3 (Standards): possível Duplicated Code — o `incognita()` novo não é usado na linha do `gh api` (`"$" in palavras[k]`) nem nas checagens antigas do `git`, e duas das três grafias ignoram a crase (`` `which gh` api -X POST repos/o/r/pulls `` dá `ignora`, como `` `which git` merge `` já dava) — quem fechar essa lacuna precisa achar os três lugares.
+- Review round=1 · P3 (Standards): possível Duplicated Code — `GH_API_PARAMETRO` é subconjunto de `GH_API_VALOR` escrito por extenso duas vezes; uma opção de parâmetro nova posta numa lista só faz a regra "parâmetro sem `-X` é POST" divergir em silêncio.
+- Review round=1 · P3 (Standards): possível Duplicated Code — o salto de redirecionamento do `gh_api_abre_pr` repete o do laço de alvos do merge — dois lugares a manter iguais.
+- Review round=1 · P3 (Standards): `post = parametro if metodo is None else metodo.upper() == "POST" or incognita(metodo)` só está certo pela precedência da expressão condicional; sem parênteses, quem ler pode entender `(… else …) or incognita(metodo)`.
+- Review round=1 · P3 (Standards): na lista "O que a guarda NÃO pega", o item antigo termina em ponto e o novo vem depois, quebrando a série em `;`; e o reflow do parágrafo da guarda no manual `anvil-omp` deixou uma linha curta no meio — só forma.
+- Review round=1 · P3 (Spec): o filtro rápido não vê `"gh" api -X POST repos/o/r/pulls` (nem `"gh" pr create`, que já passava), porque `[^"]{0,4}` não atravessa a aspa, e a lista "O que a guarda NÃO pega" só dá exemplos do `git` — quem ler pode supor que o `gh` entre aspas é conferido.
+- Review round=1 · P3 (Spec): o perfil do tracker e o `ARCHIVE.md` dizem que o hook bloqueia "o `git merge` e a criação do PR", mas a guarda também confere `gh pr merge` e `tea pr merge` — o texto não mente, descreve menos do que a guarda confere.
