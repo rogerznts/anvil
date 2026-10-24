@@ -4,7 +4,7 @@
 #
 #   . .claude/skills/anvil-sync/scripts/proof.sh
 #
-#   proof_prepare [--remote] [--forge] [--infra]
+#   proof_prepare [--remote] [--forge] [--infra] [--dep <skill>]...
 #       Cria o diretório da execução, $PROOF_RUN, com nome único (mktemp -d), e
 #       nele o overlay de config do omp, $PROOF_CONFIG: skills.customDirectories
 #       com as skills do payload e da camada omp desta árvore, que têm precedência
@@ -24,6 +24,12 @@
 #       infra do prefixo, com compose, rede, registro e volumes próprios. A limpeza
 #       a derruba (infra.sh --teardown, da fonte) antes de remover $PROOF_RUN,
 #       também na falha e na interrupção.
+#       --dep <skill>, uma vez por skill, declara uma dependência da prova: uma
+#       skill que o payload chama por ~/.claude/skills/<skill>/…, caminho que o
+#       overlay não cria. Antes de criar $PROOF_RUN, o helper confere que
+#       ~/.claude/skills/<skill> é um link para o payload desta árvore; se não for,
+#       sai 2 com a skill e o comando do dev-link.sh no motivo. O helper não cria
+#       nem remove link: quem liga é o operador.
 #
 #   proof_session --model <modelo> --cwd <fixture> --out <saídas> -- <turno>...
 #       Conduz a sessão pelo rpc do omp (proof-rpc.py): o primeiro turno é
@@ -44,18 +50,23 @@
 #   proof_verdict --model <modelo> --out <saídas> <código das conferências>
 #       Confere o modelo de toda mensagem do assistente em session.jsonl e em
 #       subagents/*.jsonl de <saídas> (proof-verdict.py), e sai com o código da
-#       prova. <modelo> casa com o <provider>/<model> da mensagem ou só com o
-#       <model>; o código das conferências é 0, verde, ou 1, vermelho. Imprime, e
-#       grava em <saídas>/verdict.txt, cada modelo que respondeu com quantas
-#       mensagens deu, por sessão e no total, e a sessão que terminou em erro do
-#       provedor, com a mensagem de erro. Não pede proof_prepare: a prova o
-#       chama por último, com as saídas de proof_session.
+#       prova. A sessão principal é julgada pelo modelo pedido: <modelo> casa com
+#       o <provider>/<model> da mensagem ou só com o <model>. Cada subagente, por
+#       um modelo só do começo ao fim: o que tem modelo próprio por papel ou por
+#       frontmatter, diferente do pedido, não invalida e vai para o relatório. O
+#       código das conferências é 0, verde, ou 1, vermelho. Imprime, e grava em
+#       <saídas>/verdict.txt, cada modelo que respondeu com quantas mensagens deu,
+#       por sessão e no total, e a sessão que terminou em erro do provedor, com a
+#       mensagem de erro. Não pede proof_prepare: a prova o chama por último, com
+#       as saídas de proof_session.
 #
 # Códigos de saída: 0 verde e 1 vermelho, os das conferências; 2 ambiente ou uso
 # recusado — omp, git, docker ou python3 fora do PATH, opção inválida, a fixture
-# que o --remote não liga, ou a sessão que não se conduz —, com o motivo no stderr;
-# 3 prova inválida, quando alguma mensagem é de outro modelo, que vale sobre o
-# verde e sobre o vermelho.
+# que o --remote não liga, a dependência declarada que não é link para esta árvore,
+# a sessão que não se conduz, ou a falha do próprio script de veredito, que nunca
+# vira 1 —, com o motivo no stderr; 3 prova inválida, quando a sessão principal tem
+# mensagem de outro modelo que não o pedido ou um subagente tem mais de um modelo,
+# que vale sobre o verde e sobre o vermelho.
 # Nada é escrito em ~/.claude, ~/.agents nem no config de usuário do omp; a
 # sessão guarda o jsonl dela em $PROOF_RUN. Com --infra, o registro do prefixo, em
 # ~/projects/.<prefixo>-anvil-infra/, vive até a derrubada.
@@ -108,17 +119,33 @@ _proof_cleanup() {
 
 proof_prepare() {
     [ -z "$PROOF_RUN" ] || _proof_refuse "proof_prepare já rodou nesta execução: $PROOF_RUN"
-    local opt remote="" forge="" infra="" tool tmp="${TMPDIR:-/tmp}"
-    for opt in "$@"; do
-        case "$opt" in
+    local remote="" forge="" infra="" deps="" skill tool tmp="${TMPDIR:-/tmp}"
+    while [ $# -gt 0 ]; do
+        case "$1" in
             --remote) remote=1 ;;
             --forge) forge=1 ;;
             --infra) infra=1 ;;
-            *) _proof_refuse "opção inválida: $opt" ;;
+            --dep)
+                [ $# -ge 2 ] || _proof_refuse "--dep pede o nome de uma skill"
+                case "$2" in
+                    ""|.|..|*/*) _proof_refuse "--dep pede o nome de uma skill do payload: $2" ;;
+                esac
+                [ -d "$_PROOF_SKILLS/$2" ] || _proof_refuse "--dep $2: não é skill do payload desta árvore, $_PROOF_SKILLS"
+                deps="$deps $2"
+                shift ;;
+            *) _proof_refuse "opção inválida: $1" ;;
         esac
+        shift
     done
     for tool in omp git docker python3; do
         command -v "$tool" >/dev/null 2>&1 || _proof_refuse "$tool não está no PATH"
+    done
+    # O payload chama essas skills por ~/.claude/skills/<skill>/…, que o overlay
+    # não cria: o link tem de levar ao payload desta árvore. Quem liga é o operador.
+    for skill in $deps; do
+        [ -L "$HOME/.claude/skills/$skill" ] \
+            && [ "$(cd "$HOME/.claude/skills/$skill" 2>/dev/null && pwd -P)" = "$(cd "$_PROOF_SKILLS/$skill" && pwd -P)" ] \
+            || _proof_refuse "a prova depende de ~/.claude/skills/$skill, que não é um link para $_PROOF_SKILLS/$skill; ligue com bash $_PROOF_SCRIPTS/dev-link.sh --all"
     done
     trap '_proof_cleanup' EXIT
     trap 'exit 129' HUP
@@ -194,7 +221,7 @@ proof_session() {
 }
 
 proof_verdict() {
-    local model="" out="" code
+    local model="" out="" code err rc
     while [ $# -gt 1 ]; do
         case "$1" in
             --model) model="$2"; shift 2 ;;
@@ -210,6 +237,17 @@ proof_verdict() {
         *) _proof_refuse "o código das conferências é 0 ou 1: $code" ;;
     esac
     command -v python3 >/dev/null 2>&1 || _proof_refuse "python3 não está no PATH"
-    python3 "$_PROOF_SCRIPTS/proof-verdict.py" "$model" "$out" "$code"
-    exit $?
+    # O script de veredito sai com o código da prova e grava o verdict.txt por
+    # último; o que sai de outro jeito é falha dele, de ambiente, e nunca vermelho. O
+    # stdout passa; o stderr fica para o motivo.
+    rm -f "$out/verdict.txt"
+    { err="$(python3 "$_PROOF_SCRIPTS/proof-verdict.py" "$model" "$out" "$code" 2>&1 1>&3 3>&-)"; } 3>&1
+    rc=$?
+    case "$rc" in
+        0|1|3) if [ -f "$out/verdict.txt" ]; then
+                   [ -z "$err" ] || printf '%s\n' "$err" >&2
+                   exit "$rc"
+               fi ;;
+    esac
+    _proof_refuse "o script de veredito falhou, com saída $rc, e a prova fica sem código: ${err:-sem mensagem}"
 }

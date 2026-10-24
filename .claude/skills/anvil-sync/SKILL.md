@@ -51,10 +51,24 @@ carrega, pelo ADR-0017: cria o diretório da execução, carrega as skills do pa
 e da camada omp na sessão sem ligar nada em `~/.claude` nem em `~/.agents`, desliga
 o fallback de modelo só nela, e conduz a sessão pelo rpc do omp, com o `/skill:`
 real no primeiro turno, por `scripts/proof-rpc.py`. Depois das conferências da
-prova, o `proof_verdict` confere o modelo de toda mensagem do assistente, na
-sessão principal e nas de subagente, por `scripts/proof-verdict.py`, e sai com o
-código da prova: `0` verde, `1` vermelho, `3` inválida, quando outro modelo
-respondeu. Para provas que passam por remoto e por PR, sem servidor, o
+prova, o `proof_verdict` confere o modelo de toda mensagem do assistente, por
+`scripts/proof-verdict.py`, e sai com o código da prova: `0` verde, `1` vermelho,
+`3` inválida. A sessão principal é julgada pelo modelo pedido, e cada subagente
+por um modelo só, do começo ao fim: a prova sai inválida quando a principal tem
+mensagem de outro modelo ou quando um subagente troca de modelo; o subagente com
+modelo próprio por papel ou por frontmatter não invalida, e o relatório lista os
+modelos de cada sessão. Uma falha do próprio script de veredito sai `2`, de
+ambiente, e nunca `1`.
+
+O payload chama skills por `~/.claude/skills/<skill>/…`, e o overlay carrega o
+`SKILL.md` delas, não esse caminho. A prova declara as skills de que depende com
+`proof_prepare --dep <skill>`, uma vez por skill, e o helper confere que cada
+`~/.claude/skills/<skill>` é um link para o payload desta árvore; se não for, sai
+`2`, antes de abrir a sessão, com a skill e o comando do `dev-link.sh` no motivo.
+O helper não cria nem remove link: quem liga é o operador, com
+`scripts/dev-link.sh --all`.
+
+Para provas que passam por remoto e por PR, sem servidor, o
 `proof_prepare --remote` cria um repositório bare na execução, que o
 `proof_session` liga como `origin` da fixture, com o branch dela publicado, e o
 `proof_prepare --forge` põe um `gh` e um `tea` falsos à frente do `PATH` da sessão,
@@ -62,11 +76,16 @@ que gravam cada chamada no `forge.jsonl` das saídas e respondem como no sucesso
 por `scripts/proof-forge.py`. Para provas do bench com a stack de pé, o
 `proof_prepare --infra` liga o prefixo de execução do `infra.sh` com o id da
 execução, no script da prova e na sessão, e a limpeza derruba essa infra no fim.
-As operações, as saídas e os códigos de saída estão no cabeçalho do `proof.sh`.
+
+Os códigos de saída do helper são `0` verde, `1` vermelho, `2` ambiente ou uso
+recusado — ferramenta fora do `PATH`, opção inválida, dependência declarada sem o
+link, sessão que não se conduz, veredito que falha — e `3` inválida, que vale sobre
+o verde e sobre o vermelho. As operações, as saídas e os códigos estão no
+cabeçalho do `proof.sh`.
 
 ```bash
 . .claude/skills/anvil-sync/scripts/proof.sh
-proof_prepare
+proof_prepare --dep <skill>
 proof_session --model <modelo> --cwd <fixture> --out <saídas> -- "/skill:<nome> …" "<turno 2>"
 # … as conferências da prova sobre a fixture e <saídas>, com o código em $rc (0 ou 1)
 proof_verdict --model <modelo> --out <saídas> "$rc"
