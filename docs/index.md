@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-23T19:20:00Z
+Last updated: 2026-10-24T17:50:42Z
 
 ## Visão geral
 
@@ -23,10 +23,11 @@ Last updated: 2026-10-23T19:20:00Z
 
 ## Specs ativas
 
-- [010 — Helper de prova e sobras da 009](./specs/010-extension-proof-harness/spec.md) — `extension/010-proof-harness`, em andamento, 8/10 tickets resolvidos
+Nenhuma.
 
 ## Specs arquivadas
 
+- [010 — Helper de prova e sobras da 009](./specs/archive/010-extension-proof-harness/spec.md) — `extension/010-proof-harness`, 10 tickets
 - [009 — Pontos em aberto do piloto automático](./specs/archive/009-extension-anvil-auto-open-points/spec.md) — `extension/009-anvil-auto-open-points`, 8 tickets
 - [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/archive/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, 11 tickets
 - [007 — Migração lista o que está fora do git e edita o alvo de symlink no repositório](./specs/archive/007-extension-migration-out-of-git/spec.md) — `extension/007-migration-out-of-git`, 4 tickets
