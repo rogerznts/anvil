@@ -2,7 +2,7 @@
 
 **Blocked by:** 02, 04, 10
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=5a46779; scope=full; verdict=pass; p1=none
 
 **What to build:** uma saída do `--reverify` com gate manual desta spec aberto e
@@ -15,9 +15,9 @@ aberto desta spec deixa a spec parada por decisão. A regra mora no `GATE.md`.
       caído, haja ou não gate manual desta spec aberto; sem `CHECK:` caído, o gate
       manual aberto desta spec deixa a spec parada por decisão; a pergunta do gate
       manual vai para o relatório nos dois casos.
-- [ ] O `anvil-auto` dispensa a pesquisa só quando nenhum `CHECK:` caiu, e aponta
+- [x] O `anvil-auto` dispensa a pesquisa só quando nenhum `CHECK:` caiu, e aponta
       para o `GATE.md` em vez de repetir a regra.
-- [ ] Prova S2 pelo helper, com a infra isolada, num diretório novo de
+- [x] Prova S2 pelo helper, com a infra isolada, num diretório novo de
       `workspace/`, sobre a fixture de `workspace/56-manual-gate-rule/`, com
       `/skill:anvil-auto` no primeiro turno e uma saída mista: o vermelho, com o
       texto de antes, para sem pesquisar; o verde pesquisa no caminho do `CHECK:`
@@ -97,3 +97,42 @@ aberto desta spec deixa a spec parada por decisão. A regra mora no `GATE.md`.
   só apontando para a regra do `GATE.md`, e refaz o verde da S2 com o texto novo.
   Espera o ticket 10, para que o checker que a S2 roda seja o desta árvore, com o
   `anvil-bench` declarado como dependência da prova.
+- Implementação rodada 2 · no `anvil-auto`, as quatro cópias da precedência
+  saíram: o parágrafo do `PASS` segue "Pesquisa antes de travar", "menos quando a
+  regra do `GATE.md` dá à saída do `--reverify` a spec parada por decisão"; a
+  lista do `--reverify` do bench passou a ter um item por desfecho do `GATE.md` —
+  a saída que vale o `PASS`, o `FAIL` no teto e a spec parada por decisão —, com o
+  desfecho tirado "só dela"; a pergunta formulada do gate manual vale para cada
+  gate que a regra manda para "o que ainda espera decisão"; e "Pesquisa antes de
+  travar" e "Parada" citam "a spec que a regra do `GATE.md` deixa parada por
+  decisão no `--reverify`". Nenhuma frase do `anvil-auto` diz mais quando um
+  `CHECK:` caiu, então o checker que não roda segue o `FAIL` no teto pelo
+  `GATE.md`. O `GATE.md` não mudou.
+- Implementação rodada 2 · prova em `workspace/68-failed-check-manual-gate-r2/s2.sh`,
+  a S2 de `workspace/64-failed-check-manual-gate/` sobre a mesma fixture do caso G
+  — o caso da 56 com o C2, de `CHECK:`, e o C3, manual, no ledger da 002 —, sem o
+  caminho do texto antigo e com `proof_prepare --infra --dep anvil-bench --dep
+  anvil-docs`, as duas skills que o `anvil-auto` e o `GATE.md` chamam por
+  `~/.claude/skills/` nesta saída (o checker e o `roadmap.sh`). Conferência nova: o
+  `--reverify` copiou o checker por um caminho que existe e resolve para o
+  `anvil-bench` desta árvore.
+- Implementação rodada 2 · verde: `s2.out`, código `0` do helper, todo de
+  `anthropic/claude-sonnet-4-5`. O primeiro `--reverify` sai `1` com
+  `gates:C2, gates:C3`, pelo checker de `~/.claude/skills/anvil-bench/unlazy/scripts/.`;
+  o piloto commita a pesquisa com a fonte do MDN, abre a rodada 2 no ticket 01, o
+  implementer corrige, e o último `--reverify` sai `1` com só `gates:C3`; a 002 para
+  sem archive nem merge, e "o que ainda espera decisão" pergunta quem confere o C3.
+- Implementação rodada 2 · com o C1 da 001 fechada caído (`CAIDO=fechada`), as duas
+  saídas deram `1` por falha alheia à regra, e nenhuma é verde: nas duas, o primeiro
+  `--reverify` sai misto (`gates:C1, gates:C3`), o checker é o desta árvore, o
+  piloto pesquisa e o C3 fica aberto. Em `s2-fechada.out`, o piloto foi à pesquisa
+  sem commitar o ledger que o checker reescreveu, e o `frontier.sh` parou com
+  `halt` de árvore suja depois da rodada 2, sem o segundo `--reverify` nem o
+  relatório. Em `s2-fechada-2.out`, a pesquisa saiu sem URL, e a spec parou pela
+  verificação, com o relatório citando a pesquisa e perguntando pelo C3; o agente da
+  pesquisa respondeu com `anthropic/claude-haiku-5-5`, o que o helper lista e não
+  invalida.
+- Observação rodada 2 · o "commite no branch o que mudou na pasta da spec" do
+  `--reverify` vem depois da lista de desfechos, e o `FAIL` no teto manda para
+  "Pesquisa antes de travar" antes dele: em `s2-fechada.out` o ledger ficou fora de
+  commit e o `frontier.sh` parou a execução. A ordem é anterior a este ticket.
