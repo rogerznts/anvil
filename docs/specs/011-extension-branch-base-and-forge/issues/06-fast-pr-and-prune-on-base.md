@@ -2,7 +2,8 @@
 
 **Blocked by:** 05
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=c6548ff; scope=full; verdict=fail; p1=open
 
 **What to build:** o `anvil-open-fast-pr` consulta o resolvedor antes de qualquer
 `git stash`, cria o branch novo a partir do branch base e abre o PR como o
@@ -56,3 +57,10 @@ e não uma `main` fixa.
   guarda nada e o `pop` tira um stash antigo do operador.
 - Implementação · no caso `recusa`, a resposta final saiu em inglês, com a fixture
   em pt-BR — desvio do modelo, como no ticket 05.
+- Review round=1 · P1 (Spec): o resolvedor roda duas vezes no PR rápido, no Step 0 dele e no Step 0 do `anvil-open-pr`, com o `git fetch origin` do Step 2 no meio, e o git 2.48 ou mais novo cria o `origin/HEAD` nesse fetch (reproduzido no git 2.50.1: `base: main` antes, `base: develop` depois) — num repositório sem `origin/HEAD`, o branch sai de um branch base e o PR vai para outro, ou o resolvedor recusa depois do commit e do push e o branch fica publicado sem PR; "One PR, to `<base>`" fica falso.
+- Review round=1 · P2 (Spec): o caso `prune` passou verde também com o texto de antes (`s2-red-prune.out`, código `0`) — a prova não distingue a mudança da limpeza e não pega uma regressão para a `main` fixa.
+- Review round=1 · P3 (Spec): o `anvil-prune-branches` deixou de descobrir o remoto por `git remote -v` e passou a usar sempre o `origin`, parando com `remote: none` — um repositório cujo único remoto não se chama `origin` perde a limpeza; coerente com o resolvedor, que só lê o `origin`, mas não declarado no ticket.
+- Review round=1 · P3 (Standards): possível Duplicated Code — o Step 0 do PR rápido repete o tratamento do resolvedor do Step 0 do `anvil-open-pr` (recusa, `forge: nenhum`), e o Step 6 manda seguir este desde o Step 0, rodando o resolvedor duas vezes — uma mudança no tratamento de recusa do `anvil-open-pr` deixa a cópia para trás sem aviso.
+- Review round=1 · P3 (Standards): no `anvil-prune-branches`, o Step 2 ainda diz "Before anything", depois do Step 1 que roda o resolvedor — o leitor acha "antes de tudo" no segundo passo; a ordem dos passos resolve.
+- Review round=1 · P3 (Standards): possível Divergent Change no commit 0a979ec, `feat(anvil-open-fast-pr)` que muda também o `anvil-prune-branches` e o README — um `git log` pelo escopo do prune não acha o commit.
+- Review round=1 · P3 (Standards): o último comentário de implementação cita o ticket 05 sem a glosa (o `anvil-open-pr` no GitHub e no Gitea) — quem lê precisa abrir o ticket para saber que a semelhança é a resposta final em inglês.
