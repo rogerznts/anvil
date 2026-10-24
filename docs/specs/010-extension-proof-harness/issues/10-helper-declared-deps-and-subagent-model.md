@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=97b337a; scope=full; verdict=pass; p1=none
 
 **What to build:** três correções no helper de prova, decididas pelo operador
 depois dos tickets 05, 06 e 09, e o caso N do B1 refeito sobre elas.
@@ -77,3 +78,10 @@ depois dos tickets 05, 06 e 09, e o caso N do B1 refeito sobre elas.
   que resolvem para esta árvore, e nenhum checker rodado no N; `b1-n-sem-link.out`,
   com um `HOME` sem os links (e o `DOCKER_CONFIG` do usuário), dá `N=2` com o motivo
   do helper, sem `frames.jsonl` nem `session.jsonl`.
+- Review round=1 · P3 (Standards): os códigos de saída e a regra do veredito aparecem no cabeçalho do `proof.sh`, na docstring do `proof-verdict.py` e duas vezes na seção "Helper de prova" do `SKILL.md` (Duplicated Code / Shotgun Surgery) — a próxima mudança de código pede quatro edições, e uma esquecida faz o `SKILL.md` contradizer o cabeçalho.
+- Review round=1 · P3 (Standards): a recusa da dependência sempre manda `dev-link.sh --all`, também para skills do roster, como `anvil-docs` e `anvil-to-spec` — quem segue a mensagem liga o payload inteiro em todo projeto da máquina, desfazendo a curadoria do roster; o `dev-link.sh` não liga uma skill só.
+- Review round=1 · P3 (Standards): o exemplo do `SKILL.md` passou a `proof_prepare --dep <skill>` e, lido sozinho, sugere que o `--dep` é obrigatório — quem copia numa prova sem dependência pode inventar um `--dep`, que o helper recusa com `2`.
+- Review round=1 · P3 (Standards): a sessão principal entra no laço do `proof-verdict.py` só para ser separada por `path == main_session` (caso especial dentro do laço) — forma apenas, o comportamento está certo.
+- Review round=1 · P3 (Standards): "As S1 de 59 a 62" cita diretórios de `workspace/` sem a glosa de que são as S1 dos tickets 01 a 04 — quem lê precisa abrir `workspace/` para ligar número a ticket.
+- Review round=1 · P3 (Spec): o `proof-verdict.py` grava o `verdict.txt` direto no destino; uma escrita que falha no meio, por disco cheio, deixa o arquivo e sai `1`, que o helper aceita como vermelho — uma falha de ambiente rara pode se registrar como vermelho, e não `2`.
+- Review round=1 · P3 (Spec): no N, a parte do checker da conferência da árvore passa porque nenhum checker rodou, e o `infra_da_arvore` do `b1.sh` ainda ignora caminho que não existe — um caso futuro do B1 pode passar com um checker que nunca foi conferido de fato.
