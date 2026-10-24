@@ -1,6 +1,6 @@
 ---
 name: anvil-prune-branches
-description: Fetches with prune and removes local branches whose remote tracking branch has been deleted.
+description: Updates the project's branch base, as the resolver gives it, fetches with prune and removes local branches whose remote tracking branch has been deleted.
 ---
 
 # Prune Branches
@@ -9,29 +9,35 @@ Your goal is to synchronize the local repository with the remote by pruning stal
 
 ## Workflow
 
-### Step 1 — Detect the remote name
+### Step 1 — Resolve the branch base and the remote
 
-Run:
+Run, from the project root:
+
 ```bash
-git remote -v
+bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
 ```
 
-Identify the primary remote name (commonly `origin`). Use it in all subsequent commands.
+It reads the `## Git` section of `.claude/rules/anvil.md` and detects what the
+section doesn't declare. The answer comes in `key: value` lines; this skill uses
+`base:` (the branch base) and `remote:` (the URL of `origin`, or `none`).
+
+- **Exit `2`, with `refusal:` lines:** stop here. Tell the user each reason as it
+  came — it says what to declare or fix.
+- **`remote: none`:** the project has no `origin`, and there is nothing to prune
+  against. Stop and say so.
+- Otherwise keep `<base>`. The remote is `origin`, the one the resolver reads. The
+  forge isn't used here: pruning is plain git, with any forge or none.
 
 ---
 
-### Step 2 — Sync main integration branches
+### Step 2 — Sync the branch base
 
-Before anything, update the main branches so git's merge-base calculations are accurate (this prevents false "unmerged" errors on `-d`).
+Before anything, update the branch base so git's merge-base calculations are accurate (this prevents false "unmerged" errors on `-d`):
 
-Detect which main branches exist and update them:
 ```bash
-git fetch --prune
-git checkout main && git pull <remote> main
-git checkout <integration-branch> && git pull <remote> <integration-branch>
+git fetch --prune origin
+git checkout <base> && git pull origin <base>
 ```
-
-Common integration branch names: `hml`, `develop`, `staging`. Confirm with the user if unsure.
 
 Return to the original branch after pulling:
 ```bash

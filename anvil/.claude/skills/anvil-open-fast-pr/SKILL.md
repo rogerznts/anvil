@@ -1,25 +1,37 @@
 ---
 name: anvil-open-fast-pr
-description: "Full flow from scratch using `tea` CLI: asks branch type, creates and checkouts the branch (from stable branch for hotfix, from integration branch otherwise), commits pending changes, pushes, and opens a PR on Gitea."
+description: "Full flow from scratch: resolves the project's branch base before any stash, asks branch type and name, creates the branch from the branch base, commits pending changes, pushes, and opens the PR as /anvil-open-pr does — GitHub with `gh` or Gitea with `tea`."
 ---
 
-# Open Fast PR (tea)
+# Open Fast PR
 
-Your goal is to guide the user through the **full flow**: branch creation → commit → push → Pull Request, all in a single command. This extends `/anvil-open-pr` by handling everything from the branch creation onward.
-
-## Prerequisites
-
-`tea` must be configured with a login for this server. If not yet done, run:
-
-```bash
-tea login add --name=<alias> --url=<gitea-url> --token=<your-token>
-```
-
-When run inside a git repository that has a Gitea remote, `tea` auto-detects the login and repo — no flags or env vars needed.
+Your goal is to guide the user through the **full flow**: branch creation → commit → push → Pull Request, all in a single command. This extends `/anvil-open-pr` by handling everything from the branch creation onward; the PR itself is opened as `/anvil-open-pr` opens it, on either forge.
 
 ---
 
 ## Workflow
+
+### Step 0 — Resolve the branch base, before touching the tree
+
+Run, from the project root, before any `git stash` or checkout:
+
+```bash
+bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
+```
+
+It reads the `## Git` section of `.claude/rules/anvil.md` and detects what the
+section doesn't declare. The answer comes in `key: value` lines; this skill uses
+`base:` (the branch base) and `forge:` (`github`, `gitea` or `nenhum`).
+
+- **Exit `2`, with `refusal:` lines:** stop here. Tell the user each reason as it
+  came — it says what to declare or fix. Nothing was stashed, checked out or
+  committed: the pending changes stay where they are.
+- **`forge: nenhum`:** there is no forge to open a PR on. Stop and say so, with
+  nothing stashed: the project closes by local merge into the branch base.
+- **`forge: github`** or **`forge: gitea`:** keep `<base>`. The remote below is
+  `origin`, the one the resolver reads.
+
+---
 
 ### Step 1 — Ask for branch type and name
 
@@ -35,38 +47,22 @@ Compose the full branch name as `<type>/<name>` (e.g., `hotfix/login-fix`).
 > spec number atomically and produces `{tipo}/{NNN}-{nome}` plus the matching
 > flat folder. This skill is for ordinary branches that are not specs.
 
-Also confirm the branch conventions with the user if unknown:
-- **Stable branch** (production): typically `main` or `master`
-- **Integration branch** (staging/QA): typically `hml`, `develop`, or `staging`
-
 ---
 
-### Step 2 — Create and checkout the branch
+### Step 2 — Create and checkout the branch from the branch base
 
-Based on the type:
+Whatever the type, hotfix included, the new branch comes out of `<base>`. Run:
 
-- **hotfix** → base is the stable branch (e.g., `main`). Run:
-  ```bash
-  git stash
-  git fetch origin
-  git checkout main
-  git pull origin main
-  git checkout -b <branch-name>
-  git stash pop
-  ```
+```bash
+git stash
+git fetch origin
+git checkout <base>
+git pull origin <base>
+git checkout -b <branch-name>
+git stash pop
+```
 
-- **feature / bugfix** (or any other type) → base is the integration branch (e.g., `hml`). Run:
-  ```bash
-  git stash
-  git fetch origin
-  git checkout hml
-  git pull origin hml
-  git checkout -b <branch-name>
-  git stash pop
-  ```
-
-> Replace `origin` with the actual remote name used in the repository.
-> Never skip the checkout and pull of the base branch before creating the new one.
+> Never skip the checkout and pull of the branch base before creating the new one.
 > If `git stash pop` results in a merge conflict, show the diff to the user and ask which version to keep before proceeding.
 
 ---
@@ -107,207 +103,30 @@ git commit -m "<conventional-commit-message>"
 git push -u origin <branch-name>
 ```
 
-Replace `origin` with the actual remote name. Confirm push succeeded before proceeding.
+Confirm push succeeded before proceeding.
 
 ---
 
-### Step 6 — Identify the branches and type (for PR)
+### Step 6 — Open the PR as `/anvil-open-pr` does
 
-- The **source** (head) is the branch just created and pushed.
-- Use the branch prefix to determine targets:
-  - **Feature / Bugfix** → single PR to the integration branch
-  - **Hotfix** → two PRs: first to the stable branch, second to the integration branch
+Load the `anvil-open-pr` skill and follow it from its Step 0, on the branch just
+pushed. The PR is written there once, for both forges: the resolver's `--repo`
+and, on Gitea, `--login`; the PR text; the label from the forge's list; the
+assignee; the `pr create` command and where its URL comes from; the `PR:` line in
+the tickets; and the URL returned to the user. One PR, to `<base>`, whatever the
+type, hotfix included.
 
----
-
-### Step 6.5 — Resolve the spec, if the branch has one
-
-Same resolution as `/anvil-open-pr`, **by numeric prefix** — branch is
-`{type}/{NNN}-{name}`, folder is `{NNN}-{type}-{name}`, two different strings:
-
-```bash
-NUM=$(git rev-parse --abbrev-ref HEAD | sed -nE 's|^[a-z]+/([0-9]{3})-.*|\1|p')
-[ -n "$NUM" ] && SPEC_DIR=$(ls -d docs/specs/"$NUM"-*/ docs/specs/archive/"$NUM"-*/ 2>/dev/null | head -1)
-grep -l 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # fechados
-grep -L 'Status:.*resolved' "$SPEC_DIR"issues/*.md   # abertos
-```
-
-Os dois globs, porque a spec já arquivada mora em `docs/specs/archive/`.
-
-Branch criado neste fluxo raramente tem spec: o Step 1 pergunta tipo e nome
-livres, sem número. Quando não há número, a seção `## Spec` do Step 8 e o Step
-11.5 são pulados inteiros.
-
-Quando **há** spec, o padrão é o mesmo do `/anvil-open-pr`: **um PR por spec**, com
-todos os tickets fechados e a spec já arquivada. A guarda de merge impõe isso —
-ela bloqueia o `tea pr create` enquanto houver ticket aberto, e também enquanto a
-spec não estiver sob `archive/`. O `/anvil-docs archive` roda **antes** do PR, no
-mesmo branch: depois do merge não sobra branch onde commitar o move.
-
-### Step 7 — Read the diff (for PR text)
-
-```bash
-git log <integration-branch>..<head> --oneline
-git diff <integration-branch>..<head> --stat
-```
-
-(Use `<stable-branch>..<head>` for hotfix.)
-
-Alert the user if debug logs (`console.log`, `var_dump`, `dd()`) are present.
-
----
-
-### Step 8 — Generate the PR text
-
-**Title:** Conventional Commits format (e.g., `feat(module): short description`).
-
-**Body (Standard PR — Feature / Bugfix / Hotfix → stable branch):**
-
-```
-## Summary
-
-- <bullet: what this PR does, high level>
-
-## Details
-
-**How:** <explanation of how the changes were implemented>
-
-- <bullet per relevant change group>
-
-**Why:** <motivation, business rule, or problem being solved>
-
-## Impact
-
-- <bullet: effect on the user or system>
-
-## Spec
-
-`docs/specs/<spec-dir>/spec.md`
-
-Tickets:
-- `issues/01-<slug>.md` — <ticket title>
-- `issues/02-<slug>.md` — <ticket title>
-```
-
-**Um PR por spec, não por ticket.** Uma spec tem N tickets; abrir um PR para cada
-produziria uma enxurrada de PRs de uma linha, e o revisor perderia a unidade que
-faz sentido revisar.
-
-Todos os tickets da seção estão fechados porque a **guarda de merge** só libera
-`tea pr create` quando `issues/` não tem nenhum `Status:` diferente de `resolved`.
-Se ela bloquear, a spec não terminou.
-
-A seção é **omitida** num branch sem número — o que é o caso comum deste fluxo,
-já que o Step 1 pergunta tipo e nome livres, sem número.
-
-**Body (Hotfix → integration branch — always use exactly this):**
-
-```
-Applying hotfix changes to the integration branch.
-```
-
-- The PR title, body and commit messages must be in English. What you tell the
-  user in the chat follows the project's communication language, not this rule.
-- Be clear and professional.
-
----
-
-### Step 9 — Determine the label
-
-Run to list available labels:
-```bash
-tea labels list
-```
-
-Auto-suggest based on branch prefix:
-
-| Branch prefix | Suggested label |
-|---------------|-----------------|
-| `feature/`    | `Kind/Feature` (or equivalent) |
-| `bugfix/`     | `Kind/Bug` (or equivalent) |
-| `hotfix/`     | `Kind/Hot` (or equivalent) |
-
-- Match against the actual labels returned by `tea labels list`.
-- If a clear match exists, inform the user and proceed. If not, show the list and ask.
-- The same label applies to **both PRs** on a hotfix.
-
----
-
-### Step 10 — Determine the assignee
-
-Ask the user who to assign, or skip if unneeded.
-
----
-
-### Step 11 — Create the PR(s)
-
-**Feature / Bugfix — single PR to integration branch:**
-```bash
-tea pr create \
-  --title "<title>" \
-  --description "<body>" \
-  --base <integration-branch> \
-  --labels "<label-name>" \
-  --assignees "<username>"
-```
-
-**Hotfix — two PRs:**
-
-First, PR to stable branch:
-```bash
-tea pr create \
-  --title "<title>" \
-  --description "<standard body>" \
-  --base <stable-branch> \
-  --labels "<label-name>" \
-  --assignees "<username>"
-```
-
-Then, PR to integration branch:
-```bash
-tea pr create \
-  --title "<title>" \
-  --description "Applying hotfix changes to the integration branch." \
-  --base <integration-branch> \
-  --labels "<label-name>" \
-  --assignees "<username>"
-```
-
-Use `--login <alias>` if you have multiple logins configured.
-
----
-
-### Step 11.5 — Link the tickets back to the PR
-
-Só quando houve spec. Para cada ticket que este PR fecha, acrescente uma linha
-logo abaixo de `**Status:**`:
-
-```markdown
-**PR:** https://gitea.exemplo/org/repo/pulls/51
-```
-
-Ticket que já tem `**PR:**` ganha **outra** linha, não substituição — um ticket
-retrabalhado em dois PRs tem duas, e o histórico é o ponto.
-
-Commite antes de devolver a URL, para o link existir no diff do próprio PR. Em
-hotfix, use a URL do **primeiro** PR, o que vai para o branch estável.
-
-### Step 12 — Return the URL(s)
-
-`tea pr create` outputs the PR URL on success. Show it to the user:
-
-- **Feature / Bugfix:** the single PR URL
-- **Hotfix:** both PR URLs with their respective targets
+A branch created in this flow rarely carries a spec: Step 1 asks for a free name,
+with no number, and the `anvil-open-pr` skips the spec parts. When it does carry
+one, the `anvil-open-pr` stops while a ticket is open, and the merge guard blocks
+the `pr create` until the spec is archived.
 
 ---
 
 ## Notes
 
-- `tea` resolves label names and assignee usernames automatically — no ID lookups needed.
-- `tea` auto-detects server and repo from the git remote when run inside the repository.
-- Replace `origin` with the actual remote name used in the repository (check with `git remote -v`).
-- Never skip the base branch checkout/pull before creating the new branch.
+- The resolver decides the branch base and the forge, before the stash; the skill never guesses them, and never stashes when it refuses.
+- Never skip the branch base checkout/pull before creating the new branch.
 - Never use `--no-verify` on commits.
-- For hotfixes, both PRs share the same title and label, but have different bodies and base branches.
 - If the working tree is clean after branch creation, stop and inform the user — there is nothing to commit.
 - If `git stash pop` causes a merge conflict, surface the diff to the user and ask which version to keep before doing anything else.
