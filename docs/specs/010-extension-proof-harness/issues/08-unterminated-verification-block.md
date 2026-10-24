@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=4e2fb69; scope=full; verdict=pass; p1=none
 
 **What to build:** no script do comando de verificação do piloto, o bloco `bash` da
 seção `## Comando de verificação` vai da cerca de abertura até a cerca de
@@ -27,3 +28,13 @@ resto das rules como comando; passa a ser recusado como as outras recusas.
   — bloco sem cerca seguido de mais seções, e bloco sem cerca no fim do arquivo —
   falham 14 checagens, e o `run` criou na raiz os arquivos das linhas de depois do
   bloco. Depois, `s1.out`: tudo passa, os casos 1 a 9 do prior art inclusive.
+- Review round=1 · P3 (Standards): o cabeçalho do script trocou "até o título de
+  segundo nível seguinte" pela cerca de fechamento e deixou de dizer que a busca
+  pelo bloco para no título `## ` seguinte, o que o `awk` ainda faz — quem lê só o
+  cabeçalho não sabe que um bloco `bash` depois do título seguinte é recusado.
+- Review round=1 · P3 (Spec): a cerca de fechamento aceita é a próxima linha
+  "```" do arquivo, mesmo em outra seção; um bloco sem cerca seguido de uma seção
+  com outro bloco cercado não é recusado, e o `run` roda o texto até essa cerca —
+  o cabeçalho pode levar a crer que todo bloco sem cerca na própria seção é
+  recusado. É o mesmo do CommonMark, e recusar quebraria a linha `## ` dentro do
+  bloco; uma linha no cabeçalho dizendo o limite bastaria.
