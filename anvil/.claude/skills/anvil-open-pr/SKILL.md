@@ -1,44 +1,69 @@
 ---
 name: anvil-open-pr
-description: Opens a Pull Request on Gitea using the `tea` CLI. Auto-detects branch type, generates PR text, applies label and assignee automatically.
+description: Opens a Pull Request to the project's branch base on its forge — GitHub with `gh` or Gitea with `tea` —, as the resolver says. Auto-detects branch type, generates PR text, applies label and assignee automatically.
 ---
 
-# Open Pull Request (tea)
+# Open Pull Request
 
-Your goal is to open a Pull Request on Gitea using the `tea` CLI, generating clear, professional, and well-structured PR text that facilitates efficient code reviews.
+Your goal is to open a Pull Request on the project's forge, to its branch base,
+generating clear, professional, and well-structured PR text that facilitates
+efficient code reviews.
 
-## Prerequisites
-
-`tea` must be configured with a login for this server. If not yet done, run:
-
-```bash
-tea login add --name=<alias> --url=<gitea-url> --token=<your-token>
-```
-
-When run inside a git repository that has a Gitea remote, `tea` auto-detects the login and repo — no flags or env vars needed.
+The PR text, the label, the assignee and the `PR:` line are written once, below;
+only the command block changes between the forges — `gh` on GitHub, `tea` on
+Gitea.
 
 ---
 
 ## Workflow
 
-### Step 1 — Identify the branches and type
+### Step 0 — Resolve the branch base and the forge
 
-- Use the current git branch as the **source** (head).
+Run, from the project root:
+
+```bash
+bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
+```
+
+It reads the `## Git` section of `.claude/rules/anvil.md` and detects what the
+section doesn't declare. The answer comes in `key: value` lines: `base:` (the
+branch base), `forge:` (`github`, `gitea` or `nenhum`), `remote:`, `host:` (the
+real host of the remote), `repo:` (`org/repo`) and, on Gitea, `login:` (the `tea`
+login that matches the real host).
+
+- **Exit `2`, with `refusal:` lines:** stop here. Tell the user each reason as it
+  came — it says what to declare or fix — and call neither `gh` nor `tea`.
+- **`forge: nenhum`:** there is no forge to open a PR on. Stop and say so: the
+  project closes by local merge into the branch base.
+- **`forge: github`** or **`forge: gitea`:** keep `<base>`, `<repo>` and, on Gitea,
+  `<login>`. Every step below uses them.
+
+Never let a CLI guess the server. Every `gh` call takes `--repo <repo>`, and every
+`tea` call takes `--login <login> --repo <repo>`: without them, `tea` falls back to
+its default login when none matches the remote, and the PR lands on the wrong
+server.
+
+The CLI must be authenticated: `gh auth login` on GitHub; on Gitea, the login the
+resolver found — when none matches, its refusal names the `tea login` to run.
+
+---
+
+### Step 1 — Identify the branch and type
+
+- Use the current git branch as the **source** (head), `<branch>`.
 - Auto-detect the branch type from its name prefix. Anvil spec branches are
   `{tipo}/{NNN}-{nome}` (e.g. `fix/013-carrinho-vazio`), so the prefix **is**
   the type:
   - `feature/` → **Feature**
   - `fix/` (or the legacy `bugfix/`) → **Bugfix**
   - `hotfix/` → **Hotfix**
-  - `refactor/`, `gmud/`, `experimental/` → **Feature** (single PR to integration)
+  - `refactor/`, `gmud/`, `experimental/` → **Feature**
   - Legacy shape `{NNN}-{tipo}-{nome}` (e.g. `013-fix-carrinho`) → read the
     type from the **second** segment
   - Otherwise → treat as **Feature**
-- Based on the type, determine targets:
-  - **Feature / Bugfix** → single PR to the integration branch (typically `hml` or `develop`)
-  - **Hotfix** → two PRs: first to the stable branch (typically `main`), second to the integration branch
-
-Confirm with the user which base branches apply if the repo does not follow the `main`/`hml` pattern.
+- The **target** is always the branch base, `<base>`: one PR, whatever the type,
+  hotfix included. Taking a hotfix further — to a production branch, when the
+  branch base is a `develop` — is the operator's step, outside the toolkit.
 
 ---
 
@@ -64,13 +89,13 @@ exist.
 promove o ADR e move a spec para `archive/`; as duas coisas são mudança em
 arquivo e precisam de um commit. Depois do merge não sobra branch onde commitar
 — seria um segundo PR só para mover pasta, e no intervalo a spec fica no branch
-padrão sem arquivar, que é exatamente o buraco que a guarda de merge existe para
+base sem arquivar, que é exatamente o buraco que a guarda de merge existe para
 fechar. Antes do PR, o move entra no diff que o revisor já vai olhar.
 
 Liste os tickets. Todos devem estar `resolved` — se algum não estiver, a guarda
-de merge vai bloquear o `tea pr create`, e ela está certa: o padrão é **um PR por
-spec**, e uma spec com ticket aberto não terminou. Ela bloqueia também quando a
-spec ainda não está sob `archive/`.
+de merge vai bloquear o `pr create`, do `gh` ou do `tea`, e ela está certa: o
+padrão é **um PR por spec**, e uma spec com ticket aberto não terminou. Ela
+bloqueia também quando a spec ainda não está sob `archive/`.
 
 ```bash
 ls "$SPEC_DIR"issues/*.md
@@ -82,11 +107,9 @@ bash ~/.claude/skills/anvil-docs/scripts/validate.sh ship-ready   # o que a guar
 
 Run:
 ```bash
-git log <integration-branch>..<head> --oneline
-git diff <integration-branch>..<head> --stat
+git log <base>..<branch> --oneline
+git diff <base>..<branch> --stat
 ```
-
-(Use `<stable-branch>..<head>` for hotfix.)
 
 - Alert the user if debug logs (`console.log`, `var_dump`, `dd()`) or temporary test code are present.
 
@@ -96,7 +119,7 @@ git diff <integration-branch>..<head> --stat
 
 **Title:** Conventional Commits format (e.g., `feat(module): short description`, `fix(module): short description`).
 
-**Body (Standard PR — Feature / Bugfix / Hotfix → stable branch):**
+**Body**, the same for every type:
 
 ```
 ## Summary
@@ -130,7 +153,7 @@ produziria uma enxurrada de PRs de uma linha, e o revisor perderia a unidade que
 faz sentido revisar — a mudança inteira.
 
 Por isso todos os tickets da seção estão fechados: a **guarda de merge** só libera
-`tea pr create` quando `issues/` não tem nenhum `Status:` diferente de `resolved`.
+o `pr create` quando `issues/` não tem nenhum `Status:` diferente de `resolved`.
 Se ela bloquear, a spec não terminou — feche o que falta ou reveja o recorte, que
 pode estar grande demais para uma spec só.
 
@@ -144,12 +167,6 @@ estável, e resolve no diff deste próprio PR.
 ela vai continuar depois do merge. Citar `docs/specs/<spec-dir>/` deixaria o
 corpo do PR apontando para um lugar que já não existe.
 
-**Body (Hotfix → integration branch — always use exactly this):**
-
-```
-Applying hotfix changes to the integration branch.
-```
-
 - The PR title, body and commit messages must be in English. What you tell the
   user in the chat follows the project's communication language, not this rule.
 - Be clear and professional.
@@ -158,66 +175,66 @@ Applying hotfix changes to the integration branch.
 
 ### Step 4 — Determine the label
 
-Run to list available labels:
-```bash
-tea labels list
-```
+List the labels the forge has:
 
-Auto-suggest based on branch prefix:
+- **GitHub:** `gh label list --repo <repo>`
+- **Gitea:** `tea labels list --login <login> --repo <repo>`
 
-| Branch prefix | Suggested label |
-|---------------|-----------------|
-| `feature/`    | `Kind/Feature` (or equivalent) |
-| `bugfix/`     | `Kind/Bug` (or equivalent) |
-| `hotfix/`     | `Kind/Hot` (or equivalent) |
+Auto-suggest based on branch type:
 
-- Match against the actual labels returned by `tea labels list`.
+| Branch type | Suggested label |
+|-------------|-----------------|
+| Feature     | `Kind/Feature`, `enhancement` (or equivalent) |
+| Bugfix      | `Kind/Bug`, `bug` (or equivalent) |
+| Hotfix      | `Kind/Hot`, `bug` (or equivalent) |
+
+- Match against the labels the list returned — never a label it didn't.
 - If a clear match exists, inform the user and proceed. If not, show the list and ask the user to choose.
-- The same label applies to **both PRs** on a hotfix.
 
 ---
 
 ### Step 5 — Determine the assignee
 
-Ask the user who to assign, or skip if unneeded. `tea` accepts usernames directly — no ID lookups required.
+The assignee is whoever opens the PR, the user the CLI is authenticated as:
+
+- **GitHub:** `@me`.
+- **Gitea:** the `user` of the login `<login>` in `tea login list --output json`.
 
 ---
 
-### Step 6 — Create the PR(s)
+### Step 6 — Create the PR
 
-**Feature / Bugfix — single PR to integration branch:**
+One PR, to `<base>`. Run the block of the resolver's forge.
+
+**GitHub:**
+```bash
+gh pr create \
+  --repo <repo> \
+  --base <base> \
+  --head <branch> \
+  --title "<title>" \
+  --body "<body>" \
+  --label "<label>" \
+  --assignee @me
+```
+
+The PR URL is what `gh pr create` prints on stdout.
+
+**Gitea:**
 ```bash
 tea pr create \
+  --login <login> \
+  --repo <repo> \
+  --base <base> \
+  --head <branch> \
   --title "<title>" \
   --description "<body>" \
-  --base <integration-branch> \
-  --labels "<label-name>" \
-  --assignees "<username>"
+  --labels "<label>" \
+  --assignees "<user>" \
+  --output json
 ```
 
-**Hotfix — two PRs:**
-
-First, PR to stable branch:
-```bash
-tea pr create \
-  --title "<title>" \
-  --description "<standard body>" \
-  --base <stable-branch> \
-  --labels "<label-name>" \
-  --assignees "<username>"
-```
-
-Then, PR to integration branch:
-```bash
-tea pr create \
-  --title "<title>" \
-  --description "Applying hotfix changes to the integration branch." \
-  --base <integration-branch> \
-  --labels "<label-name>" \
-  --assignees "<username>"
-```
-
-`tea` auto-detects the repo from the git remote. Use `--login <alias>` if you have multiple logins configured.
+The PR URL is the `url` field of the JSON object `tea pr create` prints.
 
 ---
 
@@ -226,10 +243,11 @@ tea pr create \
 The PR now points at the tickets. Point the tickets back, so someone reading a
 ticket months later finds where it landed without searching the log.
 
-For each ticket this PR closes, add a line right under `**Status:**`:
+For each ticket this PR closes, add a line under `**Status:**` and its
+`**Review:**` lines, with the URL from Step 6:
 
 ```markdown
-**PR:** https://gitea.exemplo/org/repo/pulls/51
+**PR:** <url>
 ```
 
 Ticket that already has a `**PR:**` line gets **a second one**, not a replacement:
@@ -240,24 +258,17 @@ in the PR's own diff.
 
 Os tickets já estão sob `docs/specs/archive/` neste ponto, e escrever neles aqui
 não fere a imutabilidade da spec arquivada: ela começa quando o merge chega ao
-branch padrão. Até lá é tudo o mesmo PR, ainda em revisão.
+branch base. Até lá é tudo o mesmo PR, ainda em revisão.
 
-On a hotfix, which opens two PRs, use the URL of the **first** — the one to the
-stable branch, where the fix actually lands.
+### Step 7 — Return the URL
 
-### Step 7 — Return the URL(s)
-
-`tea pr create` outputs the PR URL on success. Show it to the user:
-
-- **Feature / Bugfix:** the single PR URL
-- **Hotfix:** both PR URLs with their respective targets
+Show the user the PR URL from Step 6, with its base, `<base>`.
 
 ---
 
 ## Notes
 
-- `tea` resolves label names and assignee usernames automatically — no ID lookups needed.
-- `tea` auto-detects server and repo from the git remote when run inside the repository.
-- For hotfixes, both PRs share the same title and label, but have different bodies and base branches.
-- Never skip label selection — always use `tea labels list` to validate names.
+- The resolver decides the forge, the branch base, the repo and the `tea` login; the skill never guesses them from the remote by itself.
+- `gh` and `tea` resolve label names and usernames themselves — no ID lookups needed.
+- Never skip label selection — always use the forge's label list to validate names.
 - Branch type is always auto-detected from the branch name — never ask. In anvil spec branches the prefix is the type (`fix/013-…`); in the legacy shape it is the second segment (`013-fix-…`).

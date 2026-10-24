@@ -50,7 +50,10 @@
 #       vão assinados. Com --remote, antes de abrir a sessão, liga o bare como
 #       origin da fixture, que precisa ser a raiz de um repositório git, num branch
 #       com commit, e sem outro origin, e publica nele o branch atual dela, com
-#       upstream; a fixture que já o tem como origin fica como está. Com --forge, o
+#       upstream; a fixture que já o tem como URL de push do origin fica como está.
+#       É assim que a prova dá ao origin a URL de um forge, que o resolvedor lê, com
+#       o push no bare: git remote add origin <URL do forge>, git remote set-url
+#       --push origin "$PROOF_REMOTE" e o push do branch, antes da sessão. Com --forge, o
 #       gh e o tea falsos vão à frente do PATH só da sessão, e não no do script da
 #       prova. Em <saídas>, que fica fora de $PROOF_RUN — o diretório da prova em
 #       workspace/ —, ficam frames.jsonl, os frames do rpc; session.jsonl, a cópia
@@ -111,11 +114,11 @@ _proof_tea_login_ok() {
 }
 
 # Liga o remoto bare como origin da fixture <dir> e publica nele o branch atual dela,
-# com upstream; a fixture que já o tem como origin fica como está.
+# com upstream; a fixture que já o tem como URL de push do origin fica como está.
 _proof_publish() {
     local fx="$1" url branch
     url="$(git -C "$fx" remote get-url origin 2>/dev/null)" || url=""
-    [ "$url" != "$PROOF_REMOTE" ] || return 0
+    [ "$(git -C "$fx" remote get-url --push origin 2>/dev/null)" != "$PROOF_REMOTE" ] || return 0
     [ "$(git -C "$fx" rev-parse --show-toplevel 2>/dev/null)" = "$(cd "$fx" && pwd -P)" ] \
         || _proof_refuse "a opção --remote pede a fixture na raiz de um repositório git: $fx"
     [ -z "$url" ] || _proof_refuse "a fixture já tem um origin, $url; a opção --remote liga o dela"

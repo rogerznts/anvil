@@ -247,7 +247,7 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 | `anvil-setup` | escreve o perfil do issue tracker que o fluxo lê | mattpocock |
 | `anvil-wizard` | gera um wizard em bash para o passo que só um humano pode fazer | mattpocock |
 | `anvil-commit` | commit em Conventional Commits, sem pular hook | autoral |
-| `anvil-open-pr` · `anvil-open-fast-pr` | PR no Gitea, **um por spec**: o corpo lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
+| `anvil-open-pr` · `anvil-open-fast-pr` | PR no GitHub ou no Gitea, para o branch base, **um por spec**: o corpo lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
 | `anvil-prune-branches` | remove branch local cujo remoto sumiu | autoral |
 
 ### Stack e bench
