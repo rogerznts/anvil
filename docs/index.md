@@ -23,7 +23,7 @@ Last updated: 2026-10-23T19:20:00Z
 
 ## Specs ativas
 
-- [010 — Helper de prova e sobras da 009](./specs/010-extension-proof-harness/spec.md) — `extension/010-proof-harness`, em andamento, 0/9 tickets resolvidos
+- [010 — Helper de prova e sobras da 009](./specs/010-extension-proof-harness/spec.md) — `extension/010-proof-harness`, em andamento, 8/10 tickets resolvidos
 
 ## Specs arquivadas
 

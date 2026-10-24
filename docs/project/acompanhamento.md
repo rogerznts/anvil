@@ -127,3 +127,25 @@ tickets foram aceitos no fechamento, e a decisão está registrada nos `## Comme
   comentários do script. Enquanto ninguém mexer, a próxima mudança numa delas
   exige editar todas as cópias, e a que ficar para trás volta a mentir. Vizinha
   da A17, que cobre a árvore de decisão do dry-run nas duas skills.
+
+## Spec 010: helper de prova e sobras da 009
+
+Origem: `docs/specs/archive/010-extension-proof-harness/`. P2 que o operador
+deixou para depois no grill de 2026-10-24, por não mudarem o que as provas da
+spec afirmam.
+
+- **A27 · o `origin` da fixture fica apontando para o bare apagado.** Ticket 03,
+  rodada 1, P2 (Spec). A limpeza do helper apaga o repositório bare, mas deixa o
+  `origin` e o upstream no `.git/config` da fixture. Enquanto ninguém mexer, uma
+  fixture reaproveitada entre execuções sai `2` na execução seguinte; as provas de
+  hoje recriam a fixture a cada vez.
+- **A28 · o volume do app sobra depois da derrubada da infra do prefixo.** Ticket
+  04, rodada 1, P2. O `--teardown` tira os containers da rede do prefixo, mas não
+  os volumes do compose do app, como o `node_modules`. Enquanto ninguém mexer,
+  cada prova do bench que não derruba o app com o compose dele deixa um volume
+  órfão na máquina; o B1 do ticket 09 derruba.
+- **A29 · a parada no fechamento tem três nomes no `anvil-auto`.** Ticket 05,
+  rodada 1, P3 (Standards), Mysterious Name. "Parada no fechamento depois do
+  archive", "não fecha no fechamento" e "parada, já arquivada no branch" são o
+  mesmo caso. Enquanto ninguém mexer, quem lê a skill casa três nomes para um caso
+  só, e uma regra nova pode acertar um nome e esquecer os outros.

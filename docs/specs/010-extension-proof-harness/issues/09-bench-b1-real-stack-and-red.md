@@ -105,3 +105,9 @@ aberta.
 - Review round=1 · P3 (Spec): "com um pedido igual ao ticket 02… também (`b1-r.out`…)" cita uma saída da fase 2 de hoje — o vermelho que construiu com esse pedido não está no disco.
 - Review round=1 · P3 (Spec): "(`b1-comando*`; o vermelho pulou a busca)" chama de vermelho o verde que falhou em `b1-comando-3` — quem lê confunde as duas rodadas.
 - Review round=1 · P3 (Spec): rodar os casos um por vez evita colisão de porta entre os casos, mas não o P3 do ticket 04, a colisão com um projeto real parado que suba durante a prova, e o comentário sugere que resolve.
+- Operador · a regra nova do `anvil-bench` fica — com spec aberta, a mudança pedida
+  espera a spec fechar, sem entrevista nesta vez, e a entrega avisa — e foi
+  registrada na spec 010 (história 33 e a decisão "Mudança pedida com spec aberta,
+  no bench"). O N sem verde reproduzível passa ao ticket 10, que faz o helper
+  recusar com `2` quando as skills chamadas por `~/.claude/skills/` não estão
+  ligadas a esta árvore e refaz o N.

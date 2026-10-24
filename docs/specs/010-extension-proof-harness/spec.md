@@ -84,8 +84,9 @@ As provas antigas de `workspace/` não são reescritas.
 1. Como mantenedor, quero que a prova confira o modelo de cada mensagem do
    assistente no jsonl, para saber que o comportamento medido é o do modelo pedido.
 2. Como mantenedor, quero que a conferência cubra a sessão principal e as sessões
-   de subagente que ela abriu, como a do `anvil-implementer`, para que o modelo do
-   implementer também fique medido.
+   de subagente que ela abriu, como a do `anvil-implementer`: a principal pelo
+   modelo pedido, e cada subagente por um modelo só do começo ao fim, para pegar a
+   troca de modelo sem invalidar o agente que tem modelo próprio por papel.
 3. Como mantenedor, quero que a prova respondida por outro modelo saia com o código
    `3`, distinto de verde e de vermelho, para não confundir "o provedor caiu" com
    "o comportamento quebrou".
@@ -155,10 +156,11 @@ As provas antigas de `workspace/` não são reescritas.
 ### Sobras da 009
 
 24. Como operador, quero que o relatório do piloto traga o `decisions-log.md` da
-    spec fechada, lido do caminho dela depois do archive, para ver o que foi
-    decidido sem humano em toda spec que fechou.
-25. Como operador, quero que a spec parada continue com o `decisions-log.md` lido do
-    caminho de antes do archive, que é onde ele está.
+    spec cujo archive está commitado no branch, lido do caminho de depois do
+    archive, para ver o que foi decidido sem humano em toda spec que fechou ou que
+    parou no fechamento.
+25. Como operador, quero que a spec parada antes do archive continue com o
+    `decisions-log.md` lido do caminho de antes do archive, que é onde ele está.
 26. Como operador do bench, quero que uma saída com gate manual aberto desta spec e
     gate com `CHECK:` caído siga o caminho do `CHECK:` caído, para que a regressão
     seja pesquisada e corrigida antes de a spec parar pela pergunta.
@@ -178,6 +180,17 @@ As provas antigas de `workspace/` não são reescritas.
 32. Como mantenedor, quero que o B1 da busca pela spec aberta reprove com o texto da
     fase 2 de antes da 009, caindo em *Evoluir uma ferramenta*, para que a prova
     segure a busca se alguém a tirar.
+
+### Decididas depois dos tickets
+
+33. Como pessoa que usa o bench, quero que uma mudança pedida enquanto há spec
+    aberta espere essa spec fechar, sem entrevista nesta vez, e que a entrega diga
+    que ela fica para depois, para que o bench termine o que começou antes de abrir
+    outra frente.
+34. Como mantenedor, quero que a prova declare as skills que o payload chama por
+    `~/.claude/skills/<skill>/…` e que o helper recuse com `2` quando alguma não é
+    um link para o payload desta árvore, para que a sessão nunca rode a cópia de
+    outro projeto ou um script velho.
 
 ## Implementation Decisions
 
@@ -210,11 +223,19 @@ As provas antigas de `workspace/` não são reescritas.
   as sessões de subagente. Grava os frames e as cópias dos jsonl nas saídas da
   prova.
 - **Conferir o modelo.** Lê toda mensagem do assistente nos jsonl da sessão
-  principal e dos subagentes. Alguma com modelo diferente do pedido torna a prova
-  inválida. Sessão que terminou em erro do provedor fica registrada como tal.
+  principal e dos subagentes. A principal com mensagem de modelo diferente do
+  pedido, ou um subagente com mais de um modelo, torna a prova inválida; o
+  subagente com modelo próprio por papel, do começo ao fim, só vai para o
+  relatório. Sessão que terminou em erro do provedor fica registrada como tal.
+- **Dependências declaradas.** A prova lista as skills que o payload chama pelo
+  caminho da instalação de usuário, como `anvil-bench` e `anvil-stack-payload`. O
+  helper confere que `~/.claude/skills/<skill>` é um link para o payload desta
+  árvore e, se não for, sai `2` mandando rodar o `dev-link.sh`. O helper não liga
+  nada.
 - **Códigos de saída do helper:** `0` verde, `1` vermelho, `2` ambiente ou uso
-  recusado (omp, docker ou git ausente, opção inválida), `3` inválida. A inválida
-  vale sobre o vermelho e sobre o verde: com outro modelo, nenhum dos dois conta.
+  recusado (omp, docker ou git ausente, opção inválida, dependência não ligada,
+  falha do próprio veredito), `3` inválida. A inválida vale sobre o vermelho e
+  sobre o verde: com outro modelo, nenhum dos dois conta.
 - **Limpar.** Num trap de saída, também em falha e interrupção: derruba a infra do
   prefixo, se houver, e remove o diretório da execução. As saídas ficam em
   `workspace/`.
@@ -237,8 +258,9 @@ As provas antigas de `workspace/` não são reescritas.
 ### Sobras da 009
 
 - **`decisions-log.md` no relatório.** O piloto lê o arquivo do branch da spec pelo
-  caminho que ela tem lá: em `docs/specs/archive/<pasta>/` quando a spec fechou, e
-  em `docs/specs/<pasta>/` quando parou.
+  caminho que ela tem lá: em `docs/specs/archive/<pasta>/` quando o archive está
+  commitado no branch, o que vale para a spec fechada e para a parada no
+  fechamento, e em `docs/specs/<pasta>/` quando ela parou antes do archive.
 - **Precedência no `GATE.md`**, em "Sob o piloto automático": a saída com algum
   gate de `CHECK:` caído, nesta spec ou numa fechada, segue o caminho do `CHECK:`
   caído, haja ou não gate manual desta spec aberto. Só quando nenhum `CHECK:` cai,
@@ -256,6 +278,13 @@ As provas antigas de `workspace/` não são reescritas.
   de antes da 009. A fixture e o pedido do turno são ajustados até o texto antigo
   cair em *Evoluir uma ferramenta*; o texto de hoje segue para a construção da
   spec aberta.
+- **Mudança pedida com spec aberta, no bench.** Decisão do operador depois do
+  ticket 09: com spec aberta, a mudança que o usuário pede espera, sem entrevista
+  nesta vez; o bench segue a construção da spec aberta, e a entrega diz que a
+  mudança fica para depois que ela fechar. *Evoluir uma ferramenta* abre dizendo
+  que só vale sem spec aberta, e a busca pela spec aberta lista os tickets não
+  `resolved` por um comando. Sem isso, o texto da 009 ia à entrevista e não
+  construía.
 
 ## Testing Decisions
 

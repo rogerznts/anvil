@@ -1,8 +1,8 @@
 # 06: O `CHECK:` caído vale antes do gate manual aberto
 
-**Blocked by:** 02, 04
+**Blocked by:** 02, 04, 10
 
-**Status:** resolved
+**Status:** claimed
 **Review:** round=1; sha=5a46779; scope=full; verdict=pass; p1=none
 
 **What to build:** uma saída do `--reverify` com gate manual desta spec aberto e
@@ -15,14 +15,15 @@ aberto desta spec deixa a spec parada por decisão. A regra mora no `GATE.md`.
       caído, haja ou não gate manual desta spec aberto; sem `CHECK:` caído, o gate
       manual aberto desta spec deixa a spec parada por decisão; a pergunta do gate
       manual vai para o relatório nos dois casos.
-- [x] O `anvil-auto` dispensa a pesquisa só quando nenhum `CHECK:` caiu, e aponta
+- [ ] O `anvil-auto` dispensa a pesquisa só quando nenhum `CHECK:` caiu, e aponta
       para o `GATE.md` em vez de repetir a regra.
 - [ ] Prova S2 pelo helper, com a infra isolada, num diretório novo de
       `workspace/`, sobre a fixture de `workspace/56-manual-gate-rule/`, com
       `/skill:anvil-auto` no primeiro turno e uma saída mista: o vermelho, com o
       texto de antes, para sem pesquisar; o verde pesquisa no caminho do `CHECK:`
       caído e, quando só o gate manual sobra, para com a pergunta dele. O código do
-      helper sai nas saídas, e prova inválida se repete.
+      helper sai nas saídas, e prova inválida se repete. O vermelho é limite
+      aceito pelo operador (ver `## Comments`); só o verde é exigido.
 - [x] `vendor-sync.sh verify` sai `0`.
 
 ## Comments
@@ -84,3 +85,15 @@ aberto desta spec deixa a spec parada por decisão. A regra mora no `GATE.md`.
 - Review round=1 · P2 (Spec): o `anvil-auto` repete a condição pela metade: o `GATE.md` diz "o gate com `CHECK:` que cai … ou o checker que não roda … haja ou não gate manual", e as cópias em `SKILL.md:501-503`, `521-523`, `724` e `826` dizem só "sem `CHECK:` caído" — com o checker fora do ar e o C3 aberto, as linhas 724 e 826 classificam a parada como decisão, sem pesquisa, contra o `GATE.md`.
 - Review round=1 · P3 (Spec): "`s2-red-low-2.out` … foi repetida por `s2-red-low-1.out`" — as duas rodaram em paralelo, e a `low-1` terminou antes da `low-2`; a regra de repetir a prova inválida está atendida no mérito, mas quem lê pensa que houve uma repetição feita depois do código `3`.
 - Review round=1 · P3 (Spec): em `s2-fechada` o checker não rodou nenhuma vez (`out-fechada/passos`: `P D I 01`), e não só "no primeiro `--reverify`" — o lado "numa fechada" da regra nova não tem observação verde, só foi visto com o texto antigo.
+- Operador · o vermelho da saída mista fica como limite aceito: com o texto
+  antigo, o `claude-sonnet-4-5` já resolvia a ambiguidade a favor da pesquisa, e
+  medir com outro modelo provaria o modelo, não o payload. O critério da prova
+  passa a exigir só o verde, que a rodada 2 refaz com o texto novo.
+- Operador · reaberto para a rodada 2, pelo P2 (Spec) da rodada 1: o critério 2
+  pede que o `anvil-auto` aponte para o `GATE.md` em vez de repetir a regra, e as
+  cópias da precedência no `anvil-auto` perderam o "checker que não roda" — com o
+  checker fora do ar e o gate manual aberto, o `anvil-auto` para por decisão, sem
+  pesquisa, contra o `GATE.md`. A rodada 2 tira as cópias e deixa o `anvil-auto`
+  só apontando para a regra do `GATE.md`, e refaz o verde da S2 com o texto novo.
+  Espera o ticket 10, para que o checker que a S2 roda seja o desta árvore, com o
+  `anvil-bench` declarado como dependência da prova.
