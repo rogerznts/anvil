@@ -3,33 +3,51 @@
 # (ADR-0015, ADR-0016). Nada e escrito.
 #
 # Uso, da raiz do projeto, com o anvil na instalacao de usuario:
-#   bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
+#   bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh [--pr]
 #
 # Le a secao "## Git" de .claude/rules/anvil.md, com as linhas "branch base:" e
 # "forge:". Cada valor declarado vale sobre a deteccao; o que falta e detectado.
 #
+# --pr: um PR vai sair, e no Gitea o resolvedor procura tambem o login do tea. Sem
+# a opcao, o tea nao e chamado, e nao sai login: nem recusa de login.
+#
 # Saida em linhas "chave: valor", como o roadmap.sh; as chaves sao em ingles e
-# estaveis, e o motivo para o operador e em pt-BR.
+# estaveis, e o motivo para o operador e em pt-BR. Todo valor resolvido sai, mesmo
+# com recusa noutro campo; o campo recusado nao sai.
 #   base:    o branch base. Declarado ou detectado, ele existe em refs/heads/.
 #            Detectado: o de origin/HEAD; sem ele, o unico entre main e master
 #   forge:   gitea, github ou nenhum. Sem remoto, nenhum
 #   remote:  a URL do origin, como o git a usa, ou none sem origin
-#   host:    o host real do origin, ou none sem origin ou com origin local
+#   host:    o host real do origin, ou none sem origin ou com origin local. Nao
+#            sai quando o host real do alvo ssh nao se acha
 #   repo:    org/repo, ou none quando o caminho do origin nao da um
-#   login:   so no Gitea, o login do tea que casa com o host real
-#   refusal: <motivo>, uma por problema, quando nao ha resposta unica. Com
-#            recusa nao sai nenhuma outra linha, e o script sai com 2. Argumento
-#            e chamada fora de um repositorio git tambem saem so com refusal:
+#   login:   so com --pr e no Gitea, o login do tea que casa com o host real
+#   refusal: <campo>: <motivo>, uma por problema, depois dos valores, quando nao
+#            ha resposta unica. O campo e o que a recusa atinge: base, forge ou
+#            login. A de forge cobre tambem o host real que nao se acha e o
+#            caminho do origin sem org/repo, sem os quais nao ha onde abrir PR.
+#            Com qualquer recusa o script sai com 2, e quem chama confere so os
+#            campos de que precisa: o base, para abrir spec, comecar o piloto e
+#            limpar branches; o base, o forge, o repo e o login, para abrir PR.
+#            Argumento desconhecido e chamada fora de um repositorio git saem so
+#            com uma refusal: base:, tambem com 2: sem eles nada se resolve, e todo
+#            consumidor confere o base
 set -u
 
 RULES=.claude/rules/anvil.md
 SECTION="na seção \`## Git\` de $RULES"
 
 refusals=""
-add_refusal() { refusals="$refusals$1"$'\n'; }
-refuse() { echo "refusal: $1"; exit 2; }
+add_refusal() { refusals="$refusals$1: $2"$'\n'; }  # <campo> <motivo>
+refuse() { echo "refusal: base: $1"; exit 2; }
 
-[ $# -eq 0 ] || refuse "argumento desconhecido '$1'; o resolve-git.sh não recebe argumentos"
+pr=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --pr) pr=1; shift ;;
+        *) refuse "argumento desconhecido '$1'; o único é --pr" ;;
+    esac
+done
 root="$(git rev-parse --show-toplevel 2>/dev/null)" || refuse "fora de um repositório git"
 cd "$root" || exit 1
 
@@ -57,20 +75,20 @@ has_branch() { git show-ref --verify --quiet "refs/heads/$1"; }
 base=""
 if [ -n "$declared_base" ]; then
     if has_branch "$declared_base"; then base="$declared_base"
-    else add_refusal "o branch base declarado, '$declared_base', não existe em refs/heads/: corrija \`branch base:\` $SECTION, ou crie o branch"
+    else add_refusal base "o branch base declarado, '$declared_base', não existe em refs/heads/: corrija \`branch base:\` $SECTION, ou crie o branch"
     fi
 elif origin_head="$(git symbolic-ref -q --short refs/remotes/origin/HEAD)"; then
     b="${origin_head#origin/}"
     if has_branch "$b"; then base="$b"
-    else add_refusal "o origin/HEAD aponta para '$b', que não existe em refs/heads/: crie-o com \`git branch $b origin/$b\`, ou declare \`branch base: <nome>\` $SECTION"
+    else add_refusal base "o origin/HEAD aponta para '$b', que não existe em refs/heads/: crie-o com \`git branch $b origin/$b\`, ou declare \`branch base: <nome>\` $SECTION"
     fi
 else
     found=""
     for b in main master; do has_branch "$b" && found="$found $b"; done
     case "$found" in
         " main"|" master") base="${found# }" ;;
-        "") add_refusal "branch base não detectado: sem origin/HEAD, e nem main nem master em refs/heads/; declare \`branch base: <nome>\` $SECTION" ;;
-        *) add_refusal "branch base ambíguo: sem origin/HEAD, e main e master existem em refs/heads/; declare \`branch base: <nome>\` $SECTION" ;;
+        "") add_refusal base "branch base não detectado: sem origin/HEAD, e nem main nem master em refs/heads/; declare \`branch base: <nome>\` $SECTION" ;;
+        *) add_refusal base "branch base ambíguo: sem origin/HEAD, e main e master existem em refs/heads/; declare \`branch base: <nome>\` $SECTION" ;;
     esac
 fi
 
@@ -116,21 +134,74 @@ repo_of() {  # <caminho>
     [ -n "$name" ] && [ -n "$owner" ] && echo "$owner/$name"
 }
 
+# O remoto, o host real e o org/repo saem do origin, com qualquer forge. O host
+# vazio e o real que nao se achou, com o motivo em host_refusal.
+remote=none; host=none; repo=none; kind=""; host_refusal=""
+if remote="$(git remote get-url origin 2>/dev/null)"; then
+    parse_remote "$remote"
+    case "$kind" in
+        local) host=none ;;
+        ssh)
+            ssh_hostname "$ssh_target" || {
+                host=""
+                host_refusal="não deu para achar o host real de '$ssh_target' com \`$ssh_cmd -G $ssh_target\`, o comando de ssh que o git usaria: $ssh_error"; } ;;
+    esac
+    host="$(printf '%s' "$host" | tr '[:upper:]' '[:lower:]')"
+    repo="$(repo_of "$path")"; [ -n "$repo" ] || repo=none
+else
+    remote=none
+fi
+
+# --- forge --------------------------------------------------------------------
+# Sem origin, o forge e nenhum, qualquer que seja o declarado: nao ha onde abrir
+# PR, e a spec fecha por merge local. Origin em caminho local tambem nao tem
+# forge, e com gitea ou github declarado e recusa.
+forge=""
+resolve_forge() {
+    local f="$declared_forge"
+    case "$f" in
+        ""|gitea|github|nenhum) ;;
+        *) add_refusal forge "o forge declarado, '$f', não é gitea, github nem nenhum: corrija \`forge:\` $SECTION"; return ;;
+    esac
+    [ "$remote" != none ] || { forge=nenhum; return; }
+    if [ "$kind" = local ]; then
+        case "$f" in gitea|github)
+            add_refusal forge "o forge declarado é $f, e o origin, '$remote', é um caminho local, sem host: aponte o origin para o servidor, ou corrija \`forge:\` $SECTION"
+            return ;;
+        esac
+        forge=nenhum; return
+    fi
+    [ -n "$host" ] || { add_refusal forge "$host_refusal"; return; }
+    if [ -z "$f" ]; then
+        if [ "$host" = github.com ]; then f=github
+        else
+            add_refusal forge "o origin, '$remote', está em '$host', que não é github.com, e o forge não está declarado: declare \`forge: gitea\`, \`forge: github\` ou \`forge: nenhum\` $SECTION"
+            return
+        fi
+    fi
+    if [ "$repo" = none ] && [ "$f" != nenhum ]; then
+        add_refusal forge "o forge é $f, e o caminho do origin, '$remote', não dá um org/repo"
+        return
+    fi
+    forge="$f"
+}
+resolve_forge
+
 # --- login do tea -------------------------------------------------------------
-# No Gitea, o login do tea cujo host do url ou cujo ssh_host e o host real. Sem
-# --login, o tea cai no login padrao quando nenhum casa (ADR-0016); aqui, nenhum
-# ou mais de um e recusa. O python3 le o JSON e devolve uma linha por login,
-# separada por tabulacao: m quando casa e - quando nao, o nome, o url e o
+# So com --pr, no Gitea: o login do tea cujo host do url ou cujo ssh_host e o host
+# real. Sem --login, o tea cai no login padrao quando nenhum casa (ADR-0016); aqui,
+# nenhum ou mais de um e recusa. O python3 le o JSON e devolve uma linha por
+# login, separada por tabulacao: m quando casa e - quando nao, o nome, o url e o
 # ssh_host, com - no campo vazio.
 login=""
 tea_login() {
     local json rows m name url ssh n=0 matches="" seen=""
     command -v tea >/dev/null 2>&1 || {
-        add_refusal "o forge é gitea, e o tea não está no PATH: instale-o e crie o login com \`tea login add --name <nome> --url https://$host\`"; return; }
+        add_refusal login "o forge é gitea, e o tea não está no PATH: instale-o e crie o login com \`tea login add --name <nome> --url https://$host\`"; return; }
     command -v python3 >/dev/null 2>&1 || {
-        add_refusal "o forge é gitea, e falta o python3 para ler o \`tea login list --output json\`"; return; }
+        add_refusal login "o forge é gitea, e falta o python3 para ler o \`tea login list --output json\`"; return; }
     json="$(tea login list --output json 2>/dev/null)" || {
-        add_refusal "o \`tea login list --output json\` falhou: $(tea login list --output json 2>&1 >/dev/null | sed -n 1p)"; return; }
+        add_refusal login "o \`tea login list --output json\` falhou: $(tea login list --output json 2>&1 >/dev/null | sed -n 1p)"; return; }
     rows="$(printf '%s' "$json" | python3 -c '
 import json, sys
 from urllib.parse import urlsplit
@@ -151,7 +222,7 @@ for l in logins:
     hit = sys.argv[1] in (url_host, ssh.lower())
     print("\t".join(("m" if hit else "-", name or "-", url or "-", ssh or "-")))
 ' "$host")" || {
-        add_refusal "a saída do \`tea login list --output json\` não é uma lista JSON de logins"; return; }
+        add_refusal login "a saída do \`tea login list --output json\` não é uma lista JSON de logins"; return; }
     while IFS=$'\t' read -r m name url ssh; do
         [ -n "$m" ] || continue
         seen="$seen${seen:+; }$name (url $url, ssh_host $ssh)"
@@ -161,59 +232,18 @@ $rows
 EOF
     case "$n" in
         1) login="$matches" ;;
-        0) add_refusal "nenhum login do tea casa com o host '$host' pelo url nem pelo ssh_host; logins vistos: ${seen:-nenhum}. Crie um com \`tea login add --name <nome> --url https://$host\`, ou acerte o url ou o ssh_host de um existente com \`tea login edit\`" ;;
-        *) add_refusal "mais de um login do tea casa com o host '$host': $matches; logins vistos: $seen. Deixe um só casando, com \`tea login delete <nome>\` ou acertando o url ou o ssh_host em \`tea login edit\`" ;;
+        0) add_refusal login "nenhum login do tea casa com o host '$host' pelo url nem pelo ssh_host; logins vistos: ${seen:-nenhum}. Crie um com \`tea login add --name <nome> --url https://$host\`, ou acerte o url ou o ssh_host de um existente com \`tea login edit\`" ;;
+        *) add_refusal login "mais de um login do tea casa com o host '$host': $matches; logins vistos: $seen. Deixe um só casando, com \`tea login delete <nome>\` ou acertando o url ou o ssh_host em \`tea login edit\`" ;;
     esac
 }
+[ "$pr" -eq 0 ] || [ "$forge" != gitea ] || tea_login
 
-# --- forge --------------------------------------------------------------------
-# Sem origin, o forge e nenhum, qualquer que seja o declarado: nao ha onde abrir
-# PR, e a spec fecha por merge local. Origin em caminho local tambem nao tem
-# forge, e com gitea ou github declarado e recusa.
-forge=nenhum; remote=none; host=none; repo=none
-resolve_forge() {
-    case "$declared_forge" in
-        ""|gitea|github|nenhum) ;;
-        *) add_refusal "o forge declarado, '$declared_forge', não é gitea, github nem nenhum: corrija \`forge:\` $SECTION"; return ;;
-    esac
-    remote="$(git remote get-url origin 2>/dev/null)" || { remote=none; return; }
-    parse_remote "$remote"
-    case "$kind" in
-        local)
-            case "$declared_forge" in gitea|github)
-                add_refusal "o forge declarado é $declared_forge, e o origin, '$remote', é um caminho local, sem host: aponte o origin para o servidor, ou corrija \`forge:\` $SECTION" ;;
-            esac
-            return ;;
-        ssh)
-            ssh_hostname "$ssh_target" || {
-                add_refusal "não deu para achar o host real de '$ssh_target' com \`$ssh_cmd -G $ssh_target\`, o comando de ssh que o git usaria: $ssh_error"; return; } ;;
-    esac
-    host="$(printf '%s' "$host" | tr '[:upper:]' '[:lower:]')"
-    forge="$declared_forge"
-    if [ -z "$forge" ]; then
-        if [ "$host" = github.com ]; then forge=github
-        else
-            add_refusal "o origin, '$remote', está em '$host', que não é github.com, e o forge não está declarado: declare \`forge: gitea\`, \`forge: github\` ou \`forge: nenhum\` $SECTION"
-            return
-        fi
-    fi
-    repo="$(repo_of "$path")"
-    if [ -z "$repo" ]; then
-        repo=none
-        [ "$forge" = nenhum ] || add_refusal "o forge é $forge, e o caminho do origin, '$remote', não dá um org/repo"
-        return
-    fi
-    [ "$forge" != gitea ] || tea_login
-}
-resolve_forge
-
-if [ -n "$refusals" ]; then
-    printf '%s' "$refusals" | while IFS= read -r l; do echo "refusal: $l"; done
-    exit 2
-fi
-echo "base: $base"
-echo "forge: $forge"
+[ -z "$base" ] || echo "base: $base"
+[ -z "$forge" ] || echo "forge: $forge"
 echo "remote: $remote"
-echo "host: $host"
+[ -z "$host" ] || echo "host: $host"
 echo "repo: $repo"
 [ -z "$login" ] || echo "login: $login"
+[ -n "$refusals" ] || exit 0
+printf '%s' "$refusals" | while IFS= read -r l; do echo "refusal: $l"; done
+exit 2

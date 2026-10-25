@@ -90,7 +90,9 @@ suja, porque ele commita no branch base — a `main`, a `master` ou o que a seç
 `## Git` de `.claude/rules/anvil.md` declara — e o que é seu entraria num commit
 dele; o projeto cujo branch base o resolvedor não decide, com o motivo dele; e,
 fora do bench, o `.claude/rules/anvil.md` sem a seção `## Comando de verificação`
-com um bloco `bash`, que o `/anvil-boot` grava em projeto novo. Chamado no branch
+com um bloco `bash`, que o `/anvil-boot` grava em projeto novo. Só a recusa do
+branch base para a largada: a de forge ou de login, como num Gitea sem `tea` ou
+sem a seção `## Git`, fica para o fechamento por PR. Chamado no branch
 de uma spec aberta do roteiro, ele retoma a spec do ponto que o disco indica e
 depois segue a corrente. Em outro branch, como o de uma spec arquivada ou o de uma
 spec que não é de entrada do roteiro, ele recusa.
@@ -116,10 +118,13 @@ do roteiro e só quando as dependências da entrada fecharam:
   `verdict=pass; p1=none`, e o comando de verificação rodado por ele saindo `0`.
   No bench, o `--reverify` dos gates desta spec e das já fechadas toma o lugar
   do comando;
-- fecha com o archive e, pelo forge que o resolvedor dá e pela regra do projeto, o
-  merge local no branch base ou o PR aberto pelo `/anvil-open-pr`, no GitHub ou no
-  Gitea. Sem remoto ou com `forge: nenhum`, o merge é local; depois do PR, ele envia
-  a linha `PR:` ao remoto, confere a árvore e só então volta ao branch base. No
+- fecha com o archive e, nesta ordem: sem remoto, o merge local no branch base;
+  com uma rule que manda fechar sem PR, ou sem o passo `/anvil-open-pr` no perfil
+  do tracker, o merge local, sem consultar o forge; senão, o forge que o resolvedor
+  dá decide — `nenhum`, o merge local; `github` ou `gitea`, o PR aberto pelo
+  `/anvil-open-pr` —, e a recusa do forge, ou a que para o `/anvil-open-pr`, como a
+  do login do `tea`, deixa a spec parada. Depois do PR, ele envia a linha `PR:` ao
+  remoto, confere a árvore e só então volta ao branch base. No
   merge local, quando o branch base andou desde o corte do branch, como
   quando uma spec irmã fechou nesse meio-tempo, ele prepara o merge sem commitá-lo
   e roda a verificação sobre o estado combinado: o comando de verificação ou, no

@@ -19,14 +19,18 @@ bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
 
 It reads the `## Git` section of `.claude/rules/anvil.md` and detects what the
 section doesn't declare. The answer comes in `key: value` lines; this skill uses
-`base:` (the branch base) and `remote:` (the URL of `origin`, or `none`).
+`base:` (the branch base) and `remote:` (the URL of `origin`, or `none`). Every
+value the resolver could resolve comes out, and each refusal comes as
+`refusal: <field>: <reason>`, naming the field it hits — `base`, `forge` or
+`login`.
 
-- **Exit `2`, with `refusal:` lines:** stop here. Tell the user each reason as it
+- **No `base:` line:** stop here. Tell the user each `refusal: base:` reason as it
   came — it says what to declare or fix.
 - **`remote: none`:** the project has no `origin`, and there is nothing to prune
   against. Stop and say so.
-- Otherwise keep `<base>`. The remote is `origin`, the one the resolver reads. The
-  forge isn't used here: pruning is plain git, with any forge or none.
+- Otherwise keep `<base>`, even when the resolver exits `2` with a `refusal: forge:`
+  line: the forge isn't used here, and pruning is plain git, with any forge or
+  none. The remote is `origin`, the one the resolver reads.
 
 ---
 

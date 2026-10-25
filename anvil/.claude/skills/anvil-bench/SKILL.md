@@ -139,9 +139,12 @@ forge: nenhum
 ```
 
 Sob o piloto automático, o repositório já existe: em vez desses defaults do
-`git init`, use o branch base e o forge que o `resolve-git.sh` da instalação de
-usuário do `anvil-docs` resolve na raiz do projeto. Preserve uma seção Git já
-configurada. O arquivo entra no commit do piloto, junto dos perfis.
+`git init`, use o que o `resolve-git.sh` da instalação de usuário do `anvil-docs`
+resolve na raiz do projeto. O bench confere só o `base:`: a linha `branch base:`
+leva esse valor, e a `forge:` vai só quando o resolvedor dá a linha `forge:`. Com
+uma `refusal: forge:`, a seção sai sem a linha `forge:`, e a recusa fica para o
+fechamento. Preserve uma seção Git já configurada. O arquivo entra no commit do
+piloto, junto dos perfis.
 
 Para os dois perfis, é a regra do `scaffold` do `anvil-docs`: ausente, copie; idêntico, siga; divergente,
 não sobrescreva e não pergunte, que o perfil do projeto fica. Commite tudo isso na

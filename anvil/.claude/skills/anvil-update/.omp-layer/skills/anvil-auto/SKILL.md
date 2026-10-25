@@ -98,10 +98,12 @@ escreva, não commite e não se ofereça para fazer o trabalho por conta própri
 
 4. **Branch.** Pela saída do passo 1. Com `base: none`, recuse com as linhas
    `base_refusal`, copiadas como estão: são o motivo do resolvedor, o
-   `resolve-git.sh` do `anvil-docs`, e dizem como sair dela. Senão, a linha `base`
-   é o **branch base**, de onde a corrente parte e para onde cada spec volta:
-   `<base>` nos comandos daqui em diante. Com a linha `branch` igual à `base`,
-   siga para a entrada. Em outro branch, a linha `do:` do script é da
+   `resolve-git.sh` do `anvil-docs`, e dizem como sair dela. Só a recusa do branch
+   base para a largada: uma de forge ou de login, como num Gitea sem `tea` ou sem a
+   seção `## Git`, não sai no `base_refusal` e só pesa no fechamento por PR. Senão,
+   a linha `base` é o **branch base**, de onde a corrente parte e para onde cada
+   spec volta: `<base>` nos comandos daqui em diante. Com a linha `branch` igual à
+   `base`, siga para a entrada. Em outro branch, a linha `do:` do script é da
    `anvil-plan` e não vale aqui: você não propõe etapa nem termina a vez por ela.
    Decida assim:
    - com `next: none`, o branch é de uma spec arquivada, a da linha `spec`: recuse
@@ -558,25 +560,27 @@ diz "Fora do caminho feliz", com os arquivos no motivo: não volte ao branch bas
 não faça o merge e não mexa nesses arquivos. O que o archive ou o `anvil-open-pr`
 deixou fora de commit iria para o branch base com você.
 
-O fechamento segue o forge do projeto e as rules. Rode o resolvedor, da instalação
+O fechamento segue as rules e o forge do projeto. Rode o resolvedor, da instalação
 de usuário, o mesmo que deu o branch base na largada:
 
 ```bash
 bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
 ```
 
-Decida, nesta ordem:
+Ele dá os valores que resolveu e uma linha `refusal: <campo>: <motivo>` por
+recusa. Decida, nesta ordem, e pare na primeira que decide:
 
-1. Com linhas `refusal:`, a spec fica parada, como diz "Parada", com essas linhas
-   no motivo, copiadas como estão: elas dizem o que declarar ou corrigir.
-2. Com `forge: nenhum`, a spec fecha por merge local, mesmo que o perfil do
-   tracker ou as rules falem de PR: sem remoto, ou com um remoto sem forge, não há
-   onde abrir o PR.
-3. Com `forge: github` ou `forge: gitea`, leia a seção de fechar a spec do perfil do
-   tracker, `docs/agents/issue-tracker.md`, e as rules de `.claude/rules/`. A spec
-   fecha por PR quando a sequência do perfil tem o `/anvil-open-pr` e nenhuma rule o
-   tira. Ela fecha por merge local quando uma rule diz que o projeto fecha sem PR,
-   ou quando o perfil não tem esse passo.
+1. Com `remote: none`, o projeto não tem remoto, e a spec fecha por merge local.
+2. Leia a seção de fechar a spec do perfil do tracker,
+   `docs/agents/issue-tracker.md`, e as rules de `.claude/rules/`. Quando uma rule
+   diz que o projeto fecha sem PR, ou o perfil não tem o passo `/anvil-open-pr`, a
+   spec fecha por merge local, sem consultar o forge: as linhas `forge:` e
+   `refusal: forge:` não contam.
+3. Senão, o forge decide. Com uma linha `refusal: forge:`, a spec fica parada, como
+   diz "Parada", com essas linhas no motivo, copiadas como estão: elas dizem o que
+   declarar ou corrigir. Com `forge: nenhum`, a spec fecha por merge local, mesmo
+   que o perfil do tracker fale de PR: um remoto sem forge não tem onde abrir o PR.
+   Com `forge: github` ou `forge: gitea`, ela fecha por PR.
 
 A guarda de merge confere o `git merge`, o `gh pr create` e o `tea pr create` como
 confere os do operador, e um bloqueio dela é recusa, não sucesso: a spec fica
@@ -683,9 +687,11 @@ git push -u origin <branch>
 
 No branch da spec, carregue o `anvil-open-pr` e siga-o: ele abre o PR no forge do
 resolvedor, com o `gh` ou o `tea`. As pausas dele seguem a regra das pausas, e a
-base do PR é o branch base, de onde a corrente parte. Depois que a skill commita a
-linha `PR:` nos tickets, leve esse commit ao remoto com `git push`, e guarde a URL
-do PR.
+base do PR é o branch base, de onde a corrente parte. Ele roda o resolvedor com
+`--pr`, que no Gitea procura também o login do `tea`: quando a skill para numa
+recusa dele, como a `refusal: login:`, a spec fica parada, como diz "Parada", com
+a recusa no motivo. Depois que a skill commita a linha `PR:` nos tickets, leve esse
+commit ao remoto com `git push`, e guarde a URL do PR.
 
 Não faça o merge, nem o do PR nem um local: a revisão do PR é do operador. A
 entrada fica `stopped` até o merge do PR, e as que dependem dela esperam. Confira a
@@ -837,9 +843,10 @@ aqui a spec que:
   verificação ou o `--reverify`;
 - fica parada por decisão pela regra do `GATE.md`, no `--reverify` do bench;
 - esbarra numa contradição incumprível, ou numa decisão aberta do `map.md`;
-- não fecha no fechamento: o resolvedor que recusa, o merge bloqueado pela guarda,
-  o merge abortado por conflito fora do `docs/index.md` ou pela conferência do
-  merge, ou o PR aberto, à espera do merge do operador.
+- não fecha no fechamento: o forge que o resolvedor recusa, a recusa que para o
+  `anvil-open-pr`, o merge bloqueado pela guarda, o merge abortado por conflito
+  fora do `docs/index.md` ou pela conferência do merge, ou o PR aberto, à espera do
+  merge do operador.
 
 Depois disso, não faça archive nem merge dela e não mexa no que está commitado no
 branch. No bench, commite antes no branch o `decisions-log.md` da spec, se ele

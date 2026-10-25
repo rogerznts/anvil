@@ -228,10 +228,14 @@ onde volta — e o forge (`gitea`, `github` ou `nenhum`). Da raiz do projeto:
 bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
 ```
 
+O resolvedor dá os valores que resolveu e uma linha `refusal: <campo>: <motivo>`
+por recusa, com o campo `base` ou `forge`.
+
 - **Saída `0`:** mostre ao usuário o branch base de `base:` e o forge de `forge:`,
   e peça confirmação ou correção dos dois antes de escrever.
-- **Saída `2`:** mostre o motivo das linhas `refusal:` e pergunte os dois valores,
-  branch base e forge. Espere a resposta; não grave a seção com valores presumidos.
+- **Saída `2`:** mostre o motivo de cada linha `refusal:` e pergunte os dois
+  valores, branch base e forge. Espere a resposta; não grave a seção com valores
+  presumidos.
 
 Com a resposta, escreva a seção com os valores confirmados ou corrigidos, neste
 formato (os valores abaixo são exemplo, não defaults):
@@ -245,7 +249,7 @@ forge: nenhum
 
 Nas linhas de valor vai só o nome do branch e um dos três valores de forge, sem
 explicação junto. Depois de escrever, rode o resolvedor de novo: se ainda recusar
-— por exemplo, branch inexistente ou login do `tea` ambíguo —, mostre o motivo e
+— por exemplo, branch inexistente ou forge que não se resolve —, mostre o motivo e
 registre a pendência no relatório do passo 10, sem trocar a escolha do usuário.
 
 A seção de modelos do `anvil.md`:

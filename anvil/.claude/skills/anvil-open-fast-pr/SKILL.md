@@ -16,17 +16,21 @@ Your goal is to guide the user through the **full flow**: branch creation → co
 Run, from the project root, before any `git stash` or checkout:
 
 ```bash
-bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
+bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh --pr
 ```
 
 It reads the `## Git` section of `.claude/rules/anvil.md` and detects what the
 section doesn't declare. The answer comes in `key: value` lines: `base:` (the
 branch base), `forge:` (`github`, `gitea` or `nenhum`), `repo:` and, on Gitea,
-`login:`, among others.
+`login:` — looked up only with `--pr` —, among others. Each refusal comes as
+`refusal: <field>: <reason>`, naming the field it hits — `base`, `forge` or
+`login` —, after the values it did resolve.
 
-- **Exit `2`, with `refusal:` lines:** stop here. Tell the user each reason as it
-  came — it says what to declare or fix. Nothing was stashed, checked out or
-  committed: the pending changes stay where they are.
+- **Exit `2`, with `refusal:` lines:** stop here. The PR at the end needs the
+  branch base, the forge, the repo and, on Gitea, the login, so any refusal stops
+  the flow. Tell the user each reason as it came — it says what to declare or fix.
+  Nothing was stashed, checked out or committed: the pending changes stay where
+  they are.
 - **`forge: nenhum`:** there is no forge to open a PR on. Stop and say so, with
   nothing stashed: the project closes by local merge into the branch base.
 - **`forge: github`** or **`forge: gitea`:** keep `<base>`, `<repo>` and, on Gitea,

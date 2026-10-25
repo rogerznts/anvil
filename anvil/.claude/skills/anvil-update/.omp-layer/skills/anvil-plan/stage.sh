@@ -13,8 +13,9 @@
 #
 # Depois da linha branch sai a base: o branch base do projeto, o que o
 # resolve-git.sh do anvil-docs da (ADR-0015), para quem compara o branch atual com
-# ele, como a largada do anvil-auto. Quando o resolvedor recusa, sai base: none e
-# uma linha base_refusal: por motivo dele; a etapa nao depende disso.
+# ele, como a largada do anvil-auto. Sem o base: do resolvedor, sai base: none e
+# uma linha base_refusal: por recusa dele do campo base; a de forge e a de login
+# nao contam, porque so param o PR. A etapa nao depende disso.
 #
 #   perfil do tracker ausente ou outro          -> refused
 #   sem spec no branch                          -> anvil-grill
@@ -59,17 +60,17 @@ tracker_refusal() {
 }
 
 # O branch base pelo resolvedor do anvil-docs, da instalacao de usuario: base:
-# <branch> ou, na recusa, base: none e os motivos em base_refusal:.
+# <branch> ou, sem ele, base: none e as recusas do campo base em base_refusal:.
 base_lines() {
-    local out base
+    local out base refusals
     out="$(bash "$HOME/.claude/skills/anvil-docs/scripts/resolve-git.sh" 2>&1)"
     base="$(printf '%s\n' "$out" | sed -n 's/^base: //p')"
     if [ -n "$base" ]; then echo "base: $base"; return; fi
     echo "base: none"
-    case "$out" in
-        "refusal: "*) printf '%s\n' "$out" | sed -n 's/^refusal: /base_refusal: /p' ;;
-        *) echo "base_refusal: o resolve-git.sh do anvil-docs não deu o branch base: ${out:-sem saída}" ;;
-    esac
+    refusals="$(printf '%s\n' "$out" | sed -n 's/^refusal: base: /base_refusal: /p')"
+    if [ -n "$refusals" ]; then printf '%s\n' "$refusals"
+    else echo "base_refusal: o resolve-git.sh do anvil-docs não deu o branch base: ${out:-sem saída}"
+    fi
 }
 
 root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
