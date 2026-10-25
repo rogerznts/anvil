@@ -117,6 +117,12 @@ do roteiro e só quando as dependências da entrada fecharam:
   opção recomendada pela skill ou, sem recomendação, a mais conservadora;
 - despacha os tickets em série, um `anvil-implementer` por ticket, pelo
   `frontier.sh` da `anvil-run`;
+  Reconhece o despacho interrompido como a `anvil-run`: tenta o agente vivo
+  primeiro e, sem ele e sem isolação, despacha um implementer novo que preserva
+  os commits e a árvore suja, com o `HEAD` de antes do primeiro despacho. A leitura
+  seguinte leva `--resume NN`. Cada ticket tem no máximo duas retomadas do
+  despacho, registradas em "Decidido sem humano" com o ticket e a tentativa;
+  sem agente vivo com isolação, ou passado o limite, fica pulado e segue a parada;
 - fecha a spec só com `PASS`: todo ticket `resolved`, com a última `Review:` em
   `verdict=pass; p1=none`, e o comando de verificação rodado por ele saindo `0`.
   No bench, o `--reverify` dos gates desta spec e das já fechadas toma o lugar

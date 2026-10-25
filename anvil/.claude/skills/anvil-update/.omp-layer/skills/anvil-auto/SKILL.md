@@ -455,8 +455,14 @@ Se, ao escrever a spec ou os tickets, o código contradiz a entrada, siga
 dela, da instalação de usuário:
 
 ```bash
-bash ~/.omp/agent/skills/anvil-run/frontier.sh [--skip "NN NN"]
+bash ~/.omp/agent/skills/anvil-run/frontier.sh [--skip "NN NN"] [--resume NN]
 ```
+
+`--resume NN` só vai na leitura que segue um despacho interrompido do NN, como o
+passo 3 diz. Essa leitura é pré-condição de cada tentativa: execute-a antes do
+`write` ao agente vivo ou do `task` novo, e decida pela saída, não pela leitura de
+antes da interrupção. Isso acontece na mesma execução; a "Retomada" acima é rodar
+a skill de novo depois que a sessão caiu.
 
 1. Com `next: none` e sem linha `halt`, o despacho acabou. Com
    `all_resolved: yes`, siga para o `PASS`. Senão, sobrou ticket sem resolver:
@@ -468,15 +474,55 @@ bash ~/.omp/agent/skills/anvil-run/frontier.sh [--skip "NN NN"]
 2. Despache o ticket da linha `next` com o `task`, numa chamada só, com um item:
    `agent` é `anvil-implementer`, `task` é o caminho do ticket e, com a linha
    `isolation` em `on` ou `misconfigured`, o item leva `isolated: true`. No
-   `context`, diga a pasta da spec, o branch e o idioma de saída. O implementer
-   é bloqueante: não chame outra ferramenta na mesma mensagem, e não leia o
-   ticket, não investigue nem termine o trabalho dele.
-3. Rode o script de novo e compare a linha do ticket com a de antes. Se `status`,
-   `reviews` e `last` estão iguais, o implementer terminou sem mudar o estado: anote
-   o ticket como pulado nesta execução e, com o pulado novo, rode o script mais uma
-   vez, já com o `--skip` de todos os pulados. Daí em diante, toda chamada leva o
-   `--skip` com todos os pulados, e o pulado não é despachado de novo nesta
-   execução, nem quando o implementer caiu, abortou ou devolveu erro. Só a
+   `context`, diga a pasta da spec, o branch e o idioma de saída. Antes do primeiro
+   despacho de cada ticket, anote o `HEAD` e guarde-o até o fim da execução. O
+   implementer é bloqueante: não chame outra ferramenta na mesma mensagem, e não
+   leia o ticket, não investigue nem termine o trabalho dele: a única intervenção
+   permitida é retomar o despacho pelo passo 3, sem implementar nem commitar no
+   lugar dele.
+3. Reconheça o **despacho interrompido** antes de comparar o estado: resultado do
+   `task` sem os três campos `ticket`, `status` e `review`, cancelado ou com erro.
+   Para cada ticket interrompido, rode o script com `--resume NN` na leitura
+   seguinte, mantendo os `--skip` acumulados. O disco continua soberano: com
+   `halt`, ou com o NN já resolvido, travado, pulado ou fora do frontier, não
+   retome; siga ao passo 4 com essa saída.
+
+   O limite é de **duas retomadas do despacho por ticket nesta execução**,
+   contando as duas formas abaixo. Antes de cada tentativa, incremente o
+   contador e escreva esta linha de andamento, preenchendo ticket e tentativa:
+   `ticket <NN> — retomada do despacho, tentativa <1 ou 2>/2`.
+   - Primeiro tente o agente vivo: um id no resultado não basta. Resultado
+     `completed` indica agente encerrado, não vivo. Se o retorno cancelado ou com
+     erro não diz se ele ainda roda, consulte `read agent://<id>`; só o estado
+     ainda em execução autoriza a tentativa pelo agente vivo. Mande por
+     `write agent://<id>` que termine o ticket e devolva os três campos e espere
+     com `wait`. Não abra outro implementer enquanto esse agente estiver vivo.
+     Com os campos e sem erro ou cancelamento, o despacho terminou; vá ao passo 4.
+     Se continuar interrompido, repita este passo, inclusive a leitura com
+     `--resume NN`, sem zerar o contador.
+   - Sem agente vivo e com `isolation: off`, despache um `anvil-implementer` novo
+     para o mesmo ticket, pelo passo 2. No `context`, escreva **retomada do
+     despacho**, o `HEAD` de antes do primeiro despacho, e que ele deve continuar
+     dos commits desde esse `HEAD` e da árvore suja, preservando ambos. Ao voltar,
+     repita este passo, sem trocar o `HEAD` inicial nem zerar o contador.
+   - Sem agente vivo e com isolação (`on` ou `misconfigured`), ou sem tentativa
+     restante, anote o ticket como pulado, com o motivo: cópia isolada que não
+     volta, ou limite de duas retomadas do despacho. Rode o script já com ele no
+     `--skip`, sem `--resume` para esse ticket, e siga ao passo 4. Mesmo com
+     `halt` pela sujeira, o relatório inclui esse pulado e seu motivo.
+
+   Cada retomada do despacho vai também para "Decidido sem humano", com o ticket,
+   a tentativa e o motivo: agente vivo ou implementer novo sem isolação.
+   Só o despacho interrompido passa por essa exceção ao não redespachar; ele
+   ainda não é pulado enquanto cabe uma retomada. Resultado com os três campos,
+   sem cancelamento nem erro, segue a comparação do passo 4, inclusive quando
+   diz que falhou, que faltou ferramenta ou que o omp não integrou o trabalho.
+4. Rode o script de novo, salvo a saída que o passo 3 já trouxe para um pulado ou
+   um impedimento do disco, e compare cada ticket com a leitura anterior ao seu
+   primeiro despacho. Se `status`, `reviews` e `last` estão iguais, anote-o como
+   pulado, e rode o script já com ele no `--skip`. Toda chamada leva todos os
+   pulados acumulados. Nunca despache um pulado de novo nesta execução: a retomada
+   do despacho no passo 3 acontece antes de anotá-lo como pulado. Só a
    "Contradição com o roteiro" e o "Abrir a rodada" o tiram do `--skip`. Volte ao
    passo 1 com a última saída do script: com pulado novo, a do `--skip`, cujo
    `next` nunca aponta um pulado.
@@ -975,6 +1021,7 @@ exit: 0
 ### Decidido sem humano
 
 - <o que você decidiu sozinho, fora das pausas, e por quê>
+- ticket <NN> — retomada do despacho, tentativa <1 ou 2>/2: <agente vivo | implementer novo sem isolação>, após despacho interrompido.
 
 ## <nome da entrada> — parada antes da spec
 
