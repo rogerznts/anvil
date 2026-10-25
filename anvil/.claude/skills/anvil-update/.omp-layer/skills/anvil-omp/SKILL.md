@@ -122,9 +122,14 @@ do roteiro e só quando as dependências da entrada fecharam:
   com uma rule que manda fechar sem PR, ou sem o passo `/anvil-open-pr` no perfil
   do tracker, o merge local, sem consultar o forge; senão, o forge que o resolvedor
   dá decide — `nenhum`, o merge local; `github` ou `gitea`, o PR aberto pelo
-  `/anvil-open-pr` —, e a recusa do forge, ou a que para o `/anvil-open-pr`, como a
-  do login do `tea`, deixa a spec parada. Depois do PR, ele envia a linha `PR:` ao
-  remoto, confere a árvore e só então volta ao branch base. No
+  `/anvil-open-pr` —, e a recusa do forge deixa a spec parada. No PR, antes do
+  `git push`, ele roda o resolvedor com `--pr`: qualquer recusa, como a do login do
+  `tea`, deixa a spec parada sem nada no remoto, com a recusa no motivo; sem
+  recusa, ele envia o branch, e o `/anvil-open-pr` usa o branch base, o
+  repositório e o login conferidos, sem rodar o resolvedor de novo; a skill que
+  para antes do PR também deixa a spec parada.
+  Depois do PR, ele envia a linha `PR:` ao remoto, confere a árvore e só então
+  volta ao branch base. No
   merge local, quando o branch base andou desde o corte do branch, como
   quando uma spec irmã fechou nesse meio-tempo, ele prepara o merge sem commitá-lo
   e roda a verificação sobre o estado combinado: o comando de verificação ou, no

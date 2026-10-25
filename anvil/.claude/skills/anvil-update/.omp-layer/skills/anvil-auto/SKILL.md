@@ -675,19 +675,39 @@ no branch base depois do corte, as que a saída aponta.
 
 #### PR
 
-Leve o branch ao remoto, abra o PR pelo `anvil-open-pr` e pare ali, sem merge. O
-remoto é o `origin`, o que o resolvedor leu:
+Antes de levar o branch ao remoto, confira o que o PR pede. Rode o resolvedor com
+`--pr`, que no Gitea procura também o login do `tea`:
+
+```bash
+bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh --pr
+```
+
+Com qualquer linha `refusal:`, de branch base, forge ou login, a spec fica parada,
+como diz "Parada", sem `git push` e sem `pr create`. O motivo são essas linhas,
+inteiras e copiadas como estão, com o `refusal: <campo>:` do começo, porque elas
+dizem o que declarar ou corrigir, como o `tea login` que falta. No relatório, elas
+vão no próprio `Estado:` da spec, e não num resumo delas:
+
+```text
+- Estado: parada no branch: resolvedor com --pr, antes do push: <cada linha refusal:, como veio>
+```
+
+Sem recusa, guarde o `<base>`, o `<repo>` e, no Gitea, o `<login>` que ele deu.
+
+Leve então o branch ao remoto, abra o PR pelo `anvil-open-pr` e pare ali, sem
+merge. O remoto é o `origin`, o que o resolvedor leu:
 
 ```bash
 git push -u origin <branch>
 ```
 
-No branch da spec, carregue o `anvil-open-pr` e siga-o: ele abre o PR no forge do
-resolvedor, com o `gh` ou o `tea`. As pausas dele seguem a regra das pausas, e a
-base do PR é o branch base, de onde a corrente parte. Ele roda o resolvedor com
-`--pr`, que no Gitea procura também o login do `tea`: quando a skill para numa
-recusa dele, como a `refusal: login:`, a spec fica parada, como diz "Parada", com
-a recusa no motivo. Depois que a skill commita a linha `PR:` nos tickets, leve esse
+No branch da spec, carregue o `anvil-open-pr` e siga-o, com uma mudança: o Step 0
+dele usa o `<base>`, o `<repo>` e o `<login>` que você conferiu antes do push, e
+não roda o resolvedor de novo, como no Step 6 do `anvil-open-fast-pr`. Ele abre o
+PR no forge do resolvedor, com o `gh` ou o `tea`. As pausas dele seguem a regra das
+pausas, e a base do PR é o branch base, de onde a corrente parte. Quando a skill
+para antes de devolver a URL do PR, a spec fica parada, como diz "Parada", com o
+motivo dela. Depois que a skill commita a linha `PR:` nos tickets, leve esse
 commit ao remoto com `git push`, e guarde a URL do PR.
 
 Não faça o merge, nem o do PR nem um local: a revisão do PR é do operador. A
@@ -840,10 +860,10 @@ aqui a spec que:
   verificação ou o `--reverify`;
 - fica parada por decisão pela regra do `GATE.md`, no `--reverify` do bench;
 - esbarra numa contradição incumprível, ou numa decisão aberta do `map.md`;
-- não fecha no fechamento: o forge que o resolvedor recusa, a recusa que para o
-  `anvil-open-pr`, o merge bloqueado pela guarda, o merge abortado por conflito
-  fora do `docs/index.md` ou pela conferência do merge, ou o PR aberto, à espera do
-  merge do operador.
+- não fecha no fechamento: o forge que o resolvedor recusa, a recusa do resolvedor
+  com `--pr`, antes do push, a parada do `anvil-open-pr`, o merge bloqueado pela
+  guarda, o merge abortado por conflito fora do `docs/index.md` ou pela conferência
+  do merge, ou o PR aberto, à espera do merge do operador.
 
 Depois disso, não faça archive nem merge dela e não mexa no que está commitado no
 branch. No bench, commite antes no branch o `decisions-log.md` da spec, se ele
