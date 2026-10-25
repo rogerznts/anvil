@@ -3,6 +3,7 @@
 **Blocked by:** 03, 04, 05
 
 **Status:** resolved
+**Review:** round=1; sha=fca185e0ae3d56438ac562a420dac0fdf979e3e4; scope=full; verdict=pass; p1=none
 
 **What to build:** as linhas que a 012 resolve saem de `docs/project/acompanhamento.md`
 no branch da spec, como manda o cabeçalho do arquivo, e a poda de cache de build da
