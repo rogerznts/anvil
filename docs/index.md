@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-25T05:37:15Z
+Last updated: 2026-10-25T05:45:00Z
 
 ## Visão geral
 
@@ -23,7 +23,7 @@ Last updated: 2026-10-25T05:37:15Z
 
 ## Specs ativas
 
-Nenhuma.
+- [012 — Push só depois do login, aviso de branch publicado e provas da 011](./specs/012-extension-push-after-login/spec.md) — `extension/012-push-after-login`, especificado
 
 ## Specs arquivadas
 

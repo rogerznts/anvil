@@ -79,6 +79,18 @@ e dependências, que o piloto automático executa. O estado de cada entrada sai 
 disco.
 _Avoid_: plano, plano principal, backlog
 
+**Parada**:
+A spec que o piloto automático não fecha sozinho: fica aberta no branch dela,
+com o motivo e a pergunta que a destrava no relatório, e a corrente segue pelo
+que não depende dela.
+_Avoid_: spec travada, spec bloqueada, spec falha
+
+**Parada no fechamento**:
+A parada de uma spec já arquivada no branch que não chega ao branch base: forge
+recusado, recusa do PR, guarda, conflito, conferência do merge ou PR à espera do
+operador.
+_Avoid_: não fecha no fechamento, parada depois do archive, parada já arquivada
+
 ### Git e forge
 
 **Forge**:
