@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=a4ec4f4; scope=full; verdict=pass; p1=none
 
 **What to build:** decisão do operador depois do ticket 10. Hoje uma recusa
 qualquer do resolvedor esconde todos os valores, e uma recusa de forge ou de login
@@ -130,3 +131,13 @@ olha as rules antes do forge.
   dbb34ee, código 1 nos dois (`s2-largada-r1.out`, `s2-regra-r1.out`).
 - Verificação · `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` saiu
   `0` (`verify: limpo`), com a saída em `workspace/80-resolver-refusal-per-field/verify.out`.
+- Review round=1 · P2 (Spec): a ordem "rule antes do forge recusado", centro da US 39 (a rule que manda fechar sem PR não para num forge não resolvido), não tem prova: o caso `regra` da S2 usa `forge: github` resolvido e não tem vermelho — um texto que volte a olhar a `refusal: forge:` antes da rule passa nas duas S2, e um Gitea sem a seção cuja rule fecha por merge local volta a parar sem aviso.
+- Review round=1 · P2 (Spec): no "PR" do `anvil-auto`, o `git push -u origin <branch>` vem antes do Step 0 do `anvil-open-pr`, onde o login é procurado; num Gitea sem login do `tea` casando, o branch fica publicado sem PR, e nem a "Parada" nem o relatório dizem que ele ficou no remoto — o operador só descobre ao achar o branch órfão.
+- Review round=1 · P2 (Spec): a limpeza seguindo com uma `refusal: forge:` (US 36, limpar branches) e o bench escrevendo a seção sem a linha `forge:` não têm prova — um texto que volte a parar em qualquer recusa passa sem acusar.
+- Review round=1 · P3 (Spec): o passo 4 da largada do `anvil-auto`, o cabeçalho do `stage.sh` e o manual `anvil-omp` citam a recusa de login (e o "Gitea sem `tea`") como uma que a largada ignora, mas sem `--pr` ela nem sai — o leitor espera na largada uma recusa que não acontece; a regra de não parar continua certa.
+- Review round=1 · P3 (Spec): com `forge: nenhum` declarado e o host ssh que não se acha, o resolvedor dá `refusal: forge:`, contra o próprio cabeçalho ("sem os quais não há onde abrir PR") e a isenção do `nenhum` — no fechamento a spec para em vez de fechar por merge local; comportamento herdado do ticket 01, caso raro.
+- Review round=1 · P3 (Spec): no `s2.sh`, a linha final "conferências 0" mostra o código de saída das conferências, não uma contagem — nas saídas verdes parece "nenhuma conferência".
+- Review round=1 · P3 (Standards): o comentário novo do `roadmap.sh` (`base_label`) tem acento, e o resto do arquivo é ASCII — só a forma fica inconsistente.
+- Review round=1 · P3 (Standards): possível Mysterious Name — `base_name` no `roadmap.sh` guarda o rótulo "branch base master", não o nome do branch; quem reaproveitar a variável num comando git recebe a frase inteira.
+- Review round=1 · P3 (Standards): o `refuse()` do `resolve-git.sh` marca argumento desconhecido e chamada fora do git como `refusal: base:` (escolha documentada no cabeçalho) — um consumidor futuro que traduza `refusal: base:` em "declare o branch base" dá o conselho errado.
+- Review round=1 · P3 (Standards): possível Duplicated Code / Shotgun Surgery — o `new-spec.sh` e o `stage.sh` repetem o parse do resolvedor (o `base:`, o filtro de `refusal: base:` e a mensagem de reserva), e o parágrafo do Step 0 se repete no `anvil-open-pr` e no `anvil-open-fast-pr`; o padrão de skill autocontida vence, mas a próxima mudança de formato repete as edições espalhadas.
