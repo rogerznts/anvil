@@ -377,28 +377,23 @@ bash ~/.claude/skills/anvil-to-spec/scripts/new-spec.sh --type <Tipo> --short-na
 
 O JSON da saída dá o número, em `number`, e o branch, em `branch`, e vale sobre
 qualquer previsão. O script deixa o checkout no branch novo, ainda sem commit.
-Então, nesta ordem:
+Então, nesta ordem, cada passo depois do anterior, nunca em chamadas paralelas:
 
 1. Volte ao branch base com `git checkout <base>`.
 2. No `roadmap.md`, acrescente a linha `Spec: <number>` à seção da entrada, junto
    das outras chaves: logo abaixo de `Depende de:` ou, sem ela, de `Tipo:`. É a
    única mudança no roteiro.
-3. Commite só o roteiro:
+3. Commite só o roteiro e leve o branch da spec até esse commit, voltando a ele,
+   num comando só:
 
    ```bash
-   git add docs/specs/roadmap.md
-   git commit -m "docs(roadmap): record spec <number> for <nome>"
+   git add docs/specs/roadmap.md && git commit -m "docs(roadmap): record spec <number> for <nome>" && git checkout -B <branch> <base>
    ```
 
-4. Leve o branch da spec até esse commit e volte a ele:
-
-   ```bash
-   git checkout -B <branch> <base>
-   ```
-
-   O branch acabou de nascer e não tem commit próprio, então o `-B` só o avança.
-   Assim o `Spec:` está no branch base antes de qualquer commit da spec, e o
-   branch o contém.
+   Em duas chamadas paralelas, o checkout pode vir antes do commit, e o `Spec:`
+   cai no branch da spec, e não no branch base. O branch acabou de nascer e não tem
+   commit próprio, então o `-B` só o avança. Assim o `Spec:` está no branch base
+   antes de qualquer commit da spec, e o branch o contém.
 
 ### Ledger da spec
 
@@ -572,10 +567,12 @@ recusa. Decida, nesta ordem, e pare na primeira que decide:
 
 1. Com `remote: none`, o projeto não tem remoto, e a spec fecha por merge local.
 2. Leia a seção de fechar a spec do perfil do tracker,
-   `docs/agents/issue-tracker.md`, e as rules de `.claude/rules/`. Quando uma rule
-   diz que o projeto fecha sem PR, ou o perfil não tem o passo `/anvil-open-pr`, a
-   spec fecha por merge local, sem consultar o forge: as linhas `forge:` e
-   `refusal: forge:` não contam.
+   `docs/agents/issue-tracker.md`, e cada arquivo de `.claude/rules/` inteiro, com
+   o `read`, e não por busca de palavra: a rule pode dizer isso de muitos jeitos,
+   num trecho sobre o fluxo git ou o fechamento. Quando uma rule diz que o projeto
+   fecha sem PR, ou o perfil não tem o passo `/anvil-open-pr`, a spec fecha por
+   merge local, sem consultar o forge: as linhas `forge:` e `refusal: forge:` não
+   contam.
 3. Senão, o forge decide. Com uma linha `refusal: forge:`, a spec fica parada, como
    diz "Parada", com essas linhas no motivo, copiadas como estão: elas dizem o que
    declarar ou corrigir. Com `forge: nenhum`, a spec fecha por merge local, mesmo
