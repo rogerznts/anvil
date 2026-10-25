@@ -141,3 +141,8 @@ olha as rules antes do forge.
 - Review round=1 · P3 (Standards): possível Mysterious Name — `base_name` no `roadmap.sh` guarda o rótulo "branch base master", não o nome do branch; quem reaproveitar a variável num comando git recebe a frase inteira.
 - Review round=1 · P3 (Standards): o `refuse()` do `resolve-git.sh` marca argumento desconhecido e chamada fora do git como `refusal: base:` (escolha documentada no cabeçalho) — um consumidor futuro que traduza `refusal: base:` em "declare o branch base" dá o conselho errado.
 - Review round=1 · P3 (Standards): possível Duplicated Code / Shotgun Surgery — o `new-spec.sh` e o `stage.sh` repetem o parse do resolvedor (o `base:`, o filtro de `refusal: base:` e a mensagem de reserva), e o parágrafo do Step 0 se repete no `anvil-open-pr` e no `anvil-open-fast-pr`; o padrão de skill autocontida vence, mas a próxima mudança de formato repete as edições espalhadas.
+- Fechamento · decisão do operador, 2026-10-25: o `git push -u origin <branch>` do
+  "PR" do `anvil-auto` fica antes do Step 0 do `anvil-open-pr`, como a spec decidiu
+  ("o login só com `--pr`"). O branch publicado sem PR num Gitea sem login casando
+  vira a linha A35 de `docs/project/acompanhamento.md`; os outros dois P2 da rodada
+  1, lacunas de prova, viram a A36 e a A37.
