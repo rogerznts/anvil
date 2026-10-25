@@ -3,6 +3,7 @@
 **Blocked by:** 07
 
 **Status:** resolved
+**Review:** round=1; sha=640cebfffd64a07c90320b4bd7d82a7c44de5ac2; scope=full; verdict=pass; p1=none
 
 **What to build:** parte da issue #8. O piloto automático reescreve o laço da
 `anvil-run` no "Despacho" em vez de carregá-la, então ganha o mesmo passo do ticket
@@ -37,3 +38,4 @@ vai para "Decidido sem humano" no relatório.
 - Verde final: `OUT=out-green-guard bash workspace/89-auto-resume/s2.sh`, código `0`, doze conferências passando e modelo confirmado `anthropic/claude-sonnet-4-5` na principal e nos dois filhos, sem fallback. Dois implementers novos, contador `2`, `--resume 01` entre os despachos, `HEAD` inicial no segundo `context`, arquivo iniciado preservado e concluído, ticket `resolved` no branch, árvore limpa, nenhuma leitura com `halt` e ticket 01 com tentativa 1/2 em "Decidido sem humano" do relatório. As saídas brutas, os comandos, os contextos e o veredito ficam em `out-green-guard/`.
 - O caminho do agente vivo permanece sem prova pelo motivo da spec: o falso encerra a resposta, não permanece em execução como o implementer real. Não há typecheck nem suíte automatizada neste repositório; a verificação prescrita é `vendor-sync.sh verify`.
 - Verificação antes do commit de implementação: `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` saiu `0`, com `verify: limpo`.
+- Review round=1: Standards e Spec deram `veredito: pass`, sem achados acionáveis P1, P2 ou P3. Rodada inteira sobre `git diff c22c23f2481202a641d5865eab462fc8b30d4733...HEAD`, com o `HEAD` medido `640cebfffd64a07c90320b4bd7d82a7c44de5ac2`; os eixos leram as evidências gravadas e não repetiram as provas.
