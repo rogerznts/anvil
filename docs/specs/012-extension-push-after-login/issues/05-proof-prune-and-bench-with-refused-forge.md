@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=97a9632b154d254a5c33d76265e119356cd9a48a; scope=full; verdict=pass; p1=none
 
 **What to build:** a A37 do acompanhamento. A US 36 da 011 diz que a limpeza de
 branches e o bench não param por uma recusa de forge, porque só precisam do branch
@@ -65,3 +66,8 @@ corrija a skill neste ticket.
   saiu `0`; `workspace/86-prune-and-bench-refused-forge/verify.out` registra
   `verify: limpo` e `exit: 0`. Provas e saídas ficam em `workspace/`, fora do git,
   conforme as rules do projeto.
+- Review round=1 · P2 (Spec): o vermelho do bench para no `stage.sh`, com
+  `base: none`, antes de carregar o consumidor do resolvedor da fase 2; uma
+  regressão apenas nessa fase fica sem vermelho específico que a diagnostique.
+  A limitação está declarada acima, e uma prova complementar que alcance o
+  consumidor do bench no vermelho fortaleceria a atribuição da falha.
