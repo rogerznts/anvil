@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=83311530a10348016729f9cbaccf3b4b992a718d; scope=full; verdict=pass; p1=none
 
 **What to build:** a A35 do acompanhamento. No fechamento por PR, o piloto
 automático publica o branch e só depois o `anvil-open-pr` procura o login do `tea`;
@@ -60,3 +61,8 @@ rodar o resolvedor, como no Step 6 do `anvil-open-fast-pr`.
   do helper 0. A S2 `github` de `workspace/76-pilot-closes-by-pr/` passa
   (`s2-76-github.out`, código 0), com um só `resolve-git.sh --pr`, antes do push.
   `vendor-sync.sh verify` sai `0` (`verify.out`).
+- Review round=1 · P3 (Spec): a conferência do `Estado:` no `s2.sh` só procura `refusal: login:` e não compara a linha inteira com `out/resolve-pr` — uma rodada futura que corte o fim da recusa passa verde, contra o "copiadas como estão" do ticket.
+- Review round=1 · P3 (Spec): nenhuma conferência automática cobre o "não chama o resolvedor de novo" do `anvil-open-pr` carregado pelo piloto; só a lista de comandos do `s2-76-github.out` mostra um único `resolve-git.sh --pr`, antes do push — uma regressão em que o `anvil-open-pr` volte a rodar o resolvedor depois do push passa as duas S2.
+- Review round=1 · P3 (Standards): possível Shotgun Surgery / Duplicated Code — a regra "o `anvil-open-pr` recebe `<base>`, `<repo>` e `<login>` e não roda o resolvedor de novo" mora no `anvil-auto`, no manual `anvil-omp` e no Step 6 do `anvil-open-fast-pr` — se o Step 0 do `anvil-open-pr` mudar de interface, um dos três fica descrevendo o contrato antigo.
+- Review round=1 · P3 (Standards): possível Speculative Generality — no "PR" do `anvil-auto`, "de branch base, forge ou login" lista recusas de base e forge que o resolvedor sem `--pr` da decisão já teria parado antes; o leitor pode procurar um caminho que nunca acontece, sem quebrar nada, porque o ticket pede "qualquer linha `refusal:`".
+- Review round=1 · P3 (Standards): no manual `anvil-omp`, o "No" do fim da linha 132 fica sozinho, separado do "merge local" da linha seguinte, e a linha do `Estado:` no comentário de implementação passa das ~80 colunas — só forma, o Markdown renderiza igual.
