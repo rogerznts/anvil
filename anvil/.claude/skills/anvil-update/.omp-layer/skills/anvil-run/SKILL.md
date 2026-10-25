@@ -58,11 +58,12 @@ O script é o `~/.omp/agent/skills/anvil-run/frontier.sh`, da instalação de
 usuário. No diretório em que a sessão está, que é a raiz do projeto, rode sem `cd`:
 
 ```bash
-bash ~/.omp/agent/skills/anvil-run/frontier.sh [NNN] [--skip "NN NN"]
+bash ~/.omp/agent/skills/anvil-run/frontier.sh [NNN] [--skip "NN NN"] [--resume NN]
 ```
 
 Passe o número da spec se o operador passou. `--skip` leva os tickets que você anotou
-como pulados nesta execução, explicados abaixo. O script sai com `refusal:` quando
+como pulados nesta execução, explicados abaixo. `--resume NN` só vai na leitura
+que segue um despacho interrompido do NN, como o passo 5 diz. O script sai com `refusal:` quando
 não há o que conduzir daqui, como no branch de outra spec, num branch sem número ou
 num projeto sem o perfil `docs/specs` do tracker.
 Nesse caso, mostre a linha ao operador e pare. Não troque de branch nem rode o
@@ -78,10 +79,11 @@ tickets estão no frontier, `frontier_files`, com os caminhos deles na mesma ord
 cuja última `Review:` tem `round` 2 ou mais e `verdict=fail`, e o de bloqueio
 ilegível, `class=unreadable_blockers`, cujo `Blocked by` não é uma lista de
 números: nele, `blocked_by` traz entre aspas o texto da linha como está no
-arquivo. Com a árvore suja, o script devolve `halt` e `next: none` quando há
-ticket a despachar, porque um implementer novo commitaria o que sobrou junto com o
-ticket dele, e também quando tudo está resolvido, porque o próximo passo da spec
-partiria do que está fora de commit.
+arquivo. Com a árvore suja, o script devolve `halt` e `next: none`, salvo com
+`--resume NN` e o NN despachável: aí devolve `resume: NN` e o NN como `next`.
+Resolvido, travado, pulado ou com bloqueio ilegível ou pendente não recebe essa
+exceção. Sem ela, um implementer novo commitaria o que sobrou junto com outro
+ticket, e o próximo passo de uma spec resolvida partiria do que está fora de commit.
 
 ## O laço
 
@@ -89,30 +91,66 @@ partiria do que está fora de commit.
 2. Se `next` é `none`, vá para o fim. É a única condição de parada do laço, e
    quem a decide é o script.
 3. Anote o valor da linha `ready` desta rodada, para o relatório: só a leitura que
-   vem antes de um despacho conta, e a releitura do passo 5 não. Mostre ao
+   vem antes de um despacho conta, inclusive de retomada, e a releitura do passo 6 não. Mostre ao
    operador uma linha de andamento: os tickets que vão sair e quantos já estão
    resolvidos.
 4. Despache com o `task`, numa chamada só. Em série, ela tem um item, o `next`.
    Numa leva, um item por caminho da linha `frontier_files`, na ordem dela, até N
    itens; o primeiro é o `next`. Em cada item, `agent` é `anvil-implementer` e o
    `task` é o caminho do ticket. Com `isolation: on` ou `misconfigured`, todo item
-   leva também `isolated: true`. No `context`, diga a pasta da spec e o branch. O
-   implementer é bloqueante, e a chamada só volta quando todos os itens terminam.
-   Não espere pelo `hub`, não chame outra ferramenta na mesma mensagem e nunca
-   faça duas chamadas do `task` ao mesmo tempo. Fora de `isolation: on`, nunca
-   despache dois tickets ao mesmo tempo, como a seção Paralelo diz. O que o
-   implementer devolve não muda o laço, nem quando ele diz que falhou, que faltou
-   ferramenta, ou quando o omp diz que não integrou o trabalho dele. Não leia o
-   ticket, não investigue e não termine o trabalho dele: quem decide o que vem
-   depois é o disco, no passo 5.
-5. Rode o script de novo e compare a linha de cada ticket despachado com a de
-   antes. Se `status`, `reviews` e `last` estão iguais, o implementer terminou sem
-   mudar o estado. Anote o ticket como pulado, na memória desta execução, e, com
-   algum pulado novo, rode o script mais uma vez, já com ele no `--skip`. Daqui em
-   diante, toda chamada leva o `--skip` com todos os pulados. Nunca despache um
-   pulado de novo nesta execução, nem quando o implementer caiu, abortou ou
-   devolveu erro: quem tenta de novo é a próxima execução.
-6. Mostre a linha de andamento de cada ticket despachado, com o `status` e a
+   leva também `isolated: true`. No `context`, diga a pasta da spec e o branch e
+   peça resposta em pt-BR. Antes do primeiro despacho de cada ticket, anote o
+   `HEAD` e guarde-o até o fim da execução. O implementer é bloqueante, e a
+   chamada só volta quando todos os itens terminam. Não espere pelo `hub`, não
+   chame outra ferramenta na mesma mensagem e nunca faça duas chamadas do `task`
+   ao mesmo tempo. Fora de `isolation: on`, nunca despache dois tickets ao mesmo
+   tempo, como a seção Paralelo diz. Não leia o ticket, não investigue e não
+   termine o trabalho dele: a única intervenção permitida é retomar o despacho
+   pelo passo 5, sem implementar nem commitar no lugar dele.
+5. Reconheça o **despacho interrompido** antes de comparar o estado: resultado do
+   `task` sem os três campos `ticket`, `status` e `review`, cancelado ou com erro.
+   Para cada ticket interrompido, rode o script com `--resume NN` na leitura
+   seguinte, mantendo os `--skip` acumulados. O disco continua soberano: com
+   `halt`, ou com o NN já resolvido, travado, pulado ou fora do frontier, não
+   retome; siga ao passo 6 com essa saída.
+
+   O limite é de **duas retomadas do despacho por ticket nesta execução**,
+   contando as duas formas abaixo. Antes de cada tentativa, incremente o
+   contador e escreva esta linha de andamento, preenchendo ticket e tentativa:
+   `ticket <NN> — retomada do despacho, tentativa <1 ou 2>/2`.
+   - Primeiro tente o agente vivo: um id no resultado não basta. Resultado
+     `completed` indica agente encerrado, não vivo. Se o retorno cancelado ou com
+     erro não diz se ele ainda roda, consulte `read agent://<id>`; só o estado
+     ainda em execução autoriza a tentativa pelo agente vivo. Mande por
+     `write agent://<id>` que termine o ticket e devolva os três campos e espere
+     com `wait`. Não abra outro implementer enquanto esse agente estiver vivo.
+     Com os campos e sem erro ou cancelamento, o despacho terminou; vá ao passo 6.
+     Se continuar interrompido, repita este passo, inclusive a leitura com
+     `--resume NN`, sem zerar o contador.
+   - Sem agente vivo e com `isolation: off`, despache um `anvil-implementer` novo
+     para o mesmo ticket, pelo passo 4. No `context`, escreva **retomada do
+     despacho**, o `HEAD` de antes do primeiro despacho, e que ele deve continuar
+     dos commits desde esse `HEAD` e da árvore suja, preservando ambos. Anote o
+     `ready` e mostre o andamento como no passo 3. Ao voltar, repita este passo,
+     sem trocar o `HEAD` inicial nem zerar o contador.
+   - Sem agente vivo e com isolação (`on` ou `misconfigured`), ou sem tentativa
+     restante, anote o ticket como pulado, com o motivo: cópia isolada que não
+     volta, ou limite de duas retomadas do despacho. Rode o script já com ele no
+     `--skip`, sem `--resume` para esse ticket, e siga ao passo 6. Mesmo com
+     `halt` pela sujeira, o relatório inclui esse pulado e seu motivo.
+
+   Só o despacho interrompido passa por essa exceção ao não redespachar; ele
+   ainda não é pulado enquanto cabe uma retomada. Resultado com os três campos,
+   sem cancelamento nem erro, segue a comparação do passo 6, inclusive quando
+   diz que falhou, que faltou ferramenta ou que o omp não integrou o trabalho.
+6. Rode o script de novo, salvo a saída que o passo 5 já trouxe para um pulado ou
+   um impedimento do disco, e compare cada ticket com a leitura anterior ao seu
+   primeiro despacho. Se `status`, `reviews` e `last` estão iguais, anote-o como
+   pulado, e rode o script já com ele no `--skip`. Toda chamada leva todos os
+   pulados acumulados. Nunca despache um pulado de novo nesta execução: quem
+   tenta de novo é a próxima execução; a retomada do despacho no passo 5 acontece
+   antes de anotá-lo como pulado.
+7. Mostre a linha de andamento de cada ticket despachado, com o `status` e a
    `last` lidos do disco. Volte ao passo 2 com a última saída do script.
 
 ## O fim
@@ -166,8 +204,9 @@ QA: a spec ainda não terminou. Ele lista:
 - os de bloqueio ilegível, `class=unreadable_blockers`, cada um com o texto do
   `blocked_by`. O operador corrige a linha para uma lista de números, como `01, 02`,
   e roda a skill de novo;
-- os pulados, que terminaram sem mudar o estado, e o motivo que o implementer deu.
-  Rodar a skill de novo tenta de novo. O pulado cujo trabalho o omp não integrou,
+- os pulados, que terminaram sem mudar o estado ou cujo despacho interrompido
+  ficou sem agente vivo com isolação ou passou do limite de duas retomadas, com
+  o motivo. Rodar a skill de novo tenta de novo. O pulado cujo trabalho o omp não integrou,
   com "Branch merge failed" no resultado do `task`, leva também o nome do branch
   `omp/task/<id>` e, se houver, o aviso de que os commits dele anteriores ao
   conflito já estão no branch da spec;
@@ -185,8 +224,8 @@ roteamento das diretivas o invoca sem argumento, depois do relatório.
   `git commit`, `git checkout`, `git restore`, `git reset` ou `git clean`.
 - Trocar de branch, criar branch ou rodar o script em outro repositório.
 - Recomendar o próximo passo da spec com `halt`.
-- Chamar o `task` para outra coisa que não despachar o `next`, ou a leva, a
-  `anvil-implementer`.
+- Chamar o `task` para outra coisa que não despachar o `next`, a leva ou a
+  retomada do despacho autorizada no passo 5, a `anvil-implementer`.
 
 ## Retomada
 
@@ -194,10 +233,15 @@ Se a sessão cair, rodar a skill de novo retoma pelo disco: o script recalcula o
 frontier a partir dos tickets gravados. A lista de pulados vale só para a execução
 que a anotou.
 
-Sem isolação, um implementer que caiu deixa a árvore suja, e o script para com
-`halt` até o operador decidir. Com isolação, o que ele deixou não chega ao branch da
-spec: o ticket fica com o estado de antes, sai como pulado nesta execução, e a
-seguinte o despacha de novo.
+Isso é **retomada da skill**, numa execução nova. A **retomada do despacho** do
+passo 5 acontece dentro da mesma execução, conserva o `HEAD` anterior ao primeiro
+despacho e tem no máximo duas tentativas por ticket, pelo agente vivo ou por um
+implementer novo sem isolação. Ela não transfere a implementação ao supervisor.
+
+Sem isolação, se a sessão inteira caiu, a execução nova não tem a atribuição da
+sujeira ao despacho interrompido: o script para com `halt` até o operador decidir.
+Com isolação e sem agente vivo, o que ele deixou não chega ao branch da spec: o
+ticket fica pulado nesta execução, e a seguinte o despacha de novo.
 
 Numa leva, o omp integra cada implementer quando ele termina, com o cherry-pick dos
 commits dele, um por vez. Se um commit conflita, o omp desfaz só esse e para ali:

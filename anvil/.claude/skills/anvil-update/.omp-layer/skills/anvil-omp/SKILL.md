@@ -208,12 +208,18 @@ despacho e aponta esta configuração. Ele despacha mesmo assim, e a árvore suj
 o omp deixa o para com `halt`. Para conferir o que o omp lê, rode os dois
 `omp config get` acima na raiz do projeto.
 
-A isolação muda a retomada. Sem ela, um implementer que cai deixa a sobra na árvore
-da spec, e o `anvil-run` para com `halt` antes do próximo despacho, até você
-decidir: `git stash -u` guarda a sobra, um commit seu a mantém, e rodar a skill de
-novo retoma. Com ela, a sobra de um implementer que cai ou desiste não chega ao
-branch da spec. O omp a deixa no branch `omp/task/<id>` dele, o ticket fica como
-estava, e a execução seguinte o despacha de novo. Os branches `omp/task/*` podem
+Na mesma execução, a `anvil-run` reconhece o despacho interrompido pelo resultado
+sem os três campos, cancelado ou com erro. Tenta primeiro o agente vivo; sem ele
+e sem isolação, um implementer novo continua dos commits e da árvore suja, com o
+`HEAD` de antes do primeiro despacho como fixed point da rodada 1. Cada ticket tem
+no máximo duas retomadas do despacho, visíveis no andamento. Sem agente vivo com
+isolação, ou passado o limite, fica pulado e aparece no relatório com o motivo.
+
+Isso não é rodar a skill de novo depois que a sessão caiu. Nessa execução nova,
+sem isolação, a sobra continua dando `halt` até você decidir: `git stash -u` guarda
+a sobra, um commit seu a mantém, e rodar a skill de novo retoma. Com isolação, a
+sobra não chega ao branch da spec: o omp a deixa no branch `omp/task/<id>` dele, o
+ticket fica como estava, e a execução seguinte o despacha de novo. Os branches `omp/task/*` podem
 ficar no repositório depois da integração, e o de um trabalho não integrado fica
 sempre; apague-os com `git branch -D` quando não precisar mais deles.
 

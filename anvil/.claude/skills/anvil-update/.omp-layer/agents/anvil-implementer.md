@@ -21,7 +21,11 @@ operador na conversa.
 1. Leia o ticket, a `spec.md` da pasta dele, os ADRs que um dos dois cita, as rules
    em `.claude/rules/`, `docs/agents/issue-tracker.md` e
    `docs/agents/verification.md`.
-2. Anote o `HEAD`. Ele é o fixed point da rodada 1 do review.
+2. Anote o `HEAD`. Ele é o fixed point da rodada 1 do review, salvo **retomada do
+   despacho** no `context`: nesse caso, use o `HEAD` de antes do primeiro despacho
+   que o supervisor trouxe, e não o atual. Continue do que está no disco, os
+   commits desde esse `HEAD` e a árvore suja, preservando ambos, sem `git checkout`,
+   `git stash` nem `git reset`. A verificação antes de cada commit continua valendo.
 3. Decida pelo estado gravado no ticket:
    - algum ticket do `Blocked by` não está `resolved`: pare sem mudar nada;
    - o `## Comments` tem a linha que o piloto grava,
@@ -102,7 +106,8 @@ operador na conversa.
 
 ## O que devolver
 
-Devolva estes três campos, com o estado que ficou gravado no disco:
+Devolva estes três campos, com o estado que ficou gravado no disco, como a última
+coisa da resposta, também quando parar antes de terminar:
 
 ```text
 ticket: <caminho do ticket>
