@@ -172,6 +172,24 @@ O toolkit supõe que todo projeto tem uma `main` e fecha PR num Gitea:
 35. Como mantenedor, quero que o aviso de referência fora do roster só acuse nome
     de skill do payload, para que o `"anvil-net"` não apareça como dependência.
 
+### Decididas depois dos tickets
+
+36. Como operador de um Gitea sem `tea`, ou sem a seção `## Git`, quero abrir uma
+    spec, começar o piloto e limpar branches quando o branch base está claro, para
+    que uma recusa de forge ou de login só me pare no PR.
+37. Como operador, quero que cada recusa do resolvedor diga o campo que ela atinge
+    e que os valores resolvidos saiam mesmo assim, para que cada skill pare só pelo
+    que precisa.
+38. Como operador, quero que o login do `tea` só seja procurado quando um PR vai
+    sair, para que nada mais chame o `tea`.
+39. Como operador cujas rules mandam fechar sem PR, quero que o piloto feche por
+    merge local sem consultar o forge, para que um forge não resolvido não pare o
+    fechamento.
+40. Como operador de um projeto com `master`, quero que o motivo da spec parada no
+    índice e no relatório cite o branch base, e não a `main`.
+41. Como mantenedor, quero que o `new-spec.sh` funcione chamado por caminho
+    relativo de uma subpasta, como antes desta spec.
+
 ## Implementation Decisions
 
 ### O resolvedor
@@ -179,8 +197,14 @@ O toolkit supõe que todo projeto tem uma `main` e fecha PR num Gitea:
 - **Um script do payload**, junto dos scripts do `anvil-docs` que todas as skills
   já chamam, rodado da raiz do projeto. Saída em linhas `chave: valor`: `base:`,
   `forge:` (`gitea`, `github` ou `nenhum`), `remote:` (a URL), `host:` (o real),
-  `repo:` (`org/repo`) e, no Gitea, `login:`. Quando não há resposta única: linhas
-  `refusal:` com o motivo e saída `2`, como o `roadmap.sh`.
+  `repo:` (`org/repo`) e, no Gitea, `login:`.
+- **Recusa por campo** (decisão do operador depois do ticket 10): os valores que o
+  resolvedor resolveu saem sempre, e cada recusa diz o campo que atinge —
+  `refusal: base: …`, `refusal: forge: …`, `refusal: login: …`. Com qualquer recusa
+  a saída é `2`, e quem chama confere só os campos de que precisa: o
+  `new-spec.sh`, a largada do piloto, a limpeza, o `roadmap.sh` e o bench, só o
+  `base:`; as skills de PR, o branch base, o forge, o repositório e o login.
+- **O login só com `--pr`.** Sem a opção, o resolvedor não chama o `tea`.
 - **Seção `## Git`** de `.claude/rules/anvil.md`, com as linhas `branch base:` e
   `forge:`. Cada valor declarado vale sobre a detecção; o que falta é detectado.
 - **Branch base detectado:** `origin/HEAD`; sem ele, o único entre `main` e
@@ -219,9 +243,14 @@ O toolkit supõe que todo projeto tem uma `main` e fecha PR num Gitea:
 
 - **Piloto automático:** todo `git checkout main`, `rev-list <branch>..main`,
   `merge-base … main` e `checkout -B <branch> main` passa a usar o branch base. O
-  fechamento por PR chama o `/anvil-open-pr`; a decisão entre PR e merge local usa
-  o `forge:` do resolvedor e as rules, como hoje usa o perfil.
-- **`new-spec.sh`:** recusa quando o checkout atual não é o branch base.
+  fechamento por PR chama o `/anvil-open-pr`. A decisão de fechar segue esta
+  ordem: sem remoto, merge local; uma rule que manda fechar sem PR, merge local,
+  sem consultar o forge; senão o `forge:` do resolvedor decide, e a recusa dele
+  deixa a spec parada.
+- **`roadmap.sh`:** o motivo da spec arquivada no branch e sem merge cita o branch
+  base que o resolvedor dá.
+- **`new-spec.sh`:** recusa quando o checkout atual não é o branch base, e acha o
+  resolvedor por caminho absoluto, de qualquer pasta.
 - **`anvil-bench`:** continua criando o projeto com `git init -b main`, e escreve a
   seção `## Git` com `branch base: main` e `forge: nenhum`.
 - **`anvil-boot`:** escreve a seção `## Git` com o valor detectado e confirmado

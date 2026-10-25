@@ -23,7 +23,7 @@ Last updated: 2026-10-24T17:50:42Z
 
 ## Specs ativas
 
-- [011 — Branch base e forge neutro](./specs/011-extension-branch-base-and-forge/spec.md) — `extension/011-branch-base-and-forge`, em andamento, 0/10 tickets resolvidos
+- [011 — Branch base e forge neutro](./specs/011-extension-branch-base-and-forge/spec.md) — `extension/011-branch-base-and-forge`, em andamento, 10/11 tickets resolvidos
 
 ## Specs arquivadas
 

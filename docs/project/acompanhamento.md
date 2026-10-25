@@ -149,3 +149,31 @@ spec afirmam.
   archive", "não fecha no fechamento" e "parada, já arquivada no branch" são o
   mesmo caso. Enquanto ninguém mexer, quem lê a skill casa três nomes para um caso
   só, e uma regra nova pode acertar um nome e esquecer os outros.
+
+## Spec 011: branch base e forge neutro
+
+Origem: `docs/specs/archive/011-extension-branch-base-and-forge/`. Lacunas de
+prova que o operador deixou para depois no grill de 2026-10-25: todas têm verde, e
+nenhuma muda comportamento.
+
+- **A30 · a limpeza de branches passa também com o texto antigo.** Ticket 06,
+  rodada 1, P2 (Spec). O caso `prune` saiu `0` com o texto de antes, em que o
+  modelo atualizou o `master` apesar do `git checkout main` escrito. Enquanto
+  ninguém mexer, uma regressão para a `main` fixa na limpeza passa verde.
+- **A31 · a prova do PR rápido não conta as chamadas do resolvedor.** Ticket 06,
+  rodada 2, P2 (Spec). O vermelho do `origin-head` saiu `0`. Enquanto ninguém
+  mexer, um texto que volte a mandar rodar o resolvedor duas vezes, com o branch
+  saindo de uma base e o PR indo para outra, passa enquanto o modelo ignorar a
+  instrução.
+- **A32 · a prova do PR não confere o responsável no Gitea.** Ticket 05, rodada
+  1, P2. Enquanto ninguém mexer, uma regressão no responsável do PR do Gitea passa
+  sem a prova ver.
+- **A33 · o `gh label list` falso não foi capturado do `gh` real.** Ticket 04,
+  rodada 1, P2 (Spec). O formato vem do código do `gh`. Enquanto ninguém mexer, se
+  o `gh` real divergir, as provas validam as skills contra uma resposta que o
+  GitHub não dá.
+- **A34 · a regra do `origin` com o bare só está no helper.** Ticket 05, rodada 1,
+  P2 (Spec). A fixture cuja URL de push do `origin` é o bare fica como está; isso
+  está só no cabeçalho do `proof.sh` e na seção da `anvil-sync`. Enquanto ninguém
+  mexer, quem escreve outra prova com forge esbarra na recusa do `origin` local
+  sem saber por quê.
