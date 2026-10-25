@@ -23,7 +23,7 @@ Last updated: 2026-10-25T05:45:00Z
 
 ## Specs ativas
 
-- [012 — Push só depois do login, retomada do despacho interrompido e provas da 011](./specs/012-extension-push-after-login/spec.md) — `extension/012-push-after-login`, especificado
+- [012 — Push só depois do login, retomada do despacho interrompido e provas da 011](./specs/012-extension-push-after-login/spec.md) — `extension/012-push-after-login`, em andamento, 0/9 tickets resolvidos
 
 ## Specs arquivadas
 
