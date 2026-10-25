@@ -3,6 +3,7 @@
 **Blocked by:** 06
 
 **Status:** resolved
+**Review:** round=1; sha=b191d3bcec9303f9a95adc019fd166c64dbc2992; scope=full; verdict=pass; p1=none
 
 **What to build:** parte da issue #8. Um despacho interrompido, o `task` do
 `anvil-implementer` que volta sem os três campos, cancelado ou com erro, deixa de
@@ -51,3 +52,4 @@ três campos.
 - Vermelho do limite: `CASO=limite RED=4271efd OUT=out-red-limite bash workspace/88-run-resume/s2.sh`, modelo confirmado `anthropic/claude-sonnet-4-5`, código do helper `1`, oito falhas: só um despacho, nenhuma retomada e parada no `halt`. A primeira execução do limite com o texto novo (`out-limite/`) fez os três despachos e pulou após as duas retomadas, mas o terceiro falso confundiu a âncora `1:2` do `read` com o valor do contador e gravou `2` de novo; saiu `1`. O falso passou a ler `.git/despachos:raw`; a conferência da contagem real de chamadas `task` foi mantida junto da conferência do contador.
 - Verde do limite: `CASO=limite OUT=out-limite-green bash workspace/88-run-resume/s2.sh`, código do helper `0`, modelo confirmado `anthropic/claude-sonnet-4-5` na principal e nos três filhos. O falso foi despachado três vezes, o contador terminou `3`, o andamento identificou ticket 01 e tentativas 1/2 e 2/2, e a leitura final com `--skip "01"` deixou o ticket pulado no relatório pelo limite, sem quarto despacho. Nenhum caso usou fallback de modelo.
 - Verificação antes do commit de implementação: `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` saiu `0`, com `verify: limpo`.
+- Review round=1: Standards e Spec deram `veredito: pass`, sem achados acionáveis P1, P2 ou P3. Rodada inteira sobre `git diff bd48ef1893511abfd6a4d3be27c280533071c301...HEAD`, com o `HEAD` medido `b191d3bcec9303f9a95adc019fd166c64dbc2992`; os eixos leram as evidências finais e não repetiram as provas.
