@@ -666,7 +666,7 @@ juntos. Aborte o merge, sem corrigir nada:
 git merge --abort
 ```
 
-A spec fica parada, como diz "Parada", já arquivada no branch. É parada por
+A spec fica em parada no fechamento, como diz "Parada". É parada por
 decisão: sem pesquisa e sem rodada extra. Na seção dela no relatório, o `Estado:`
 diz que a verificação falhou sobre o merge com o branch base, e a seção do
 comando de verificação, ou do `--reverify`, leva a saída da conferência. Em "o
@@ -701,14 +701,34 @@ merge. O remoto é o `origin`, o que o resolvedor leu:
 git push -u origin <branch>
 ```
 
+Numa retomada da spec parada depois do push, o branch já está no remoto, e a ordem
+é a mesma: o resolvedor com `--pr`, este `git push -u`, que não muda nada no
+remoto, e o `anvil-open-pr`. O `git push -u` que não sai `0` deixa a spec parada,
+como diz "Parada", com a saída dele no motivo.
+
 No branch da spec, carregue o `anvil-open-pr` e siga-o, com uma mudança: o Step 0
 dele usa o `<base>`, o `<repo>` e o `<login>` que você conferiu antes do push, e
 não roda o resolvedor de novo, como no Step 6 do `anvil-open-fast-pr`. Ele abre o
 PR no forge do resolvedor, com o `gh` ou o `tea`. As pausas dele seguem a regra das
-pausas, e a base do PR é o branch base, de onde a corrente parte. Quando a skill
-para antes de devolver a URL do PR, a spec fica parada, como diz "Parada", com o
-motivo dela. Depois que a skill commita a linha `PR:` nos tickets, leve esse
-commit ao remoto com `git push`, e guarde a URL do PR.
+pausas, e a base do PR é o branch base, de onde a corrente parte.
+
+A URL do PR é a que o `pr create` imprime saindo `0`. O `pr create` que sai
+diferente de `0` não deu URL, e nenhuma URL se monta à mão. Quando a skill para
+sem devolver a URL, por CLI sem autenticação, erro do `pr create` ou outra recusa
+dela, o `git push -u` já saiu `0`, e o branch está no remoto sem PR. A spec fica
+em parada no fechamento, como diz "Parada", e o `Estado:` dela no relatório diz
+onde o branch ficou, com o passo e o motivo da skill:
+
+```text
+- Estado: parada no branch, publicado em origin sem PR: <passo e motivo>
+```
+
+Em "o que ainda espera decisão", a pergunta é se o operador corrige `<motivo>` e
+abre o PR ou apaga `origin/<branch>`. A decisão é dele: não apague o branch remoto,
+nem com `git push --delete`, nem com outro comando.
+
+Depois que a skill commita a linha `PR:` nos tickets, leve esse commit ao remoto
+com `git push`, e guarde a URL do PR.
 
 Não faça o merge, nem o do PR nem um local: a revisão do PR é do operador. A
 entrada fica `stopped` até o merge do PR, e as que dependem dela esperam. Confira a
@@ -860,10 +880,11 @@ aqui a spec que:
   verificação ou o `--reverify`;
 - fica parada por decisão pela regra do `GATE.md`, no `--reverify` do bench;
 - esbarra numa contradição incumprível, ou numa decisão aberta do `map.md`;
-- não fecha no fechamento: o forge que o resolvedor recusa, a recusa do resolvedor
-  com `--pr`, antes do push, a parada do `anvil-open-pr`, o merge bloqueado pela
-  guarda, o merge abortado por conflito fora do `docs/index.md` ou pela conferência
-  do merge, ou o PR aberto, à espera do merge do operador.
+- fica em parada no fechamento, já arquivada no branch e sem chegar ao branch
+  base: o forge que o resolvedor recusa, a recusa do resolvedor com `--pr`, antes
+  do push, a parada do `anvil-open-pr`, o merge bloqueado pela guarda, o merge
+  abortado por conflito fora do `docs/index.md` ou pela conferência do merge, ou o
+  PR aberto, à espera do merge do operador.
 
 Depois disso, não faça archive nem merge dela e não mexa no que está commitado no
 branch. No bench, commite antes no branch o `decisions-log.md` da spec, se ele
@@ -896,9 +917,9 @@ O relatório tem esta forma, com uma seção de segundo nível por entrada tocad
 execução, na ordem, e as seções sem conteúdo ficam com "nenhum". No bench, a seção
 de cada spec traz o `decisions-log.md` dela, lido do branch com
 `git show <branch>:<caminho>` pelo caminho que ele tem lá: com o archive da spec
-commitado no branch, como na spec fechada e na parada no fechamento depois do
-archive, o caminho é `docs/specs/archive/<pasta>/decisions-log.md`; na spec parada
-antes do archive, `docs/specs/<pasta>/decisions-log.md`. No bench também, o
+commitado no branch, como na spec fechada e na parada no fechamento, o caminho é
+`docs/specs/archive/<pasta>/decisions-log.md`; na spec parada antes do archive,
+`docs/specs/<pasta>/decisions-log.md`. No bench também, o
 `--reverify` vem no lugar do comando de verificação:
 
 ````markdown
@@ -908,7 +929,7 @@ Roteiro: `docs/specs/roadmap.md`, <confirmado no commit <commit do sim> | execu�
 
 ## <nome da entrada> — spec <number>
 
-- Estado: <fechada, com merge local no `<base>` | PR aberto, <URL>, à espera do merge | parada no branch: <passo e motivo>>
+- Estado: <fechada, com merge local no `<base>` | PR aberto, <URL>, à espera do merge | parada no branch: <passo e motivo> | parada no branch, publicado em origin sem PR: <passo e motivo>>
 - Branch: `<branch>`
 
 ### Pausas respondidas pelo piloto
@@ -959,7 +980,7 @@ exit: 0
 
 ## O que ainda espera decisão
 
-- <cada item como pergunta: o que destrava cada spec parada, cada PR aberto, cada contradição e cada gate manual aberto; a da parada técnica cita o ticket e o arquivo da pesquisa>?
+- <cada item como pergunta: o que destrava cada spec parada, cada PR aberto, cada contradição e cada gate manual aberto; a da parada técnica cita o ticket e o arquivo da pesquisa; a do branch publicado em origin sem PR pergunta se o operador corrige o motivo e abre o PR ou apaga `origin/<branch>`>?
 ````
 
 ## O fim
@@ -1032,3 +1053,5 @@ parte, para quem opera o anvil, como na entrega do bench chamado direto.
 - Trocar de branch fora dos passos da corrente: a volta ao branch base depois do
   `new-spec.sh`, o `git checkout -B` do branch recém-criado, a ida ao branch base
   para o merge e a volta ao branch base depois de uma parada ou do PR aberto.
+- Apagar o branch remoto, com `git push --delete` ou outro comando, nem o da spec
+  parada com o branch publicado em `origin` sem PR.

@@ -127,7 +127,9 @@ do roteiro e só quando as dependências da entrada fecharam:
   `tea`, deixa a spec parada sem nada no remoto, com a recusa no motivo; sem
   recusa, ele envia o branch, e o `/anvil-open-pr` usa o branch base, o
   repositório e o login conferidos, sem rodar o resolvedor de novo; a skill que
-  para antes do PR também deixa a spec parada.
+  para antes do PR também deixa a spec parada, e o relatório diz que o branch
+  ficou publicado em `origin` sem PR e pergunta se o operador corrige o motivo e
+  abre o PR ou apaga o branch remoto, o que o piloto nunca faz sozinho.
   Depois do PR, ele envia a linha `PR:` ao remoto, confere a árvore e só então
   volta ao branch base. No
   merge local, quando o branch base andou desde o corte do branch, como
