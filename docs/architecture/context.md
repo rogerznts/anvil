@@ -124,6 +124,16 @@ _Avoid_: port, análise, estudo
 Os tickets cujos bloqueadores já estão todos resolvidos.
 _Avoid_: fila, backlog, próximos
 
+**Despacho interrompido**:
+O despacho de um ticket ao implementer que volta sem o relatório dele: cancelado,
+com erro ou sem os três campos.
+_Avoid_: despacho falho, implementer morto, ticket caído
+
+**Retomada do despacho**:
+O despacho de novo, na mesma execução, de um ticket cujo despacho foi
+interrompido, continuando do que ele deixou no disco.
+_Avoid_: redespacho, retry, retomada (que é rodar a skill de novo)
+
 ### Verificação
 
 **Prova**:
