@@ -81,6 +81,10 @@ perguntam antes de abrir o PR: `--tea-login <nome>,<url>,<ssh_host>,<padrão>`, 
 vez por login, dá a lista que o `tea login list --output json` devolve, no formato
 do `tea` real; `--labels <rótulo>,<rótulo>…` dá os rótulos que o `gh label list` e
 o `tea labels list` devolvem, e, sem ele, são os de um repositório novo do GitHub.
+Para provar o que acontece quando o PR não sai, a prova cria o arquivo de pedido
+`$PROOF_RUN/pr-create-fails` depois do `proof_prepare`: com ele, o `gh pr create`
+e o `tea pr create` saem `1`, sem URL, com a mensagem do CLI real sem autenticação
+no stderr, e a chamada fica no `forge.jsonl`; o resto do forge falso não muda.
 Para provas do bench com a stack de pé, o
 `proof_prepare --infra` liga o prefixo de execução do `infra.sh` com o id da
 execução, no script da prova e na sessão, e a limpeza derruba essa infra no fim.

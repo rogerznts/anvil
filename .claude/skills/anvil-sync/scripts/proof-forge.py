@@ -30,6 +30,13 @@ A forma de listar rótulos que este arquivo não sabe dar — o --jq, o --templa
 --web do gh, campo do --json fora dos três, outro --output do tea — sai 1 com o motivo
 no stderr, em vez de uma resposta que o CLI real não daria. As outras chamadas saem 0
 sem efeito.
+
+Com o arquivo de pedido <execução>/pr-create-fails, que a prova cria depois do
+proof_prepare, o gh pr create e o tea pr create saem 1, sem nada no stdout, com a
+mensagem do CLI real sem autenticação no stderr: "gh: To use GitHub CLI in
+automation, set the GH_TOKEN environment variable." no gh e "Error: no available
+login" no tea, as duas sem TTY (o gh real sai 4 nesse caso, e o falso, 1). A chamada
+fica no forge.jsonl como as outras, e o resto não muda.
 """
 import json
 import os
@@ -52,6 +59,12 @@ GH_NEW_REPO_LABELS = [
 CONFIGURED_LABEL_COLOR = 'ededed'
 TEA_LOGIN_USER = 'prova'
 GH_LABEL_FIELDS = ('name', 'color', 'description')
+# A mensagem do CLI real sem autenticação, sem TTY, e o arquivo que a pede.
+PR_CREATE_FAILS = 'pr-create-fails'
+PR_CREATE_AUTH_ERROR = {
+    'gh': 'gh: To use GitHub CLI in automation, set the GH_TOKEN environment variable.',
+    'tea': 'Error: no available login',
+}
 
 
 def option(args, *names):
@@ -166,7 +179,10 @@ def tea_labels_list(args, run):
     return 0
 
 
-def pr_create(tool, args, calls):
+def pr_create(tool, args, calls, run):
+    if os.path.exists(os.path.join(run, PR_CREATE_FAILS)):
+        print(PR_CREATE_AUTH_ERROR[tool], file=sys.stderr)
+        return 1
     index = 1 + sum(1 for c in calls if c['tool'] == tool and is_pr_create(c['argv']))
     if tool == 'gh':
         print('https://github.com/%s/pull/%d' % (option(args, '--repo', '-R') or 'fake/fixture', index))
@@ -193,7 +209,7 @@ def main():
     with open(log, 'a', encoding='utf-8') as f:
         f.write(json.dumps({'tool': tool, 'argv': args, 'cwd': os.getcwd()}, ensure_ascii=False) + '\n')
     if is_pr_create(args):
-        return pr_create(tool, args, calls)
+        return pr_create(tool, args, calls, run)
     if tool == 'gh' and args[:1] == ['label'] and args[1:2] in (['list'], ['ls']):
         return gh_label_list(args[2:], run)
     if tool == 'tea' and args[:1] in (['labels'], ['label']) and (len(args) == 1 or args[1] in ('list', 'ls') or args[1].startswith('-')):

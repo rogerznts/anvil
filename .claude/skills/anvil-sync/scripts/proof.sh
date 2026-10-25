@@ -20,7 +20,9 @@
 #       title, url, state, base e head, o tea login list --output json imprime os
 #       logins configurados, o gh label list e o tea labels list imprimem os
 #       rótulos, e as outras chamadas saem 0 sem efeito; as formas de cada resposta
-#       estão no proof-forge.py.
+#       estão no proof-forge.py. Com o arquivo de pedido $PROOF_RUN/pr-create-fails,
+#       que a prova cria depois do proof_prepare, o gh pr create e o tea pr create
+#       saem 1, sem URL, com a mensagem de autenticação no stderr.
 #       --tea-login <nome>,<url>,<ssh_host>,<padrão>, uma vez por login, pede
 #       --forge e configura um login do tea falso: o tea login list --output json
 #       o devolve no formato do tea real, com name, url, ssh_host, user e default.
