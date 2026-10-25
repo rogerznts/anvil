@@ -3,6 +3,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=7f82e0a04ce358d22543de79c3b19172bdf82b89; scope=full; verdict=pass; p1=none
 
 **What to build:** parte da issue #8. Hoje, qualquer caminho fora de commit dá
 `halt`, e a corrente para mesmo quando a sujeira é do despacho interrompido do
