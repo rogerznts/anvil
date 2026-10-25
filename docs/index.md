@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-24T17:50:42Z
+Last updated: 2026-10-25T05:37:15Z
 
 ## Visão geral
 
@@ -23,10 +23,11 @@ Last updated: 2026-10-24T17:50:42Z
 
 ## Specs ativas
 
-- [011 — Branch base e forge neutro](./specs/011-extension-branch-base-and-forge/spec.md) — `extension/011-branch-base-and-forge`, em andamento, 10/11 tickets resolvidos
+Nenhuma.
 
 ## Specs arquivadas
 
+- [011 — Branch base e forge neutro](./specs/archive/011-extension-branch-base-and-forge/spec.md) — `extension/011-branch-base-and-forge`, 11 tickets
 - [010 — Helper de prova e sobras da 009](./specs/archive/010-extension-proof-harness/spec.md) — `extension/010-proof-harness`, 10 tickets
 - [009 — Pontos em aberto do piloto automático](./specs/archive/009-extension-anvil-auto-open-points/spec.md) — `extension/009-anvil-auto-open-points`, 8 tickets
 - [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/archive/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, 11 tickets
