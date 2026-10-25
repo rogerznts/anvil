@@ -2,7 +2,8 @@
 
 **Blocked by:** 01, 02
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=91c167577abbf046e770278d75e77a9c8bb18bb2; scope=full; verdict=fail; p1=open
 
 **What to build:** quando o push do fechamento por PR deu certo e nenhuma URL de PR
 voltou, por CLI sem autenticação, erro do `pr create` ou outra recusa do
@@ -60,3 +61,11 @@ três nomes da parada de uma spec já arquivada que não chega ao branch base vi
   sem "publicad" no relatório, e `workspace/76-pilot-closes-by-pr/s2-t03-github.out`,
   código 0, com o `Estado:` de PR aberto e a URL. `vendor-sync.sh verify` sai `0`
   (`verify.out`).
+- Review round=1 · P1 (Spec): a retomada da spec em parada no fechamento, que o ticket pede ("a spec retomada no fechamento refaz o `git push -u` e segue a ordem do ticket 02") e a US 13 da spec repete, está escrita no "PR" do `anvil-auto`, mas é inalcançável: no branch, o `stage.sh` dá `next: none` e a "Largada" recusa a spec arquivada ("o piloto não retoma a spec"); no branch base, a entrada fica `stopped` e fora do `next` — o operador que corrige a autenticação e chama o piloto de novo recebe uma recusa e abre o PR à mão.
+- Review round=1 · P3 (Spec): o `git push -u` que não sai `0` deixa a spec parada, mas o caso não entra na lista da "Parada" — quem casa a regra pela lista não o acha.
+- Review round=1 · P3 (Spec): o manual `anvil-omp` ainda diz "a spec fica parada, já arquivada no branch", e a spec afirma que o `anvil-auto` é o único lugar da camada omp com os três nomes — a US 16 (um nome só na skill, no relatório e no glossário) fica pela metade, embora o ticket peça a troca só no `anvil-auto`.
+- Review round=1 · P3 (Spec): o "sem publicado" da parada antes do push só foi lido em `workspace/83-pilot-login-before-push/out-t03/report`, e não é conferência do `s2.sh` de lá — se o aviso passar a sair antes do push, aquela S2 continua verde.
+- Review round=1 · P3 (Standards): possível Duplicated Code, aceito pelo padrão do "Nunca" e do modelo do relatório — a proibição de apagar o branch remoto e a pergunta do destino dele aparecem no "PR", no modelo do relatório, no "Nunca" e no manual `anvil-omp`; uma mudança na pergunta precisa ser feita em três lugares.
+- Review round=1 · P3 (Standards): desvio do glossário — o `git push -u` que não sai `0` é mais uma parada depois do archive, fora da lista da "Parada" e da definição de **Parada no fechamento** do `context.md`, e as linhas do "PR" alternam "parada, como diz Parada" e "parada no fechamento" — quem procura os casos do fechamento pela lista ou pelo glossário não acha a falha do push.
+- Review round=1 · P3 (Standards): no item novo do "Nunca", "o branch remoto, …, nem o da spec parada com o branch publicado em `origin`" repete "branch" e o "nem" não acrescenta nada — só deixa a leitura mais lenta.
+- Review round=1 · P3 (Standards): no manual `anvil-omp`, "corrige o motivo e abre o PR ou apaga o branch remoto, o que o piloto nunca faz sozinho" tem antecedente ambíguo — o operador pode ler que o piloto nunca abre o PR sozinho, contra a frase anterior do próprio manual.
