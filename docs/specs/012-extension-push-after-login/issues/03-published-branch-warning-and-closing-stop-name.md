@@ -4,6 +4,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=91c167577abbf046e770278d75e77a9c8bb18bb2; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=bdf65a02911f0f7e4d306c6379303766dfa437c2; scope=diff:91c167577abbf046e770278d75e77a9c8bb18bb2..bdf65a02911f0f7e4d306c6379303766dfa437c2; verdict=pass; p1=none
 
 **What to build:** quando o push do fechamento por PR deu certo e nenhuma URL de PR
 voltou, por CLI sem autenticação, erro do `pr create` ou outra recusa do
@@ -87,3 +88,10 @@ três nomes da parada de uma spec já arquivada que não chega ao branch base vi
   `workspace/83-pilot-login-before-push/s2-t03-r2.out`, código 0, sem "publicad"
   no relatório, e `workspace/76-pilot-closes-by-pr/s2-t03-r2-github.out`, código
   0, com o `Estado:` de PR aberto. `vendor-sync.sh verify` sai `0`.
+- Review round=2: o P1 da rodada 1 fechou (eixo Spec). Os P3 da rodada 1 continuam abertos nos dois eixos, com o mesmo texto: o `git push -u` que não sai `0` fora da lista da "Parada" e da definição do glossário, o "já arquivada no branch" do manual `anvil-omp`, a S2 de `workspace/83-pilot-login-before-push/` sem conferir a ausência do aviso, a redação do item do "Nunca" e o antecedente ambíguo do manual; o Duplicated Code segue aceito pelo padrão do "Nunca".
+- Review round=2 · P2 (Spec): a recusa da spec parada pela conferência do merge saiu da "Largada" para o caso `none` da "Retomada", depois do `roadmap.sh` e do resolvedor, e o texto não manda mais a recusa dizer que a spec está arquivada no branch sem merge nem apontar o branch base, o motivo que o ticket 06 da spec 009 exige; a S2 que confere isso, `workspace/57-merge-check/s2.sh` no `CASO=F` (F2), não foi rodada de novo — a recusa pode perder o motivo sem que prova alguma acuse.
+- Review round=2 · P3 (Standards): possível Duplicated Code — a ordem do PR (`--pr`, `git push -u`, `anvil-open-pr`) aparece no caso `none` da "Retomada", no "PR" e no manual `anvil-omp`; quem mudar a ordem num lugar e esquecer outro deixa duas versões em conflito.
+- Review round=2 · P3 (Standards): possível Mysterious Name — a "Largada" e a "Retomada" separam "spec aberta" de "spec em parada no fechamento", mas a "Parada" diz que a spec parada "fica aberta no branch dela", e a descrição do frontmatter e a introdução só falam em "spec aberta" — quem lê a descrição não sabe se a retomada no fechamento está coberta.
+- Review round=2 · P3 (Standards): na retomada no fechamento, a linha `Roteiro:` do modelo do relatório ("na etapa <next do stage.sh>") vira "na etapa none" (`workspace/84-pilot-published-branch-warning/out-retomada/report`) — o operador não lê nela em que ponto a spec foi retomada.
+- Review round=2 · P3 (Standards): o manual `anvil-omp` passou a dizer "spec parada no fechamento" poucas linhas antes do "a spec fica parada, já arquivada no branch" que o _Avoid_ do glossário lista — os dois nomes ficam lado a lado no mesmo arquivo.
+- Review round=2 · P3 (Spec e Standards): "No bench, a pasta da spec sem `gates.md` pede o Ledger da spec antes de qualquer um desses pontos" passa a valer para o caso `none`, em que a pasta já está em `docs/specs/archive/` — o piloto pode procurar o `gates.md` no caminho antigo e refazer o ledger de uma spec arquivada, contra o "O que o disco já tem não se refaz".
