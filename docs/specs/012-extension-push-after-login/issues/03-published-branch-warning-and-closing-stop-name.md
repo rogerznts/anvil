@@ -2,7 +2,7 @@
 
 **Blocked by:** 01, 02
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=91c167577abbf046e770278d75e77a9c8bb18bb2; scope=full; verdict=fail; p1=open
 
 **What to build:** quando o push do fechamento por PR deu certo e nenhuma URL de PR
@@ -69,3 +69,21 @@ três nomes da parada de uma spec já arquivada que não chega ao branch base vi
 - Review round=1 · P3 (Standards): desvio do glossário — o `git push -u` que não sai `0` é mais uma parada depois do archive, fora da lista da "Parada" e da definição de **Parada no fechamento** do `context.md`, e as linhas do "PR" alternam "parada, como diz Parada" e "parada no fechamento" — quem procura os casos do fechamento pela lista ou pelo glossário não acha a falha do push.
 - Review round=1 · P3 (Standards): no item novo do "Nunca", "o branch remoto, …, nem o da spec parada com o branch publicado em `origin`" repete "branch" e o "nem" não acrescenta nada — só deixa a leitura mais lenta.
 - Review round=1 · P3 (Standards): no manual `anvil-omp`, "corrige o motivo e abre o PR ou apaga o branch remoto, o que o piloto nunca faz sozinho" tem antecedente ambíguo — o operador pode ler que o piloto nunca abre o PR sozinho, contra a frase anterior do próprio manual.
+- Correção do P1 da rodada 1: na "Largada" do `anvil-auto`, o `next: none` com o
+  branch fora do branch base (`git merge-base --is-ancestor HEAD <base>` diferente
+  de `0`) deixou de recusar e vai à "Retomada" como spec em parada no fechamento;
+  com `0`, a recusa fica. A "Retomada" ganhou o caso `none`: sem refazer o archive,
+  o piloto roda o resolvedor e decide como em "Fechamento"; com merge local, ou com
+  a linha `PR:` num ticket (PR aberto), recusa; com PR e sem a linha, segue o "PR",
+  com o `--pr`, o `git push -u` e o `anvil-open-pr`. O manual `anvil-omp` descreve
+  a retomada no fechamento. Prova: o caso `CASO=retomada` do mesmo
+  `workspace/84-pilot-published-branch-warning/s2.sh`, com a 001 arquivada no
+  branch, o branch já no bare e sem o pedido de falha. Vermelho com o payload de
+  `91c1675`, a rodada 1 (`s2-red-retomada.out`): a largada recusou, 8 falhas,
+  código do helper 1. Verde (`s2-retomada.out`): nenhum archive novo, o `--pr`
+  antes do `git push -u`, um `gh pr create`, a linha `PR:` no bare e o `Estado:`
+  de PR aberto, com a URL; código do helper 0. Com o texto final, o aviso passa de
+  novo (`s2-r2.out`, código 0), e as S2 do ticket 02 também:
+  `workspace/83-pilot-login-before-push/s2-t03-r2.out`, código 0, sem "publicad"
+  no relatório, e `workspace/76-pilot-closes-by-pr/s2-t03-r2-github.out`, código
+  0, com o `Estado:` de PR aberto. `vendor-sync.sh verify` sai `0`.

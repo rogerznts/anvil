@@ -106,12 +106,11 @@ escreva, não commite e não se ofereça para fazer o trabalho por conta própri
    `base`, siga para a entrada. Em outro branch, a linha `do:` do script é da
    `anvil-plan` e não vale aqui: você não propõe etapa nem termina a vez por ela.
    Decida assim:
-   - com `next: none`, o branch é de uma spec arquivada, a da linha `spec`: recuse
-     e aponte o branch base. Quando `git merge-base --is-ancestor HEAD <base>` sai
-     diferente de `0`, a spec está arquivada no branch e ainda sem merge no branch
-     base, como a que a conferência do merge parou: a recusa diz esse motivo, e
-     que o piloto não retoma a spec nem refaz o merge dela, porque qual spec cede
-     é decisão do operador;
+   - com `next: none`, o branch é de uma spec arquivada, a da linha `spec`. Quando
+     `git merge-base --is-ancestor HEAD <base>` sai `0`, ela já chegou ao branch
+     base: recuse e aponte o branch base. Diferente de `0`, a spec está em parada
+     no fechamento, arquivada no branch e ainda sem merge no branch base: retome
+     pela seção "Retomada", que diz quando ela segue e quando a recusa vem;
    - com `spec: none`, retome pela seção "Retomada" quando o branch tem número,
      `{tipo}/{NNN}-{nome}`, e esse número está no `Spec:` de uma entrada do
      roteiro: a spec nasceu e ainda não tem pasta commitada. Senão, recuse, aponte
@@ -276,13 +275,13 @@ vez, sem esperar resposta.
 
 ## Retomada
 
-Chamado no branch de uma spec aberta, você não passa pela entrada: o roteiro foi
-confirmado numa execução anterior, e não há grill nem sim. Rode o `roadmap.sh` e
-ache a linha `entry:` cujo `spec=` tem o número do branch, comparado como número.
-Sem ela, recuse: a spec não é de uma entrada do roteiro, e quem a conduz é a
-`anvil-plan` e a `anvil-run`. Com ela, a entrada desta volta é essa: leia a seção
-dela no `roadmap.md` e retome a spec do ponto que o disco indica, pela linha `next`
-do `stage.sh` da largada:
+Chamado no branch de uma spec aberta, ou de uma em parada no fechamento, você não
+passa pela entrada: o roteiro foi confirmado numa execução anterior, e não há
+grill nem sim. Rode o `roadmap.sh` e ache a linha `entry:` cujo `spec=` tem o
+número do branch, comparado como número. Sem ela, recuse: a spec não é de uma
+entrada do roteiro, e quem a conduz é a `anvil-plan` e a `anvil-run`. Com ela, a
+entrada desta volta é essa: leia a seção dela no `roadmap.md` e retome a spec do
+ponto que o disco indica, pela linha `next` do `stage.sh` da largada:
 
 - `anvil-grill`, no branch com número e sem pasta, ou `anvil-to-spec`: escreva a
   spec e os tickets, como diz "Spec e tickets";
@@ -292,7 +291,15 @@ do `stage.sh` da largada:
   todo ticket resolvido, o despacho acaba de saída e vai para o `PASS`;
 - `anvil-wayfinder`: o `map.md` da spec tem decisão aberta, e decisão é do
   operador. A spec fica parada, como diz "Parada", com a decisão em "o que ainda
-  espera decisão".
+  espera decisão";
+- `none`, com a spec em parada no fechamento: o `PASS` e o archive já estão
+  commitados no branch, e ela volta à decisão de "Fechamento", sem refazer o
+  archive. Rode o resolvedor e decida na mesma ordem. Com merge local, recuse: o
+  merge que a guarda bloqueou ou que o conflito ou a conferência abortou pede a
+  decisão do operador, e o piloto não o refaz. Com PR, quando um ticket da spec já
+  tem a linha `PR:`, o PR está aberto, e o merge dele é do operador: recuse, com a
+  URL. Sem ela, siga o "PR" de "Fechamento", na ordem de lá: o resolvedor com
+  `--pr`, o `git push -u` e o `anvil-open-pr`.
 
 No bench, a pasta da spec sem `gates.md` pede o "Ledger da spec" antes de qualquer
 um desses pontos.

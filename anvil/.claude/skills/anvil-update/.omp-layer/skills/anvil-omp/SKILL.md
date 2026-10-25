@@ -94,8 +94,11 @@ com um bloco `bash`, que o `/anvil-boot` grava em projeto novo. Só a recusa do
 branch base para a largada: a de forge ou de login, como num Gitea sem `tea` ou
 sem a seção `## Git`, fica para o fechamento por PR. Chamado no branch
 de uma spec aberta do roteiro, ele retoma a spec do ponto que o disco indica e
-depois segue a corrente. Em outro branch, como o de uma spec arquivada ou o de uma
-spec que não é de entrada do roteiro, ele recusa.
+depois segue a corrente. Chamado no branch de uma spec parada no fechamento, já
+arquivada e sem merge, ele volta à decisão do fechamento: pelo PR, sem PR aberto,
+refaz a conferência do `--pr`, o push e o `/anvil-open-pr`; pelo merge local, ou
+com o PR aberto, recusa. Em outro branch, como o de uma spec que já chegou ao
+branch base ou o de uma spec que não é de entrada do roteiro, ele recusa.
 
 **O único sim.** O grill, ou a entrevista, cobre o trabalho inteiro: as specs, a
 ordem, o escopo, o que fica de fora e o critério de pronto de cada uma. No fim, o
