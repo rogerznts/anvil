@@ -28,7 +28,8 @@ com adaptação registrada — ver
 │  contrato de 6 capacidades                                │
 └───────────────────────────────────────────────────────────┘
       apoiadas por 10 skills autorais: docs · boot · update ·
-      bench · ui · distill · tea-* (4)
+      bench · ui · distill · commit · open-pr · open-fast-pr ·
+      prune-branches
 ```
 
 ## Harnesses

@@ -68,8 +68,9 @@ tocado.
   spec tem tela e nunca o dispara, assim como nunca dispara archive nem PR.
 
 A guarda de merge age sozinha: `git merge` de spec com ticket aberto ou sem archive,
-e `tea pr create` sem archive, são bloqueados com o mesmo motivo que o Claude Code
-mostra. Ela só age em projeto anvil, o que tem `.claude/rules/anvil.md`, e chama o
+e PR aberto pelo `gh` ou pelo `tea` sem archive, são bloqueados com o mesmo motivo
+que o Claude Code mostra. Ela só age em projeto anvil, o que tem
+`.claude/rules/anvil.md`, e chama o
 `guard-spec-merge.sh` da instalação de usuário, em
 `~/.claude/skills/anvil-docs/scripts/`. Se ele faltar num projeto anvil, cada
 comando do `bash` traz um aviso de que a guarda está desligada, até um
@@ -85,26 +86,30 @@ programa, e não o `anvil-grill`. Nenhum outro sinal liga o modo bench.
 
 **Largada.** Antes de escrever qualquer arquivo, o piloto recusa o perfil do
 tracker que não é o `docs/specs`, com a mesma recusa dos condutores; a árvore
-suja, porque ele commita na `main` e o que é seu entraria num commit dele; e, fora
-do bench, o `.claude/rules/anvil.md` sem a seção `## Comando de verificação` com
-um bloco `bash`, que o `/anvil-boot` grava em projeto novo. Chamado no branch de
-uma spec aberta do roteiro, ele retoma a spec do ponto que o disco indica e depois
-segue a corrente. Em outro branch, como o de uma spec arquivada ou o de uma spec
-que não é de entrada do roteiro, ele recusa.
+suja, porque ele commita no branch base — a `main`, a `master` ou o que a seção
+`## Git` de `.claude/rules/anvil.md` declara — e o que é seu entraria num commit
+dele; o projeto cujo branch base o resolvedor não decide, com o motivo dele; e,
+fora do bench, o `.claude/rules/anvil.md` sem a seção `## Comando de verificação`
+com um bloco `bash`, que o `/anvil-boot` grava em projeto novo. Só a recusa do
+branch base para a largada: a de forge ou de login, como num Gitea sem `tea` ou
+sem a seção `## Git`, fica para o fechamento por PR. Chamado no branch
+de uma spec aberta do roteiro, ele retoma a spec do ponto que o disco indica e
+depois segue a corrente. Em outro branch, como o de uma spec arquivada ou o de uma
+spec que não é de entrada do roteiro, ele recusa.
 
 **O único sim.** O grill, ou a entrevista, cobre o trabalho inteiro: as specs, a
 ordem, o escopo, o que fica de fora e o critério de pronto de cada uma. No fim, o
 piloto escreve o **roteiro** em `docs/specs/roadmap.md`, valida e mostra o texto,
 que no bench é a versão em português simples. A sua confirmação sobre esse texto
-é o único sim da execução, e com ela o roteiro é commitado na `main`. Um roteiro
+é o único sim da execução, e com ela o roteiro é commitado no branch base. Um roteiro
 que já existe com entrada inacabada é editado pelo grill, não substituído: uma
 entrada inacabada só sai com a sua resposta sobre ela.
 
 **O que ele faz sozinho.** Depois do sim, sem pausa, entrada por entrada, na ordem
 do roteiro e só quando as dependências da entrada fecharam:
 
-- abre o branch da spec pelo `new-spec.sh`, saído da `main`, e grava o `Spec:` da
-  entrada na `main`;
+- abre o branch da spec pelo `new-spec.sh`, saído do branch base, e grava o
+  `Spec:` da entrada no branch base;
 - roda o `anvil-to-spec` e o `anvil-to-tickets` e responde às pausas deles com a
   opção recomendada pela skill ou, sem recomendação, a mais conservadora;
 - despacha os tickets em série, um `anvil-implementer` por ticket, pelo
@@ -113,8 +118,14 @@ do roteiro e só quando as dependências da entrada fecharam:
   `verdict=pass; p1=none`, e o comando de verificação rodado por ele saindo `0`.
   No bench, o `--reverify` dos gates desta spec e das já fechadas toma o lugar
   do comando;
-- fecha com o archive e, pela regra do projeto, o merge local na `main` ou o PR
-  aberto. No merge local, quando a `main` andou desde o corte do branch, como
+- fecha com o archive e, nesta ordem: sem remoto, o merge local no branch base;
+  com uma rule que manda fechar sem PR, ou sem o passo `/anvil-open-pr` no perfil
+  do tracker, o merge local, sem consultar o forge; senão, o forge que o resolvedor
+  dá decide — `nenhum`, o merge local; `github` ou `gitea`, o PR aberto pelo
+  `/anvil-open-pr` —, e a recusa do forge, ou a que para o `/anvil-open-pr`, como a
+  do login do `tea`, deixa a spec parada. Depois do PR, ele envia a linha `PR:` ao
+  remoto, confere a árvore e só então volta ao branch base. No
+  merge local, quando o branch base andou desde o corte do branch, como
   quando uma spec irmã fechou nesse meio-tempo, ele prepara o merge sem commitá-lo
   e roda a verificação sobre o estado combinado: o comando de verificação ou, no
   bench, o `--reverify`. Com o comando saindo `0` fora do bench, ou, no bench, com
@@ -135,7 +146,7 @@ desbloqueada.
 **Onde fica o resultado.** O roteiro, em `docs/specs/roadmap.md`, não guarda
 estado: o estado de cada entrada sai do disco, e o `docs/index.md` o mostra. O
 relatório, em `docs/specs/report.md`, é escrito à medida que a corrente avança e
-commitado na `main` a cada fronteira de spec: o que foi feito, cada pausa
+commitado no branch base a cada fronteira de spec: o que foi feito, cada pausa
 respondida pelo piloto, o que ele decidiu sem você, onde a corrente parou e, por
 último, o que ainda espera decisão, cada item como pergunta. O piloto termina
 oferecendo um grill novo com essa lista como pauta.
@@ -152,7 +163,7 @@ no mesmo checkout é erro de operação, e nada o impede.
 - fazer o merge de um PR. Ele abre o PR e para, e o que depende da entrada espera
   o seu merge;
 - contornar a guarda de merge. Um bloqueio dela deixa a spec parada, e nenhum
-  outro verbo leva o branch para a `main`;
+  outro verbo leva o branch para o branch base;
 - despachar em paralelo, ou construir duas specs ao mesmo tempo. O `--parallel N`
   é só da `anvil-run`;
 - fazer archive ou merge sem `PASS`, ou resolver conflito de merge fora do

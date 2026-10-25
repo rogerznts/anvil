@@ -82,7 +82,8 @@ esta instalação possui, com uma linha `skill:` por skill, uma `agent:` por
 agente e uma `omp:` por arquivo da camada omp, com o caminho relativo a
 `~/.omp/agent/`. É o que substitui a detecção por prefixo do mosk — um lockfile
 diz a verdade, um prefixo adivinha, e adivinha errado justamente nas skills que
-não seguem o padrão de nome, como as `tea-*`.
+não seguem o padrão de nome, como as `tea-*`, que viraram `anvil-*` e só saem
+pelo lock.
 
 Sem lock, é a primeira instalação de usuário: nada é do anvil, nada é apagado, e
 toda skill ou agente do payload que já estiver em `~/.claude/` sai como colisão.
@@ -126,7 +127,9 @@ O diretório do usuário não tem git por trás, então o dry-run **lista por no
 tudo que será substituído, removido e preservado. A saída classifica as skills e
 os agentes em quatro grupos: *substituídos* · *órfãos, serão removidos* · *não são
 do anvil, ficam intocados* · *preservados sempre*. Skill aparece pelo nome, agente
-pelo caminho (`~/.claude/agents/{nome}.md`).
+pelo caminho (`~/.claude/agents/{nome}.md`). Uma `tea-*` órfã sai com o nome novo
+ao lado — `tea-open-pr — agora anvil-open-pr` —, porque as skills de git do anvil
+mudaram de nome e o comando a digitar mudou com elas.
 
 O substituído que o lock não lista sai de novo logo abaixo, como *possível colisão
 com arquivo do usuário*: pode ser uma skill ou um agente que você escreveu com o
@@ -164,7 +167,9 @@ template novo.
 
 Diga numa frase o que será apagado e o que será preservado, **nomeando os
 órfãos** e as **possíveis colisões**, de skill, de agente e da camada omp, que
-serão sobrescritas. Não continue com um "talvez".
+serão sobrescritas. Órfã com nome novo vai com o nome novo: é o único aviso ao
+usuário de que o `/tea-*` que ele digitava deixou de existir. Não continue com um
+"talvez".
 
 Colisão no espelho não é sobrescrita. Antes de executar, compare cada uma com a
 skill instalada, que o dry-run ainda não trocou:

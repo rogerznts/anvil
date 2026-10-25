@@ -41,7 +41,9 @@ skills, só o roster de fluxo é ligado, não o payload inteiro — `--all` liga
 `--dry-run` mostra sem alterar. Os agentes do payload e os arquivos da camada omp
 são ligados todos. Symlink com o nome de uma peça do payload que aponta para outro
 lugar é refeito; diretório ou arquivo real é pulado, e numa máquina com a
-instalação publicada tirá-la para ligar a fonte é à mão.
+instalação publicada tirá-la para ligar a fonte é à mão. O symlink para o payload
+cujo alvo saiu dele — a skill renomeada ou tirada — sai de `~/.claude/skills` e de
+`~/.agents/skills`; o pendurado de outro toolkit fica.
 
 O `--unlink` tira só os symlinks que apontam para o payload deste repositório, e
 deixa a máquina pronta para receber a instalação publicada. Ao ligar e no
@@ -95,7 +97,8 @@ O julgamento está em `.claude/skills/anvil-sync/SKILL.md`, o catálogo em
 nada disso aqui — são a fonte, isto é o ponteiro.
 
 Skill autoral — `anvil-boot`, `anvil-update`, `anvil-docs`, `anvil-ui`,
-`anvil-distill`, `anvil-bench` e as `tea-*` — não tem upstream, e se
+`anvil-distill`, `anvil-bench`, `anvil-commit`, `anvil-open-pr`,
+`anvil-open-fast-pr` e `anvil-prune-branches` — não tem upstream, e se
 edita direto no payload. A ressalva é o
 `anvil-bench`: o que está em `anvil-bench/unlazy/` é material do
 `unlazy`, que vem de upstream com pin e registro no manifesto, e segue a regra de
@@ -121,7 +124,7 @@ Trabalho com spec vai num branch `{tipo}/{NNN}-{nome}`. Fecha com
 Trabalho sem spec vai direto na `main`.
 
 O fechamento segue o perfil do tracker, `docs/agents/issue-tracker.md`, menos o
-passo `/tea-open-pr`: aqui não há PR, e a spec fecha com o merge local. O que a
+passo `/anvil-open-pr`: aqui não há PR, e a spec fecha com o merge local. O que a
 guarda de merge exige para liberar está no mesmo perfil. Ela confere o `git
 merge` disparado da `main` ou do branch da spec, e é um hook do Claude Code: só vê
 comando do agente, não o que se digita no terminal.

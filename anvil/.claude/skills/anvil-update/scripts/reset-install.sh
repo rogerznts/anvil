@@ -23,8 +23,9 @@
 #
 # O conjunto a apagar vem do lock de usuário, não de um prefixo de nome. Um
 # lockfile diz a verdade; um prefixo adivinha — e adivinha errado nas skills que
-# não seguem o padrão de nome, como as `tea-*`. O lock tem uma linha `skill:` por
-# skill e uma `agent:` por agente; o que está fora dele é do usuário e fica.
+# não seguem o padrão de nome, como as `tea-*`, que viraram `anvil-*`. O lock tem
+# uma linha `skill:` por skill e uma `agent:` por agente; o que está fora dele é
+# do usuário e fica.
 # O espelho sai do mesmo lock: um symlink por linha `skill:`, e o que o lock
 # deixou de listar sai.
 # A camada omp vem de .claude/skills/anvil-update/.omp-layer/ do payload e entra
@@ -468,6 +469,9 @@ lista() {
 }
 espelho() { printf '%s' "$1" | sed 's|^\(.*\)$|    ~/.agents/skills/\1|'; }
 na_camada() { printf '%s' "$1" | sed 's|^\(.*\)$|    ~/.omp/agent/\1|'; }
+# As skills de git do anvil eram `tea-*` e viraram `anvil-*`: saem como órfãs pela
+# regra do lock, e o relatório é o único aviso de que o nome a digitar mudou.
+com_nome_novo() { sed -E 's/^  tea-(commit|open-pr|open-fast-pr|prune-branches)$/& — agora anvil-\1/'; }
 
 echo "reset-install: $FROM_ABS -> $U (instalação de usuário)"
 [ "$DRY" -eq 1 ] && echo "(dry-run: nada foi alterado)"
@@ -478,7 +482,7 @@ if [ -n "$colisoes$colisoes_ag" ]; then
     echo "ATENÇÃO, substituídos fora do lock, possível colisão com arquivo do usuário ($(conta "$colisoes$colisoes_ag")):"
     lista "$colisoes" "$colisoes_ag"
 fi
-echo "órfãos, serão REMOVIDOS ($(conta "$orfaos$orfaos_ag")):"; lista "$orfaos" "$orfaos_ag"
+echo "órfãos, serão REMOVIDOS ($(conta "$orfaos$orfaos_ag")):"; lista "$orfaos" "$orfaos_ag" | com_nome_novo
 echo "não são do anvil, ficam intocados ($(conta "$alheios$alheios_ag")):"; lista "$alheios" "$alheios_ag"
 echo "preservados sempre:"
 for p in .claude/settings.local.json .claude/rules .omp/agent/config.yml; do

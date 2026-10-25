@@ -16,7 +16,9 @@
 #   dev-link.sh [--dry-run]     liga o roster de fluxo em ~/.claude/skills e os
 #                               agentes em ~/.claude/agents, espelha as skills
 #                               ligadas em ~/.agents/skills, e liga a camada omp
-#                               em ~/.omp/agent
+#                               em ~/.omp/agent; tira de ~/.claude/skills e de
+#                               ~/.agents/skills o symlink nosso cujo alvo saiu
+#                               do payload
 #   dev-link.sh --all           liga o payload inteiro
 #   dev-link.sh --unlink        remove os symlinks que apontam para este payload,
 #                               e somente eles
@@ -149,7 +151,7 @@ anvil-unslop
 anvil-writing-for-agents
 anvil-browser-qa
 anvil-next
-tea-commit"
+anvil-commit"
 
 MODO="roster"; DRY=0
 while [ $# -gt 0 ]; do
@@ -223,6 +225,17 @@ for s in $conjunto; do
     ligados=$((ligados + 1)); a_ligar="$a_ligar$s"$'\n'
 done
 
+# --- links pendurados ------------------------------------------------------------
+# O symlink nosso cujo alvo saiu do payload — a skill renomeada ou tirada — sai, no
+# roster e no --all. Symlink para outro lugar, pendurado ou nao, e de outro
+# toolkit e fica.
+pend_removidos=0
+for l in "$DEST"/*; do
+    nosso "$l" && [ ! -e "$l" ] || continue
+    if [ "$DRY" -eq 1 ]; then echo "removeria $(curto "$l")"; else rm -f "$l"; fi
+    pend_removidos=$((pend_removidos + 1))
+done
+
 # --- agentes -------------------------------------------------------------------
 # Todos, no roster e no --all. O roster poupa a atencao que as descriptions das
 # skills disputam; os agentes do payload so recebem trabalho da skill que os
@@ -242,11 +255,11 @@ done
 # Gerado a partir do que esta ligado agora em ~/.claude/skills, nao so do conjunto
 # desta execucao: o roster nao desliga o que um --all ligou antes. Como no reset,
 # o symlink com nome de skill do payload e do anvil e e refeito; o nosso de skill
-# que nao esta mais ligada sai. Diretorio ou arquivo fica: `ln -s` sobre um
-# diretorio criaria o link dentro dele.
+# que nao esta mais ligada sai, o pendurado inclusive. Diretorio ou arquivo fica:
+# `ln -s` sobre um diretorio criaria o link dentro dele.
 ligada() {
     printf '%s' "$a_ligar" | grep -qxF -e "$1" && return 0
-    nosso "$DEST/$1"
+    nosso "$DEST/$1" && [ -e "$DEST/$1" ]
 }
 esp_ligados=0; esp_removidos=0; esp_pulados=""
 for s in $disponiveis; do
@@ -289,7 +302,7 @@ done <<< "$omp_links"
 
 seria() { [ "$DRY" -eq 1 ] && echo "$1" || echo "$2"; }
 echo
-echo "$ligados de $(conta "$disponiveis") skills do payload $(seria "seriam ligadas" "ligadas") em ~/.claude/skills."
+echo "$ligados de $(conta "$disponiveis") skills do payload $(seria "seriam ligadas" "ligadas") e $pend_removidos symlink(s) pendurado(s) $(seria "seriam removidos" "removidos") em ~/.claude/skills."
 echo "$ag_ligados de $ag_total agentes do payload $(seria "seriam ligados" "ligados") em ~/.claude/agents."
 echo "$esp_ligados symlink(s) $(seria "seriam ligados" "ligados") e $esp_removidos $(seria "seriam removidos" "removidos") em ~/.agents/skills."
 echo "$omp_ligados arquivo(s) da camada omp $(seria "seriam ligados" "ligados") e $omp_removidos symlink(s) $(seria "seriam removidos" "removidos") em ~/.omp/agent."
@@ -304,14 +317,16 @@ echo "$omp_ligados arquivo(s) da camada omp $(seria "seriam ligados" "ligados") 
 # --- aviso: referencia para fora do roster ------------------------------------
 # Nao religa nada. Existe para a lista nao apodrecer em silencio: uma skill
 # ligada apontando para uma que nao esta e ou uma dependencia esquecida, ou uma
-# ausencia deliberada. Quem decide e voce.
+# ausencia deliberada. Quem decide e voce. So conta nome que e skill do payload:
+# o texto tambem cita nome de outra coisa com o mesmo prefixo, como a rede
+# "anvil-net".
 penduradas=""
 for s in $conjunto; do
     [ -d "$PAYLOAD/$s" ] || continue
     for ref in $(grep -rhoE '"(anvil|tea)-[a-z0-9-]+"|\.\./(anvil|tea)-[a-z0-9-]+' "$PAYLOAD/$s" 2>/dev/null \
                  | grep -oE '(anvil|tea)-[a-z0-9-]+' | sort -u); do
         [ "$ref" = "$s" ] && continue
-        [ -f "$AGENTS/$ref.md" ] && continue   # agente do payload, nao skill: ja ligado acima
+        [ -d "$PAYLOAD/$ref" ] || continue   # nao e skill do payload: a rede anvil-net, um agente
         printf '%s\n' "$conjunto"    | grep -qx "$ref" && continue
         printf '%s\n' "$penduradas"  | grep -q "^$s -> $ref\$" && continue
         penduradas="$penduradas$s -> $ref"$'\n'

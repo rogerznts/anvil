@@ -35,7 +35,7 @@ encontrar e tentar usar:
 | `.claude/agents/mosk-*.md` | as doze personas. Só elas: o diretório fica |
 | `.claude/mosk/` | o core: tasks, templates, checklists, scripts, schemas |
 | `.claude/skills/mosk-*` | os wrappers de agente e as skills soltas |
-| `.claude/skills/tea-*` | as cópias do mosk. As do anvil vêm da instalação de usuário, e a cópia do mosk no projeto as sombrearia no omp |
+| `.claude/skills/tea-*` | as cópias do mosk das skills de git. As do anvil se chamam `anvil-commit`, `anvil-open-pr`, `anvil-open-fast-pr` e `anvil-prune-branches` e vêm da instalação de usuário; a cópia do mosk deixaria no projeto o nome antigo, com o comportamento antigo |
 | `.claude/hooks/guard-spec-merge.sh` | a guarda do mosk. A do anvil vem da instalação de usuário |
 | em `.claude/settings.json`, só a entrada do hook que chama `.claude/hooks/guard-spec-merge.sh` | chamaria um script apagado a cada comando. O resto do arquivo, hooks do projeto inclusive, fica |
 
@@ -188,8 +188,8 @@ puro, sem frontmatter.
   camadas, convenções de pasta, como rodar os testes, fluxos comuns, e as regras
   que o agente deve seguir neste projeto.
 - **`anvil.md`** — sempre. A configuração resolvida: idioma de comunicação
-  (default pt-BR), o comando de verificação, a lista de modelos por papel que o
-  `anvil-arena`, o `anvil-how` e o `anvil-architect` leem, e a seção de
+  (default pt-BR), o comando de verificação, a seção Git, a lista de modelos por
+  papel que o `anvil-arena`, o `anvil-how` e o `anvil-architect` leem, e a seção de
   instalação, para quem clona o projeto.
 - **`frontend.md`** — só se houver código de frontend.
 
@@ -220,6 +220,37 @@ npm test
   junto com o resto da proposta, e espere a resposta. Não grave a seção vazia,
   nem com um comando inventado: sem resposta, ela fica de fora, e o relatório do
   passo 10 a lista como pendente, porque sem ela o piloto recusa o projeto.
+
+A seção Git do `anvil.md` declara o branch base — de onde o trabalho sai e para
+onde volta — e o forge (`gitea`, `github` ou `nenhum`). Da raiz do projeto:
+
+```bash
+bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh
+```
+
+O resolvedor dá os valores que resolveu e uma linha `refusal: <campo>: <motivo>`
+por recusa, com o campo `base` ou `forge`.
+
+- **Saída `0`:** mostre ao usuário o branch base de `base:` e o forge de `forge:`,
+  e peça confirmação ou correção dos dois antes de escrever.
+- **Saída `2`:** mostre o motivo de cada linha `refusal:` e pergunte os dois
+  valores, branch base e forge. Espere a resposta; não grave a seção com valores
+  presumidos.
+
+Com a resposta, escreva a seção com os valores confirmados ou corrigidos, neste
+formato (os valores abaixo são exemplo, não defaults):
+
+```markdown
+## Git
+
+branch base: main
+forge: nenhum
+```
+
+Nas linhas de valor vai só o nome do branch e um dos três valores de forge, sem
+explicação junto. Depois de escrever, rode o resolvedor de novo: se ainda recusar
+— por exemplo, branch inexistente ou forge que não se resolve —, mostre o motivo e
+registre a pendência no relatório do passo 10, sem trocar a escolha do usuário.
 
 A seção de modelos do `anvil.md`:
 
@@ -255,10 +286,11 @@ O segundo comando mostra o que entra e o que fica; o terceiro instala. Para
 trocar de versão depois, rode `/anvil-update`.
 ```
 
-Num `anvil.md` que já existe sem a seção de verificação, sem a lista de modelos
-ou sem a seção de instalação, proponha acrescentá-las; valor já configurado não
-se troca. O comando de teste que um boot antigo gravou sob outro título é o que a
-seção de verificação leva.
+Num `anvil.md` que já existe sem a seção de verificação, sem a seção Git, sem a
+lista de modelos ou sem a seção de instalação, proponha acrescentar só o que
+falta, sem mexer no resto. Para a seção Git ausente, siga a detecção e confirmação
+acima; valor já configurado não se troca. O comando de teste que um boot antigo
+gravou sob outro título é o que a seção de verificação leva.
 
 Depois, **sugira** rules adicionais, cada uma com uma linha de evidência do
 código que a justifica, e **espere aprovação**: `coding-standards.md`,

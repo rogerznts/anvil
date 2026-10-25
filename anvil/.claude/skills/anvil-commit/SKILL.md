@@ -1,5 +1,5 @@
 ---
-name: tea-commit
+name: anvil-commit
 description: Stages and commits pending changes using Conventional Commits format. Reads the diff, alerts for debug code, generates a clear commit message, and commits without skipping hooks.
 model: haiku
 ---

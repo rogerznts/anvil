@@ -42,6 +42,28 @@ command -v git >/dev/null 2>&1 || { echo "erro: git não encontrado" >&2; exit 2
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "erro: não é um repositório git" >&2; exit 2; }
 SPECS="$ROOT/docs/specs"
 
+# --- branch base --------------------------------------------------------------
+# A spec sai do branch base, o que o resolve-git.sh do anvil-docs dá (ADR-0015),
+# para que nenhuma spec nasça de outra. Fora dele, ou sem o base: do resolvedor,
+# o script para aqui, antes de reservar o número: nada é reservado nem criado. Só
+# a recusa do campo base para a spec; a de forge e a de login param só o PR. O
+# resolvedor é achado pelo caminho físico deste script, de qualquer pasta.
+RESOLVER="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../../anvil-docs/scripts/resolve-git.sh"
+RESOLVER_OUT="$(cd "$ROOT" && bash "$RESOLVER" 2>&1)"
+BASE="$(printf '%s\n' "$RESOLVER_OUT" | sed -n 's/^base: //p')"
+if [ -z "$BASE" ]; then
+    BASE_REFUSALS="$(printf '%s\n' "$RESOLVER_OUT" | sed -n 's/^refusal: base: /erro: /p')"
+    if [ -n "$BASE_REFUSALS" ]; then printf '%s\n' "$BASE_REFUSALS" >&2
+    else echo "erro: o resolve-git.sh do anvil-docs não deu o branch base: ${RESOLVER_OUT:-sem saída}" >&2
+    fi
+    exit 2
+fi
+ATUAL="$(git branch --show-current)"
+[ "$ATUAL" = "$BASE" ] || {
+    echo "erro: a spec sai do branch base, $BASE, e o checkout atual é ${ATUAL:-um HEAD destacado}; rode git checkout $BASE e chame de novo" >&2
+    exit 2
+}
+
 # --- slug ---------------------------------------------------------------------
 if [ -z "$SHORT" ]; then
     SHORT="$(printf '%s' "$DESC" \

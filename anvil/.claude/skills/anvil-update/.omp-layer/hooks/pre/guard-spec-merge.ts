@@ -43,7 +43,7 @@ export default function guardSpecMerge(pi: HookAPI): void {
 
 		const guarda = join(homedir(), GUARDA);
 		if (!existsSync(guarda)) {
-			return avisa(ctx, `guarda de merge desligada: ${guarda} não existe, e nenhum merge deste projeto é verificado. Reinstale o anvil com /anvil-update.`);
+			return avisa(ctx, `guarda de merge desligada: ${guarda} não existe, e nenhum git merge nem PR do gh ou do tea deste projeto é verificado. Reinstale o anvil com /anvil-update.`);
 		}
 
 		const r = spawnSync("bash", [guarda], {

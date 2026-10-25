@@ -23,12 +23,14 @@
 # Estado, lido do checkout atual e, para spec aberta, do commit do branch local
 # de spec com o mesmo numero, sem trocar de checkout:
 #   pending  sem Spec:
-#   closed   pasta docs/specs/archive/{NNN}-* no checkout atual: ja esta na main
+#   closed   pasta docs/specs/archive/{NNN}-* no checkout atual: ja esta no branch base
 #   open     spec achada fora de archive/ sem spec.md, sem ticket, ou com ticket
 #            a despachar; ou o branch dela ainda sem a pasta commitada
 #   stopped  spec achada e nao fechada sem ticket a despachar (todos resolved, ou
 #            os nao resolvidos travados ou dependentes de travado), spec arquivada
-#            no branch e sem merge na main, ou Spec: sem pasta nem branch
+#            no branch e sem merge no branch base, ou Spec: sem pasta nem branch.
+#            O motivo da arquivada no branch cita o branch base que o
+#            resolve-git.sh, ao lado deste script, da
 set -u
 
 roadmap=docs/specs/roadmap.md
@@ -37,6 +39,7 @@ FIELD_SEP=$'\037'
 TYPES="feature fix hotfix gmud refactor experimental extension"
 
 refuse() { echo "refusal: $1"; exit 2; }
+RESOLVER="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)/resolve-git.sh"
 
 skip=""
 while [ $# -gt 0 ]; do
@@ -278,6 +281,15 @@ spec_state() {  # <fonte> <pasta> <onde>
     found_reason="nenhum ticket a despachar: $found_reason ($where)"
 }
 
+# "branch base <nome>" em base_name, pelo base: do resolvedor, rodado uma vez só;
+# sem o base:, só "branch base".
+base_name=""
+base_label() {
+    [ -z "$base_name" ] || return 0
+    base_name="$(bash "$RESOLVER" 2>/dev/null | sed -n 's/^base: //p')"
+    base_name="branch base${base_name:+ $base_name}"
+}
+
 entry_state() {  # <Spec:>: o estado da entrada em found_state e found_reason
     local s="$1" num dir br src where
     case "$s" in
@@ -294,7 +306,7 @@ entry_state() {  # <Spec:>: o estado da entrada em found_state e found_reason
     if [ -n "$src" ]; then
         dir="$(spec_dir_in "$src" docs/specs/archive "$num")"
         if [ -n "$dir" ]; then
-            found_state=stopped; found_reason="arquivada no branch $br e ainda sem merge na main"; return
+            base_label; found_state=stopped; found_reason="arquivada no branch $br e ainda sem merge no $base_name"; return
         fi
     fi
     dir="$(spec_dir_in "$src" docs/specs "$num")"

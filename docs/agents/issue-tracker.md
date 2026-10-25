@@ -17,8 +17,8 @@ parte do repositório e sobrevivem ao merge.
   desbloqueado quando todos os que ele lista estão `resolved`
 - Comentários e histórico são anexados ao fim do arquivo, sob `## Comments`
 - Ticket que foi para um PR ganha uma linha `PR:` logo abaixo do `Status:`, com
-  a URL. Escrita pelas skills `tea-open-pr` e `tea-open-fast-pr` depois de abrir
-  o PR. Ticket retrabalhado em dois PRs tem **duas** linhas, não uma
+  a URL. Escrita pelas skills `anvil-open-pr` e `anvil-open-fast-pr` depois de
+  abrir o PR. Ticket retrabalhado em dois PRs tem **duas** linhas, não uma
   substituída — o histórico é o ponto
 - Cada rodada de verificação acrescenta uma linha `Review:` logo abaixo do
   `Status:`. Formato estável: `round`, `sha`, `scope`, `verdict` e `p1`
@@ -116,14 +116,15 @@ no mesmo branch:
 
 ```
 /anvil-docs archive   promove o que virou canônico, move p/ docs/specs/archive/
-/tea-open-pr          um PR por spec; cada ticket ganha a linha PR: de volta
+/anvil-open-pr        um PR por spec; cada ticket ganha a linha PR: de volta
 merge
 ```
 
 O `archive` vem **antes** do PR, não depois do merge: mover a pasta é mudança em
 arquivo e precisa de um commit, e depois do merge não sobra branch onde ele
-caiba. O hook bloqueia o `tea pr create` e o `git merge` enquanto a spec não
-estiver arquivada no commit do branch — o `git merge` disparado da `main`
+caiba. O hook bloqueia o `git merge` e a criação do PR, pelo `gh` (`gh pr create`
+e `gh api` com `POST` em `pulls`) ou pelo `tea` (`tea pr create`), enquanto a spec
+não estiver arquivada no commit do branch — o `git merge` disparado da `main`
 inclusive, porque a spec do branch mesclado também é conferida.
 
 ## Roteiro e relatório

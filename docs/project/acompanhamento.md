@@ -149,3 +149,49 @@ spec afirmam.
   archive", "não fecha no fechamento" e "parada, já arquivada no branch" são o
   mesmo caso. Enquanto ninguém mexer, quem lê a skill casa três nomes para um caso
   só, e uma regra nova pode acertar um nome e esquecer os outros.
+
+## Spec 011: branch base e forge neutro
+
+Origem: `docs/specs/archive/011-extension-branch-base-and-forge/`. Lacunas de
+prova que o operador deixou para depois no grill de 2026-10-25: todas têm verde, e
+nenhuma muda comportamento. A A35 a A37 vêm da rodada 1 do ticket 11 e foram
+aceitas no fechamento, no mesmo dia; a A35 é de comportamento, não de prova.
+
+- **A30 · a limpeza de branches passa também com o texto antigo.** Ticket 06,
+  rodada 1, P2 (Spec). O caso `prune` saiu `0` com o texto de antes, em que o
+  modelo atualizou o `master` apesar do `git checkout main` escrito. Enquanto
+  ninguém mexer, uma regressão para a `main` fixa na limpeza passa verde.
+- **A31 · a prova do PR rápido não conta as chamadas do resolvedor.** Ticket 06,
+  rodada 2, P2 (Spec). O vermelho do `origin-head` saiu `0`. Enquanto ninguém
+  mexer, um texto que volte a mandar rodar o resolvedor duas vezes, com o branch
+  saindo de uma base e o PR indo para outra, passa enquanto o modelo ignorar a
+  instrução.
+- **A32 · a prova do PR não confere o responsável no Gitea.** Ticket 05, rodada
+  1, P2. Enquanto ninguém mexer, uma regressão no responsável do PR do Gitea passa
+  sem a prova ver.
+- **A33 · o `gh label list` falso não foi capturado do `gh` real.** Ticket 04,
+  rodada 1, P2 (Spec). O formato vem do código do `gh`. Enquanto ninguém mexer, se
+  o `gh` real divergir, as provas validam as skills contra uma resposta que o
+  GitHub não dá.
+- **A34 · a regra do `origin` com o bare só está no helper.** Ticket 05, rodada 1,
+  P2 (Spec). A fixture cuja URL de push do `origin` é o bare fica como está; isso
+  está só no cabeçalho do `proof.sh` e na seção da `anvil-sync`. Enquanto ninguém
+  mexer, quem escreve outra prova com forge esbarra na recusa do `origin` local
+  sem saber por quê.
+- **A35 · o piloto publica o branch antes de saber se o PR sai.** Ticket 11,
+  rodada 1, P2 (Spec). No "PR" do `anvil-auto`, o `git push -u origin <branch>`
+  vem antes do Step 0 do `anvil-open-pr`, onde o login do `tea` é procurado.
+  Enquanto ninguém mexer, num Gitea sem login que case com o host o branch fica no
+  remoto sem PR, a spec para, e nem a "Parada" nem o relatório dizem que ele foi
+  publicado: o operador só descobre ao achar o branch órfão.
+- **A36 · a ordem "rule antes do forge recusado" não tem prova.** Ticket 11,
+  rodada 1, P2 (Spec), sobre a US 39 (a rule que manda fechar sem PR não para num
+  forge não resolvido). O caso `regra` da S2 usa `forge: github` resolvido e não
+  tem vermelho. Enquanto ninguém mexer, um texto que volte a olhar a `refusal:
+  forge:` antes da rule passa verde, e um Gitea sem a seção `## Git` cuja rule
+  fecha por merge local volta a parar sem aviso.
+- **A37 · a limpeza e o bench seguindo com recusa de forge não têm prova.** Ticket
+  11, rodada 1, P2 (Spec). Nenhuma prova cobre a limpeza de branches com uma
+  `refusal: forge:` (US 36) nem o bench escrevendo a seção sem a linha `forge:`.
+  Enquanto ninguém mexer, um texto que volte a parar em qualquer recusa passa sem
+  acusar.
