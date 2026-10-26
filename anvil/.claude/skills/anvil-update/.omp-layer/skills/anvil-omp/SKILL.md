@@ -94,8 +94,11 @@ com um bloco `bash`, que o `/anvil-boot` grava em projeto novo. Só a recusa do
 branch base para a largada: a de forge ou de login, como num Gitea sem `tea` ou
 sem a seção `## Git`, fica para o fechamento por PR. Chamado no branch
 de uma spec aberta do roteiro, ele retoma a spec do ponto que o disco indica e
-depois segue a corrente. Em outro branch, como o de uma spec arquivada ou o de uma
-spec que não é de entrada do roteiro, ele recusa.
+depois segue a corrente. Chamado no branch de uma spec parada no fechamento, já
+arquivada e sem merge, ele volta à decisão do fechamento: pelo PR, sem PR aberto,
+refaz a conferência do `--pr`, o push e o `/anvil-open-pr`; pelo merge local, ou
+com o PR aberto, recusa. Em outro branch, como o de uma spec que já chegou ao
+branch base ou o de uma spec que não é de entrada do roteiro, ele recusa.
 
 **O único sim.** O grill, ou a entrevista, cobre o trabalho inteiro: as specs, a
 ordem, o escopo, o que fica de fora e o critério de pronto de cada uma. No fim, o
@@ -114,6 +117,12 @@ do roteiro e só quando as dependências da entrada fecharam:
   opção recomendada pela skill ou, sem recomendação, a mais conservadora;
 - despacha os tickets em série, um `anvil-implementer` por ticket, pelo
   `frontier.sh` da `anvil-run`;
+  Reconhece o despacho interrompido como a `anvil-run`: tenta o agente vivo
+  primeiro e, sem ele e sem isolação, despacha um implementer novo que preserva
+  os commits e a árvore suja, com o `HEAD` de antes do primeiro despacho. A leitura
+  seguinte leva `--resume NN`. Cada ticket tem no máximo duas retomadas do
+  despacho, registradas em "Decidido sem humano" com o ticket e a tentativa;
+  sem agente vivo com isolação, ou passado o limite, fica pulado e segue a parada;
 - fecha a spec só com `PASS`: todo ticket `resolved`, com a última `Review:` em
   `verdict=pass; p1=none`, e o comando de verificação rodado por ele saindo `0`.
   No bench, o `--reverify` dos gates desta spec e das já fechadas toma o lugar
@@ -122,9 +131,16 @@ do roteiro e só quando as dependências da entrada fecharam:
   com uma rule que manda fechar sem PR, ou sem o passo `/anvil-open-pr` no perfil
   do tracker, o merge local, sem consultar o forge; senão, o forge que o resolvedor
   dá decide — `nenhum`, o merge local; `github` ou `gitea`, o PR aberto pelo
-  `/anvil-open-pr` —, e a recusa do forge, ou a que para o `/anvil-open-pr`, como a
-  do login do `tea`, deixa a spec parada. Depois do PR, ele envia a linha `PR:` ao
-  remoto, confere a árvore e só então volta ao branch base. No
+  `/anvil-open-pr` —, e a recusa do forge deixa a spec parada. No PR, antes do
+  `git push`, ele roda o resolvedor com `--pr`: qualquer recusa, como a do login do
+  `tea`, deixa a spec parada sem nada no remoto, com a recusa no motivo; sem
+  recusa, ele envia o branch, e o `/anvil-open-pr` usa o branch base, o
+  repositório e o login conferidos, sem rodar o resolvedor de novo; a skill que
+  para antes do PR também deixa a spec parada, e o relatório diz que o branch
+  ficou publicado em `origin` sem PR e pergunta se o operador corrige o motivo e
+  abre o PR ou apaga o branch remoto, o que o piloto nunca faz sozinho.
+  Depois do PR, ele envia a linha `PR:` ao remoto, confere a árvore e só então
+  volta ao branch base. No
   merge local, quando o branch base andou desde o corte do branch, como
   quando uma spec irmã fechou nesse meio-tempo, ele prepara o merge sem commitá-lo
   e roda a verificação sobre o estado combinado: o comando de verificação ou, no
@@ -198,12 +214,18 @@ despacho e aponta esta configuração. Ele despacha mesmo assim, e a árvore suj
 o omp deixa o para com `halt`. Para conferir o que o omp lê, rode os dois
 `omp config get` acima na raiz do projeto.
 
-A isolação muda a retomada. Sem ela, um implementer que cai deixa a sobra na árvore
-da spec, e o `anvil-run` para com `halt` antes do próximo despacho, até você
-decidir: `git stash -u` guarda a sobra, um commit seu a mantém, e rodar a skill de
-novo retoma. Com ela, a sobra de um implementer que cai ou desiste não chega ao
-branch da spec. O omp a deixa no branch `omp/task/<id>` dele, o ticket fica como
-estava, e a execução seguinte o despacha de novo. Os branches `omp/task/*` podem
+Na mesma execução, a `anvil-run` reconhece o despacho interrompido pelo resultado
+sem os três campos, cancelado ou com erro. Tenta primeiro o agente vivo; sem ele
+e sem isolação, um implementer novo continua dos commits e da árvore suja, com o
+`HEAD` de antes do primeiro despacho como fixed point da rodada 1. Cada ticket tem
+no máximo duas retomadas do despacho, visíveis no andamento. Sem agente vivo com
+isolação, ou passado o limite, fica pulado e aparece no relatório com o motivo.
+
+Isso não é rodar a skill de novo depois que a sessão caiu. Nessa execução nova,
+sem isolação, a sobra continua dando `halt` até você decidir: `git stash -u` guarda
+a sobra, um commit seu a mantém, e rodar a skill de novo retoma. Com isolação, a
+sobra não chega ao branch da spec: o omp a deixa no branch `omp/task/<id>` dele, o
+ticket fica como estava, e a execução seguinte o despacha de novo. Os branches `omp/task/*` podem
 ficar no repositório depois da integração, e o de um trabalho não integrado fica
 sempre; apague-os com `git branch -D` quando não precisar mais deles.
 

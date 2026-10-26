@@ -144,18 +144,12 @@ spec afirmam.
   os volumes do compose do app, como o `node_modules`. Enquanto ninguém mexer,
   cada prova do bench que não derruba o app com o compose dele deixa um volume
   órfão na máquina; o B1 do ticket 09 derruba.
-- **A29 · a parada no fechamento tem três nomes no `anvil-auto`.** Ticket 05,
-  rodada 1, P3 (Standards), Mysterious Name. "Parada no fechamento depois do
-  archive", "não fecha no fechamento" e "parada, já arquivada no branch" são o
-  mesmo caso. Enquanto ninguém mexer, quem lê a skill casa três nomes para um caso
-  só, e uma regra nova pode acertar um nome e esquecer os outros.
 
 ## Spec 011: branch base e forge neutro
 
 Origem: `docs/specs/archive/011-extension-branch-base-and-forge/`. Lacunas de
 prova que o operador deixou para depois no grill de 2026-10-25: todas têm verde, e
-nenhuma muda comportamento. A A35 a A37 vêm da rodada 1 do ticket 11 e foram
-aceitas no fechamento, no mesmo dia; a A35 é de comportamento, não de prova.
+nenhuma muda comportamento.
 
 - **A30 · a limpeza de branches passa também com o texto antigo.** Ticket 06,
   rodada 1, P2 (Spec). O caso `prune` saiu `0` com o texto de antes, em que o
@@ -178,20 +172,14 @@ aceitas no fechamento, no mesmo dia; a A35 é de comportamento, não de prova.
   está só no cabeçalho do `proof.sh` e na seção da `anvil-sync`. Enquanto ninguém
   mexer, quem escreve outra prova com forge esbarra na recusa do `origin` local
   sem saber por quê.
-- **A35 · o piloto publica o branch antes de saber se o PR sai.** Ticket 11,
-  rodada 1, P2 (Spec). No "PR" do `anvil-auto`, o `git push -u origin <branch>`
-  vem antes do Step 0 do `anvil-open-pr`, onde o login do `tea` é procurado.
-  Enquanto ninguém mexer, num Gitea sem login que case com o host o branch fica no
-  remoto sem PR, a spec para, e nem a "Parada" nem o relatório dizem que ele foi
-  publicado: o operador só descobre ao achar o branch órfão.
-- **A36 · a ordem "rule antes do forge recusado" não tem prova.** Ticket 11,
-  rodada 1, P2 (Spec), sobre a US 39 (a rule que manda fechar sem PR não para num
-  forge não resolvido). O caso `regra` da S2 usa `forge: github` resolvido e não
-  tem vermelho. Enquanto ninguém mexer, um texto que volte a olhar a `refusal:
-  forge:` antes da rule passa verde, e um Gitea sem a seção `## Git` cuja rule
-  fecha por merge local volta a parar sem aviso.
-- **A37 · a limpeza e o bench seguindo com recusa de forge não têm prova.** Ticket
-  11, rodada 1, P2 (Spec). Nenhuma prova cobre a limpeza de branches com uma
-  `refusal: forge:` (US 36) nem o bench escrevendo a seção sem a linha `forge:`.
-  Enquanto ninguém mexer, um texto que volte a parar em qualquer recusa passa sem
-  acusar.
+
+## Issue #8: cache de build entre verificações
+
+Origem: issue #8 do anvil (`https://github.com/rogerznts/anvil/issues/8`),
+incorporada pela spec 012, que deixou a poda de cache fora do toolkit.
+
+- **A38 · cache de build sem poda entre verificações.** No `ore`, o `target/` de
+  um pacote chegou a 191 GB e encheu o disco uma vez. Enquanto ninguém mexer, um
+  projeto cujo comando de verificação cresce o cache pode encher o disco no meio
+  de uma corrente longa. A poda é do comando de verificação de cada projeto, e
+  não do toolkit.

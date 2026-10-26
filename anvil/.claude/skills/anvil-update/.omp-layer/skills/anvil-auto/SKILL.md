@@ -106,12 +106,11 @@ escreva, não commite e não se ofereça para fazer o trabalho por conta própri
    `base`, siga para a entrada. Em outro branch, a linha `do:` do script é da
    `anvil-plan` e não vale aqui: você não propõe etapa nem termina a vez por ela.
    Decida assim:
-   - com `next: none`, o branch é de uma spec arquivada, a da linha `spec`: recuse
-     e aponte o branch base. Quando `git merge-base --is-ancestor HEAD <base>` sai
-     diferente de `0`, a spec está arquivada no branch e ainda sem merge no branch
-     base, como a que a conferência do merge parou: a recusa diz esse motivo, e
-     que o piloto não retoma a spec nem refaz o merge dela, porque qual spec cede
-     é decisão do operador;
+   - com `next: none`, o branch é de uma spec arquivada, a da linha `spec`. Quando
+     `git merge-base --is-ancestor HEAD <base>` sai `0`, ela já chegou ao branch
+     base: recuse e aponte o branch base. Diferente de `0`, a spec está em parada
+     no fechamento, arquivada no branch e ainda sem merge no branch base: retome
+     pela seção "Retomada", que diz quando ela segue e quando a recusa vem;
    - com `spec: none`, retome pela seção "Retomada" quando o branch tem número,
      `{tipo}/{NNN}-{nome}`, e esse número está no `Spec:` de uma entrada do
      roteiro: a spec nasceu e ainda não tem pasta commitada. Senão, recuse, aponte
@@ -276,13 +275,13 @@ vez, sem esperar resposta.
 
 ## Retomada
 
-Chamado no branch de uma spec aberta, você não passa pela entrada: o roteiro foi
-confirmado numa execução anterior, e não há grill nem sim. Rode o `roadmap.sh` e
-ache a linha `entry:` cujo `spec=` tem o número do branch, comparado como número.
-Sem ela, recuse: a spec não é de uma entrada do roteiro, e quem a conduz é a
-`anvil-plan` e a `anvil-run`. Com ela, a entrada desta volta é essa: leia a seção
-dela no `roadmap.md` e retome a spec do ponto que o disco indica, pela linha `next`
-do `stage.sh` da largada:
+Chamado no branch de uma spec aberta, ou de uma em parada no fechamento, você não
+passa pela entrada: o roteiro foi confirmado numa execução anterior, e não há
+grill nem sim. Rode o `roadmap.sh` e ache a linha `entry:` cujo `spec=` tem o
+número do branch, comparado como número. Sem ela, recuse: a spec não é de uma
+entrada do roteiro, e quem a conduz é a `anvil-plan` e a `anvil-run`. Com ela, a
+entrada desta volta é essa: leia a seção dela no `roadmap.md` e retome a spec do
+ponto que o disco indica, pela linha `next` do `stage.sh` da largada:
 
 - `anvil-grill`, no branch com número e sem pasta, ou `anvil-to-spec`: escreva a
   spec e os tickets, como diz "Spec e tickets";
@@ -292,7 +291,15 @@ do `stage.sh` da largada:
   todo ticket resolvido, o despacho acaba de saída e vai para o `PASS`;
 - `anvil-wayfinder`: o `map.md` da spec tem decisão aberta, e decisão é do
   operador. A spec fica parada, como diz "Parada", com a decisão em "o que ainda
-  espera decisão".
+  espera decisão";
+- `none`, com a spec em parada no fechamento: o `PASS` e o archive já estão
+  commitados no branch, e ela volta à decisão de "Fechamento", sem refazer o
+  archive. Rode o resolvedor e decida na mesma ordem. Com merge local, recuse: o
+  merge que a guarda bloqueou ou que o conflito ou a conferência abortou pede a
+  decisão do operador, e o piloto não o refaz. Com PR, quando um ticket da spec já
+  tem a linha `PR:`, o PR está aberto, e o merge dele é do operador: recuse, com a
+  URL. Sem ela, siga o "PR" de "Fechamento", na ordem de lá: o resolvedor com
+  `--pr`, o `git push -u` e o `anvil-open-pr`.
 
 No bench, a pasta da spec sem `gates.md` pede o "Ledger da spec" antes de qualquer
 um desses pontos.
@@ -448,8 +455,14 @@ Se, ao escrever a spec ou os tickets, o código contradiz a entrada, siga
 dela, da instalação de usuário:
 
 ```bash
-bash ~/.omp/agent/skills/anvil-run/frontier.sh [--skip "NN NN"]
+bash ~/.omp/agent/skills/anvil-run/frontier.sh [--skip "NN NN"] [--resume NN]
 ```
+
+`--resume NN` só vai na leitura que segue um despacho interrompido do NN, como o
+passo 3 diz. Essa leitura é pré-condição de cada tentativa: execute-a antes do
+`write` ao agente vivo ou do `task` novo, e decida pela saída, não pela leitura de
+antes da interrupção. Isso acontece na mesma execução; a "Retomada" acima é rodar
+a skill de novo depois que a sessão caiu.
 
 1. Com `next: none` e sem linha `halt`, o despacho acabou. Com
    `all_resolved: yes`, siga para o `PASS`. Senão, sobrou ticket sem resolver:
@@ -461,15 +474,55 @@ bash ~/.omp/agent/skills/anvil-run/frontier.sh [--skip "NN NN"]
 2. Despache o ticket da linha `next` com o `task`, numa chamada só, com um item:
    `agent` é `anvil-implementer`, `task` é o caminho do ticket e, com a linha
    `isolation` em `on` ou `misconfigured`, o item leva `isolated: true`. No
-   `context`, diga a pasta da spec, o branch e o idioma de saída. O implementer
-   é bloqueante: não chame outra ferramenta na mesma mensagem, e não leia o
-   ticket, não investigue nem termine o trabalho dele.
-3. Rode o script de novo e compare a linha do ticket com a de antes. Se `status`,
-   `reviews` e `last` estão iguais, o implementer terminou sem mudar o estado: anote
-   o ticket como pulado nesta execução e, com o pulado novo, rode o script mais uma
-   vez, já com o `--skip` de todos os pulados. Daí em diante, toda chamada leva o
-   `--skip` com todos os pulados, e o pulado não é despachado de novo nesta
-   execução, nem quando o implementer caiu, abortou ou devolveu erro. Só a
+   `context`, diga a pasta da spec, o branch e o idioma de saída. Antes do primeiro
+   despacho de cada ticket, anote o `HEAD` e guarde-o até o fim da execução. O
+   implementer é bloqueante: não chame outra ferramenta na mesma mensagem, e não
+   leia o ticket, não investigue nem termine o trabalho dele: a única intervenção
+   permitida é retomar o despacho pelo passo 3, sem implementar nem commitar no
+   lugar dele.
+3. Reconheça o **despacho interrompido** antes de comparar o estado: resultado do
+   `task` sem os três campos `ticket`, `status` e `review`, cancelado ou com erro.
+   Para cada ticket interrompido, rode o script com `--resume NN` na leitura
+   seguinte, mantendo os `--skip` acumulados. O disco continua soberano: com
+   `halt`, ou com o NN já resolvido, travado, pulado ou fora do frontier, não
+   retome; siga ao passo 4 com essa saída.
+
+   O limite é de **duas retomadas do despacho por ticket nesta execução**,
+   contando as duas formas abaixo. Antes de cada tentativa, incremente o
+   contador e escreva esta linha de andamento, preenchendo ticket e tentativa:
+   `ticket <NN> — retomada do despacho, tentativa <1 ou 2>/2`.
+   - Primeiro tente o agente vivo: um id no resultado não basta. Resultado
+     `completed` indica agente encerrado, não vivo. Se o retorno cancelado ou com
+     erro não diz se ele ainda roda, consulte `read agent://<id>`; só o estado
+     ainda em execução autoriza a tentativa pelo agente vivo. Mande por
+     `write agent://<id>` que termine o ticket e devolva os três campos e espere
+     com `wait`. Não abra outro implementer enquanto esse agente estiver vivo.
+     Com os campos e sem erro ou cancelamento, o despacho terminou; vá ao passo 4.
+     Se continuar interrompido, repita este passo, inclusive a leitura com
+     `--resume NN`, sem zerar o contador.
+   - Sem agente vivo e com `isolation: off`, despache um `anvil-implementer` novo
+     para o mesmo ticket, pelo passo 2. No `context`, escreva **retomada do
+     despacho**, o `HEAD` de antes do primeiro despacho, e que ele deve continuar
+     dos commits desde esse `HEAD` e da árvore suja, preservando ambos. Ao voltar,
+     repita este passo, sem trocar o `HEAD` inicial nem zerar o contador.
+   - Sem agente vivo e com isolação (`on` ou `misconfigured`), ou sem tentativa
+     restante, anote o ticket como pulado, com o motivo: cópia isolada que não
+     volta, ou limite de duas retomadas do despacho. Rode o script já com ele no
+     `--skip`, sem `--resume` para esse ticket, e siga ao passo 4. Mesmo com
+     `halt` pela sujeira, o relatório inclui esse pulado e seu motivo.
+
+   Cada retomada do despacho vai também para "Decidido sem humano", com o ticket,
+   a tentativa e o motivo: agente vivo ou implementer novo sem isolação.
+   Só o despacho interrompido passa por essa exceção ao não redespachar; ele
+   ainda não é pulado enquanto cabe uma retomada. Resultado com os três campos,
+   sem cancelamento nem erro, segue a comparação do passo 4, inclusive quando
+   diz que falhou, que faltou ferramenta ou que o omp não integrou o trabalho.
+4. Rode o script de novo, salvo a saída que o passo 3 já trouxe para um pulado ou
+   um impedimento do disco, e compare cada ticket com a leitura anterior ao seu
+   primeiro despacho. Se `status`, `reviews` e `last` estão iguais, anote-o como
+   pulado, e rode o script já com ele no `--skip`. Toda chamada leva todos os
+   pulados acumulados. Nunca despache um pulado de novo nesta execução: a retomada
+   do despacho no passo 3 acontece antes de anotá-lo como pulado. Só a
    "Contradição com o roteiro" e o "Abrir a rodada" o tiram do `--skip`. Volte ao
    passo 1 com a última saída do script: com pulado novo, a do `--skip`, cujo
    `next` nunca aponta um pulado.
@@ -666,7 +719,7 @@ juntos. Aborte o merge, sem corrigir nada:
 git merge --abort
 ```
 
-A spec fica parada, como diz "Parada", já arquivada no branch. É parada por
+A spec fica em parada no fechamento, como diz "Parada". É parada por
 decisão: sem pesquisa e sem rodada extra. Na seção dela no relatório, o `Estado:`
 diz que a verificação falhou sobre o merge com o branch base, e a seção do
 comando de verificação, ou do `--reverify`, leva a saída da conferência. Em "o
@@ -675,20 +728,60 @@ no branch base depois do corte, as que a saída aponta.
 
 #### PR
 
-Leve o branch ao remoto, abra o PR pelo `anvil-open-pr` e pare ali, sem merge. O
-remoto é o `origin`, o que o resolvedor leu:
+Antes de levar o branch ao remoto, confira o que o PR pede. Rode o resolvedor com
+`--pr`, que no Gitea procura também o login do `tea`:
+
+```bash
+bash ~/.claude/skills/anvil-docs/scripts/resolve-git.sh --pr
+```
+
+Com qualquer linha `refusal:`, de branch base, forge ou login, a spec fica parada,
+como diz "Parada", sem `git push` e sem `pr create`. O motivo são essas linhas,
+inteiras e copiadas como estão, com o `refusal: <campo>:` do começo, porque elas
+dizem o que declarar ou corrigir, como o `tea login` que falta. No relatório, elas
+vão no próprio `Estado:` da spec, e não num resumo delas:
+
+```text
+- Estado: parada no branch: resolvedor com --pr, antes do push: <cada linha refusal:, como veio>
+```
+
+Sem recusa, guarde o `<base>`, o `<repo>` e, no Gitea, o `<login>` que ele deu.
+
+Leve então o branch ao remoto, abra o PR pelo `anvil-open-pr` e pare ali, sem
+merge. O remoto é o `origin`, o que o resolvedor leu:
 
 ```bash
 git push -u origin <branch>
 ```
 
-No branch da spec, carregue o `anvil-open-pr` e siga-o: ele abre o PR no forge do
-resolvedor, com o `gh` ou o `tea`. As pausas dele seguem a regra das pausas, e a
-base do PR é o branch base, de onde a corrente parte. Ele roda o resolvedor com
-`--pr`, que no Gitea procura também o login do `tea`: quando a skill para numa
-recusa dele, como a `refusal: login:`, a spec fica parada, como diz "Parada", com
-a recusa no motivo. Depois que a skill commita a linha `PR:` nos tickets, leve esse
-commit ao remoto com `git push`, e guarde a URL do PR.
+Numa retomada da spec parada depois do push, o branch já está no remoto, e a ordem
+é a mesma: o resolvedor com `--pr`, este `git push -u`, que não muda nada no
+remoto, e o `anvil-open-pr`. O `git push -u` que não sai `0` deixa a spec parada,
+como diz "Parada", com a saída dele no motivo.
+
+No branch da spec, carregue o `anvil-open-pr` e siga-o, com uma mudança: o Step 0
+dele usa o `<base>`, o `<repo>` e o `<login>` que você conferiu antes do push, e
+não roda o resolvedor de novo, como no Step 6 do `anvil-open-fast-pr`. Ele abre o
+PR no forge do resolvedor, com o `gh` ou o `tea`. As pausas dele seguem a regra das
+pausas, e a base do PR é o branch base, de onde a corrente parte.
+
+A URL do PR é a que o `pr create` imprime saindo `0`. O `pr create` que sai
+diferente de `0` não deu URL, e nenhuma URL se monta à mão. Quando a skill para
+sem devolver a URL, por CLI sem autenticação, erro do `pr create` ou outra recusa
+dela, o `git push -u` já saiu `0`, e o branch está no remoto sem PR. A spec fica
+em parada no fechamento, como diz "Parada", e o `Estado:` dela no relatório diz
+onde o branch ficou, com o passo e o motivo da skill:
+
+```text
+- Estado: parada no branch, publicado em origin sem PR: <passo e motivo>
+```
+
+Em "o que ainda espera decisão", a pergunta é se o operador corrige `<motivo>` e
+abre o PR ou apaga `origin/<branch>`. A decisão é dele: não apague o branch remoto,
+nem com `git push --delete`, nem com outro comando.
+
+Depois que a skill commita a linha `PR:` nos tickets, leve esse commit ao remoto
+com `git push`, e guarde a URL do PR.
 
 Não faça o merge, nem o do PR nem um local: a revisão do PR é do operador. A
 entrada fica `stopped` até o merge do PR, e as que dependem dela esperam. Confira a
@@ -840,10 +933,11 @@ aqui a spec que:
   verificação ou o `--reverify`;
 - fica parada por decisão pela regra do `GATE.md`, no `--reverify` do bench;
 - esbarra numa contradição incumprível, ou numa decisão aberta do `map.md`;
-- não fecha no fechamento: o forge que o resolvedor recusa, a recusa que para o
-  `anvil-open-pr`, o merge bloqueado pela guarda, o merge abortado por conflito
-  fora do `docs/index.md` ou pela conferência do merge, ou o PR aberto, à espera do
-  merge do operador.
+- fica em parada no fechamento, já arquivada no branch e sem chegar ao branch
+  base: o forge que o resolvedor recusa, a recusa do resolvedor com `--pr`, antes
+  do push, a parada do `anvil-open-pr`, o merge bloqueado pela guarda, o merge
+  abortado por conflito fora do `docs/index.md` ou pela conferência do merge, ou o
+  PR aberto, à espera do merge do operador.
 
 Depois disso, não faça archive nem merge dela e não mexa no que está commitado no
 branch. No bench, commite antes no branch o `decisions-log.md` da spec, se ele
@@ -876,9 +970,9 @@ O relatório tem esta forma, com uma seção de segundo nível por entrada tocad
 execução, na ordem, e as seções sem conteúdo ficam com "nenhum". No bench, a seção
 de cada spec traz o `decisions-log.md` dela, lido do branch com
 `git show <branch>:<caminho>` pelo caminho que ele tem lá: com o archive da spec
-commitado no branch, como na spec fechada e na parada no fechamento depois do
-archive, o caminho é `docs/specs/archive/<pasta>/decisions-log.md`; na spec parada
-antes do archive, `docs/specs/<pasta>/decisions-log.md`. No bench também, o
+commitado no branch, como na spec fechada e na parada no fechamento, o caminho é
+`docs/specs/archive/<pasta>/decisions-log.md`; na spec parada antes do archive,
+`docs/specs/<pasta>/decisions-log.md`. No bench também, o
 `--reverify` vem no lugar do comando de verificação:
 
 ````markdown
@@ -888,7 +982,7 @@ Roteiro: `docs/specs/roadmap.md`, <confirmado no commit <commit do sim> | execu�
 
 ## <nome da entrada> — spec <number>
 
-- Estado: <fechada, com merge local no `<base>` | PR aberto, <URL>, à espera do merge | parada no branch: <passo e motivo>>
+- Estado: <fechada, com merge local no `<base>` | PR aberto, <URL>, à espera do merge | parada no branch: <passo e motivo> | parada no branch, publicado em origin sem PR: <passo e motivo>>
 - Branch: `<branch>`
 
 ### Pausas respondidas pelo piloto
@@ -927,6 +1021,7 @@ exit: 0
 ### Decidido sem humano
 
 - <o que você decidiu sozinho, fora das pausas, e por quê>
+- ticket <NN> — retomada do despacho, tentativa <1 ou 2>/2: <agente vivo | implementer novo sem isolação>, após despacho interrompido.
 
 ## <nome da entrada> — parada antes da spec
 
@@ -939,7 +1034,7 @@ exit: 0
 
 ## O que ainda espera decisão
 
-- <cada item como pergunta: o que destrava cada spec parada, cada PR aberto, cada contradição e cada gate manual aberto; a da parada técnica cita o ticket e o arquivo da pesquisa>?
+- <cada item como pergunta: o que destrava cada spec parada, cada PR aberto, cada contradição e cada gate manual aberto; a da parada técnica cita o ticket e o arquivo da pesquisa; a do branch publicado em origin sem PR pergunta se o operador corrige o motivo e abre o PR ou apaga `origin/<branch>`>?
 ````
 
 ## O fim
@@ -1012,3 +1107,5 @@ parte, para quem opera o anvil, como na entrega do bench chamado direto.
 - Trocar de branch fora dos passos da corrente: a volta ao branch base depois do
   `new-spec.sh`, o `git checkout -B` do branch recém-criado, a ida ao branch base
   para o merge e a volta ao branch base depois de uma parada ou do PR aberto.
+- Apagar o branch remoto, com `git push --delete` ou outro comando, nem o da spec
+  parada com o branch publicado em `origin` sem PR.
