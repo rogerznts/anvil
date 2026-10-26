@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-25T05:45:00Z
+Last updated: 2026-10-26T03:58:52Z
 
 ## Visão geral
 
@@ -23,10 +23,11 @@ Last updated: 2026-10-25T05:45:00Z
 
 ## Specs ativas
 
-- [012 — Push só depois do login, retomada do despacho interrompido e provas da 011](./specs/012-extension-push-after-login/spec.md) — `extension/012-push-after-login`, em andamento, 0/9 tickets resolvidos
+Nenhuma.
 
 ## Specs arquivadas
 
+- [012 — Push só depois do login, retomada do despacho interrompido e provas da 011](./specs/archive/012-extension-push-after-login/spec.md) — `extension/012-push-after-login`, 9 tickets
 - [011 — Branch base e forge neutro](./specs/archive/011-extension-branch-base-and-forge/spec.md) — `extension/011-branch-base-and-forge`, 11 tickets
 - [010 — Helper de prova e sobras da 009](./specs/archive/010-extension-proof-harness/spec.md) — `extension/010-proof-harness`, 10 tickets
 - [009 — Pontos em aberto do piloto automático](./specs/archive/009-extension-anvil-auto-open-points/spec.md) — `extension/009-anvil-auto-open-points`, 8 tickets
