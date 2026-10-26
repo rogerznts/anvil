@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-26T03:58:52Z
+Last updated: 2026-10-26T04:27:44Z
 
 ## Visão geral
 
@@ -93,6 +93,8 @@ Nenhuma.
     — as skills `tea-*` viram `anvil-*` e servem Gitea e GitHub, com remoto ssh ou https
   - [adr-0017](./architecture/adr/adr-0017-prova-pelo-caminho-real-com-resultado-invalido.md)
     — a prova roda pelo `/skill:` real, isolada, e sai inválida quando outro modelo responde
+  - [adr-0018](./architecture/adr/adr-0018-dev-home-isolado-por-checkout.md)
+    — o modo dev usa HOME privado por checkout, sem substituir a instalação publicada dos outros projetos
 
 ### Project
 

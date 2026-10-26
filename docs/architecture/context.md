@@ -40,6 +40,12 @@ O toolkit instalado uma vez por usuário, no diretório dele — `~/.claude/`,
 todos os projetos da máquina. O projeto guarda só rules e `docs/`.
 _Avoid_: instalação global, instalação do sistema
 
+**HOME de desenvolvimento**:
+O ambiente privado de um checkout do anvil, usado somente nas sessões abertas
+explicitamente para trabalhar na fonte. A instalação publicada dos outros
+projetos permanece independente.
+_Avoid_: instalação dev global, sandbox dev
+
 **Instalação de projeto antiga**:
 O toolkit copiado dentro de um projeto, como o anvil instalava antes da instalação
 de usuário: skills, agentes e lock em `.claude/`, espelho em `.agents/skills`,

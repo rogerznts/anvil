@@ -190,11 +190,10 @@ if [ -f "$DIRETIVAS" ]; then
 fi
 
 # --- instalacao de desenvolvimento --------------------------------------------
-# Na maquina de desenvolvimento do anvil, o dev-link liga ~/.claude/skills, os
-# agentes e a camada omp ao payload fonte, por symlink. Instalar por cima
-# escreveria o payload publicado dentro da fonte, atraves do link. Entrada do
-# payload que e symlink recusa o reset antes de qualquer escrita, no dry-run
-# tambem. O espelho fica de fora: ali o symlink e a forma normal.
+# Os links dev antigos no HOME real e os links do HOME privado apontam para a
+# fonte. Instalar por cima escreveria o payload publicado atraves deles.
+# Entrada do payload que e symlink recusa o reset antes de qualquer escrita,
+# no dry-run tambem. O espelho fica de fora: ali symlink e a forma normal.
 dev=""
 for s in $novo; do
     if [ -L "$SKILLS/$s" ]; then dev="$dev  ~/.claude/skills/$s -> $(readlink "$SKILLS/$s")"$'\n'; fi
@@ -209,10 +208,15 @@ if [ -n "$dev" ]; then
     {
         echo "erro: instalação de desenvolvimento em $U — estas entradas do payload são symlink:"
         printf '%s' "$dev"
-        echo "O reset escreveria o payload publicado através delas. Desfaça a ligação, no"
-        echo "repositório do anvil, com"
-        echo "  bash .claude/skills/anvil-sync/scripts/dev-link.sh --unlink"
-        echo "e rode o update de novo. Nada foi alterado."
+        echo "O reset escreveria o payload publicado através delas."
+        if [ -n "${ANVIL_DEV_ROOT:-}" ]; then
+            echo "Este é o HOME privado de desenvolvimento. Rode o update fora do dev-run.sh."
+            echo "Não remova os links privados para instalar por cima. Nada foi alterado."
+        else
+            echo "Para retirar a ligação dev global antiga, no repositório do anvil, rode:"
+            echo "  bash .claude/skills/anvil-sync/scripts/dev-link.sh --unlink"
+            echo "Depois instale a versão publicada fora do launcher dev. Nada foi alterado."
+        fi
     } >&2
     exit 2
 fi

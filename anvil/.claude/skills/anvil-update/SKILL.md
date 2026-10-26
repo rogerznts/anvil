@@ -116,12 +116,17 @@ de reset é a nova, não a da versão velha. O `--unignore`, que só tira do
 instalada — é o que o `/anvil-boot` faz.
 
 **Instalação de desenvolvimento.** Se uma skill, um agente ou um arquivo da
-camada do payload for symlink em `~/.claude/` ou em `~/.omp/agent/` — o que o
-`dev-link` deixa na máquina de desenvolvimento do anvil —, o dry-run recusa,
-lista essas entradas e não escreve nada. Instalar por cima escreveria o payload
-publicado dentro da fonte, através do link. Pare aqui e repasse a recusa, que
-aponta o `dev-link.sh --unlink` no repositório do anvil; não apague symlink
-nenhum por conta própria.
+camada do payload for symlink em `~/.claude/` ou em `~/.omp/agent/`, o dry-run
+recusa antes de escrever: instalar por cima alcançaria a fonte através do link.
+Pare e repasse a recusa; não apague symlink nenhum por conta própria.
+
+- **Dentro do `dev-run.sh`**, com `ANVIL_DEV_ROOT` no ambiente: este é o HOME
+  privado do checkout. Peça para abrir uma sessão normal, fora do launcher, e
+  atualizar a instalação publicada lá. Não proponha retirar os links privados.
+- **Fora do launcher:** pode ser a ligação dev global antiga. O diagnóstico
+  aponta `bash .claude/skills/anvil-sync/scripts/dev-link.sh --unlink`, executado
+  na raiz do repositório do anvil, não no subdiretório `anvil/`. A retirada é
+  explícita, separada da instalação publicada; nunca faça isso automaticamente.
 
 O diretório do usuário não tem git por trás, então o dry-run **lista por nome**
 tudo que será substituído, removido e preservado. A saída classifica as skills e

@@ -47,11 +47,13 @@ conflito. O script sinaliza o que falta, sempre.
 ## Helper de prova
 
 `scripts/proof.sh` é a biblioteca que o script de uma prova nova em `workspace/`
-carrega, pelo ADR-0017: cria o diretório da execução, carrega as skills do payload
-e da camada omp na sessão sem ligar nada em `~/.claude` nem em `~/.agents`, desliga
-o fallback de modelo só nela, e conduz a sessão pelo rpc do omp, com o `/skill:`
-real no primeiro turno, por `scripts/proof-rpc.py`. Depois das conferências da
-prova, o `proof_verdict` confere o modelo de toda mensagem do assistente, por
+carrega, pelo ADR-0017 — provas pelo `/skill:` real do omp. Cria o diretório da
+execução, mantém o overlay com as skills do payload e da camada omp e desliga o
+fallback de modelo só na sessão. O `proof_session` lança `python3 proof-rpc.py`
+por `bash scripts/dev-run.sh --`, que prepara o HOME privado em
+`workspace/anvil-dev/home`, sem mudar o HOME do script da prova nem a instalação
+pessoal. O primeiro turno continua sendo o `/skill:` real. Depois das conferências
+da prova, o `proof_verdict` confere o modelo de toda mensagem do assistente, por
 `scripts/proof-verdict.py`, e sai com o código da prova: `0` verde, `1` vermelho,
 `3` inválida. A sessão principal é julgada pelo modelo pedido, e cada subagente
 por um modelo só, do começo ao fim: a prova sai inválida quando a principal tem
@@ -62,11 +64,17 @@ ambiente, e nunca `1`.
 
 O payload chama skills por `~/.claude/skills/<skill>/…`, e o overlay carrega o
 `SKILL.md` delas, não esse caminho. A prova declara as skills de que depende com
-`proof_prepare --dep <skill>`, uma vez por skill, e o helper confere que cada
-`~/.claude/skills/<skill>` é um link para o payload desta árvore; se não for, sai
-`2`, antes de abrir a sessão, com a skill e o comando do `dev-link.sh` no motivo.
-O helper não cria nem remove link: quem liga é o operador, com
-`scripts/dev-link.sh --all`.
+`proof_prepare --dep <skill>`, uma vez por skill, e o helper valida o nome e o
+diretório fonte no payload desta árvore; se não existir, sai `2` antes de abrir a
+sessão. O launcher prepara os links privados por `dev-link.sh --all`; não há
+pré-requisito de symlinks globais. Python, omp e seus filhos herdam o mesmo HOME
+dev e o `PATH` da sessão, inclusive os CLIs falsos da prova. O launcher usa `exec`,
+mantendo o PID seguido pelo helper e seus traps, e preserva os argumentos.
+
+O HOME dev persiste entre provas e tem login/configuração próprios; não copia
+autenticação nem configuração pessoal. Variáveis de ambiente são herdadas, e isso
+não é sandbox. `$PROOF_RUN`, overlay, sessões e saídas mantêm o ciclo de vida do
+helper: a limpeza remove o temporário, não o HOME privado nem as saídas da prova.
 
 Para provas que passam por remoto e por PR, sem servidor, o
 `proof_prepare --remote` cria um repositório bare na execução, que o
@@ -87,13 +95,15 @@ e o `tea pr create` saem `1`, sem URL, com a mensagem do CLI real sem autentica�
 no stderr, e a chamada fica no `forge.jsonl`; o resto do forge falso não muda.
 Para provas do bench com a stack de pé, o
 `proof_prepare --infra` liga o prefixo de execução do `infra.sh` com o id da
-execução, no script da prova e na sessão, e a limpeza derruba essa infra no fim.
+execução, no script da prova e na sessão. Se não houver `ANVIL_PROJECTS_DIR`,
+exporta `$PROOF_RUN/projects`: o registro tem o mesmo caminho no pai, na sessão
+com HOME dev e no teardown. A limpeza derruba essa infra no fim.
 
 Os códigos de saída do helper são `0` verde, `1` vermelho, `2` ambiente ou uso
-recusado — ferramenta fora do `PATH`, opção inválida, dependência declarada sem o
-link, sessão que não se conduz, veredito que falha — e `3` inválida, que vale sobre
-o verde e sobre o vermelho. As operações, as saídas e os códigos estão no
-cabeçalho do `proof.sh`.
+recusado — ferramenta fora do `PATH`, opção inválida, dependência declarada ausente
+na fonte, preparação do HOME dev, sessão que não se conduz, veredito que falha —
+e `3` inválida, que vale sobre o verde e sobre o vermelho. As operações, as saídas
+e os códigos estão no cabeçalho do `proof.sh`.
 
 ```bash
 . .claude/skills/anvil-sync/scripts/proof.sh

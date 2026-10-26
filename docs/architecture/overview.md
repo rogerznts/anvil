@@ -56,6 +56,12 @@ mesmo passo mantém. Ver
 [adr-0014](./adr/adr-0014-piloto-automatico-fecha-sem-humano.md) e os termos
 em [context.md](./context.md).
 
+O desenvolvimento do próprio anvil abre uma sessão explícita com HOME privado
+por checkout. Ali os links de skills, agentes e camada omp apontam à fonte, e os
+scripts chamados por `~/...` seguem a mesma seleção. A instalação publicada e os
+projetos abertos normalmente não mudam; configuração e login dev são próprios.
+Ver [ADR-0018 — HOME dev por checkout](./adr/adr-0018-dev-home-isolado-por-checkout.md).
+
 ## O que o anvil impõe, e só isso
 
 Uma coisa: **onde o arquivo é salvo dentro de `docs/`**. O conteúdo é

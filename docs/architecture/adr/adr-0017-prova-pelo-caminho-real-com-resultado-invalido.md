@@ -1,5 +1,7 @@
 # ADR-0017 — A prova roda pelo caminho real, isolada, e pode sair inválida
 
+- Revisto em parte pelo [ADR-0018 — HOME dev por checkout](./adr-0018-dev-home-isolado-por-checkout.md): o launcher da prova resolve suas dependências no HOME privado, sem exigir links globais.
+
 - Status: aceito
 - Data: 2026-10-23
 

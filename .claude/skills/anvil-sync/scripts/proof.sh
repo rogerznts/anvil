@@ -1,6 +1,6 @@
 # proof.sh — o helper de prova do anvil, pelo ADR-0017: a prova roda pelo /skill:
-# real, isolada do resto da máquina. Biblioteca de shell que o script da prova
-# carrega; a fixture e as conferências continuam no script, em workspace/.
+# real, com HOME dev privado. Biblioteca de shell que o script da prova carrega;
+# a fixture e as conferências continuam no script, em workspace/.
 #
 #   . .claude/skills/anvil-sync/scripts/proof.sh
 #
@@ -8,7 +8,7 @@
 #       Cria o diretório da execução, $PROOF_RUN, com nome único (mktemp -d), e
 #       nele o overlay de config do omp, $PROOF_CONFIG: skills.customDirectories
 #       com as skills do payload e da camada omp desta árvore, que têm precedência
-#       sobre a instalação de usuário, e retry.modelFallback: false. Arma a
+#       na sessão, e retry.modelFallback: false. Arma a
 #       limpeza num trap de EXIT, INT, TERM e HUP, que remove $PROOF_RUN também na
 #       falha e na interrupção. O trap é do helper: a prova não arma outro.
 #       --remote cria o remoto bare $PROOF_REMOTE, $PROOF_RUN/origin.git, que o
@@ -35,20 +35,21 @@
 #       configuração deles, saem com $PROOF_RUN. --infra liga o prefixo de execução
 #       do infra.sh do bench, ANVIL_INFRA_PREFIX, com o id da execução, exportado
 #       para o script da prova e para a sessão: todo infra.sh que eles rodam usa a
-#       infra do prefixo, com compose, rede, registro e volumes próprios. A limpeza
-#       a derruba (infra.sh --teardown, da fonte) antes de remover $PROOF_RUN,
-#       também na falha e na interrupção.
-#       --dep <skill>, uma vez por skill, declara uma dependência da prova: uma
-#       skill que o payload chama por ~/.claude/skills/<skill>/…, caminho que o
-#       overlay não cria. Antes de criar $PROOF_RUN, o helper confere que
-#       ~/.claude/skills/<skill> é um link para o payload desta árvore; se não for,
-#       sai 2 com a skill e o comando do dev-link.sh no motivo. O helper não cria
-#       nem remove link: quem liga é o operador.
+#       infra do prefixo, com compose, rede, registro e volumes próprios.
+#       ANVIL_PROJECTS_DIR recebe $PROOF_RUN/projects se não estiver definido,
+#       para o script da prova, a sessão e o teardown usarem o mesmo registro
+#       apesar dos HOMEs diferentes. A limpeza a derruba (infra.sh --teardown,
+#       da fonte) antes de remover $PROOF_RUN, também na falha e na interrupção.
+#       --dep <skill>, uma vez por skill, valida o nome e o diretório fonte de
+#       uma dependência da prova. Não exige links no HOME pessoal: os caminhos
+#       ~/.claude/skills/<skill>/… da sessão vêm do HOME dev preparado pelo launcher.
 #
 #   proof_session --model <modelo> --cwd <fixture> --out <saídas> -- <turno>...
-#       Conduz a sessão pelo rpc do omp (proof-rpc.py): o primeiro turno é
-#       "/skill:<nome> …", como o operador digita; cada turno seguinte vai depois
-#       do prompt_result e do session_settled do anterior. Os frames de subagente
+#       Lança python3 proof-rpc.py por bash dev-run.sh --, que prepara o HOME
+#       privado em workspace/anvil-dev/home e faz exec, sem mudar o PATH nem o CWD
+#       do launcher. O rpc do omp recebe "/skill:<nome> …" no primeiro turno, como
+#       o operador digita; cada turno seguinte vai depois do prompt_result e do
+#       session_settled do anterior. Os frames de subagente
 #       vão assinados. Com --remote, antes de abrir a sessão, liga o bare como
 #       origin da fixture, que precisa ser a raiz de um repositório git, num branch
 #       com commit, e sem outro origin, e publica nele o branch atual dela, com
@@ -80,14 +81,14 @@
 # Códigos de saída: 0 verde e 1 vermelho, os das conferências; 2 ambiente ou uso
 # recusado — omp, git, docker ou python3 fora do PATH, opção inválida, o
 # --tea-login ou o --labels fora da forma ou sem --forge, a fixture
-# que o --remote não liga, a dependência declarada que não é link para esta árvore,
-# a sessão que não se conduz, ou a falha do próprio script de veredito, que nunca
+# que o --remote não liga, a dependência declarada ausente na fonte, a preparação
+# do HOME dev, a sessão que não se conduz, ou a falha do próprio script de veredito, que nunca
 # vira 1 —, com o motivo no stderr; 3 prova inválida, quando a sessão principal tem
 # mensagem de outro modelo que não o pedido ou um subagente tem mais de um modelo,
 # que vale sobre o verde e sobre o vermelho.
-# Nada é escrito em ~/.claude, ~/.agents nem no config de usuário do omp; a
-# sessão guarda o jsonl dela em $PROOF_RUN. Com --infra, o registro do prefixo, em
-# ~/projects/.<prefixo>-anvil-infra/, vive até a derrubada.
+# O launcher não altera ~/.claude, ~/.agents nem o config omp do HOME pessoal:
+# esses caminhos apontam para a fonte só no HOME dev, que persiste após a prova.
+# A sessão guarda o jsonl dela em $PROOF_RUN, que a limpeza remove.
 
 case "${BASH_SOURCE[0]}" in
     */*) _PROOF_SCRIPTS="$(cd "${BASH_SOURCE[0]%/*}" && pwd)" ;;
@@ -149,7 +150,7 @@ _proof_cleanup() {
 
 proof_prepare() {
     [ -z "$PROOF_RUN" ] || _proof_refuse "proof_prepare já rodou nesta execução: $PROOF_RUN"
-    local remote="" forge="" infra="" deps="" logins="" labels="" labels_set="" skill tool tmp="${TMPDIR:-/tmp}"
+    local remote="" forge="" infra="" logins="" labels="" labels_set="" tool tmp="${TMPDIR:-/tmp}"
     while [ $# -gt 0 ]; do
         case "$1" in
             --remote) remote=1 ;;
@@ -161,7 +162,6 @@ proof_prepare() {
                     ""|.|..|*/*) _proof_refuse "--dep pede o nome de uma skill do payload: $2" ;;
                 esac
                 [ -d "$_PROOF_SKILLS/$2" ] || _proof_refuse "--dep $2: não é skill do payload desta árvore, $_PROOF_SKILLS"
-                deps="$deps $2"
                 shift ;;
             --tea-login)
                 [ $# -ge 2 ] && _proof_tea_login_ok "$2" \
@@ -182,13 +182,6 @@ proof_prepare() {
         || _proof_refuse "--tea-login e --labels configuram o gh e o tea falsos, e pedem --forge"
     for tool in omp git docker python3; do
         command -v "$tool" >/dev/null 2>&1 || _proof_refuse "$tool não está no PATH"
-    done
-    # O payload chama essas skills por ~/.claude/skills/<skill>/…, que o overlay
-    # não cria: o link tem de levar ao payload desta árvore. Quem liga é o operador.
-    for skill in $deps; do
-        [ -L "$HOME/.claude/skills/$skill" ] \
-            && [ "$(cd "$HOME/.claude/skills/$skill" 2>/dev/null && pwd -P)" = "$(cd "$_PROOF_SKILLS/$skill" && pwd -P)" ] \
-            || _proof_refuse "a prova depende de ~/.claude/skills/$skill, que não é um link para $_PROOF_SKILLS/$skill; ligue com bash $_PROOF_SCRIPTS/dev-link.sh --all"
     done
     trap '_proof_cleanup' EXIT
     trap 'exit 129' HUP
@@ -219,6 +212,7 @@ proof_prepare() {
             || _proof_refuse "não deu para criar o gh e o tea falsos em $_PROOF_FORGE"
     fi
     if [ -n "$infra" ]; then
+        export ANVIL_PROJECTS_DIR="${ANVIL_PROJECTS_DIR:-$PROOF_RUN/projects}"
         # O id da execução é o sufixo do mktemp, em hexadecimal: o prefixo do infra.sh
         # só aceita minúsculas, e o sufixo distingue maiúsculas.
         _PROOF_INFRA="proof-$(printf '%s' "${PROOF_RUN##*.}" | od -An -tx1 | tr -d ' \n')"
@@ -249,9 +243,11 @@ proof_session() {
     esac
     mkdir -p "$out" || _proof_refuse "não deu para criar $out"
     [ -z "$PROOF_REMOTE" ] || _proof_publish "$cwd"
-    # Em segundo plano, para que o trap rode no sinal sem esperar a sessão acabar. O
-    # gh e o tea falsos vão à frente do PATH só da sessão.
-    PATH="${_PROOF_FORGE:+$_PROOF_FORGE:}$PATH" python3 "$_PROOF_SCRIPTS/proof-rpc.py" \
+    # Em segundo plano, para que o trap rode no sinal sem esperar a sessão acabar.
+    # O launcher faz exec do python, preservando o PID; PATH e argumentos seguem
+    # intactos, com gh e tea falsos à frente só na sessão e nos seus filhos.
+    PATH="${_PROOF_FORGE:+$_PROOF_FORGE:}$PATH" bash "$_PROOF_SCRIPTS/dev-run.sh" -- \
+        python3 "$_PROOF_SCRIPTS/proof-rpc.py" \
         --config "$PROOF_CONFIG" --model "$model" \
         --cwd "$cwd" --session-dir "$PROOF_RUN/sessions" --out "$out" -- "$@" &
     _PROOF_PID=$!

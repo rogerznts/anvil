@@ -402,6 +402,39 @@ O catálogo de adaptações é **fechado**: `rename`, `invocable`, `docs-remap`,
 sendo feita. E há uma lista do que **nunca** é adaptação: traduzir, enxugar,
 uniformizar vocabulário entre skills, corrigir erro do upstream.
 
+### Desenvolver sem afetar os outros projetos
+
+A instalação publicada continua no diretório do usuário. Para trabalhar na fonte
+do anvil, abra uma sessão pelo launcher na raiz deste repositório:
+
+```bash
+bash .claude/skills/anvil-sync/scripts/dev-run.sh --dry-run -- omp
+bash .claude/skills/anvil-sync/scripts/dev-run.sh -- omp
+# Também aceita: -- claude ou -- codex
+```
+
+O launcher prepara links em `workspace/anvil-dev/home/` e troca o HOME só do
+processo e seus filhos. Skills e scripts `~/...` chegam à mesma fonte; abrir
+`omp`, `claude` ou `codex` normalmente continua usando a instalação publicada.
+Configuração, sessões e login dev ficam separados. Não há cópia de credenciais
+ou importação automática de terceiros. Ferramentas que consultam HOME precisam
+de configuração dev ou variáveis explícitas. Não é sandbox nem separação dos
+serviços de credenciais do SO; veja os limites no
+[ADR-0018 — HOME dev por checkout](docs/architecture/adr/adr-0018-dev-home-isolado-por-checkout.md).
+
+No primeiro uso, autentique o cliente pelo mesmo launcher, por exemplo
+`dev-run.sh -- omp login`, `dev-run.sh -- claude auth login --claudeai` ou
+`dev-run.sh -- codex login` (usando o caminho completo do launcher acima).
+Sem login ou chave de ambiente, o omp pode recusar a abertura por não ter modelo
+padrão. Não execute o login Console do Claude como se fosse isolado: o serviço
+de credenciais do SO pode afetar a conta pessoal.
+
+Para quem usava a ligação dev global antiga, o cutover é explícito, fora do
+launcher: `bash .claude/skills/anvil-sync/scripts/dev-link.sh --unlink --dry-run`,
+depois `--unlink`, e instalação publicada com os comandos do início deste README,
+revisando o dry-run antes da execução. O launcher não altera a instalação pessoal
+nem faz esse cutover automaticamente.
+
 ---
 
 ## Estrutura do repositório

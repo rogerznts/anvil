@@ -1,133 +1,153 @@
 #!/usr/bin/env bash
-# dev-link.sh — liga a instalacao de usuario ao payload deste repositorio, por
-# symlink.
-#
-# O anvil e construido pelo proprio anvil. A fonte e anvil/, e o toolkit se instala
-# uma vez por usuario: ~/.claude/skills, ~/.claude/agents, o espelho
-# ~/.agents/skills e a camada omp em ~/.omp/agent. Copiar criaria duas copias, e a
-# editada seria a errada — a que esta carregada. O symlink deixa uma fonte so:
-# editar a skill instalada E editar o payload, e o rollback e um git checkout.
-# Todo projeto da maquina passa a rodar a fonte em edicao, skill editada pela
-# metade inclusive.
-#
-# Isto nao e o caminho de uma maquina comum. La e o /anvil-update, que se recusa a
-# instalar por cima destes symlinks.
-#
-#   dev-link.sh [--dry-run]     liga o roster de fluxo em ~/.claude/skills e os
-#                               agentes em ~/.claude/agents, espelha as skills
-#                               ligadas em ~/.agents/skills, e liga a camada omp
-#                               em ~/.omp/agent; tira de ~/.claude/skills e de
-#                               ~/.agents/skills o symlink nosso cujo alvo saiu
-#                               do payload
-#   dev-link.sh --all           liga o payload inteiro
-#   dev-link.sh --unlink        remove os symlinks que apontam para este payload,
-#                               e somente eles
-#
-# anvil-sync nao e ligada: ela vive em .claude/skills deste repositorio, e dele e
-# nao vai no payload.
-
+# Prepara somente workspace/anvil-dev/home deste checkout, com links por peca.
+# Nao importa configuracao/auth, nao instala o publicado e nao e sandbox.
+# --unlink e uma migracao global explicita; nunca faz parte da preparacao dev.
+# Compativel com Bash 3.2. Saida: 0 sucesso; 2 uso/ambiente/colisao recusados.
 set -euo pipefail
+umask 077
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
-FONTE="$ROOT/anvil/.claude"
-PAYLOAD="$FONTE/skills"
-AGENTS="$FONTE/agents"
-# A camada omp viaja no payload dentro da anvil-update, e o update a instala em
-# ~/.omp/agent. Aqui cada arquivo dela vira um symlink no mesmo caminho relativo.
-CAMADA="$PAYLOAD/anvil-update/.omp-layer"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd -P)"
+SOURCE="$ROOT/anvil/.claude"
+PAYLOAD="$SOURCE/skills"
+LAYER="$PAYLOAD/anvil-update/.omp-layer"
+DEV_HOME="$ROOT/workspace/anvil-dev/home"
+MODE=roster
+DRY=0
 
-[ -d "$PAYLOAD" ] || { echo "erro: payload nao encontrado em $PAYLOAD" >&2; exit 2; }
-[ -n "${HOME:-}" ] && [ -d "$HOME" ] || { echo "erro: \$HOME nao e um diretorio — e o destino da ligacao" >&2; exit 2; }
-U="$(cd "$HOME" && pwd)"
-DEST="$U/.claude/skills"
-DEST_AGENTS="$U/.claude/agents"
-ESPELHO="$U/.agents/skills"
-OMP="$U/.omp/agent"
+fail() { printf 'erro: %s\n' "$*" >&2; exit 2; }
+usage() {
+    cat <<'HELP'
+Uso: bash dev-link.sh [--all] [--dry-run]
+     bash dev-link.sh --unlink [--dry-run]
 
-# Nosso e o symlink que aponta para dentro deste payload. O resto de HOME — skill,
-# agente, arquivo, ou symlink para outro lugar — e do usuario.
-nosso() {
+Prepara workspace/anvil-dev/home, sem tocar a instalacao pessoal. Por padrao
+liga o roster de fluxo; --all liga todas as skills. Agentes, espelho Codex e
+camada omp entram em ambos. Colisoes e ancestrais symlink sao recusados antes
+de qualquer escrita. --dry-run nao cria nem altera arquivos/diretorios.
+
+--unlink remove somente links globais deste checkout e links historicos do
+projeto reconhecidos. Nao toca o HOME dev nem restaura a instalacao publicada.
+Execute a migracao separadamente no HOME real; nunca dentro de dev-run.sh.
+Abra clientes com dev-run.sh -- <comando> [args...], de preferencia na raiz.
+HELP
+}
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --all) [ "$MODE" != unlink ] || fail '--all e --unlink sao incompativeis'; MODE=all ;;
+        --unlink) [ "$MODE" != all ] || fail '--all e --unlink sao incompativeis'; MODE=unlink ;;
+        --dry-run) DRY=1 ;;
+        -h|--help) usage; exit 0 ;;
+        *) fail "argumento desconhecido: $1" ;;
+    esac
+    shift
+done
+
+# Normalizacao lexical reconhece tambem links relativos e alvos que sumiram,
+# sem seguir symlinks nem confundir /payload/../terceiro com fonte nossa.
+normalize() {
+    local part result='' count=0
+    local parts=() stack=()
+    IFS=/ read -r -a parts <<< "$1"
+    for part in ${parts[@]+"${parts[@]}"}; do
+        case "$part" in
+            ''|.) ;;
+            ..) if [ "$count" -gt 0 ]; then count=$((count - 1)); unset 'stack[count]'; fi ;;
+            *) stack[$count]="$part"; count=$((count + 1)) ;;
+        esac
+    done
+    for part in ${stack[@]+"${stack[@]}"}; do result="$result/$part"; done
+    printf '%s\n' "${result:-/}"
+}
+owned() {
+    local target
     [ -L "$1" ] || return 1
-    case "$(readlink "$1")" in "$FONTE"/*) return 0 ;; esac
+    target="$(readlink "$1")"
+    case "$target" in /*) ;; *) target="${1%/*}/$target" ;; esac
+    target="$(normalize "$target")"
+    case "$target" in "$SOURCE"/*) return 0 ;; esac
     return 1
 }
-curto() { printf '~%s' "${1#"$U"}"; }
-# tira as pastas que a remocao deixou vazias, ate <limite>, que fica
-poda() {
-    local d; d="$(dirname "$1")"
-    while [ "$d" != "$2" ] && rmdir "$d" 2>/dev/null; do d="$(dirname "$d")"; done
-}
-# Os symlinks nossos da camada em ~/.omp/agent. A busca fica nas pastas de topo da
-# camada: o resto de ~/.omp/agent e do omp — sessoes, bancos, cache —, com
-# milhares de arquivos.
-nossos_omp() {
-    local top
-    for top in "$CAMADA"/*; do
-        [ -d "$OMP/$(basename "$top")" ] || continue
-        find "$OMP/$(basename "$top")" -type l | while IFS= read -r l; do
-            if nosso "$l"; then echo "$l"; fi
-        done
+# Verifica todos os ancestrais, inclusive os que ja existem acima do checkout.
+check_dir() {
+    local path="$1"
+    while [ "$path" != / ]; do
+        [ ! -L "$path" ] || fail "ancestral/diretorio symlink recusado: $path"
+        if [ -e "$path" ] && [ ! -d "$path" ]; then fail "diretorio ocupado por arquivo: $path"; fi
+        path="${path%/*}"
+        [ -n "$path" ] || path=/
     done
+}
+LINKS=()
+TARGETS=()
+REMOVALS=()
+DIRS=()
+LINK_COUNT=0
+REMOVE_COUNT=0
+add_link() {
+    LINKS[$LINK_COUNT]="$1"; TARGETS[$LINK_COUNT]="$2"
+    LINK_COUNT=$((LINK_COUNT + 1))
+}
+add_removal() {
+    REMOVALS[$REMOVE_COUNT]="$1"; REMOVE_COUNT=$((REMOVE_COUNT + 1))
 }
 
-# --- o projeto: o que o dev-link de antes ligava ---------------------------------
-# Antes da instalacao de usuario, o dev-link ligava o payload dentro deste
-# repositorio, por caminho relativo: skills e agentes em .claude/, o espelho em
-# .agents/skills e a camada em .omp/. Eles duplicariam a instalacao de usuario, e
-# no omp a camada do projeto pode vencer a de usuario. Saem, tanto ao ligar quanto
-# no --unlink. O resto de .claude, .agents e .omp e de quem mantem o repositorio,
-# anvil-sync inclusive.
-antigos() {
-    local l n
-    for l in "$ROOT"/.claude/skills/* "$ROOT"/.claude/agents/*; do
-        [ -L "$l" ] || continue
-        case "$(readlink "$l")" in ../../anvil/.claude/skills/*|../../anvil/.claude/agents/*) echo "$l" ;; esac
+if [ "$MODE" = unlink ]; then
+    [ -n "${HOME:-}" ] && [ -d "$HOME" ] || fail 'HOME deve ser um diretorio existente'
+    case "$HOME" in /*) ;; *) fail 'HOME deve ser absoluto' ;; esac
+    USER_HOME="$(normalize "$HOME")"
+    PHYSICAL_HOME="$(cd "$HOME" && pwd -P)"
+    [ "$PHYSICAL_HOME" != "$DEV_HOME" ] || fail '--unlink nao pode rodar no HOME dev'
+    check_dir "$USER_HOME"
+    # Primeiro valida todos os pontos de busca; find nunca atravessa symlinks.
+    for dir in "$USER_HOME/.claude/skills" "$USER_HOME/.claude/agents" \
+        "$USER_HOME/.agents/skills" "$USER_HOME/.omp/agent" \
+        "$ROOT/.claude/skills" "$ROOT/.claude/agents" "$ROOT/.agents/skills" "$ROOT/.omp"; do
+        check_dir "$dir"
     done
-    for l in "$ROOT"/.agents/skills/*; do
-        n="$(basename "$l")"
-        [ -L "$l" ] && [ "$(readlink "$l")" = "../../.claude/skills/$n" ] || continue
-        # o espelho de uma skill do repositorio, como a anvil-sync, aponta para diretorio real
-        if [ -d "$ROOT/.claude/skills/$n" ] && [ ! -L "$ROOT/.claude/skills/$n" ]; then continue; fi
-        echo "$l"
+    for dir in "$USER_HOME/.claude/skills" "$USER_HOME/.claude/agents" "$USER_HOME/.agents/skills" "$USER_HOME/.omp/agent"; do
+        [ -d "$dir" ] || continue
+        while IFS= read -r -d '' link; do
+            if owned "$link"; then add_removal "$link"; fi
+        done < <(find "$dir" -type l -print0)
     done
-    [ -d "$ROOT/.omp" ] || return 0
-    find "$ROOT/.omp" -type l | while IFS= read -r l; do
-        case "$(readlink "$l")" in ../*anvil/.claude/skills/anvil-update/.omp-layer/*) echo "$l" ;; esac
+    for link in "$ROOT"/.claude/skills/* "$ROOT"/.claude/agents/*; do
+        [ -L "$link" ] || continue
+        case "$(readlink "$link")" in
+            ../../anvil/.claude/skills/*|../../anvil/.claude/agents/*)
+                if owned "$link"; then add_removal "$link"; fi ;;
+        esac
     done
-}
-# coletados antes: a poda some com pasta que o find ainda nao percorreu
-tira_antigos() {
-    local lista l n=0
-    lista="$(antigos)"
-    while IFS= read -r l; do
-        [ -n "$l" ] || continue
-        if [ "$DRY" -eq 1 ]; then
-            echo "removeria do projeto ${l#"$ROOT"/}"
-        else
-            rm -f "$l"
-            case "$l" in "$ROOT/.omp/"*) poda "$l" "$ROOT/.omp" ;; esac
+    for link in "$ROOT"/.agents/skills/*; do
+        [ -L "$link" ] || continue
+        name="${link##*/}"
+        [ "$(readlink "$link")" = "../../.claude/skills/$name" ] || continue
+        # O formato do espelho sozinho nao identifica o toolkit: preserve uma
+        # skill local real ou ligada a terceiros. Um espelho orfao so e
+        # reconhecido quando a skill ainda existe neste payload.
+        if owned "$ROOT/.claude/skills/$name"; then
+            add_removal "$link"
+        elif [ ! -e "$ROOT/.claude/skills/$name" ] && [ ! -L "$ROOT/.claude/skills/$name" ] && [ -d "$PAYLOAD/$name" ]; then
+            add_removal "$link"
         fi
-        n=$((n + 1))
-    done <<< "$lista"
-    antigos_n="$n"
-}
-
-# --- o roster ------------------------------------------------------------------
-# Da ideia ao commit, mais as skills que essas invocam de verdade. Nao e o
-# payload inteiro: UI, stack e bench nao tem o que fazer neste repositorio e so
-# competiriam por atencao — o bench, cuja description dispara em "long or
-# multi-part task", chegaria a se auto-invocar dentro do implement.
-#
-# `anvil-update` fica de fora DE PROPOSITO: rodar o update aqui baixaria o
-# payload publicado por cima do payload fonte. Nao estar instalado e a trava, e o
-# reset-install ainda recusa instalar por cima destes symlinks.
-# O `anvil-boot` fica, como ficaria num projeto — e idempotente, e a estrutura
-# deste repositorio ainda vai mudar.
-#
-# A lista e curadoria, nao deducao: prosa citando `/anvil-update` e
-# sintaticamente igual a uma invocacao, e um fecho automatico religa justamente
-# o que se quis manter fora. O fecho abaixo so AVISA.
-ROSTER="anvil-boot
+    done
+    if [ -d "$ROOT/.omp" ]; then
+        while IFS= read -r -d '' link; do
+            target="$(readlink "$link")"
+            case "$target" in
+                ../*anvil/.claude/skills/anvil-update/.omp-layer/*)
+                    if owned "$link"; then add_removal "$link"; fi ;;
+            esac
+        done < <(find "$ROOT/.omp" -type l -print0)
+    fi
+else
+    [ -d "$PAYLOAD" ] || fail "payload nao encontrado: $PAYLOAD"
+    # Os destinos de ambiente do launcher sao preparados nesta mesma transacao.
+    DIRS=("$DEV_HOME" "$DEV_HOME/.claude/skills" "$DEV_HOME/.claude/agents"
+        "$DEV_HOME/.agents/skills" "$DEV_HOME/.omp/agent" "$DEV_HOME/.codex"
+        "$DEV_HOME/.config" "$DEV_HOME/.local/share" "$DEV_HOME/.cache"
+        "$DEV_HOME/.local/state" "$DEV_HOME/.local/run" "$DEV_HOME/tmp")
+    for dir in "${DIRS[@]}"; do check_dir "$dir"; done
+    ROSTER='anvil-boot
 anvil-grill
 anvil-grilling
 anvil-domain-modeling
@@ -151,188 +171,75 @@ anvil-unslop
 anvil-writing-for-agents
 anvil-browser-qa
 anvil-next
-anvil-commit"
-
-MODO="roster"; DRY=0
-while [ $# -gt 0 ]; do
-    case "$1" in
-        --all)     MODO="all";    shift ;;
-        --unlink)  MODO="unlink"; shift ;;
-        --dry-run) DRY=1;         shift ;;
-        -h|--help) sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-        *) echo "erro: argumento desconhecido: $1" >&2; exit 2 ;;
-    esac
-done
-
-disponiveis=""
-for d in "$PAYLOAD"/*/; do
-    [ -d "$d" ] && disponiveis="$disponiveis$(basename "$d")"$'\n'
-done
-conta() { printf '%s' "$1" | grep -c . || true; }
-
-# --- unlink -------------------------------------------------------------------
-# Remove symlink nosso, nunca diretorio, arquivo ou symlink para outro lugar.
-if [ "$MODO" = "unlink" ]; then
-    tira_antigos
-    n=0
-    for l in "$DEST"/* "$DEST_AGENTS"/* "$ESPELHO"/*; do
-        nosso "$l" || continue
-        if [ "$DRY" -eq 1 ]; then echo "removeria $(curto "$l")"; else rm -f "$l"; fi
-        n=$((n + 1))
-    done
-    omp_links="$(nossos_omp)"
-    while IFS= read -r l; do
-        [ -n "$l" ] || continue
-        if [ "$DRY" -eq 1 ]; then echo "removeria $(curto "$l")"; else rm -f "$l"; poda "$l" "$OMP"; fi
-        n=$((n + 1))
-    done <<< "$omp_links"
-    echo "$n symlink(s) $([ "$DRY" -eq 1 ] && echo "a remover" || echo "removido(s)") em ~/.claude, ~/.agents/skills e ~/.omp/agent."
-    [ "$antigos_n" -gt 0 ] && echo "$antigos_n symlink(s) do dev-link antigo $([ "$DRY" -eq 1 ] && echo "a remover" || echo "removido(s)") do projeto."
-    exit 0
-fi
-
-[ "$MODO" = "all" ] && conjunto="$disponiveis" || conjunto="$ROSTER"
-
-tira_antigos
-
-# liga <alvo> <fonte>: symlink nosso ou de outro lugar e refeito; diretorio ou
-# arquivo real nao e nosso para sobrescrever. Devolve 1 quando pula.
-refeitos=""
-liga() {
-    if [ -e "$1" ] && [ ! -L "$1" ]; then return 1; fi
-    nosso "$1" && [ "$(readlink "$1")" = "$2" ] && return 0
-    if [ -L "$1" ] && ! nosso "$1"; then refeitos="$refeitos$(curto "$1") -> $(readlink "$1")"$'\n'; fi
-    if [ "$DRY" -eq 1 ]; then
-        echo "ligaria $(curto "$1")"
-    else
-        mkdir -p "$(dirname "$1")" || return 1
-        rm -f "$1"
-        ln -s "$2" "$1"
-    fi
-}
-
-# --- ligar --------------------------------------------------------------------
-ligados=0; ausentes=""; pulados=""; a_ligar=""
-for s in $conjunto; do
-    if [ ! -d "$PAYLOAD/$s" ]; then
-        ausentes="$ausentes$s"$'\n'   # roster envelheceu: a skill saiu do payload
-        continue
-    fi
-    if ! liga "$DEST/$s" "$PAYLOAD/$s"; then
-        pulados="$pulados$s"$'\n'
-        continue
-    fi
-    ligados=$((ligados + 1)); a_ligar="$a_ligar$s"$'\n'
-done
-
-# --- links pendurados ------------------------------------------------------------
-# O symlink nosso cujo alvo saiu do payload — a skill renomeada ou tirada — sai, no
-# roster e no --all. Symlink para outro lugar, pendurado ou nao, e de outro
-# toolkit e fica.
-pend_removidos=0
-for l in "$DEST"/*; do
-    nosso "$l" && [ ! -e "$l" ] || continue
-    if [ "$DRY" -eq 1 ]; then echo "removeria $(curto "$l")"; else rm -f "$l"; fi
-    pend_removidos=$((pend_removidos + 1))
-done
-
-# --- agentes -------------------------------------------------------------------
-# Todos, no roster e no --all. O roster poupa a atencao que as descriptions das
-# skills disputam; os agentes do payload so recebem trabalho da skill que os
-# despacha.
-ag_ligados=0; ag_total=0; ag_pulados=""
-for f in "$AGENTS"/*.md; do
-    [ -f "$f" ] || continue
-    a="$(basename "$f")"; ag_total=$((ag_total + 1))
-    if ! liga "$DEST_AGENTS/$a" "$f"; then
-        ag_pulados="$ag_pulados$a"$'\n'
-        continue
-    fi
-    ag_ligados=$((ag_ligados + 1))
-done
-
-# --- espelho do Codex ------------------------------------------------------------
-# Gerado a partir do que esta ligado agora em ~/.claude/skills, nao so do conjunto
-# desta execucao: o roster nao desliga o que um --all ligou antes. Como no reset,
-# o symlink com nome de skill do payload e do anvil e e refeito; o nosso de skill
-# que nao esta mais ligada sai, o pendurado inclusive. Diretorio ou arquivo fica:
-# `ln -s` sobre um diretorio criaria o link dentro dele.
-ligada() {
-    printf '%s' "$a_ligar" | grep -qxF -e "$1" && return 0
-    nosso "$DEST/$1" && [ -e "$DEST/$1" ]
-}
-esp_ligados=0; esp_removidos=0; esp_pulados=""
-for s in $disponiveis; do
-    ligada "$s" || continue
-    if ! liga "$ESPELHO/$s" "$PAYLOAD/$s"; then
-        esp_pulados="$esp_pulados$s"$'\n'
-        continue
-    fi
-    esp_ligados=$((esp_ligados + 1))
-done
-for l in "$ESPELHO"/*; do
-    s="$(basename "$l")"
-    nosso "$l" || continue
-    ligada "$s" && continue
-    if [ "$DRY" -eq 1 ]; then echo "removeria $(curto "$l")"; else rm -f "$l"; fi
-    esp_removidos=$((esp_removidos + 1))
-done
-
-# --- camada omp ---------------------------------------------------------------
-# Um symlink por arquivo da camada. Arquivo real no caminho fica, e sai do
-# relatorio como pulado. O symlink nosso para um arquivo que saiu da camada sai,
-# com as pastas que ficarem vazias.
-omp_ligados=0; omp_removidos=0; omp_pulados=""
-if [ -d "$CAMADA" ]; then
-    while IFS= read -r r; do
-        if ! liga "$OMP/$r" "$CAMADA/$r" 2>/dev/null; then
-            omp_pulados="$omp_pulados$r"$'\n'   # arquivo real, ou pasta do caminho e arquivo
-            continue
+anvil-commit'
+    for source in "$PAYLOAD"/*; do
+        [ -d "$source" ] || continue
+        name="${source##*/}"
+        selected=0
+        if [ "$MODE" = all ]; then
+            selected=1
+        else
+            while IFS= read -r skill; do
+                if [ "$skill" = "$name" ]; then selected=1; break; fi
+            done <<< "$ROSTER"
         fi
-        omp_ligados=$((omp_ligados + 1))
-    done < <(cd "$CAMADA" && find . -type f | sed 's|^\./||' | LC_ALL=C sort)
-fi
-omp_links="$(nossos_omp)"
-while IFS= read -r l; do
-    [ -n "$l" ] || continue
-    [ -f "$CAMADA/${l#"$OMP"/}" ] && continue
-    if [ "$DRY" -eq 1 ]; then echo "removeria $(curto "$l")"; else rm -f "$l"; poda "$l" "$OMP"; fi
-    omp_removidos=$((omp_removidos + 1))
-done <<< "$omp_links"
-
-seria() { [ "$DRY" -eq 1 ] && echo "$1" || echo "$2"; }
-echo
-echo "$ligados de $(conta "$disponiveis") skills do payload $(seria "seriam ligadas" "ligadas") e $pend_removidos symlink(s) pendurado(s) $(seria "seriam removidos" "removidos") em ~/.claude/skills."
-echo "$ag_ligados de $ag_total agentes do payload $(seria "seriam ligados" "ligados") em ~/.claude/agents."
-echo "$esp_ligados symlink(s) $(seria "seriam ligados" "ligados") e $esp_removidos $(seria "seriam removidos" "removidos") em ~/.agents/skills."
-echo "$omp_ligados arquivo(s) da camada omp $(seria "seriam ligados" "ligados") e $omp_removidos symlink(s) $(seria "seriam removidos" "removidos") em ~/.omp/agent."
-[ "$antigos_n" -gt 0 ] && echo "$antigos_n symlink(s) do dev-link antigo $(seria "seriam removidos" "removidos") do projeto."
-[ -n "$refeitos" ] && { echo "symlinks que apontavam para outro lugar, $(seria "seriam refeitos" "refeitos"):"; printf '%s' "$refeitos" | sed 's/^/  /'; }
-[ -n "$ausentes" ] && { echo "NO ROSTER MAS FORA DO PAYLOAD — revise a lista:"; printf '%s' "$ausentes" | sed 's/^/  /'; }
-[ -n "$pulados"  ] && { echo "pulados, porque ~/.claude/skills tem diretorio ou arquivo real com o nome:"; printf '%s' "$pulados" | sed 's/^/  /'; }
-[ -n "$ag_pulados" ] && { echo "agentes pulados, porque ~/.claude/agents tem arquivo real com o nome:"; printf '%s' "$ag_pulados" | sed 's/^/  /'; }
-[ -n "$esp_pulados" ] && { echo "espelho pulado, porque ~/.agents/skills tem diretorio ou arquivo com o nome:"; printf '%s' "$esp_pulados" | sed 's/^/  /'; }
-[ -n "$omp_pulados" ] && { echo "camada omp pulada, porque ~/.omp/agent tem arquivo real no caminho:"; printf '%s' "$omp_pulados" | sed 's/^/  /'; }
-
-# --- aviso: referencia para fora do roster ------------------------------------
-# Nao religa nada. Existe para a lista nao apodrecer em silencio: uma skill
-# ligada apontando para uma que nao esta e ou uma dependencia esquecida, ou uma
-# ausencia deliberada. Quem decide e voce. So conta nome que e skill do payload:
-# o texto tambem cita nome de outra coisa com o mesmo prefixo, como a rede
-# "anvil-net".
-penduradas=""
-for s in $conjunto; do
-    [ -d "$PAYLOAD/$s" ] || continue
-    for ref in $(grep -rhoE '"(anvil|tea)-[a-z0-9-]+"|\.\./(anvil|tea)-[a-z0-9-]+' "$PAYLOAD/$s" 2>/dev/null \
-                 | grep -oE '(anvil|tea)-[a-z0-9-]+' | sort -u); do
-        [ "$ref" = "$s" ] && continue
-        [ -d "$PAYLOAD/$ref" ] || continue   # nao e skill do payload: a rede anvil-net, um agente
-        printf '%s\n' "$conjunto"    | grep -qx "$ref" && continue
-        printf '%s\n' "$penduradas"  | grep -q "^$s -> $ref\$" && continue
-        penduradas="$penduradas$s -> $ref"$'\n'
+        # Um --all anterior nao e desfeito ao voltar ao roster.
+        if [ "$selected" -eq 0 ] && owned "$DEV_HOME/.claude/skills/$name"; then selected=1; fi
+        [ "$selected" -eq 1 ] || continue
+        add_link "$DEV_HOME/.claude/skills/$name" "$source"
+        add_link "$DEV_HOME/.agents/skills/$name" "$source"
     done
-done
-[ -n "$penduradas" ] && { echo; echo "referencias para fora do roster (nao religadas):"; printf '%s' "$penduradas" | sed 's/^/  /'; }
+    for source in "$SOURCE"/agents/*.md; do
+        [ -f "$source" ] || continue
+        add_link "$DEV_HOME/.claude/agents/${source##*/}" "$source"
+    done
+    if [ -d "$LAYER" ]; then
+        while IFS= read -r -d '' source; do
+            add_link "$DEV_HOME/.omp/agent/${source#"$LAYER"/}" "$source"
+        done < <(find "$LAYER" -type f -print0)
+    fi
+    # Recusa qualquer colisao antes de criar o primeiro diretorio ou link.
+    for ((i=0; i<LINK_COUNT; i++)); do
+        link="${LINKS[$i]}"
+        check_dir "${link%/*}"
+        if [ -e "$link" ] || [ -L "$link" ]; then
+            owned "$link" || fail "destino nao gerenciado ja existe: $link"
+        fi
+    done
+    # Inclui arquivos/agentes removidos e topos antigos da camada omp. Nao
+    # segue links de skills nem apaga estado/terceiros dentro do HOME privado.
+    for dir in "$DEV_HOME/.claude/skills" "$DEV_HOME/.claude/agents" "$DEV_HOME/.agents/skills" "$DEV_HOME/.omp/agent"; do
+        [ -d "$dir" ] || continue
+        while IFS= read -r -d '' link; do
+            owned "$link" || continue
+            [ ! -e "$link" ] || continue
+            add_removal "$link"
+        done < <(find "$dir" -type l -print0)
+    done
+fi
 
-echo
-echo "as skills, os agentes e a camada omp so aparecem na PROXIMA sessao do Claude Code e do omp, em todo projeto da maquina."
+# A validacao abrange tambem os ancestrais de cada remocao planejada.
+for link in ${REMOVALS[@]+"${REMOVALS[@]}"}; do check_dir "${link%/*}"; done
+if [ "$DRY" -eq 0 ]; then
+    for dir in ${DIRS[@]+"${DIRS[@]}"}; do mkdir -p "$dir"; done
+fi
+for link in ${REMOVALS[@]+"${REMOVALS[@]}"}; do
+    if [ "$DRY" -eq 1 ]; then printf 'removeria %s\n' "$link"; else rm -- "$link"; fi
+done
+for ((i=0; i<LINK_COUNT; i++)); do
+    link="${LINKS[$i]}"
+    target="${TARGETS[$i]}"
+    if [ -L "$link" ] && [ "$(readlink "$link")" = "$target" ]; then continue; fi
+    if [ "$DRY" -eq 1 ]; then
+        printf 'ligaria %s -> %s\n' "$link" "$target"
+    else
+        mkdir -p "${link%/*}"
+        [ ! -L "$link" ] || rm -- "$link"
+        ln -s "$target" "$link"
+    fi
+done
+if [ "$MODE" = unlink ]; then
+    printf '%s link(s) globais/historicos; HOME dev intocado. Nenhuma instalacao publicada foi feita.\n' "$REMOVE_COUNT"
+else
+    printf 'HOME dev: %s\n%s link(s) planejados; %s link(s) obsoletos. Instalacao pessoal intocada.\n' "$DEV_HOME" "$LINK_COUNT" "$REMOVE_COUNT"
+fi
