@@ -95,6 +95,19 @@ O documento que mapeia um sistema de referência para a stack corrente, com
 ponteiros verificáveis, sem implementar nada.
 _Avoid_: port, análise, estudo
 
+### Segurança
+
+**Execução da auditoria**:
+Uma passada completa da auditoria de segurança sobre um repositório, com os
+artefatos gravados fora do que o git versiona.
+_Avoid_: scan, pentest, run
+
+**Registro da auditoria**:
+O documento versionado que diz o que uma execução da auditoria cobriu e quantos
+achados teve, por veredito e severidade, sem o caminho nem a reprodução de nenhum
+achado.
+_Avoid_: relatório, report, laudo
+
 ### Tickets
 
 **Frontier**:
