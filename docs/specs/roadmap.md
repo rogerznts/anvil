@@ -4,6 +4,7 @@
 
 Tipo: feature
 Depende de:
+Spec: 013
 
 Entra: o upstream `cloudflare/security-audit-skill` como submodule em `references/`, com a fonte em `sources:` e a skill em `skills:` do `anvil-skills.yaml`; a pasta `skills/security-audit/` inteira vendorizada pelo `vendor-sync.sh vendor` como `anvil-security-audit`, com os `*.test.cjs`, sem `invocable`; um `VENDOR.md` em `keep:` com a origem e o aviso da licença MIT; a skill no roster do `dev-link.sh`; o ADR-0015 e a documentação do anvil que lista as skills.
 Fica de fora: qualquer mudança no conteúdo do upstream fora do catálogo de adaptação, incluindo o diretório de saída da auditoria; o `README.md` da raiz do upstream; a sugestão da auditoria no `anvil-boot`; checklist de segurança como capacidade de stack.
