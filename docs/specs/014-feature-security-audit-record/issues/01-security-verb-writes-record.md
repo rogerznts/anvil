@@ -4,13 +4,23 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] O verbo `security` está na tabela de verbos do `anvil-docs`, com o arquivo próprio do verbo descrevendo argumento, recusas, o que o registro leva e o que nunca leva.
-- [ ] Sobre um diretório de exemplo cujo `findings.json` e `coverage-ledger.json` passam no `validate-findings.cjs` e no `validate-coverage-ledger.cjs` da cópia vendorizada, com pelo menos um achado de cada veredito e caminhos, trechos de fonte e reprodução preenchidos, o verbo grava o registro em `docs/security/`.
-- [ ] Nenhum valor de caminho, trecho de fonte, título, descrição, comando ou reprodução de achado do exemplo aparece no registro gravado, nem id de unidade do ledger.
-- [ ] Faltando um dos três arquivos, o verbo recusa dizendo qual, e nada é gravado.
-- [ ] Com um validador saindo diferente de `0`, o verbo recusa com a saída dele, e nada é gravado.
-- [ ] Registrar de novo a mesma execução substitui o registro dela, sem criar um segundo arquivo para o mesmo `run-<N>`.
-- [ ] O script não lê nem copia o `REPORT.md`, o `FINDINGS-DETAIL.md` ou o `NEEDS-VALIDATION.md`.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] O verbo `security` está na tabela de verbos do `anvil-docs`, com o arquivo próprio do verbo descrevendo argumento, recusas, o que o registro leva e o que nunca leva.
+- [x] Sobre um diretório de exemplo cujo `findings.json` e `coverage-ledger.json` passam no `validate-findings.cjs` e no `validate-coverage-ledger.cjs` da cópia vendorizada, com pelo menos um achado de cada veredito e caminhos, trechos de fonte e reprodução preenchidos, o verbo grava o registro em `docs/security/`.
+- [x] Nenhum valor de caminho, trecho de fonte, título, descrição, comando ou reprodução de achado do exemplo aparece no registro gravado, nem id de unidade do ledger.
+- [x] Faltando um dos três arquivos, o verbo recusa dizendo qual, e nada é gravado.
+- [x] Com um validador saindo diferente de `0`, o verbo recusa com a saída dele, e nada é gravado.
+- [x] Registrar de novo a mesma execução substitui o registro dela, sem criar um segundo arquivo para o mesmo `run-<N>`.
+- [x] O script não lê nem copia o `REPORT.md`, o `FINDINGS-DETAIL.md` ou o `NEEDS-VALIDATION.md`.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+
+## Comments
+
+- Implementação · o verbo é `anvil-docs/SECURITY.md`, e o script é `anvil-docs/scripts/audit-record.cjs`, que acha os validadores na `anvil-security-audit` irmã (`../../anvil-security-audit` a partir dele). Sai com `0` e `record: <caminho>`, ou com `2` e linhas `refusal:`, como o `roadmap.sh`.
+- Implementação · rodar o `index` depois de gravar, que a spec põe no verbo, ficou para o ticket 02, que o reivindica ("O verbo `security` termina rodando o `index`").
+- Implementação · a prova é o cenário manual `workspace/06-security-record/scenario.cjs`, fora do git: monta um projeto git e uma execução `run-<N>` com um achado de cada veredito e caminhos, trechos, comandos e reprodução marcados com `LEAK`, roda o script e confere o registro, as recusas e a substituição. Os relatórios em Markdown da execução ficam com permissão `000`, e qualquer leitura deles quebraria o script. O ticket 02 pode montar a mesma execução a partir do `confirmed()`/`needsValidation()`/`rejected()` do `validate-findings.test.cjs` e do `unit()` do `validate-coverage-ledger.test.cjs`.
+- Observação sobre a spec · o upstream não fixa a forma do `source_ref` do `run-metadata.json` ("the reviewed commit and whether the worktree is dirty"). O script exige `source_ref.commit` (SHA em hexadecimal) e `source_ref.dirty` (booleano), e recusa nomeando o campo quando falta — uma execução real que grave outra forma é recusada até o metadado ser ajustado.
+- Observação sobre a spec · o `run_id` e o `incomplete_reason` só entram como ficha sem espaço (`validation_budget_exhausted`); texto livre é recusado, porque poderia nomear um arquivo. Os motivos que o upstream cita são todos fichas.
+- Observação sobre a spec · a história 3 pede o "escopo da execução" no registro, e a lista branca não tem o `scope_paths`, que é lista de caminhos. Valeu a lista branca: o registro traz só o perfil.
+- Observação sobre a spec · o padrão do `fingerprint` no `report-schema.json` aceita `/` e `:`, e o upstream o descreve como "source-derived": uma execução que derive o fingerprint do caminho, como `src/auth.c:42`, leva esse caminho ao registro pela linha do achado, que a spec manda ter. O exemplo usa fingerprints sem caminho.
