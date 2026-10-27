@@ -33,6 +33,9 @@ O script sai com `0` e a linha `record: docs/security/audit-<data>-run-<N>.md`, 
 com `2` e uma linha `refusal:` por problema. Na recusa, nada é gravado: mostre as
 linhas ao usuário como vieram, e pare.
 
+Gravado o registro, rode o verbo [`index`](INDEX.md), que o lista no domínio
+`security/` do `docs/index.md`.
+
 ## Recusas
 
 | caso | o que sai |

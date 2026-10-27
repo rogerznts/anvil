@@ -46,8 +46,8 @@ survey como item a resolver, não como coisa a mover duas vezes.
 Classifique cada entrada como **conforme** ou **não-conforme**:
 
 - Conforme: mora sob um domínio canônico (`discovery/`, `prd/`, `architecture/`,
-  `ui/`, `qa/`, `project/`, `specs/`, `agents/`), ou é `index.md`, ou é um
-  `README.md` de domínio.
+  `ui/`, `qa/`, `security/`, `project/`, `specs/`, `agents/`), ou é `index.md`,
+  ou é um `README.md` de domínio.
 - Não-conforme: tudo o mais — arquivo solto na raiz de `docs/`, monolito
   (`docs/prd.md`, `docs/architecture.md`), `docs/stories/`, `docs/epics/`, pasta
   fora dos domínios.
