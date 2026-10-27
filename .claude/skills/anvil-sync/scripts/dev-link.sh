@@ -121,6 +121,8 @@ tira_antigos() {
 # reset-install ainda recusa instalar por cima destes symlinks.
 # O `anvil-boot` fica, como ficaria num projeto — e idempotente, e a estrutura
 # deste repositorio ainda vai mudar.
+# O `anvil-security-audit` fica: o modo guidance, que e o padrao dela, nao
+# escreve arquivo nem roda as seis fases sem pedido explicito (ADR-0015).
 #
 # A lista e curadoria, nao deducao: prosa citando `/anvil-update` e
 # sintaticamente igual a uma invocacao, e um fecho automatico religa justamente
@@ -139,6 +141,7 @@ anvil-code-review
 anvil-docs
 anvil-setup
 anvil-research
+anvil-security-audit
 anvil-distill
 anvil-how
 anvil-architect

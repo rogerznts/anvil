@@ -3,8 +3,8 @@
 Toolkit de skills para Claude Code. Sucede o [mosk](https://github.com/rogerznts/mosk),
 trocando agentes-como-persona por um conjunto curado de skills de terceiros.
 
-**O anvil não escreve as próprias skills de trabalho.** Ele curadoriza 35 skills
-de cinco repositórios upstream, mantidos como submodules em `references/`, e as
+**O anvil não escreve as próprias skills de trabalho.** Ele curadoriza 36 skills
+de seis repositórios upstream, mantidos como submodules em `references/`, e as
 vendoriza com adaptação registrada num manifesto — de forma que continuem
 atualizáveis quando o upstream andar.
 
@@ -250,6 +250,17 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 | `tea-open-pr` · `tea-open-fast-pr` | PR no Gitea, **um por spec**: o corpo lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
 | `tea-prune-branches` | remove branch local cujo remoto sumiu | autoral |
 
+### Segurança
+
+| skill | para quê | origem |
+|---|---|---|
+| `anvil-security-audit` | auditoria de segurança por código-fonte em seis fases, com coverage ledger, validação adversarial e achados validados por schema. Sem pedido explícito de auditoria completa ou de relatório, só orienta, sem gravar arquivo | cloudflare |
+
+A auditoria completa grava os artefatos fora do repositório auditado, por padrão
+em `~/security-audit-skill/<repo>/run-<N>`, e dentro dele só num diretório que o
+usuário escolha e que o git ignore: nenhum achado sem correção vai parar no git.
+O anvil não muda esse caminho (ADR-0015).
+
 ### Stack e bench
 
 | skill | para quê | origem |
@@ -415,6 +426,7 @@ references/                   submodules — os pins são a base do merge
   hallmark/    Nutlope/hallmark
   taste/       Leonxlnx/taste-skill
   payload-skills/  payloadcms/skills
+  security-audit-skill/  cloudflare/security-audit-skill
   mosk/        rogerznts/mosk (herança)
 anvil/                        o payload que a instalação de usuário copia
 docs/                         a documentação do próprio anvil
@@ -431,4 +443,5 @@ O trabalho está nos repositórios upstream. O anvil é curadoria.
 [cursor/plugins](https://github.com/cursor/plugins) ·
 [Nutlope/hallmark](https://github.com/Nutlope/hallmark) ·
 [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) ·
-[payloadcms/skills](https://github.com/payloadcms/skills)
+[payloadcms/skills](https://github.com/payloadcms/skills) ·
+[cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill)

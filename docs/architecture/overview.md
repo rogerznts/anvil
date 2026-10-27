@@ -4,7 +4,7 @@ O anvil é um toolkit de skills para Claude Code, distribuído por `npx degit`.
 Sucede o [mosk](https://github.com/rogerznts/mosk), trocando agentes-como-persona
 por um conjunto curado de skills de terceiros.
 
-A tese: **não escrever as skills de trabalho.** Curadoriza 35 skills de cinco
+A tese: **não escrever as skills de trabalho.** Curadoriza 36 skills de seis
 repositórios upstream, mantidos como submodules em `references/`, e as vendoriza
 com adaptação registrada — ver
 [adr-0001](./adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md).
