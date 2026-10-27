@@ -106,13 +106,15 @@ fecha vermelha, você não tem um defeito: tem uma bissecção com N tickets
 candidatos, sobre commits já entrelaçados, e cada tentativa custa uma suíte
 inteira. O verde por ticket é o que faz do commit uma âncora confiável.
 
-**O gate não bloqueia.** Dispare-o em background e siga com o commit, a
-documentação ou o próximo ticket. O tempo de máquina não é tempo seu. Três
-rodadas bloqueantes por ticket são insustentáveis; uma não bloqueante é barata.
+**O gate não prende o trabalho.** Dispare-o em background e siga com a
+documentação e o registro do ticket enquanto ele roda; o commit que fecha o
+ticket espera o verde. O tempo de máquina não é tempo seu. Três rodadas
+bloqueantes por ticket são insustentáveis; uma em background é barata.
 
 **Antes do merge, a suíte inteira roda mais uma vez, sobre o branch completo.**
 Não é redundante com o gate por ticket: ela pega a interação entre tickets, que
-nenhum gate individual viu.
+nenhum gate individual viu. No piloto automático, a skill `anvil-auto`, essa
+rodada é a prova que ele roda antes de fechar a spec.
 
 ### O laço curto, quando a suíte começar a doer
 
@@ -129,6 +131,8 @@ medido:
   numa invocação só, porque o custo fixo de preparar o ambiente é pago por
   invocação, não por arquivo.
 - **`gate`** — a suíte inteira mais o typecheck, uma vez por ticket, como acima.
+  Continua sendo o bloco `bash` da seção `## Comando de verificação`, o que o
+  piloto automático roda; o `laço` vai em prosa, depois dele.
 
 A seleção do laço **adia** a descoberta, nunca a dispensa. A variante perigosa é
 *"rodo só o selecionado e confio"*: aí ela deixa de ser otimização de laço e vira

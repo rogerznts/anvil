@@ -1,9 +1,9 @@
 # 002 — O custo de verificar como dado do projeto
 
 **Status:** ready-for-agent
-**Branch:** `feature/adjust-code-review` — a spec corre no branch já aberto, por
-decisão do usuário; o número `002` não foi reservado no `origin` pelo
-`new-spec.sh`
+**Branch:** `extension/002-verification-cost-rebase` — reaplicada sobre a `main`
+a partir do `feature/adjust-code-review`, onde a spec correu por decisão do
+usuário (PR #6); o número `002` não foi reservado no `origin` pelo `new-spec.sh`
 
 ## Problem Statement
 

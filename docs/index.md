@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-27T02:04:17Z
+Last updated: 2026-10-27T13:01:01Z
 
 ## Visão geral
 
@@ -47,7 +47,7 @@ Nenhuma.
 - [006 — Instalação por usuário, idioma no chat e cauda do `anvil-next`](./specs/archive/006-feature-user-install-language-next/spec.md) — `feature/006-user-install-language-next`, 7 tickets
 - [004 — Robustez e isolamento da camada omp](./specs/archive/004-extension-omp-layer-hardening/spec.md) — `extension/004-omp-layer-hardening`, 11 tickets
 - [003 — omp como harness, com camada própria](./specs/archive/003-feature-omp-harness/spec.md) — `feature/003-omp-harness`, 10 tickets
-- [002 — O custo de verificar como dado do projeto](./specs/archive/002-feature-custo-de-verificacao/spec.md) — `feature/adjust-code-review`, 5 tickets
+- [002 — O custo de verificar como dado do projeto](./specs/archive/002-feature-custo-de-verificacao/spec.md) — `extension/002-verification-cost-rebase`, 5 tickets
 - [001 — Equipe e destilação](./specs/archive/001-feature-team-distill-sentrux/spec.md) — `feature/001-team-distill-sentrux`, 12 tickets
 
 ## Conteúdo por domínio
@@ -61,7 +61,8 @@ Nenhuma.
   do glossário. Single-context, sob `docs/architecture/`.
 - [verification.md](./agents/verification.md) — o critério de parada que as
   skills de verificação leem: classe do achado, orçamento de duas rodadas,
-  escopo diff-only da segunda em diante, e a régua própria da prosa.
+  escopo diff-only da segunda em diante, a régua própria da prosa, e quando a
+  suíte roda como gate.
 
 ### Architecture
 
