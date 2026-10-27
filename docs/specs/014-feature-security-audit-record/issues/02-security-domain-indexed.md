@@ -4,7 +4,8 @@
 
 **Blocked by:** 01
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=4f93665; scope=full; verdict=fail; p1=open
 
 - [x] A árvore canônica e a tabela "Quem escreve onde" do `anvil-docs` trazem `security/`, escrito pelo verbo `security`, marcado como domínio que uma skill cria no primeiro uso.
 - [x] O verbo `index` trata `security/` como domínio base: gera o link quando a pasta existe, não gera quando não existe, e lista os registros no conteúdo por domínio.
@@ -18,3 +19,7 @@
 - Implementação · os seams foram os da spec ("Testing Decisions"): o verbo `security` sobre uma execução de exemplo, observando o registro gravado e o `docs/index.md`, e a saída do `validate.sh docs-paths`. A prova é o cenário manual `workspace/07-security-index/scenario.cjs`, fora do git: monta um projeto git e a execução `run-3` com as fixtures `confirmed()`/`needsValidation()`/`rejected()` e `unit()` do upstream, com os campos livres marcados `LEAK`; confere que o `docs-paths` sai `0` antes do registro e depois dele, que uma `docs/stories/` ainda reclama, e que nada `LEAK` chega ao registro. Antes da mudança, o cenário falhava com `pasta fora dos domínios: docs/security/`.
 - Implementação · o `index` é verbo do modelo, sem script: a prova do quarto critério é o `docs/index.md` gerado pelo `INDEX.md` no projeto do cenário, com `[Security](./security/)` no "Visão geral" e a linha do `audit-<data>-run-3.md` em "Conteúdo por domínio".
 - Fora do ticket · o `templates/issue-tracker-anvil.md` e o `docs/agents/issue-tracker.md` enumeram a árvore em "Onde os outros documentos moram" sem `security/`; a lista manda chamar o `anvil-docs`, que agora traz o domínio, e ficou como estava.
+- Review round=1 · P1 (Spec): a prova do quarto critério não se reproduz — o `scenario.cjs` apaga e recria `./project` a cada execução e não roda o `index`, então o `docs/index.md` citado no comentário some na reprodução oficial, e o `[x]` do critério fica sem observação que o próximo revisor consiga repetir.
+- Review round=1 · P2 (Standards): o quarto critério tem prova mais fraca que os outros — o `docs/index.md` gerado à mão não está no disco depois de rodar o cenário, e quem revisa depois tem de confiar na descrição em vez de inspecionar o resultado.
+- Review round=1 · P3 (Standards): possível Shotgun Surgery — um domínio canônico novo exige editar seis arquivos do `anvil-docs` (`ADOPT.md`, `INDEX.md`, `SECURITY.md`, `SKILL.md`, `validate.sh`, `templates/docs-index.md`); é o padrão que já existia, e o próximo domínio vai pagar o mesmo custo.
+- Review round=1 · P3 (Spec): a chamada ao `index` no `SECURITY.md` é uma frase solta, enquanto o `ARCHIVE.md` dá ao índice uma seção numerada própria — forma divergente entre verbos irmãos, sem efeito no comportamento.
