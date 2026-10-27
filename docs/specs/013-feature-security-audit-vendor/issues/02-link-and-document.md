@@ -4,10 +4,15 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] `anvil-security-audit` está na lista `ROSTER` do `dev-link.sh`.
-- [ ] Depois de `bash .claude/skills/anvil-sync/scripts/dev-link.sh`, `~/.claude/skills/anvil-security-audit` e `~/.agents/skills/anvil-security-audit` são symlinks para `anvil/.claude/skills/anvil-security-audit`.
-- [ ] O README lista `anvil-security-audit` na tabela de skills, com o que ela faz e a origem `cloudflare`, e cita a Cloudflare onde lista os upstreams.
-- [ ] Nada no README, nas skills ou nos docs promete que a auditoria grava dentro do repositório auditado.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] `anvil-security-audit` está na lista `ROSTER` do `dev-link.sh`.
+- [x] Depois de `bash .claude/skills/anvil-sync/scripts/dev-link.sh`, `~/.claude/skills/anvil-security-audit` e `~/.agents/skills/anvil-security-audit` são symlinks para `anvil/.claude/skills/anvil-security-audit`.
+- [x] O README lista `anvil-security-audit` na tabela de skills, com o que ela faz e a origem `cloudflare`, e cita a Cloudflare onde lista os upstreams.
+- [x] Nada no README, nas skills ou nos docs promete que a auditoria grava dentro do repositório auditado.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+
+## Comments
+
+- Implementação · o `dev-link.sh` foi exercitado com `HOME` temporário, a partir da worktree isolada desta execução: os dois symlinks, em `.claude/skills` e `.agents/skills`, saem apontando para `anvil/.claude/skills/anvil-security-audit`. O `HOME` real não foi tocado, porque ligar a partir da worktree apontaria a máquina para uma cópia descartável; nesta máquina, `~/.claude/skills/anvil-research` hoje é diretório real, da instalação publicada, e o `dev-link` pula diretório real. A ligação de verdade é rodar o `dev-link.sh` do repositório principal.
+- Implementação · `docs/architecture/overview.md` dizia "35 skills de cinco repositórios", como o README; os dois passam a 36 de seis. A tabela de medição do topo do README (`stats`, datada de 2026-09-25) ficou como está: é medição datada, e refazê-la é rodar o `stats` de novo.
