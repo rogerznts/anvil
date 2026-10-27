@@ -4,7 +4,7 @@ Deriva de uma execução da `anvil-security-audit` o registro da auditoria, em
 `docs/security/`. O registro diz que a auditoria aconteceu, sobre que commit, com
 que perfil, quanto foi coberto e quantos achados houve; o detalhe de cada achado
 fica no diretório da execução, fora do git. Um achado `confirmed` versionado é uma
-vulnerabilidade divulgada antes da correção (ADR-0015 do anvil).
+vulnerabilidade divulgada antes da correção (ADR-0019 do anvil).
 
 ## Quando
 

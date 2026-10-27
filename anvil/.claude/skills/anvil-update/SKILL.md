@@ -82,7 +82,8 @@ esta instalação possui, com uma linha `skill:` por skill, uma `agent:` por
 agente e uma `omp:` por arquivo da camada omp, com o caminho relativo a
 `~/.omp/agent/`. É o que substitui a detecção por prefixo do mosk — um lockfile
 diz a verdade, um prefixo adivinha, e adivinha errado justamente nas skills que
-não seguem o padrão de nome, como as `tea-*`.
+não seguem o padrão de nome, como as `tea-*`, que viraram `anvil-*` e só saem
+pelo lock.
 
 Sem lock, é a primeira instalação de usuário: nada é do anvil, nada é apagado, e
 toda skill ou agente do payload que já estiver em `~/.claude/` sai como colisão.
@@ -115,18 +116,25 @@ de reset é a nova, não a da versão velha. O `--unignore`, que só tira do
 instalada — é o que o `/anvil-boot` faz.
 
 **Instalação de desenvolvimento.** Se uma skill, um agente ou um arquivo da
-camada do payload for symlink em `~/.claude/` ou em `~/.omp/agent/` — o que o
-`dev-link` deixa na máquina de desenvolvimento do anvil —, o dry-run recusa,
-lista essas entradas e não escreve nada. Instalar por cima escreveria o payload
-publicado dentro da fonte, através do link. Pare aqui e repasse a recusa, que
-aponta o `dev-link.sh --unlink` no repositório do anvil; não apague symlink
-nenhum por conta própria.
+camada do payload for symlink em `~/.claude/` ou em `~/.omp/agent/`, o dry-run
+recusa antes de escrever: instalar por cima alcançaria a fonte através do link.
+Pare e repasse a recusa; não apague symlink nenhum por conta própria.
+
+- **Dentro do `dev-run.sh`**, com `ANVIL_DEV_ROOT` no ambiente: este é o HOME
+  privado do checkout. Peça para abrir uma sessão normal, fora do launcher, e
+  atualizar a instalação publicada lá. Não proponha retirar os links privados.
+- **Fora do launcher:** pode ser a ligação dev global antiga. O diagnóstico
+  aponta `bash .claude/skills/anvil-sync/scripts/dev-link.sh --unlink`, executado
+  na raiz do repositório do anvil, não no subdiretório `anvil/`. A retirada é
+  explícita, separada da instalação publicada; nunca faça isso automaticamente.
 
 O diretório do usuário não tem git por trás, então o dry-run **lista por nome**
 tudo que será substituído, removido e preservado. A saída classifica as skills e
 os agentes em quatro grupos: *substituídos* · *órfãos, serão removidos* · *não são
 do anvil, ficam intocados* · *preservados sempre*. Skill aparece pelo nome, agente
-pelo caminho (`~/.claude/agents/{nome}.md`).
+pelo caminho (`~/.claude/agents/{nome}.md`). Uma `tea-*` órfã sai com o nome novo
+ao lado — `tea-open-pr — agora anvil-open-pr` —, porque as skills de git do anvil
+mudaram de nome e o comando a digitar mudou com elas.
 
 O substituído que o lock não lista sai de novo logo abaixo, como *possível colisão
 com arquivo do usuário*: pode ser uma skill ou um agente que você escreveu com o
@@ -164,7 +172,9 @@ template novo.
 
 Diga numa frase o que será apagado e o que será preservado, **nomeando os
 órfãos** e as **possíveis colisões**, de skill, de agente e da camada omp, que
-serão sobrescritas. Não continue com um "talvez".
+serão sobrescritas. Órfã com nome novo vai com o nome novo: é o único aviso ao
+usuário de que o `/tea-*` que ele digitava deixou de existir. Não continue com um
+"talvez".
 
 Colisão no espelho não é sobrescrita. Antes de executar, compare cada uma com a
 skill instalada, que o dry-run ainda não trocou:

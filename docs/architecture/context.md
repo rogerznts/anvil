@@ -40,6 +40,12 @@ O toolkit instalado uma vez por usuário, no diretório dele — `~/.claude/`,
 todos os projetos da máquina. O projeto guarda só rules e `docs/`.
 _Avoid_: instalação global, instalação do sistema
 
+**HOME de desenvolvimento**:
+O ambiente privado de um checkout do anvil, usado somente nas sessões abertas
+explicitamente para trabalhar na fonte. A instalação publicada dos outros
+projetos permanece independente.
+_Avoid_: instalação dev global, sandbox dev
+
 **Instalação de projeto antiga**:
 O toolkit copiado dentro de um projeto, como o anvil instalava antes da instalação
 de usuário: skills, agentes e lock em `.claude/`, espelho em `.agents/skills`,
@@ -79,6 +85,29 @@ e dependências, que o piloto automático executa. O estado de cada entrada sai 
 disco.
 _Avoid_: plano, plano principal, backlog
 
+**Parada**:
+A spec que o piloto automático não fecha sozinho: fica aberta no branch dela,
+com o motivo e a pergunta que a destrava no relatório, e a corrente segue pelo
+que não depende dela.
+_Avoid_: spec travada, spec bloqueada, spec falha
+
+**Parada no fechamento**:
+A parada de uma spec já arquivada no branch que não chega ao branch base: forge
+recusado, recusa do PR, guarda, conflito, conferência do merge ou PR à espera do
+operador.
+_Avoid_: não fecha no fechamento, parada depois do archive, parada já arquivada
+
+### Git e forge
+
+**Forge**:
+O serviço que hospeda o remoto do projeto e recebe o PR: hoje, Gitea ou GitHub.
+_Avoid_: provedor, host, plataforma
+
+**Branch base**:
+O branch de onde todo trabalho sai e para onde volta, pelo merge local ou pelo
+PR: a `main` ou a `master`, ou outro que o projeto declarar.
+_Avoid_: main, branch principal, trunk, branch de integração, branch estável
+
 ### Referências
 
 **Upstream vendorizado**:
@@ -113,3 +142,25 @@ _Avoid_: relatório, report, laudo
 **Frontier**:
 Os tickets cujos bloqueadores já estão todos resolvidos.
 _Avoid_: fila, backlog, próximos
+
+**Despacho interrompido**:
+O despacho de um ticket ao implementer que volta sem o relatório dele: cancelado,
+com erro ou sem os três campos.
+_Avoid_: despacho falho, implementer morto, ticket caído
+
+**Retomada do despacho**:
+O despacho de novo, na mesma execução, de um ticket cujo despacho foi
+interrompido, continuando do que ele deixou no disco.
+_Avoid_: redespacho, retry, retomada (que é rodar a skill de novo)
+
+### Verificação
+
+**Prova**:
+A execução que mostra um comportamento do toolkit acontecendo, com o vermelho
+medido antes da mudança e o verde depois.
+_Avoid_: teste, smoke, cenário
+
+**Prova inválida**:
+A prova cuja sessão não foi respondida pelo modelo pedido. Não conta como verde
+nem como vermelho, e se repete.
+_Avoid_: prova falha, prova inconclusiva

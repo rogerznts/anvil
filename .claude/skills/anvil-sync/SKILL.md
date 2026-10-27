@@ -44,6 +44,75 @@ O script faz o **mecânico**: mover bytes, rodar `merge-file`, aplicar o `rename
 gravar o pin. Você faz o **julgamento**: `docs-remap`, `decursor` e `tracker-profile`, e resolver
 conflito. O script sinaliza o que falta, sempre.
 
+## Helper de prova
+
+`scripts/proof.sh` é a biblioteca que o script de uma prova nova em `workspace/`
+carrega, pelo ADR-0017 — provas pelo `/skill:` real do omp. Cria o diretório da
+execução, mantém o overlay com as skills do payload e da camada omp e desliga o
+fallback de modelo só na sessão. O `proof_session` lança `python3 proof-rpc.py`
+por `bash scripts/dev-run.sh --`, que prepara o HOME privado em
+`workspace/anvil-dev/home`, sem mudar o HOME do script da prova nem a instalação
+pessoal. O primeiro turno continua sendo o `/skill:` real. Depois das conferências
+da prova, o `proof_verdict` confere o modelo de toda mensagem do assistente, por
+`scripts/proof-verdict.py`, e sai com o código da prova: `0` verde, `1` vermelho,
+`3` inválida. A sessão principal é julgada pelo modelo pedido, e cada subagente
+por um modelo só, do começo ao fim: a prova sai inválida quando a principal tem
+mensagem de outro modelo ou quando um subagente troca de modelo; o subagente com
+modelo próprio por papel ou por frontmatter não invalida, e o relatório lista os
+modelos de cada sessão. Uma falha do próprio script de veredito sai `2`, de
+ambiente, e nunca `1`.
+
+O payload chama skills por `~/.claude/skills/<skill>/…`, e o overlay carrega o
+`SKILL.md` delas, não esse caminho. A prova declara as skills de que depende com
+`proof_prepare --dep <skill>`, uma vez por skill, e o helper valida o nome e o
+diretório fonte no payload desta árvore; se não existir, sai `2` antes de abrir a
+sessão. O launcher prepara os links privados por `dev-link.sh --all`; não há
+pré-requisito de symlinks globais. Python, omp e seus filhos herdam o mesmo HOME
+dev e o `PATH` da sessão, inclusive os CLIs falsos da prova. O launcher usa `exec`,
+mantendo o PID seguido pelo helper e seus traps, e preserva os argumentos.
+
+O HOME dev persiste entre provas e tem login/configuração próprios; não copia
+autenticação nem configuração pessoal. Variáveis de ambiente são herdadas, e isso
+não é sandbox. `$PROOF_RUN`, overlay, sessões e saídas mantêm o ciclo de vida do
+helper: a limpeza remove o temporário, não o HOME privado nem as saídas da prova.
+
+Para provas que passam por remoto e por PR, sem servidor, o
+`proof_prepare --remote` cria um repositório bare na execução, que o
+`proof_session` liga como `origin` da fixture, com o branch dela publicado; a
+fixture que já tem o bare como URL de push do `origin`, com a URL de um forge como
+a de fetch, fica como está, e é assim que o resolvedor lê o forge e o push vai ao
+bare. O
+`proof_prepare --forge` põe um `gh` e um `tea` falsos à frente do `PATH` da sessão,
+que gravam cada chamada no `forge.jsonl` das saídas e respondem como no sucesso,
+por `scripts/proof-forge.py`. Com o `--forge`, a prova configura o que as skills
+perguntam antes de abrir o PR: `--tea-login <nome>,<url>,<ssh_host>,<padrão>`, uma
+vez por login, dá a lista que o `tea login list --output json` devolve, no formato
+do `tea` real; `--labels <rótulo>,<rótulo>…` dá os rótulos que o `gh label list` e
+o `tea labels list` devolvem, e, sem ele, são os de um repositório novo do GitHub.
+Para provar o que acontece quando o PR não sai, a prova cria o arquivo de pedido
+`$PROOF_RUN/pr-create-fails` depois do `proof_prepare`: com ele, o `gh pr create`
+e o `tea pr create` saem `1`, sem URL, com a mensagem do CLI real sem autenticação
+no stderr, e a chamada fica no `forge.jsonl`; o resto do forge falso não muda.
+Para provas do bench com a stack de pé, o
+`proof_prepare --infra` liga o prefixo de execução do `infra.sh` com o id da
+execução, no script da prova e na sessão. Se não houver `ANVIL_PROJECTS_DIR`,
+exporta `$PROOF_RUN/projects`: o registro tem o mesmo caminho no pai, na sessão
+com HOME dev e no teardown. A limpeza derruba essa infra no fim.
+
+Os códigos de saída do helper são `0` verde, `1` vermelho, `2` ambiente ou uso
+recusado — ferramenta fora do `PATH`, opção inválida, dependência declarada ausente
+na fonte, preparação do HOME dev, sessão que não se conduz, veredito que falha —
+e `3` inválida, que vale sobre o verde e sobre o vermelho. As operações, as saídas
+e os códigos estão no cabeçalho do `proof.sh`.
+
+```bash
+. .claude/skills/anvil-sync/scripts/proof.sh
+proof_prepare --dep <skill>
+proof_session --model <modelo> --cwd <fixture> --out <saídas> -- "/skill:<nome> …" "<turno 2>"
+# … as conferências da prova sobre a fixture e <saídas>, com o código em $rc (0 ou 1)
+proof_verdict --model <modelo> --out <saídas> "$rc"
+```
+
 ## Adotar uma skill nova
 
 1. **Registre no manifesto** `anvil-skills.yaml`, com `state: planned` e as

@@ -4,7 +4,7 @@
 
 Entrada `security-audit-record` do roteiro (`docs/specs/roadmap.md`), depois da
 spec 013, que trouxe a `anvil-security-audit`. A decisão de arquitetura é o
-ADR-0015 — o versionado é só o registro da auditoria, sem caminho nem reprodução
+ADR-0019 — o versionado é só o registro da auditoria, sem caminho nem reprodução
 de nenhum achado.
 
 ## Problem Statement
@@ -45,7 +45,7 @@ registro.
 14. Como leitor de `docs/index.md`, quero os registros listados no domínio `security/`, para achar o histórico de auditorias pela porta de entrada da documentação.
 15. Como usuário do anvil, quero que `docs/security/` seja um domínio canônico do `anvil-docs`, para que o `validate.sh docs-paths` e o gatilho do `adopt` não o tratem como conteúdo fora do lugar.
 16. Como usuário do anvil, quero que `docs/security/` nasça só no primeiro registro, como os outros domínios que uma skill cria no primeiro uso, para não ter pasta vazia prometendo conteúdo.
-17. Como usuário do anvil, quero que o verbo nunca copie para o repositório o `REPORT.md`, o `FINDINGS-DETAIL.md` nem o `NEEDS-VALIDATION.md`, como diz o ADR-0015.
+17. Como usuário do anvil, quero que o verbo nunca copie para o repositório o `REPORT.md`, o `FINDINGS-DETAIL.md` nem o `NEEDS-VALIDATION.md`, como diz o ADR-0019.
 
 ## Implementation Decisions
 

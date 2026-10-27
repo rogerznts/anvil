@@ -100,7 +100,7 @@ flowchart TD
     I --> J{"todos os tickets<br/>Status: resolved?"}
     J -->|não| G
     J -->|sim| P["/anvil-docs archive<br/>promove ADR · move p/ archive/"]
-    P --> K["/tea-open-pr<br/>UM PR por spec"]
+    P --> K["/anvil-open-pr<br/>UM PR por spec"]
     K --> L{"hook: issues/ fechados<br/>e spec arquivada?"}
     L -->|"ticket aberto ou<br/>spec não arquivada"| M["bloqueia · exit 2"]
     L -->|sim| N["PR aberto<br/>corpo lista a spec e os tickets<br/>cada ticket ganha a URL de volta"]
@@ -246,9 +246,9 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 | `anvil-docs` | onde o documento mora, como a spec se chama, e o que acontece quando fecha | autoral |
 | `anvil-setup` | escreve o perfil do issue tracker que o fluxo lê | mattpocock |
 | `anvil-wizard` | gera um wizard em bash para o passo que só um humano pode fazer | mattpocock |
-| `tea-commit` | commit em Conventional Commits, sem pular hook | autoral |
-| `tea-open-pr` · `tea-open-fast-pr` | PR no Gitea, **um por spec**: o corpo lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
-| `tea-prune-branches` | remove branch local cujo remoto sumiu | autoral |
+| `anvil-commit` | commit em Conventional Commits, sem pular hook | autoral |
+| `anvil-open-pr` · `anvil-open-fast-pr` | PR no GitHub ou no Gitea, para o branch base, **um por spec**: o corpo lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
+| `anvil-prune-branches` | atualiza o branch base e remove branch local cujo remoto sumiu | autoral |
 
 ### Segurança
 
@@ -259,7 +259,7 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 A auditoria completa grava os artefatos fora do repositório auditado, por padrão
 em `~/security-audit-skill/<repo>/run-<N>`, e dentro dele só num diretório que o
 usuário escolha e que o git ignore: nenhum achado sem correção vai parar no git.
-O anvil não muda esse caminho (ADR-0015).
+O anvil não muda esse caminho (ADR-0019).
 
 ### Stack e bench
 
@@ -278,7 +278,7 @@ Ele entra como material, não como skill, porque a `description` do upstream
 dispara em *"long or multi-part task"* e se auto-invocaria dentro do
 `/anvil-implement`. O que ficou de fora, e por quê, está em
 `anvil-bench/unlazy/VENDOR.md` — inclusive o Stop hook, que competiria com o teto
-de três tentativas do próprio bench.
+de duas rodadas do próprio bench.
 
 ---
 
@@ -412,6 +412,39 @@ O catálogo de adaptações é **fechado**: `rename`, `invocable`, `docs-remap`,
 `decursor`, `tracker-profile`, `keep`/`strip`/`extra`. Se uma mudança não cabe em nenhuma, ela não deveria estar
 sendo feita. E há uma lista do que **nunca** é adaptação: traduzir, enxugar,
 uniformizar vocabulário entre skills, corrigir erro do upstream.
+
+### Desenvolver sem afetar os outros projetos
+
+A instalação publicada continua no diretório do usuário. Para trabalhar na fonte
+do anvil, abra uma sessão pelo launcher na raiz deste repositório:
+
+```bash
+bash .claude/skills/anvil-sync/scripts/dev-run.sh --dry-run -- omp
+bash .claude/skills/anvil-sync/scripts/dev-run.sh -- omp
+# Também aceita: -- claude ou -- codex
+```
+
+O launcher prepara links em `workspace/anvil-dev/home/` e troca o HOME só do
+processo e seus filhos. Skills e scripts `~/...` chegam à mesma fonte; abrir
+`omp`, `claude` ou `codex` normalmente continua usando a instalação publicada.
+Configuração, sessões e login dev ficam separados. Não há cópia de credenciais
+ou importação automática de terceiros. Ferramentas que consultam HOME precisam
+de configuração dev ou variáveis explícitas. Não é sandbox nem separação dos
+serviços de credenciais do SO; veja os limites no
+[ADR-0018 — HOME dev por checkout](docs/architecture/adr/adr-0018-dev-home-isolado-por-checkout.md).
+
+No primeiro uso, autentique o cliente pelo mesmo launcher, por exemplo
+`dev-run.sh -- omp login`, `dev-run.sh -- claude auth login --claudeai` ou
+`dev-run.sh -- codex login` (usando o caminho completo do launcher acima).
+Sem login ou chave de ambiente, o omp pode recusar a abertura por não ter modelo
+padrão. Não execute o login Console do Claude como se fosse isolado: o serviço
+de credenciais do SO pode afetar a conta pessoal.
+
+Para quem usava a ligação dev global antiga, o cutover é explícito, fora do
+launcher: `bash .claude/skills/anvil-sync/scripts/dev-link.sh --unlink --dry-run`,
+depois `--unlink`, e instalação publicada com os comandos do início deste README,
+revisando o dry-run antes da execução. O launcher não altera a instalação pessoal
+nem faz esse cutover automaticamente.
 
 ---
 

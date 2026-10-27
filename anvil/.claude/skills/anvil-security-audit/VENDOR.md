@@ -26,7 +26,7 @@ está reproduzido abaixo.
 
 **Só o `rename`.** O `name:` do frontmatter do `SKILL.md`, de `security-audit`
 para `anvil-security-audit`. A `description` e o corpo ficam verbatim, inclusive o
-diretório de saída da auditoria, fora do repositório auditado (ADR-0015 do anvil).
+diretório de saída da auditoria, fora do repositório auditado (ADR-0019 do anvil).
 
 ## Ressincronizar
 

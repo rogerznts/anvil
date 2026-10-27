@@ -17,10 +17,10 @@ Confundir as duas coisas é o erro caro daqui.
 | Caminho | O que é |
 |---|---|
 | `anvil/` | **o payload — a fonte.** É o que o `/anvil-update` instala no diretório de usuário de uma máquina comum |
-| `~/.claude/skills/<skill>` | **symlinks** para `anvil/.claude/skills/<skill>`, um por skill ligada. Editar a skill instalada **é** editar o payload. Fora do repositório |
-| `~/.claude/agents/<agente>.md` | **symlinks** para `anvil/.claude/agents/<agente>.md`, do mesmo jeito |
-| `~/.agents/skills/<skill>` | o espelho do Codex, que o omp também lê: **symlinks** direto para `anvil/.claude/skills/<skill>`, um por skill ligada |
-| `~/.omp/agent/` | a camada omp: **symlinks** para `anvil/.claude/skills/anvil-update/.omp-layer/`, um por arquivo, em `skills/`, `rules/`, `agents/` e `hooks/pre/`. O resto de `~/.omp/agent` é do omp |
+| `~/.claude/skills/<skill>` | instalação publicada de usuário, independente da fonte em edição |
+| `~/.claude/agents/<agente>.md` | agentes da instalação publicada de usuário |
+| `~/.agents/skills/<skill>` | espelho da instalação publicada, lido pelo Codex e pelo omp |
+| `~/.omp/agent/` | camada omp da instalação publicada, mais os arquivos do usuário |
 | `.claude/skills/anvil-sync/` | a ferramenta de manutenção. É do repositório e **não vai no degit** |
 | `.claude/settings.json` | o hook da guarda de merge deste repositório, que chama a guarda direto do payload, `anvil/.claude/skills/anvil-docs/scripts/guard-spec-merge.sh` |
 | `anvil-skills.yaml` | o manifesto de curadoria. Também não vai no degit |
@@ -29,57 +29,53 @@ Confundir as duas coisas é o erro caro daqui.
 | `docs/` | a documentação do próprio anvil |
 | `workspace/` | projetos descartáveis para exercitar o toolkit. Fora do git |
 
-Os symlinks se reconstroem com:
+O desenvolvimento usa um HOME privado por checkout, em
+`workspace/anvil-dev/home/`. Prepare os links ou abra uma sessão explicitamente:
 
 ```bash
-bash .claude/skills/anvil-sync/scripts/dev-link.sh
+bash .claude/skills/anvil-sync/scripts/dev-link.sh --dry-run
+bash .claude/skills/anvil-sync/scripts/dev-run.sh -- omp
+# Ou: dev-run.sh -- claude / dev-run.sh -- codex
 ```
 
-Eles moram no diretório do usuário, não no repositório: **todo projeto da máquina
-roda a fonte em edição**, e uma skill editada pela metade chega a todos. Das
-skills, só o roster de fluxo é ligado, não o payload inteiro — `--all` liga tudo,
-`--dry-run` mostra sem alterar. Os agentes do payload e os arquivos da camada omp
-são ligados todos. Symlink com o nome de uma peça do payload que aponta para outro
-lugar é refeito; diretório ou arquivo real é pulado, e numa máquina com a
-instalação publicada tirá-la para ligar a fonte é à mão.
+O launcher prepara o payload inteiro, mantém o `PATH` e muda `HOME` e os
+diretórios de configuração dos três harnesses só para o processo e seus filhos.
+Assim, skills, agentes, camada omp e comandos `~/.claude/skills/...` usam a fonte
+deste checkout. A execução direta do `dev-link.sh` prepara o roster; `--all`
+prepara o payload inteiro. Nenhuma dessas operações liga a fonte no HOME real.
 
-O `--unlink` tira só os symlinks que apontam para o payload deste repositório, e
-deixa a máquina pronta para receber a instalação publicada. Ao ligar e no
-`--unlink`, saem também os symlinks que o `dev-link` antigo criava no projeto, em
-`.claude/skills`, `.claude/agents`, `.agents/skills` e `.omp/`; a `anvil-sync`
-fica.
+Configuração, sessões e login dev são próprios. O launcher não copia nem liga
+credenciais ou configurações pessoais; credenciais já no ambiente são herdadas,
+sem serem impressas ou gravadas por ele. Ferramentas que procuram configuração no
+HOME, como git e Docker, também precisam de configuração dev ou de variáveis
+explícitas. Não é sandbox: caminhos absolutos e serviços do SO continuam acessíveis.
+Não use login Console do Claude sem API key como fluxo isolado: ele pode alterar
+a conta pessoal no serviço de credenciais do SO.
 
-O `dev-link` não liga o resto da instalação de usuário: o bloco de diretivas do
-`~/.claude/CLAUDE.md`, a rule `~/.omp/agent/rules/anvil-directives.md` e o hook da
-guarda no `~/.claude/settings.json`. Aqui, as diretivas vêm do `CLAUDE.md` da raiz
-e a guarda vem do `.claude/settings.json`; nos outros projetos da máquina, a sessão
-roda sem as diretivas e, no Claude Code, sem a guarda.
+Skills de terceiros no HOME real ficam intactas e não são importadas para dev.
+Entradas próprias no HOME dev são preservadas; colisão com destino gerenciado ou
+ancestral symlink é recusada antes da escrita. Reabra a sessão para carregar uma
+skill ou agente novo. Não rode `/anvil-update` dentro do launcher: a recusa do
+reset protege os links para a fonte.
 
-Uma skill ou um agente ligado agora **só aparece na próxima sessão**, e editá-lo
-não muda a cópia que já está carregada nesta.
+### Migrar a ligação dev antiga
 
-## Nunca rode `/anvil-update` aqui
-
-Ele baixa o payload publicado do GitHub e o instala no diretório do usuário. Numa
-máquina comum é o caminho certo; nesta, a instalação de usuário é feita de
-symlinks para a fonte, e instalar por cima escreveria a versão publicada dentro da
-fonte em desenvolvimento, através do link. Ele não está entre as skills ligadas —
-não estar instalado é a primeira trava. A segunda é a recusa: o `reset-install`
-não instala quando alguma skill, agente ou arquivo da camada omp do payload é
-symlink no diretório do usuário. A recusa vem antes de qualquer escrita, no
-dry-run também, e aponta o `dev-link.sh --unlink`. Para voltar à instalação
-publicada, rode o `--unlink` e depois a instalação de máquina nova — o
-`/anvil-update` não serve, porque não está instalado aqui:
+Uma máquina que usava os links globais precisa retirá-los explicitamente, fora
+do launcher, e instalar a versão publicada no usuário:
 
 ```bash
+bash .claude/skills/anvil-sync/scripts/dev-link.sh --unlink --dry-run
+bash .claude/skills/anvil-sync/scripts/dev-link.sh --unlink
 TMP="$(mktemp -d)" && npx degit rogerznts/anvil/anvil "$TMP"
 bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --dry-run --from "$TMP"
+# Revise o dry-run e aprove antes de executar:
 bash "$TMP/.claude/skills/anvil-update/scripts/reset-install.sh" --from "$TMP"
 ```
 
-São os comandos da seção de instalação que o `anvil-boot/SKILL.md` escreve no
-`anvil.md` dos projetos: o segundo mostra o que entra e o que fica; o terceiro
-instala.
+O `--unlink` remove só os links antigos deste checkout no usuário e os links
+históricos de projeto reconhecidos. Não apaga diretórios reais ou links de
+terceiros e não instala a versão publicada. Daí em diante, `/anvil-update` fora
+do launcher atualiza os projetos sem tocar na fonte dev.
 
 ## Mudança em skill vendorizada
 
@@ -95,7 +91,8 @@ O julgamento está em `.claude/skills/anvil-sync/SKILL.md`, o catálogo em
 nada disso aqui — são a fonte, isto é o ponteiro.
 
 Skill autoral — `anvil-boot`, `anvil-update`, `anvil-docs`, `anvil-ui`,
-`anvil-distill`, `anvil-bench` e as `tea-*` — não tem upstream, e se
+`anvil-distill`, `anvil-bench`, `anvil-commit`, `anvil-open-pr`,
+`anvil-open-fast-pr` e `anvil-prune-branches` — não tem upstream, e se
 edita direto no payload. A ressalva é o
 `anvil-bench`: o que está em `anvil-bench/unlazy/` é material do
 `unlazy`, que vem de upstream com pin e registro no manifesto, e segue a regra de
@@ -121,7 +118,7 @@ Trabalho com spec vai num branch `{tipo}/{NNN}-{nome}`. Fecha com
 Trabalho sem spec vai direto na `main`.
 
 O fechamento segue o perfil do tracker, `docs/agents/issue-tracker.md`, menos o
-passo `/tea-open-pr`: aqui não há PR, e a spec fecha com o merge local. O que a
+passo `/anvil-open-pr`: aqui não há PR, e a spec fecha com o merge local. O que a
 guarda de merge exige para liberar está no mesmo perfil. Ela confere o `git
 merge` disparado da `main` ou do branch da spec, e é um hook do Claude Code: só vê
 comando do agente, não o que se digita no terminal.

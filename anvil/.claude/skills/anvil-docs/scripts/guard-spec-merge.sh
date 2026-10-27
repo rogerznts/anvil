@@ -6,8 +6,9 @@
 # a força de uma prosa e o custo de um programa.
 #
 # Bloqueia (exit 2) a INVOCAÇÃO de merge/PR quando a spec do branch tem ticket
-# sem `Status: resolved`, ou quando ela ainda não foi arquivada. Cobre GitHub
-# (`gh`), Gitea (`tea`) e `git merge`.
+# sem `Status: resolved`, ou quando ela ainda não foi arquivada. Cobre o PR do
+# GitHub (`gh pr` e o `gh api` com POST em `repos/<o>/<r>/pulls`), o do Gitea
+# (`tea pr`) e o `git merge`.
 #
 # É instalada uma vez por usuário e roda em todo repositório da máquina: o hook
 # do Claude Code fica no ~/.claude/settings.json, e o do omp em
@@ -73,6 +74,9 @@
 #   - outro verbo que traz o branch da spec para a `main`: `git pull . {spec}`,
 #     `git rebase {spec}` e `git reset --hard {spec}` — e o merge por alias do
 #     git, que tem outro nome.
+#   - o PR por outra rota da API: `gh api graphql` com a mutation
+#     `createPullRequest`, `gh api -X PUT .../pulls/<n>/merge`, o `curl` direto na
+#     API do GitHub ou do Gitea. Do `gh api`, só o POST que cria o PR é conferido.
 
 set -u
 INPUT="$(cat)"
@@ -88,9 +92,10 @@ fi
 # --- 1. filtro barato ---------------------------------------------------------
 # `|| exit 0` seria fail-open: grep ausente devolve 127, indistinguível de "não
 # encontrou" (1). Só o 1 significa ausência; qualquer outro código verifica.
-# Entre `git` e `merge` não há limite: `git -C <caminho> merge` põe ali um
-# caminho de qualquer tamanho.
-printf '%s' "$INPUT" | grep -qE '(gh|tea)[^"]{0,4}(pr|pull)|git.*merge'
+# Os verbos: `gh pr`, `gh api`, `tea pr`/`tea pulls` e `git … merge`. Entre `git`
+# e `merge` não há limite: `git -C <caminho> merge` põe ali um caminho de
+# qualquer tamanho.
+printf '%s' "$INPUT" | grep -qE '(gh|tea)[^"]{0,4}(pr|pull)|gh[^"]{0,4}api|git.*merge'
 GREP_RC=$?
 if [ "$GREP_RC" -eq 1 ]; then
     [ "${GUARD_DECIDE_ONLY:-0}" = "1" ] && echo "ignora"
@@ -274,6 +279,48 @@ REDIRECAO = {"<", ">", ">>", "<>", "<&", ">&", "&>", "&>>", ">|", "<<", "<<<"}
 def redireciona(tok):
     return tok in REDIRECAO
 
+# `gh api` abre o PR com POST em `repos/<o>/<r>/pulls`. O método é o do `-X` ou do
+# `--method`; sem eles, o `gh` manda POST quando há parâmetro (`-f`, `-F`,
+# `--input`) e GET quando não há. O endpoint é o primeiro argumento que não é
+# opção nem valor de opção. Método ou endpoint com `$` ou crase só se sabe na
+# execução: sem prova de que não é POST em pulls, vale como se fosse.
+GH_API_VALOR = {"-X", "--method", "-f", "--raw-field", "-F", "--field",
+                "--input", "-H", "--header", "-q", "--jq", "-t", "--template",
+                "--hostname", "--cache", "-p", "--preview"}
+GH_API_PARAMETRO = {"-f", "--raw-field", "-F", "--field", "--input"}
+PULLS = re.compile(r"(^|/)repos/[^/]+/[^/]+/pulls/?($|\?)")
+
+def incognita(tok):
+    return "$" in tok or "`" in tok
+
+def gh_api_abre_pr(args):
+    metodo, endpoint, parametro = None, None, False
+    args = iter(args)
+    for arg in args:
+        if redireciona(arg):
+            next(args, None)
+            continue
+        if arg.startswith("--") and "=" in arg:
+            opcao, valor = arg.split("=", 1)
+        elif arg[:2] in GH_API_VALOR and len(arg) > 2:
+            # `-XPOST` e `-X=POST`: a opção curta com o valor colado.
+            opcao, valor = arg[:2], arg[2:]
+            valor = valor[1:] if valor.startswith("=") else valor
+        elif arg in GH_API_VALOR:
+            opcao, valor = arg, next(args, "")
+        elif arg.startswith("-"):
+            continue
+        else:
+            endpoint = arg if endpoint is None else endpoint
+            continue
+        if opcao in ("-X", "--method"):
+            metodo = valor
+        parametro = parametro or opcao in GH_API_PARAMETRO
+    if endpoint is None:
+        return False
+    post = parametro if metodo is None else metodo.upper() == "POST" or incognita(metodo)
+    return post and (PULLS.search(endpoint) is not None or incognita(endpoint))
+
 comandos, atual = [], []
 for tok in tokens:
     if pontuacao(tok) and set(tok) & SEPARA and not redireciona(tok):
@@ -325,6 +372,8 @@ for palavras in comandos:
             resto = palavras[k + 1 : k + 3]
             if len(resto) == 2 and resto[0] in SUB_PR and resto[1] in ACOES:
                 verifica = True
+        if (base == "gh" or "$" in palavras[k]) and palavras[k + 1 : k + 2] == ["api"]:
+            verifica = verifica or gh_api_abre_pr(palavras[k + 2 :])
 
 # `alvos` na segunda linha é a prova de que a lista saiu do parse. Sem ela, vale
 # a lista larga montada pelo shell.
@@ -357,7 +406,7 @@ fi
 # validador não passa calado.
 VALIDATE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/validate.sh"
 if [ ! -f "$VALIDATE" ]; then
-    echo "guard-spec-merge: $VALIDATE nao encontrado — o merge nao foi verificado. Reinstale o anvil com /anvil-update." >&2
+    echo "guard-spec-merge: $VALIDATE nao encontrado — nem o git merge nem o PR do gh ou do tea foi verificado. Reinstale o anvil com /anvil-update." >&2
     exit 1
 fi
 
@@ -374,13 +423,15 @@ fi
 
 cat >&2 <<'CABECALHO'
 Bloqueado: a spec deste branch, ou a do branch mesclado, nao esta pronta para o
-merge.
+merge nem para o PR. A guarda confere o git merge e o PR do gh (gh pr, gh api) e
+do tea (tea pr).
 CABECALHO
 printf '\n%s\n\n' "$OUT" >&2
 cat >&2 <<'RODAPE'
 A ordem e: todo ticket em Status: resolved, depois /anvil-docs archive, os dois
-commitados no branch da spec, depois o merge ou o PR. A guarda le a spec do
-commit de cada branch, nao do disco: o que nao foi commitado nao conta.
+commitados no branch da spec, depois o git merge ou o PR, pelo gh ou pelo tea. A
+guarda le a spec do commit de cada branch, nao do disco: o que nao foi commitado
+nao conta.
 Para conferir: bash ~/.claude/skills/anvil-docs/scripts/validate.sh ship-ready [branch...]
 RODAPE
 exit 2

@@ -63,9 +63,20 @@ o script mora. Por projeto, ele aloca:
 - índice do Redis (0–15, com prefixo como fallback)
 - porta livre do admin (3000–3999, testada por bind)
 
+A alocação que ele imprime traz também a rede, em `ALLOC_NETWORK`, que vai para o
+`ANVIL_NETWORK` do `.env`; o compose do app lê a rede de lá, com `anvil-net` como
+padrão.
+
 O registro fica em `~/projects/.anvil-infra/registry.yaml`, que é a **fonte única
 da alocação**. Não edite à mão, e não reprovisione um projeto que já tem
 `ALLOC_*` — reuse.
+
+**A única exceção à infra única por máquina é o prefixo de execução**, e só para
+prova do toolkit (ADR-0017 do anvil). Com `ANVIL_INFRA_PREFIX`, o `infra.sh` sobe
+outra infra, com o projeto do compose, a rede e o diretório do registro
+prefixados, e os volumes no compose prefixado; a porta do admin continua testada
+contra as portas em uso na máquina. O `--teardown` a derruba, e sem o prefixo
+recusa sem tocar em nada. Nenhum projeto usa o prefixo.
 
 ## `loop-until-green`
 

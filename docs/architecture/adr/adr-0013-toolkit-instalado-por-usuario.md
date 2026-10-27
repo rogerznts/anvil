@@ -5,6 +5,7 @@
 - Revoga o [ADR-0009](./adr-0009-toolkit-instalado-fica-versionado.md): o toolkit deixa de ficar versionado no projeto
 - Emenda o [ADR-0011](./adr-0011-omp-como-harness-com-camada-propria.md): a camada omp e o espelho `.agents/skills` passam à instalação de usuário, e a linha `omp:` que torna a camada pegajosa passa a ser a do lock de usuário
 - Origem: spec 006 (`docs/specs/archive/006-feature-user-install-language-next/`)
+- Revisto em parte pelo [ADR-0018 — HOME dev por checkout](./adr-0018-dev-home-isolado-por-checkout.md): a ligação de desenvolvimento deixa o HOME real; a instalação publicada permanece por usuário.
 
 ## Contexto
 
@@ -93,9 +94,10 @@ execuções por caso; método e números no `## Comments` do
 
 - **o idioma melhorou** — rules em `English.` com pedido em pt-BR saem em inglês em
   2 de 3; antes, com a diretiva no `CLAUDE.md` do projeto, em nenhuma;
-- **a cauda não se sustenta** — no `tea-open-pr`, 0 de 3, igual a antes; no
-  `anvil-diagnose`, 0 de 3, antes 3 de 3; no `diagnose-en`, 1 de 3. Quando falha,
-  a sessão fecha com um prompt de próxima sessão escrito de memória.
+- **a cauda não se sustenta** — no `tea-open-pr`, hoje `anvil-open-pr`, 0 de 3,
+  igual a antes; no `anvil-diagnose`, 0 de 3, antes 3 de 3; no `diagnose-en`, 1
+  de 3. Quando falha, a sessão fecha com um prompt de próxima sessão escrito de
+  memória.
 
 A user story 57 da spec 006 — a cauda funcionando no omp como no Claude Code —
 fica sem cumprimento estável no omp. Um mecanismo próprio de cauda no omp fica

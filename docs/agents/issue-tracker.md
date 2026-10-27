@@ -17,8 +17,8 @@ parte do repositório e sobrevivem ao merge.
   desbloqueado quando todos os que ele lista estão `resolved`
 - Comentários e histórico são anexados ao fim do arquivo, sob `## Comments`
 - Ticket que foi para um PR ganha uma linha `PR:` logo abaixo do `Status:`, com
-  a URL. Escrita pelas skills `tea-open-pr` e `tea-open-fast-pr` depois de abrir
-  o PR. Ticket retrabalhado em dois PRs tem **duas** linhas, não uma
+  a URL. Escrita pelas skills `anvil-open-pr` e `anvil-open-fast-pr` depois de
+  abrir o PR. Ticket retrabalhado em dois PRs tem **duas** linhas, não uma
   substituída — o histórico é o ponto
 - Cada rodada de verificação acrescenta uma linha `Review:` logo abaixo do
   `Status:`. Formato estável: `round`, `sha`, `scope`, `verdict` e `p1`
@@ -53,6 +53,22 @@ em `## Comments`, com classe e consequência. Não reduza achados a uma contagem
 P1 reabre o trabalho: grave `verdict=fail`, mude `Status:` de `resolved` para
 `claimed` e corrija. Sem P1, grave `verdict=pass` e mantenha `resolved`. Assim a
 guarda de merge não libera um ticket que a revisão reprovou.
+
+A única rodada que não segue o orçamento de `docs/agents/verification.md` é a
+rodada extra do piloto automático, a skill `anvil-auto`, que ele declara no
+ticket como exceção ao ADR-0010 do anvil. A declaração é uma linha no
+`## Comments`:
+
+```markdown
+- Piloto · rodada <N> aberta por `docs/specs/<pasta>/discovery/<arquivo>`: <a fonte e o que ela explica da falha>.
+```
+
+Só o piloto automático escreve essa linha, uma vez por ticket, em qualquer
+execução, no fim do `## Comments`: o caminho do arquivo da pesquisa entre crases,
+dois-pontos, a fonte e o que ela explica. O `N` é a rodada seguinte à última
+`Review:` do ticket, ou `1` sem `Review:`. O `anvil-implementer` que encontra a
+linha e nenhuma `Review:` com `round=<N>` lê o arquivo e mede a rodada N, com
+qualquer `Status:`.
 
 Os tickets são **arquivo**, não issue de servidor, então não existe `#47` para
 fechar. A ligação com o PR é feita nos dois sentidos: o corpo do PR lista os
@@ -100,14 +116,15 @@ no mesmo branch:
 
 ```
 /anvil-docs archive   promove o que virou canônico, move p/ docs/specs/archive/
-/tea-open-pr          um PR por spec; cada ticket ganha a linha PR: de volta
+/anvil-open-pr        um PR por spec; cada ticket ganha a linha PR: de volta
 merge
 ```
 
 O `archive` vem **antes** do PR, não depois do merge: mover a pasta é mudança em
 arquivo e precisa de um commit, e depois do merge não sobra branch onde ele
-caiba. O hook bloqueia o `tea pr create` e o `git merge` enquanto a spec não
-estiver arquivada no commit do branch — o `git merge` disparado da `main`
+caiba. O hook bloqueia o `git merge` e a criação do PR, pelo `gh` (`gh pr create`
+e `gh api` com `POST` em `pulls`) ou pelo `tea` (`tea pr create`), enquanto a spec
+não estiver arquivada no commit do branch — o `git merge` disparado da `main`
 inclusive, porque a spec do branch mesclado também é conferida.
 
 ## Roteiro e relatório
@@ -128,10 +145,13 @@ cobrem mais de uma spec. Nenhum dos dois é spec, e a guarda de merge não os l�
   que a corrente avança e o commita na `main` a cada fronteira de spec.
 
 No roteiro, cada entrada é uma seção de segundo nível cujo título é o **nome**
-da entrada, em kebab-case e único no arquivo. O nome é o `--short-name` do
-`new-spec.sh` e é o que as outras entradas citam em `Depende de:`. As chaves são
-linhas `Chave: valor` no começo da linha, com ou sem negrito, como o `Status:`
-dos tickets:
+da entrada, em kebab-case e único no arquivo. Kebab-case aqui é letras minúsculas
+ASCII e dígitos, em grupos separados por um hífen, sem hífen no começo nem no
+fim: `a`, `cadastro-de-clientes` e `fase-2-relatorios` valem; `Cadastro de
+clientes`, `cadastro_de_clientes`, `-cadastro` e `cadastro--clientes`, não. O
+nome é o `--short-name` do `new-spec.sh` e é o que as outras entradas citam em
+`Depende de:`. As chaves são linhas `Chave: valor` no começo da linha, com ou
+sem negrito, como o `Status:` dos tickets:
 
 ```markdown
 # Roteiro
@@ -168,8 +188,8 @@ Pronto quando: …
 - O roteiro não tem `Status:`. O estado de cada entrada (`pending`, `open`,
   `closed` ou `stopped`) e a próxima a construir saem do disco, pelo script
   `bash ~/.claude/skills/anvil-docs/scripts/roadmap.sh`, da raiz do projeto. Ele
-  recusa, com o motivo, o roteiro com nome repetido, `Depende de:` para nome
-  inexistente, ciclo ou `Tipo:` inválido.
+  recusa, com o motivo, o roteiro com nome fora de kebab-case, nome repetido,
+  `Depende de:` para nome inexistente, ciclo ou `Tipo:` inválido.
 
 ## Wayfinding operations
 

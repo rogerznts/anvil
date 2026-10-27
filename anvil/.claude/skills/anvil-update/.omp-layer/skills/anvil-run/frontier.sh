@@ -2,7 +2,7 @@
 # Estado de uma spec do anvil, lido do disco, para a skill anvil-run.
 #
 # Uso, de dentro do repositorio, com a camada na instalacao de usuario:
-#   bash ~/.omp/agent/skills/anvil-run/frontier.sh [NNN] [--skip "NN NN"]
+#   bash ~/.omp/agent/skills/anvil-run/frontier.sh [NNN] [--skip "NN NN"] [--resume NN]
 #
 # Sem NNN, a spec sai do prefixo numerico do branch atual, {tipo}/{NNN}-{nome}.
 # --skip tira do frontier os tickets que o supervisor ja despachou nesta execucao
@@ -21,10 +21,14 @@
 # a isolacao em modo patch integra sem commit. A linha abre com o modo da execucao
 # e, fora do modo branch, com a configuracao que falta, e diz como sair: git stash
 # -u ou um commit. O supervisor abre o relatorio com ela, como esta.
+# --resume NN, na leitura depois de um despacho interrompido do NN, so muda a
+# arvore suja quando o NN esta no frontier: nao resolvido, travado, pulado, nem com
+# bloqueio ilegivel ou pendente. Nesse caso nao ha halt, next e o NN e sai a linha
+# "resume: NN". Com arvore limpa ou NN fora desse caso, a saida e a de sempre.
 #
 # ready: quantos tickets estao no frontier, para medir se o paralelo compensa.
 # frontier_files: os caminhos dos tickets do frontier, na ordem da linha frontier,
-# para a leva do paralelo; sem halt, o next e o primeiro deles.
+# para a leva do paralelo; sem halt nem resume, o next e o primeiro deles.
 #
 # Isolacao: a linha "isolation:" diz o modo da execucao, lido da configuracao do
 # omp com omp config get, na raiz do projeto, porque o omp le o .omp/config.yml do
@@ -51,10 +55,11 @@ tracker_refusal() {
     echo "o perfil do tracker em $profile é '${title:-sem título}', e os condutores só funcionam com o perfil docs/specs do anvil. O fluxo segue à mão, uma skill por vez, como no Claude Code."
 }
 
-arg=""; skip=""
+arg=""; skip=""; resume=""
 while [ $# -gt 0 ]; do
     case "$1" in
         --skip) [ $# -ge 2 ] || refuse "--skip pede a lista de tickets"; skip="$2"; shift 2 ;;
+        --resume) [ $# -ge 2 ] || refuse "--resume pede o número do ticket"; resume="$2"; shift 2 ;;
         --parallel) refuse "--parallel é argumento da anvil-run, não do script; passe só o número da spec" ;;
         *)      arg="$1"; shift ;;
     esac
@@ -62,6 +67,11 @@ done
 case "$arg" in
     "") ;;
     *[!0-9]*) refuse "o argumento é o número da spec, como 003, e veio '$arg'" ;;
+esac
+case "$resume" in
+    "") ;;
+    *[!0-9]*) refuse "--resume pede o número do ticket, como 03, e veio '$resume'" ;;
+    *) resume=$((10#$resume)) ;;
 esac
 
 root="$(git rev-parse --show-toplevel 2>/dev/null)" || refuse "fora de um repositório git"
@@ -259,7 +269,10 @@ for n in $locked; do
 done
 echo "depend_on_locked: $(or_dash "$(labels "$dependents")")"
 echo "all_resolved: $all_resolved"
-if [ "$dirty" != 0 ]; then
+if [ "$dirty" != 0 ] && [ -n "$resume" ] && [ "${class[resume]:-}" = frontier ]; then
+    next="$resume"
+    echo "resume: ${label[resume]}"
+elif [ "$dirty" != 0 ]; then
     halt_why="" halt_then=""
     if [ -n "$next" ]; then halt_why="um implementer novo os commitaria junto"
     elif [ "$all_resolved" = yes ]; then

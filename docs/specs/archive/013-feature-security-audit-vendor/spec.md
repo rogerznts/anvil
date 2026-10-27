@@ -3,7 +3,7 @@
 **Status:** ready-for-agent
 
 Entrada `security-audit-vendor` do roteiro (`docs/specs/roadmap.md`). A decisão de
-arquitetura é o ADR-0015 — a auditoria de segurança é a `security-audit` da
+arquitetura é o ADR-0019 — a auditoria de segurança é a `security-audit` da
 Cloudflare, vendorizada como `anvil-security-audit`.
 
 ## Problem Statement
@@ -40,14 +40,14 @@ e o modo guidance responde a perguntas de segurança sem escrever arquivo.
 13. Como mantenedor do anvil, quero o `vendor-sync.sh verify` saindo 0 com a skill nova, para que o payload continue íntegro: `name:` igual ao diretório, links relativos válidos, sem token da denylist, lock em dia.
 14. Como mantenedor do anvil, quero `anvil-security-audit` no `ROSTER` do `dev-link.sh`, para que, nesta máquina, a skill apareça ligada em `~/.claude/skills/` e no espelho do omp.
 15. Como leitor do README, quero a skill na tabela de skills com a origem `cloudflare`, e a Cloudflare entre os upstreams, para saber de onde ela vem.
-16. Como leitor da documentação do anvil, quero o ADR-0015 explicando por que a auditoria é vendorizada e grava fora do repositório, para não "corrigir" isso depois.
+16. Como leitor da documentação do anvil, quero o ADR-0019 explicando por que a auditoria é vendorizada e grava fora do repositório, para não "corrigir" isso depois.
 17. Como usuário do omp, quero a skill disponível pelo espelho `~/.agents/skills`, sem entrada na camada omp, porque ela não depende de nada específico do harness.
 
 ## Implementation Decisions
 
 - **Upstream novo.** O repositório `https://github.com/cloudflare/security-audit-skill.git` entra como submodule em `references/`, num diretório próprio, e como fonte `cloudflare` em `sources:`. O `vendor-sync.sh` não cria submodule: o `git submodule add` é feito à mão, antes do `vendor`.
 - **Entrada da skill no manifesto.** `name: anvil-security-audit`, `source: cloudflare`, `path: skills/security-audit`, `state: planned` até o `vendor`, `adapt: [rename]`, `keep: [VENDOR.md]`. Sem `strip`: a pasta inteira é copiada, testes inclusos. O `README.md` e o `LICENSE` da raiz ficam de fora por estarem fora do `path`, e não por `strip`.
-- **Sem adaptação de julgamento.** O conteúdo não cita glossário, ADR, tracker ou perfil de verificação do anvil; o `docs-remap`, o `decursor`, o `tracker-profile` e o `verification-profile` não se aplicam. O diretório de saída da auditoria, `~/security-audit-skill/<repo>/run-<N>`, fica como está: está fora do alcance do catálogo (ADR-0015).
+- **Sem adaptação de julgamento.** O conteúdo não cita glossário, ADR, tracker ou perfil de verificação do anvil; o `docs-remap`, o `decursor`, o `tracker-profile` e o `verification-profile` não se aplicam. O diretório de saída da auditoria, `~/security-audit-skill/<repo>/run-<N>`, fica como está: está fora do alcance do catálogo (ADR-0019).
 - **`rename`.** Só o `name:` do frontmatter muda, de `security-audit` para `anvil-security-audit`, como o script faz. Menções ao nome no corpo ficam como estão.
 - **`VENDOR.md`.** Arquivo do anvil dentro da skill, em `keep:`, com a URL do upstream, o caminho da pasta, a regra de adaptação aplicada e o texto da licença MIT do upstream, que inclui o aviso de copyright.
 - **Roster.** `anvil-security-audit` entra na lista `ROSTER` do `dev-link.sh`. Nenhuma mudança na camada omp nem no `anvil-update`.

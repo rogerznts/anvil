@@ -8,7 +8,7 @@ Depois do último ticket fechar e **antes de abrir o PR**, no mesmo branch da
 spec:
 
 ```
-tickets resolved → /anvil-docs archive → /tea-open-pr → merge
+tickets resolved → /anvil-docs archive → /anvil-open-pr → merge
 ```
 
 Promover e mover são mudança em arquivo, e mudança em arquivo precisa de um
@@ -19,7 +19,8 @@ move e o ADR promovido entram no diff que o revisor já vai olhar.
 
 A guarda impõe a ordem: `validate.sh ship-ready` sai 1 enquanto a spec do branch
 não estiver sob `docs/specs/archive/` no commit, e o hook bloqueia o `git merge` e
-o `tea pr create`. O move só conta depois de commitado.
+a criação do PR, pelo `gh` (`gh pr create` e `gh api` com `POST` em `pulls`) ou
+pelo `tea` (`tea pr create`). O move só conta depois de commitado.
 
 ## Pré-condição
 
@@ -75,7 +76,7 @@ está certo — a maioria dos artefatos de spec é da spec.
 Mova, não copie. A spec arquivada é imutável **a partir do merge**: mudança
 posterior no assunto abre uma spec nova do tipo `extension`, ligada a esta.
 
-Entre o move e o merge ainda é o mesmo PR, e o `/tea-open-pr` escreve mais uma
+Entre o move e o merge ainda é o mesmo PR, e o `/anvil-open-pr` escreve mais uma
 vez nos tickets — a linha `**PR:**` com a URL. Isso é o fechamento terminando,
 não uma revisão da spec.
 

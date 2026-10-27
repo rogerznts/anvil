@@ -12,7 +12,7 @@
 //                                                   e nada é gravado
 //
 // O registro é derivado por código, e não redigido pelo modelo, porque a garantia
-// de não divulgar uma vulnerabilidade depende de quais campos são lidos (ADR-0015).
+// de não divulgar uma vulnerabilidade depende de quais campos são lidos (ADR-0019).
 // Só se leem três arquivos da execução, e deles só a lista branca:
 //
 //   run-metadata.json     run_id, source_ref.commit, source_ref.dirty, profile,

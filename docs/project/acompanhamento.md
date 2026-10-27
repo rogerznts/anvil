@@ -128,16 +128,73 @@ tickets foram aceitos no fechamento, e a decisão está registrada nos `## Comme
   exige editar todas as cópias, e a que ficar para trás volta a mentir. Vizinha
   da A17, que cobre a árvore de decisão do dry-run nas duas skills.
 
+## Spec 010: helper de prova e sobras da 009
+
+Origem: `docs/specs/archive/010-extension-proof-harness/`. P2 que o operador
+deixou para depois no grill de 2026-10-24, por não mudarem o que as provas da
+spec afirmam.
+
+- **A27 · o `origin` da fixture fica apontando para o bare apagado.** Ticket 03,
+  rodada 1, P2 (Spec). A limpeza do helper apaga o repositório bare, mas deixa o
+  `origin` e o upstream no `.git/config` da fixture. Enquanto ninguém mexer, uma
+  fixture reaproveitada entre execuções sai `2` na execução seguinte; as provas de
+  hoje recriam a fixture a cada vez.
+- **A28 · o volume do app sobra depois da derrubada da infra do prefixo.** Ticket
+  04, rodada 1, P2. O `--teardown` tira os containers da rede do prefixo, mas não
+  os volumes do compose do app, como o `node_modules`. Enquanto ninguém mexer,
+  cada prova do bench que não derruba o app com o compose dele deixa um volume
+  órfão na máquina; o B1 do ticket 09 derruba.
+
+## Spec 011: branch base e forge neutro
+
+Origem: `docs/specs/archive/011-extension-branch-base-and-forge/`. Lacunas de
+prova que o operador deixou para depois no grill de 2026-10-25: todas têm verde, e
+nenhuma muda comportamento.
+
+- **A30 · a limpeza de branches passa também com o texto antigo.** Ticket 06,
+  rodada 1, P2 (Spec). O caso `prune` saiu `0` com o texto de antes, em que o
+  modelo atualizou o `master` apesar do `git checkout main` escrito. Enquanto
+  ninguém mexer, uma regressão para a `main` fixa na limpeza passa verde.
+- **A31 · a prova do PR rápido não conta as chamadas do resolvedor.** Ticket 06,
+  rodada 2, P2 (Spec). O vermelho do `origin-head` saiu `0`. Enquanto ninguém
+  mexer, um texto que volte a mandar rodar o resolvedor duas vezes, com o branch
+  saindo de uma base e o PR indo para outra, passa enquanto o modelo ignorar a
+  instrução.
+- **A32 · a prova do PR não confere o responsável no Gitea.** Ticket 05, rodada
+  1, P2. Enquanto ninguém mexer, uma regressão no responsável do PR do Gitea passa
+  sem a prova ver.
+- **A33 · o `gh label list` falso não foi capturado do `gh` real.** Ticket 04,
+  rodada 1, P2 (Spec). O formato vem do código do `gh`. Enquanto ninguém mexer, se
+  o `gh` real divergir, as provas validam as skills contra uma resposta que o
+  GitHub não dá.
+- **A34 · a regra do `origin` com o bare só está no helper.** Ticket 05, rodada 1,
+  P2 (Spec). A fixture cuja URL de push do `origin` é o bare fica como está; isso
+  está só no cabeçalho do `proof.sh` e na seção da `anvil-sync`. Enquanto ninguém
+  mexer, quem escreve outra prova com forge esbarra na recusa do `origin` local
+  sem saber por quê.
+
+## Issue #8: cache de build entre verificações
+
+Origem: issue #8 do anvil (`https://github.com/rogerznts/anvil/issues/8`),
+incorporada pela spec 012, que deixou a poda de cache fora do toolkit.
+
+- **A38 · cache de build sem poda entre verificações.** No `ore`, o `target/` de
+  um pacote chegou a 191 GB e encheu o disco uma vez. Enquanto ninguém mexer, um
+  projeto cujo comando de verificação cresce o cache pode encher o disco no meio
+  de uma corrente longa. A poda é do comando de verificação de cada projeto, e
+  não do toolkit.
+
 ## Spec 013: a auditoria de segurança da Cloudflare entra vendorizada
 
 Origem: `docs/specs/archive/013-feature-security-audit-vendor/`, rodada 1 do
 ticket 02, no `## Comments` dele. O P3 de alinhamento no README foi aceito no
 fechamento.
 
-- **A27 · o comportamento da auditoria está escrito em três lugares.** Ticket 02,
+- **A39 · o comportamento da auditoria está escrito em dois lugares.** Ticket 02,
   rodada 1, P2 (Standards), Duplicated Code. Que o modo guidance não escreve
   arquivo nem roda as seis fases sem pedido explícito, e o caminho de saída da
-  auditoria, estão no comentário do `dev-link.sh`, no README e no ADR-0015, sem
-  nada que force a sincronia. Enquanto ninguém mexer, um `vendor-sync update` que
-  traga mudança nesse padrão do upstream exige editar os três, e o que ficar para
-  trás passa a mentir.
+  auditoria, estão no README e no ADR-0019, sem nada que force a sincronia; o
+  comentário do `dev-link.sh`, terceira cópia na revisão, saiu na integração com o
+  `origin/main`. Enquanto ninguém mexer, um `vendor-sync update` que traga mudança
+  nesse padrão do upstream exige editar os dois, e o que ficar para trás passa a
+  mentir.

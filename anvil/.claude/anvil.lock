@@ -8,6 +8,7 @@ skill: anvil-boot
 skill: anvil-browser-qa
 skill: anvil-code-review
 skill: anvil-codebase-design
+skill: anvil-commit
 skill: anvil-diagnose
 skill: anvil-distill
 skill: anvil-docs
@@ -19,9 +20,12 @@ skill: anvil-handoff
 skill: anvil-how
 skill: anvil-implement
 skill: anvil-next
+skill: anvil-open-fast-pr
+skill: anvil-open-pr
 skill: anvil-poteto
 skill: anvil-principles
 skill: anvil-prototype
+skill: anvil-prune-branches
 skill: anvil-research
 skill: anvil-security-audit
 skill: anvil-setup
@@ -45,7 +49,3 @@ skill: anvil-wait-what
 skill: anvil-wayfinder
 skill: anvil-wizard
 skill: anvil-writing-for-agents
-skill: tea-commit
-skill: tea-open-fast-pr
-skill: tea-open-pr
-skill: tea-prune-branches
