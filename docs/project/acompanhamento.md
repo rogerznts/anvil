@@ -183,3 +183,18 @@ incorporada pela spec 012, que deixou a poda de cache fora do toolkit.
   projeto cujo comando de verificação cresce o cache pode encher o disco no meio
   de uma corrente longa. A poda é do comando de verificação de cada projeto, e
   não do toolkit.
+
+## Spec 013: a auditoria de segurança da Cloudflare entra vendorizada
+
+Origem: `docs/specs/archive/013-feature-security-audit-vendor/`, rodada 1 do
+ticket 02, no `## Comments` dele. O P3 de alinhamento no README foi aceito no
+fechamento.
+
+- **A39 · o comportamento da auditoria está escrito em dois lugares.** Ticket 02,
+  rodada 1, P2 (Standards), Duplicated Code. Que o modo guidance não escreve
+  arquivo nem roda as seis fases sem pedido explícito, e o caminho de saída da
+  auditoria, estão no README e no ADR-0019, sem nada que force a sincronia; o
+  comentário do `dev-link.sh`, terceira cópia na revisão, saiu na integração com o
+  `origin/main`. Enquanto ninguém mexer, um `vendor-sync update` que traga mudança
+  nesse padrão do upstream exige editar os dois, e o que ficar para trás passa a
+  mentir.

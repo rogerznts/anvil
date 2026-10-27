@@ -9,6 +9,7 @@ Last updated: {{LAST_UPDATED}}
 - **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[UI](./ui/)** — design system, fluxos, wireframes
 - **[QA](./qa/)** — estratégia de teste e gates
+- **[Security](./security/)** — registros das auditorias de segurança
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
 
 <!-- Linha de domínio cuja pasta não existe é OMITIDA, não deixada quebrada. -->

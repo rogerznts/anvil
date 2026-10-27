@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-26T04:27:44Z
+Last updated: 2026-10-27T02:04:17Z
 
 ## Visão geral
 
@@ -21,12 +21,23 @@ Last updated: 2026-10-26T04:27:44Z
 - **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
 
+## Roteiro
+
+- **security-audit-vendor** — fechada — [013](./specs/archive/013-feature-security-audit-vendor/)
+- **security-audit-record** — fechada — [014](./specs/archive/014-feature-security-audit-record/)
+- **security-audit-record-metadata** — fechada — [015](./specs/archive/015-extension-security-audit-record-metadata/)
+
+Relatório da execução: [report.md](./specs/report.md)
+
 ## Specs ativas
 
 Nenhuma.
 
 ## Specs arquivadas
 
+- [015 — O registro da auditoria aceita o metadado como a execução o grava](./specs/archive/015-extension-security-audit-record-metadata/spec.md) — `extension/015-security-audit-record-metadata`, 1 ticket
+- [014 — O registro da auditoria entra versionado em `docs/security/`](./specs/archive/014-feature-security-audit-record/spec.md) — `feature/014-security-audit-record`, 2 tickets
+- [013 — A auditoria de segurança da Cloudflare entra vendorizada](./specs/archive/013-feature-security-audit-vendor/spec.md) — `feature/013-security-audit-vendor`, 2 tickets
 - [012 — Push só depois do login, retomada do despacho interrompido e provas da 011](./specs/archive/012-extension-push-after-login/spec.md) — `extension/012-push-after-login`, 9 tickets
 - [011 — Branch base e forge neutro](./specs/archive/011-extension-branch-base-and-forge/spec.md) — `extension/011-branch-base-and-forge`, 11 tickets
 - [010 — Helper de prova e sobras da 009](./specs/archive/010-extension-proof-harness/spec.md) — `extension/010-proof-harness`, 10 tickets
@@ -54,7 +65,7 @@ Nenhuma.
 ### Architecture
 
 - [context.md](./architecture/context.md) — o glossário: curadoria, harness, git
-  e forge, referências, tickets e verificação, com os termos a evitar.
+  e forge, referências, segurança, tickets e verificação, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
   impõe, como o estado é lido do disco, os três harnesses e a camada omp, com o
   piloto automático, e a herança do mosk.
@@ -95,6 +106,8 @@ Nenhuma.
     — a prova roda pelo `/skill:` real, isolada, e sai inválida quando outro modelo responde
   - [adr-0018](./architecture/adr/adr-0018-dev-home-isolado-por-checkout.md)
     — o modo dev usa HOME privado por checkout, sem substituir a instalação publicada dos outros projetos
+  - [adr-0019](./architecture/adr/adr-0019-auditoria-de-seguranca-vendorizada-da-cloudflare.md)
+    — a auditoria de segurança é a skill da Cloudflare, vendorizada; o versionado é só o registro da auditoria
 
 ### Project
 

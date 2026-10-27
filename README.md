@@ -3,8 +3,8 @@
 Toolkit de skills para Claude Code. Sucede o [mosk](https://github.com/rogerznts/mosk),
 trocando agentes-como-persona por um conjunto curado de skills de terceiros.
 
-**O anvil não escreve as próprias skills de trabalho.** Ele curadoriza 35 skills
-de cinco repositórios upstream, mantidos como submodules em `references/`, e as
+**O anvil não escreve as próprias skills de trabalho.** Ele curadoriza 36 skills
+de seis repositórios upstream, mantidos como submodules em `references/`, e as
 vendoriza com adaptação registrada num manifesto — de forma que continuem
 atualizáveis quando o upstream andar.
 
@@ -250,6 +250,22 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 | `anvil-open-pr` · `anvil-open-fast-pr` | PR no GitHub ou no Gitea, para o branch base, **um por spec**: o corpo lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
 | `anvil-prune-branches` | atualiza o branch base e remove branch local cujo remoto sumiu | autoral |
 
+### Segurança
+
+| skill | para quê | origem |
+|---|---|---|
+| `anvil-security-audit` | auditoria de segurança por código-fonte em seis fases, com coverage ledger, validação adversarial e achados validados por schema. Sem pedido explícito de auditoria completa ou de relatório, só orienta, sem gravar arquivo | cloudflare |
+
+A auditoria completa grava os artefatos fora do repositório auditado, por padrão
+em `~/security-audit-skill/<repo>/run-<N>`, e dentro dele só num diretório que o
+usuário escolha e que o git ignore. O motivo: um achado confirmado traz arquivo,
+linha, entrada e resultado — é um exploit pronto —, e um commit não se desfaz:
+apagar depois não o tira do histórico, dos clones nem do diff de um PR. O que
+entra no repositório é só o registro da auditoria, pelo `/anvil-docs security`:
+o que foi coberto e quantos achados houve, sem caminho nem reprodução. Os motivos
+completos estão no
+[ADR-0019](docs/architecture/adr/adr-0019-auditoria-de-seguranca-vendorizada-da-cloudflare.md).
+
 ### Stack e bench
 
 | skill | para quê | origem |
@@ -448,6 +464,7 @@ references/                   submodules — os pins são a base do merge
   hallmark/    Nutlope/hallmark
   taste/       Leonxlnx/taste-skill
   payload-skills/  payloadcms/skills
+  security-audit-skill/  cloudflare/security-audit-skill
   mosk/        rogerznts/mosk (herança)
 anvil/                        o payload que a instalação de usuário copia
 docs/                         a documentação do próprio anvil
@@ -464,4 +481,5 @@ O trabalho está nos repositórios upstream. O anvil é curadoria.
 [cursor/plugins](https://github.com/cursor/plugins) ·
 [Nutlope/hallmark](https://github.com/Nutlope/hallmark) ·
 [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) ·
-[payloadcms/skills](https://github.com/payloadcms/skills)
+[payloadcms/skills](https://github.com/payloadcms/skills) ·
+[cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill)

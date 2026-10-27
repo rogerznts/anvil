@@ -19,3 +19,6 @@
 [submodule "references/unlazy"]
 	path = references/unlazy
 	url = https://github.com/Leonxlnx/unlazy.git
+[submodule "references/security-audit-skill"]
+	path = references/security-audit-skill
+	url = https://github.com/cloudflare/security-audit-skill.git

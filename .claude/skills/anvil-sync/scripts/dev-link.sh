@@ -161,6 +161,7 @@ anvil-code-review
 anvil-docs
 anvil-setup
 anvil-research
+anvil-security-audit
 anvil-distill
 anvil-how
 anvil-architect

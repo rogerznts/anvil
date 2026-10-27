@@ -175,7 +175,7 @@ EOF
 
 # --- docs-paths ---------------------------------------------------------------
 
-CANONICAL='discovery prd architecture ui qa project specs agents'
+CANONICAL='discovery prd architecture ui qa security project specs agents'
 
 cmd_docs_paths() {
     local root quiet="${1:-}" violations=0 entry name
