@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=9c127e4; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=38998e5; scope=diff:9c127e4..38998e5; verdict=pass; p1=none
 
 - [x] O verbo `security` está na tabela de verbos do `anvil-docs`, com o arquivo próprio do verbo descrevendo argumento, recusas, o que o registro leva e o que nunca leva.
 - [x] Sobre um diretório de exemplo cujo `findings.json` e `coverage-ledger.json` passam no `validate-findings.cjs` e no `validate-coverage-ledger.cjs` da cópia vendorizada, com pelo menos um achado de cada veredito e caminhos, trechos de fonte e reprodução preenchidos, o verbo grava o registro em `docs/security/`.
@@ -28,3 +29,5 @@
 - Review round=1 · P1 (Spec): o `report-schema.json` aceita `/`, `.` e `:` no `fingerprint`, e o `audit-record.cjs` o copia como está para a linha do achado — um `findings.json` com `fingerprint: "src/auth.c:42"` passa no `validate-findings.cjs` e grava esse caminho em `docs/security/`, contra a história 9 e o "O que o registro nunca leva" do `SECURITY.md`, e o registro versionado divulga onde está a vulnerabilidade.
 - Review round=1 · P3 (Standards): possível Mysterious Name — o `n` que atravessa `runDirectory`, `render` e `recordPath` é o número da execução, e só o comentário do topo diz isso — quem lê precisa rastrear o significado.
 - Correção da rodada 1 · o fingerprint só entra na linha do achado quando é ficha de letras, dígitos, `-` e `_`; com `/`, `.`, `:`, `@` ou `+`, a linha leva `_oculto, posição <i>_`, a posição no `findings.json` da execução, e o registro diz por quê. A história 7 pede a linha "sem que o registro revele onde ele está", e foi ela que decidiu entre ocultar e recusar a execução. O `run_id` e o `incomplete_reason` passaram à mesma ficha, sem `.` nem `:`. O `n` virou `runNumber`. O cenário ganhou um achado com `fingerprint: "fp-session/srcleak/auth.c:csrf"`, e nenhum pedaço dele aparece no registro.
+- Review round=2 · P3 (Standards): possível Duplicated Code — o `hidden` do `render` refaz o teste `SAFE_ID` que o `id()` já aplica por linha — quem mudar a regra de exibição em um dos dois e esquecer o outro deixa a nota do rodapé dizendo o contrário da tabela.
+- Review round=2 · P3 (Standards): no `SECURITY.md`, "com a posição do achado no `findings.json` da execução, onde ele se acha" tem antecedente ambíguo entre o achado e a execução — quem lê rápido não sabe onde procurar o fingerprint oculto.
