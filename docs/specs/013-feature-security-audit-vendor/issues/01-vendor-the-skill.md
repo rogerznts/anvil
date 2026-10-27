@@ -5,6 +5,7 @@
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
+**Review:** round=1; sha=0f446ec50973021ff84f5a19c4e0076c8e0fde6b; scope=full; verdict=pass; p1=none
 
 - [x] O upstream é um submodule em `references/`, registrado no `.gitmodules`, e a fonte `cloudflare` está em `sources:` do `anvil-skills.yaml`.
 - [x] A entrada `anvil-security-audit` está em `skills:` com `source: cloudflare`, `path: skills/security-audit`, `adapt: [rename]`, `keep: [VENDOR.md]`, `state: vendored` e o `pin` igual ao HEAD do submodule, gravados pelo `vendor-sync.sh vendor`, e não à mão.
