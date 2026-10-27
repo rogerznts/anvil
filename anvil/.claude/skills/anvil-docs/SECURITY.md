@@ -3,8 +3,16 @@
 Deriva de uma execução da `anvil-security-audit` o registro da auditoria, em
 `docs/security/`. O registro diz que a auditoria aconteceu, sobre que commit, com
 que perfil, quanto foi coberto e quantos achados houve; o detalhe de cada achado
-fica no diretório da execução, fora do git. Um achado `confirmed` versionado é uma
-vulnerabilidade divulgada antes da correção (ADR-0019 do anvil).
+fica no diretório da execução, fora do git.
+
+O detalhe nunca entra no repositório porque um achado confirmado é um exploit
+pronto — arquivo, linha, entrada e resultado —, e o git não esquece: apagar depois
+não o tira do histórico, dos clones nem do diff de um PR. Até o que não foi
+confirmado orienta um ataque, e o fingerprint, derivado da fonte, costuma dizer
+sozinho onde está a falha. Os motivos completos estão no ADR-0019 do anvil, na
+seção "Por que o detalhe nunca entra no repositório auditado". Este verbo é a
+única porta de saída da execução para o repositório, e ela só deixa passar
+contagem e ficha opaca.
 
 ## Quando
 

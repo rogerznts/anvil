@@ -258,8 +258,13 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 
 A auditoria completa grava os artefatos fora do repositório auditado, por padrão
 em `~/security-audit-skill/<repo>/run-<N>`, e dentro dele só num diretório que o
-usuário escolha e que o git ignore: nenhum achado sem correção vai parar no git.
-O anvil não muda esse caminho (ADR-0019).
+usuário escolha e que o git ignore. O motivo: um achado confirmado traz arquivo,
+linha, entrada e resultado — é um exploit pronto —, e um commit não se desfaz:
+apagar depois não o tira do histórico, dos clones nem do diff de um PR. O que
+entra no repositório é só o registro da auditoria, pelo `/anvil-docs security`:
+o que foi coberto e quantos achados houve, sem caminho nem reprodução. Os motivos
+completos estão no
+[ADR-0019](docs/architecture/adr/adr-0019-auditoria-de-seguranca-vendorizada-da-cloudflare.md).
 
 ### Stack e bench
 

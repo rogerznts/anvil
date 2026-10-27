@@ -28,8 +28,54 @@ vendorizada como `anvil-security-audit`.**
 - **O versionado é só o registro.** Uma peça autoral, o verbo `security` do
   `anvil-docs`, deriva de uma execução o registro da auditoria em `docs/security/`,
   indexado. Ele diz o que foi coberto e quantos achados houve, sem caminho nem
-  reprodução de nenhum. O detalhe fica no diretório da execução, fora do git: um
-  `confirmed` versionado é uma vulnerabilidade divulgada antes da correção.
+  reprodução de nenhum. O detalhe fica no diretório da execução, fora do git, pelos
+  motivos da seção seguinte.
+
+## Por que o detalhe nunca entra no repositório auditado
+
+Os artefatos de uma execução — `findings.json`, `REPORT.md`,
+`FINDINGS-DETAIL.md`, `NEEDS-VALIDATION.md`, `architecture.md`, o coverage
+ledger e o diretório `agents/` — nunca são gerados nem versionados dentro do
+projeto auditado. Cada motivo abaixo basta sozinho.
+
+- **Um achado confirmado é um exploit pronto.** O registro `confirmed` traz o
+  arquivo e a linha, o caminho do dado até a falha, a entrada que a dispara e o
+  resultado observado num teste local. Versioná-lo antes da correção é divulgar a
+  vulnerabilidade a quem lê o repositório, sem embargo, no momento em que ela é
+  mais explorável.
+- **O git não esquece.** Apagar o arquivo depois não o tira do histórico, dos
+  clones, dos forks, dos espelhos, dos caches de CI nem do diff de um PR já
+  revisado. Divulgação por commit é irreversível; tirar do histórico exige
+  reescrevê-lo e ainda não alcança as cópias que já saíram.
+- **Ler o código não é o mesmo que ler as falhas dele.** Quem tem acesso de
+  leitura ao repositório — colaborador externo, integração de CI, bot de
+  dependências, ferramenta de IA que indexa o código — não precisa do mapa de onde
+  atacar. O diretório da execução fica só na máquina de quem rodou a auditoria.
+- **O que não foi confirmado também orienta um ataque.** `needs_validation` é uma
+  hipótese de fronteira com o fato que falta, `rejected` diz que vetor já foi
+  tentado, e o ledger com as lacunas mostra o que ninguém olhou. Juntos, são um
+  plano de reconhecimento.
+- **O próprio identificador fala.** O fingerprint é derivado da fonte, e na
+  prática descreve a falha: um fingerprint na forma
+  `billing.refund.amount-not-bound-to-original-charge` — exemplo inventado, na
+  forma dos que a primeira execução real produziu — já diz, sozinho, onde olhar.
+  Por isso o registro oculta o fingerprint que não é uma ficha opaca, e por isso
+  este ADR não cita nenhum de verdade.
+- **A auditoria não pode alterar o que audita.** Ela revisa um `source_ref` — um
+  commit e se a árvore estava suja. Escrever dentro do alvo suja a árvore, muda o
+  que a próxima execução lê como fonte e mistura artefato do auditor com código do
+  projeto. As execuções seguintes leem as anteriores no diretório de saída para
+  cobrir as lacunas, e isso não depende do repositório.
+- **O detalhe envelhece e o código não avisa.** Cada achado vale para o commit
+  auditado. Versionado ao lado do código, ele parece atual depois que o código
+  mudou, e a correção feita não apaga o achado que ficou no histórico.
+
+O que pode ir para o repositório é o que não ajuda ninguém a atacar: que a
+auditoria aconteceu, sobre que commit, com que perfil, quanto foi coberto e
+quantos achados houve, por veredito e severidade — o registro da auditoria.
+Publicar o detalhe de um achado já corrigido, como um advisory, é decisão de
+quem responde pela segurança do projeto, tomada caso a caso, e não um efeito de
+rodar a skill.
 
 ## Opções consideradas
 
