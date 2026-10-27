@@ -6,6 +6,8 @@
 
 **Status:** resolved
 **Review:** round=1; sha=2ffd1c7; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/6
+**PR:** https://github.com/rogerznts/anvil/pull/10
 
 - [x] Reproduziu: a cilada entra no `RULE.md` do `anvil-stack-payload` no formato das outras, com o alcance do veredito do 04, e o título vira "As quatro ciladas".
 - [x] Nenhum número de projeto é citado na cilada.

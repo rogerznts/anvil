@@ -6,6 +6,8 @@
 
 **Status:** resolved
 **Review:** round=1; sha=2ffd1c7; scope=full; verdict=pass; p1=none
+**PR:** https://github.com/rogerznts/anvil/pull/6
+**PR:** https://github.com/rogerznts/anvil/pull/10
 
 - [x] Instalação nova: o `anvil.md` sai com comando, custo medido, data, máquina e a instrução de correção no mesmo commit.
 - [x] Comando que não roda: fica gravado sem custo, com o motivo.
