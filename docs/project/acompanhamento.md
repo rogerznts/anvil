@@ -127,3 +127,17 @@ tickets foram aceitos no fechamento, e a decisão está registrada nos `## Comme
   comentários do script. Enquanto ninguém mexer, a próxima mudança numa delas
   exige editar todas as cópias, e a que ficar para trás volta a mentir. Vizinha
   da A17, que cobre a árvore de decisão do dry-run nas duas skills.
+
+## Spec 013: a auditoria de segurança da Cloudflare entra vendorizada
+
+Origem: `docs/specs/archive/013-feature-security-audit-vendor/`, rodada 1 do
+ticket 02, no `## Comments` dele. O P3 de alinhamento no README foi aceito no
+fechamento.
+
+- **A27 · o comportamento da auditoria está escrito em três lugares.** Ticket 02,
+  rodada 1, P2 (Standards), Duplicated Code. Que o modo guidance não escreve
+  arquivo nem roda as seis fases sem pedido explícito, e o caminho de saída da
+  auditoria, estão no comentário do `dev-link.sh`, no README e no ADR-0015, sem
+  nada que force a sincronia. Enquanto ninguém mexer, um `vendor-sync update` que
+  traga mudança nesse padrão do upstream exige editar os três, e o que ficar para
+  trás passa a mentir.
