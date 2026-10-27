@@ -15,8 +15,9 @@
 // de não divulgar uma vulnerabilidade depende de quais campos são lidos (ADR-0019).
 // Só se leem três arquivos da execução, e deles só a lista branca:
 //
-//   run-metadata.json     run_id, source_ref.commit, source_ref.dirty, profile,
-//                         run_status e, com run_status incomplete, incomplete_reason
+//   run-metadata.json     run_id, profile, run_status e, com run_status incomplete,
+//                         incomplete_reason; do source_ref, o commit, o sha ou o
+//                         revision e o dirty ou o worktree_dirty, ou a string inteira
 //   coverage-ledger.json  o status de cada unidade, só para contar
 //   findings.json         o fingerprint, o verdict e o severity.overall_severity
 //
@@ -27,7 +28,13 @@
 // Identificador que entra no registro é ficha de letras, dígitos, `-` e `_`. O
 // upstream aceita `/`, `.`, `:`, `@` e `+` no fingerprint, que ele deriva da
 // fonte: um fingerprint assim pode trazer caminho de código, e a linha do achado
-// leva no lugar dele a posição do achado no findings.json.
+// leva no lugar dele a posição do achado no findings.json. O run_id e o
+// incomplete_reason fora de ficha saem "não exibido".
+//
+// O upstream não fixa a forma do source_ref: dele só entram um SHA e o estado da
+// árvore, e o que não se reconhece sai "não declarado em forma reconhecível".
+// Dos campos do run-metadata.json, só o profile e o run_status, que o upstream
+// enumera, recusam a execução.
 "use strict";
 
 const fs = require("node:fs");
@@ -46,12 +53,28 @@ const SEVERITIES = ["critical", "high", "medium", "low", "informational"];
 const PROFILES = ["quick", "standard", "deep"];
 const RUN_STATES = ["complete", "incomplete", "in_progress"];
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
-const COMMIT = /^[0-9a-f]{7,64}$/i;
+const SHA = /\b[0-9a-f]{7,64}\b/i;
+const NOT_DECLARED = "não declarado em forma reconhecível";
+const NOT_SHOWN = "não exibido";
 
 function refuse(reasons, detail = "") {
   for (const reason of reasons) console.log(`refusal: ${reason}`);
   if (detail) process.stdout.write(detail);
   process.exit(2);
+}
+
+// Do source_ref, objeto ou string, sai só o SHA e o estado da árvore; null é o
+// que não veio em forma reconhecível.
+function sourceRef(value) {
+  const sha = (text) => (typeof text === "string" ? SHA.exec(text)?.[0] ?? null : null);
+  if (typeof value === "string") {
+    return { commit: sha(value), dirty: /\bdirty\b/.test(value) ? true : /\bclean\b/.test(value) ? false : null };
+  }
+  const object = value !== null && typeof value === "object" ? value : {};
+  return {
+    commit: sha(["commit", "sha", "revision"].map((key) => object[key]).find((field) => typeof field === "string")),
+    dirty: ["dirty", "worktree_dirty"].map((key) => object[key]).find((field) => typeof field === "boolean") ?? null,
+  };
 }
 
 function readJson(runDir, name) {
@@ -93,6 +116,11 @@ function validate(runDir) {
   if (reasons.length) refuse(reasons, detail);
 }
 
+// Ficha de letras, dígitos, `-` e `_`, ou null: o resto pode nomear um arquivo.
+function token(value) {
+  return typeof value === "string" && SAFE_ID.test(value) ? value : null;
+}
+
 function metadata(runDir) {
   let meta;
   try {
@@ -101,25 +129,17 @@ function metadata(runDir) {
     refuse(["run-metadata.json não é JSON legível"]);
   }
   if (meta === null || typeof meta !== "object" || Array.isArray(meta)) refuse(["run-metadata.json não é um objeto JSON"]);
-  const sourceRef = meta.source_ref ?? {};
   const fields = {
-    run_id: meta.run_id,
-    commit: sourceRef.commit,
-    dirty: sourceRef.dirty,
+    run_id: token(meta.run_id),
+    ...sourceRef(meta.source_ref),
     profile: meta.profile,
     run_status: meta.run_status,
-    incomplete_reason: meta.run_status === "incomplete" ? meta.incomplete_reason : null,
+    incomplete_reason: meta.run_status === "incomplete" ? token(meta.incomplete_reason) : null,
   };
   const reasons = [];
   const check = (ok, field, expected) => ok || reasons.push(`run-metadata.json: ${field} deve ser ${expected}`);
-  check(typeof fields.run_id === "string" && SAFE_ID.test(fields.run_id), "run_id", "uma ficha de letras, dígitos, - e _");
-  check(typeof fields.commit === "string" && COMMIT.test(fields.commit), "source_ref.commit", "o SHA do commit auditado");
-  check(typeof fields.dirty === "boolean", "source_ref.dirty", "true ou false");
   check(PROFILES.includes(fields.profile), "profile", PROFILES.join(", "));
   check(RUN_STATES.includes(fields.run_status), "run_status", RUN_STATES.join(", "));
-  if (meta.run_status === "incomplete") {
-    check(typeof fields.incomplete_reason === "string" && SAFE_ID.test(fields.incomplete_reason), "incomplete_reason", "uma ficha de letras, dígitos, - e _");
-  }
   if (reasons.length) refuse(reasons);
   return fields;
 }
@@ -137,8 +157,9 @@ function table(header, counts) {
 }
 
 function render({ runNumber, runDir, meta, unitStates, findings }) {
+  const shown = (value) => (value === null ? NOT_SHOWN : `\`${value}\``);
   const status = meta.run_status === "incomplete"
-    ? `\`incomplete\`, motivo \`${meta.incomplete_reason}\``
+    ? `\`incomplete\`, motivo ${shown(meta.incomplete_reason)}`
     : `\`${meta.run_status}\``;
   const confirmed = findings.filter((finding) => finding.verdict === "confirmed");
   const id = (finding, index) => (SAFE_ID.test(finding.fingerprint) ? `\`${finding.fingerprint}\`` : `_oculto, posição ${index + 1}_`);
@@ -153,10 +174,10 @@ function render({ runNumber, runDir, meta, unitStates, findings }) {
     "descrição nem reprodução de nenhum achado: o detalhe fica no diretório da",
     "execução, fora do git.",
     "",
-    `- Execução: \`${meta.run_id}\``,
+    `- Execução: ${shown(meta.run_id)}`,
     `- Diretório da execução: \`${runDir}\``,
-    `- Commit auditado: \`${meta.commit}\``,
-    `- Árvore auditada: ${meta.dirty ? "suja" : "limpa"}`,
+    `- Commit auditado: ${meta.commit === null ? NOT_DECLARED : `\`${meta.commit}\``}`,
+    `- Árvore auditada: ${meta.dirty === null ? NOT_DECLARED : meta.dirty ? "suja" : "limpa"}`,
     `- Perfil: \`${meta.profile}\``,
     `- Estado da execução: ${status}`,
     "",

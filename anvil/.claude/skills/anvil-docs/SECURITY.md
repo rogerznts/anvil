@@ -45,20 +45,37 @@ Gravado o registro, rode o verbo [`index`](INDEX.md), que o lista no domínio
 | falta `run-metadata.json`, `findings.json` ou `coverage-ledger.json` | uma linha `refusal: falta <arquivo> em <diretório>` por arquivo |
 | a `anvil-security-audit` não está instalada ao lado do `anvil-docs` | a linha `refusal:` com o caminho do validador que falta |
 | o `validate-findings.cjs` ou o `validate-coverage-ledger.cjs` sai diferente de `0` | `refusal: <validador> saiu com <código> sobre <arquivo>`, seguida da saída do validador |
-| um campo lido do `run-metadata.json` falta ou foge do esperado | `refusal: run-metadata.json: <campo> deve ser <o esperado>` |
+| o `profile` ou o `run_status` do `run-metadata.json` falta ou foge dos valores do upstream | `refusal: run-metadata.json: <campo> deve ser <os valores>` |
+| o `run-metadata.json` não é JSON legível, ou não é um objeto JSON | a linha `refusal:` com o motivo |
 
 Os validadores são os da `anvil-security-audit` instalada, rodados sobre os
 arquivos da execução antes de qualquer leitura para o registro.
 
-O que o `run-metadata.json` precisa ter, porque o upstream não fixa a forma:
+## Como o `run-metadata.json` é lido
 
-- `run_id` e, com `run_status` `incomplete`, `incomplete_reason`: uma ficha de
-  letras, dígitos, `-` e `_`, como `validation_budget_exhausted`. Texto livre, ou
-  com `/`, `.` ou `:`, é recusado, porque pode nomear um arquivo.
-- `source_ref.commit`: o SHA do commit auditado, em hexadecimal.
-- `source_ref.dirty`: `true` ou `false`.
+O upstream enumera o `profile` e o `run_status`, e só eles recusam a execução:
+
 - `profile`: `quick`, `standard` ou `deep`.
 - `run_status`: `complete`, `incomplete` ou `in_progress`.
+
+Dos outros campos o upstream não fixa a forma, e nenhum deles recusa a execução:
+o que não vier na forma esperada sai marcado no registro.
+
+- `source_ref`, objeto ou string. Dele só entram o SHA do commit auditado e o
+  estado da árvore; o resto nunca entra.
+  - O SHA é a primeira palavra inteira de 7 a 64 caracteres hexadecimais. Do
+    objeto, ela é procurada no primeiro de `commit`, `sha` e `revision` que é
+    string; da string, no próprio `source_ref`.
+  - A árvore, do objeto, é o primeiro booleano entre `dirty` e `worktree_dirty`;
+    da string, a palavra inteira `dirty` dá suja e `clean` dá limpa, e com as
+    duas vale `dirty`.
+  - Sem SHA, o commit sai `não declarado em forma reconhecível`; sem estado, a
+    árvore sai igual. Sem `source_ref`, ou com outro tipo, os dois saem assim.
+- `run_id` e, com `run_status` `incomplete`, `incomplete_reason`: entram como
+  estão só quando são uma ficha de letras, dígitos, `-` e `_`, como
+  `validation_budget_exhausted`. Texto livre, valor com `/`, `.` ou `:`, como um
+  carimbo de data e hora, ausência ou outro tipo saem `não exibido`, porque podem
+  nomear um arquivo.
 
 ## O que o registro leva
 
@@ -66,16 +83,17 @@ O script lê só esta lista branca, e nenhum outro campo:
 
 | arquivo | campos |
 |---|---|
-| `run-metadata.json` | `run_id`, `source_ref.commit`, `source_ref.dirty`, `profile`, `run_status` e, só com `incomplete`, `incomplete_reason` |
+| `run-metadata.json` | `run_id`, `profile`, `run_status` e, só com `incomplete`, `incomplete_reason`; do `source_ref`, o `commit`, o `sha` ou o `revision` e o `dirty` ou o `worktree_dirty`, ou a string inteira, de onde só sai o SHA e o estado da árvore |
 | `coverage-ledger.json` | o `status` de cada unidade, para contar |
 | `findings.json` | de cada registro, o `fingerprint`, o `verdict` e o `severity.overall_severity`, que só o `confirmed` tem |
 
 Com eles, o registro traz:
 
-- o id da execução e o caminho absoluto do diretório dela;
-- o commit auditado e se a árvore estava suja;
+- o id da execução, ou `não exibido`, e o caminho absoluto do diretório dela;
+- o commit auditado e se a árvore estava suja, cada um `não declarado em forma
+  reconhecível` quando o `source_ref` não o traz numa forma reconhecida;
 - o perfil;
-- o estado da execução e, se incompleta, o motivo;
+- o estado da execução e, se incompleta, o motivo, ou `não exibido`;
 - a contagem de unidades do coverage ledger por estado, com o total;
 - a contagem de achados por veredito, e dos `confirmed` por severidade;
 - uma linha por achado, na ordem do `findings.json`, com o fingerprint, o
@@ -93,6 +111,8 @@ da execução, onde ele se acha.
   e o fingerprint que pode trazer um;
 - trecho de fonte, título, descrição, causa raiz, condição, comando, payload,
   reprodução ou correção de qualquer achado;
+- do `source_ref`, nada além do SHA e do estado da árvore, e o `run_id` ou o
+  `incomplete_reason` fora de ficha;
 - o id, a superfície, a fronteira ou qualquer outro campo de unidade do ledger,
   além do estado;
 - nada do `REPORT.md`, do `FINDINGS-DETAIL.md` nem do `NEEDS-VALIDATION.md`, que o

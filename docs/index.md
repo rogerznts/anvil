@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-27T00:53:54Z
+Last updated: 2026-10-27T02:04:17Z
 
 ## Visão geral
 
@@ -25,6 +25,7 @@ Last updated: 2026-10-27T00:53:54Z
 
 - **security-audit-vendor** — fechada — [013](./specs/archive/013-feature-security-audit-vendor/)
 - **security-audit-record** — fechada — [014](./specs/archive/014-feature-security-audit-record/)
+- **security-audit-record-metadata** — fechada — [015](./specs/archive/015-extension-security-audit-record-metadata/)
 
 Relatório da execução: [report.md](./specs/report.md)
 
@@ -34,6 +35,7 @@ Nenhuma.
 
 ## Specs arquivadas
 
+- [015 — O registro da auditoria aceita o metadado como a execução o grava](./specs/archive/015-extension-security-audit-record-metadata/spec.md) — `extension/015-security-audit-record-metadata`, 1 ticket
 - [014 — O registro da auditoria entra versionado em `docs/security/`](./specs/archive/014-feature-security-audit-record/spec.md) — `feature/014-security-audit-record`, 2 tickets
 - [013 — A auditoria de segurança da Cloudflare entra vendorizada](./specs/archive/013-feature-security-audit-vendor/spec.md) — `feature/013-security-audit-vendor`, 2 tickets
 - [012 — Push só depois do login, retomada do despacho interrompido e provas da 011](./specs/archive/012-extension-push-after-login/spec.md) — `extension/012-push-after-login`, 9 tickets
