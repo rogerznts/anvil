@@ -4,7 +4,8 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** resolved
+**Status:** claimed
+**Review:** round=1; sha=9c127e4; scope=full; verdict=fail; p1=open
 
 - [x] O verbo `security` está na tabela de verbos do `anvil-docs`, com o arquivo próprio do verbo descrevendo argumento, recusas, o que o registro leva e o que nunca leva.
 - [x] Sobre um diretório de exemplo cujo `findings.json` e `coverage-ledger.json` passam no `validate-findings.cjs` e no `validate-coverage-ledger.cjs` da cópia vendorizada, com pelo menos um achado de cada veredito e caminhos, trechos de fonte e reprodução preenchidos, o verbo grava o registro em `docs/security/`.
@@ -24,3 +25,5 @@
 - Observação sobre a spec · o `run_id` e o `incomplete_reason` só entram como ficha sem espaço (`validation_budget_exhausted`); texto livre é recusado, porque poderia nomear um arquivo. Os motivos que o upstream cita são todos fichas.
 - Observação sobre a spec · a história 3 pede o "escopo da execução" no registro, e a lista branca não tem o `scope_paths`, que é lista de caminhos. Valeu a lista branca: o registro traz só o perfil.
 - Observação sobre a spec · o padrão do `fingerprint` no `report-schema.json` aceita `/` e `:`, e o upstream o descreve como "source-derived": uma execução que derive o fingerprint do caminho, como `src/auth.c:42`, leva esse caminho ao registro pela linha do achado, que a spec manda ter. O exemplo usa fingerprints sem caminho.
+- Review round=1 · P1 (Spec): o `report-schema.json` aceita `/`, `.` e `:` no `fingerprint`, e o `audit-record.cjs` o copia como está para a linha do achado — um `findings.json` com `fingerprint: "src/auth.c:42"` passa no `validate-findings.cjs` e grava esse caminho em `docs/security/`, contra a história 9 e o "O que o registro nunca leva" do `SECURITY.md`, e o registro versionado divulga onde está a vulnerabilidade.
+- Review round=1 · P3 (Standards): possível Mysterious Name — o `n` que atravessa `runDirectory`, `render` e `recordPath` é o número da execução, e só o comentário do topo diz isso — quem lê precisa rastrear o significado.
