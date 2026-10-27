@@ -1,6 +1,6 @@
 ---
 name: anvil-docs
-description: "Organização documental do anvil: onde cada documento mora, como a spec se chama, e o que acontece com ela quando fecha. Use para montar a árvore docs/ num projeto novo, adotar um docs/ existente e bagunçado, regenerar o índice, ou arquivar uma spec promovendo o que virou canônico."
+description: "Organização documental do anvil: onde cada documento mora, como a spec se chama, e o que acontece com ela quando fecha. Use para montar a árvore docs/ num projeto novo, adotar um docs/ existente e bagunçado, regenerar o índice, arquivar uma spec promovendo o que virou canônico, ou gravar o registro de uma execução da auditoria de segurança."
 ---
 
 # Organização documental
@@ -20,6 +20,7 @@ que vai dentro dela.
 | `adopt` | projeto com gatilho do `adopt` | [ADOPT.md](ADOPT.md) |
 | `index` | depois de criar, mudar ou arquivar spec | [INDEX.md](INDEX.md) |
 | `archive` | spec fechada | [ARCHIVE.md](ARCHIVE.md) |
+| `security` | depois de uma execução da `anvil-security-audit` | [SECURITY.md](SECURITY.md) |
 
 **Gatilho do `adopt`** — basta um dos dois:
 
