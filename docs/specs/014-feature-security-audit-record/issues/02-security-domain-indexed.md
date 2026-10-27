@@ -4,8 +4,9 @@
 
 **Blocked by:** 01
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=4f93665; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=e8ab4e5; scope=diff:4f93665..e8ab4e5; verdict=pass; p1=none
 
 - [x] A árvore canônica e a tabela "Quem escreve onde" do `anvil-docs` trazem `security/`, escrito pelo verbo `security`, marcado como domínio que uma skill cria no primeiro uso.
 - [x] O verbo `index` trata `security/` como domínio base: gera o link quando a pasta existe, não gera quando não existe, e lista os registros no conteúdo por domínio.
