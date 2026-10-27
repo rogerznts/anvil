@@ -49,9 +49,9 @@ arquivos da execução antes de qualquer leitura para o registro.
 
 O que o `run-metadata.json` precisa ter, porque o upstream não fixa a forma:
 
-- `run_id` e, com `run_status` `incomplete`, `incomplete_reason`: uma ficha sem
-  espaço, como `validation_budget_exhausted`. Texto livre é recusado, porque
-  pode nomear um arquivo.
+- `run_id` e, com `run_status` `incomplete`, `incomplete_reason`: uma ficha de
+  letras, dígitos, `-` e `_`, como `validation_budget_exhausted`. Texto livre, ou
+  com `/`, `.` ou `:`, é recusado, porque pode nomear um arquivo.
 - `source_ref.commit`: o SHA do commit auditado, em hexadecimal.
 - `source_ref.dirty`: `true` ou `false`.
 - `profile`: `quick`, `standard` ou `deep`.
@@ -78,9 +78,16 @@ Com eles, o registro traz:
 - uma linha por achado, na ordem do `findings.json`, com o fingerprint, o
   veredito e a severidade.
 
+O fingerprint entra na linha só quando é ficha de letras, dígitos, `-` e `_`. O
+upstream o deriva da fonte e aceita nele `/`, `.`, `:`, `@` e `+`, e um
+fingerprint assim pode trazer caminho de código, como `src/auth.c:csrf`: a linha
+o mostra como `_oculto, posição <i>_`, com a posição do achado no `findings.json`
+da execução, onde ele se acha.
+
 ## O que o registro nunca leva
 
-- caminho de código, inclusive o escopo da execução, que é uma lista de caminhos;
+- caminho de código, inclusive o escopo da execução, que é uma lista de caminhos,
+  e o fingerprint que pode trazer um;
 - trecho de fonte, título, descrição, causa raiz, condição, comando, payload,
   reprodução ou correção de qualquer achado;
 - o id, a superfície, a fronteira ou qualquer outro campo de unidade do ledger,

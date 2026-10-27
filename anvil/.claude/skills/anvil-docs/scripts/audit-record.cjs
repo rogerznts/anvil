@@ -23,6 +23,11 @@
 // Nenhum outro campo entra no registro, nem o id de unidade do ledger. Os
 // relatórios em Markdown da execução nunca são abertos. Antes de ler, os dois
 // arquivos passam nos validadores da anvil-security-audit instalada ao lado.
+//
+// Identificador que entra no registro é ficha de letras, dígitos, `-` e `_`. O
+// upstream aceita `/`, `.`, `:`, `@` e `+` no fingerprint, que ele deriva da
+// fonte: um fingerprint assim pode trazer caminho de código, e a linha do achado
+// leva no lugar dele a posição do achado no findings.json.
 "use strict";
 
 const fs = require("node:fs");
@@ -40,9 +45,7 @@ const VERDICTS = ["confirmed", "needs_validation", "rejected"];
 const SEVERITIES = ["critical", "high", "medium", "low", "informational"];
 const PROFILES = ["quick", "standard", "deep"];
 const RUN_STATES = ["complete", "incomplete", "in_progress"];
-// Valor de metadado que entra no registro é ficha, nunca texto livre: um texto
-// livre pode nomear um arquivo.
-const TOKEN = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
+const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
 const COMMIT = /^[0-9a-f]{7,64}$/i;
 
 function refuse(reasons, detail = "") {
@@ -69,7 +72,7 @@ function runDirectory(arg) {
   if (!match) refuse([`o nome do diretório da execução não é run-<N>: ${path.basename(runDir)}`]);
   const missing = RUN_FILES.filter((name) => !fs.statSync(path.join(runDir, name), { throwIfNoEntry: false })?.isFile());
   if (missing.length) refuse(missing.map((name) => `falta ${name} em ${runDir}`));
-  return { runDir, n: match[1] };
+  return { runDir, runNumber: match[1] };
 }
 
 function validate(runDir) {
@@ -109,13 +112,13 @@ function metadata(runDir) {
   };
   const reasons = [];
   const check = (ok, field, expected) => ok || reasons.push(`run-metadata.json: ${field} deve ser ${expected}`);
-  check(typeof fields.run_id === "string" && TOKEN.test(fields.run_id), "run_id", "uma ficha sem espaço");
+  check(typeof fields.run_id === "string" && SAFE_ID.test(fields.run_id), "run_id", "uma ficha de letras, dígitos, - e _");
   check(typeof fields.commit === "string" && COMMIT.test(fields.commit), "source_ref.commit", "o SHA do commit auditado");
   check(typeof fields.dirty === "boolean", "source_ref.dirty", "true ou false");
   check(PROFILES.includes(fields.profile), "profile", PROFILES.join(", "));
   check(RUN_STATES.includes(fields.run_status), "run_status", RUN_STATES.join(", "));
   if (meta.run_status === "incomplete") {
-    check(typeof fields.incomplete_reason === "string" && TOKEN.test(fields.incomplete_reason), "incomplete_reason", "uma ficha sem espaço");
+    check(typeof fields.incomplete_reason === "string" && SAFE_ID.test(fields.incomplete_reason), "incomplete_reason", "uma ficha de letras, dígitos, - e _");
   }
   if (reasons.length) refuse(reasons);
   return fields;
@@ -133,15 +136,17 @@ function table(header, counts) {
   return [`| ${header} | quantos |`, "|---|---|", ...rows, `| total | ${total} |`].join("\n");
 }
 
-function render({ n, runDir, meta, unitStates, findings }) {
+function render({ runNumber, runDir, meta, unitStates, findings }) {
   const status = meta.run_status === "incomplete"
     ? `\`incomplete\`, motivo \`${meta.incomplete_reason}\``
     : `\`${meta.run_status}\``;
   const confirmed = findings.filter((finding) => finding.verdict === "confirmed");
-  const rows = findings.map((finding) =>
-    `| \`${finding.fingerprint}\` | \`${finding.verdict}\` | ${finding.severity ? `\`${finding.severity}\`` : "—"} |`);
+  const id = (finding, index) => (SAFE_ID.test(finding.fingerprint) ? `\`${finding.fingerprint}\`` : `_oculto, posição ${index + 1}_`);
+  const rows = findings.map((finding, index) =>
+    `| ${id(finding, index)} | \`${finding.verdict}\` | ${finding.severity ? `\`${finding.severity}\`` : "—"} |`);
+  const hidden = findings.some((finding) => !SAFE_ID.test(finding.fingerprint));
   return [
-    `# Registro da auditoria — run-${n}`,
+    `# Registro da auditoria — run-${runNumber}`,
     "",
     "Gerado pelo verbo `security` do `anvil-docs` a partir de uma execução da",
     "`anvil-security-audit`. Não leva caminho de código, trecho de fonte, título,",
@@ -172,19 +177,22 @@ function render({ n, runDir, meta, unitStates, findings }) {
     "## Lista de achados",
     "",
     ...(rows.length ? ["| fingerprint | veredito | severidade |", "|---|---|---|", ...rows] : ["Nenhum achado."]),
+    ...(hidden
+      ? ["", "Fingerprint com caractere fora de letras, dígitos, `-` e `_` pode trazer caminho de", "código e fica oculto: a linha leva a posição do achado no `findings.json` da execução."]
+      : []),
     "",
   ].join("\n");
 }
 
-function recordPath(root, n) {
+function recordPath(root, runNumber) {
   const dir = path.join(root, "docs", "security");
-  const pattern = new RegExp(`^audit-\\d{4}-\\d{2}-\\d{2}-run-${n}\\.md$`);
+  const pattern = new RegExp(`^audit-\\d{4}-\\d{2}-\\d{2}-run-${runNumber}\\.md$`);
   const existing = fs.existsSync(dir) ? fs.readdirSync(dir).find((name) => pattern.test(name)) : undefined;
-  return path.join(dir, existing ?? `audit-${new Date().toISOString().slice(0, 10)}-run-${n}.md`);
+  return path.join(dir, existing ?? `audit-${new Date().toISOString().slice(0, 10)}-run-${runNumber}.md`);
 }
 
 const root = projectRoot();
-const { runDir, n } = runDirectory(process.argv[2]);
+const { runDir, runNumber } = runDirectory(process.argv[2]);
 validate(runDir);
 const meta = metadata(runDir);
 const unitStates = readJson(runDir, "coverage-ledger.json").map((unit) => unit.status);
@@ -194,7 +202,7 @@ const findings = readJson(runDir, "findings.json").map((finding) => ({
   severity: finding.verdict === "confirmed" ? finding.severity.overall_severity : null,
 }));
 
-const file = recordPath(root, n);
+const file = recordPath(root, runNumber);
 fs.mkdirSync(path.dirname(file), { recursive: true });
-fs.writeFileSync(file, render({ n, runDir, meta, unitStates, findings }));
+fs.writeFileSync(file, render({ runNumber, runDir, meta, unitStates, findings }));
 console.log(`record: ${path.relative(root, file)}`);
