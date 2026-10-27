@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-27T00:09:16Z
+Last updated: 2026-10-27T00:53:54Z
 
 ## Visão geral
 
@@ -24,7 +24,9 @@ Last updated: 2026-10-27T00:09:16Z
 ## Roteiro
 
 - **security-audit-vendor** — fechada — [013](./specs/archive/013-feature-security-audit-vendor/)
-- **security-audit-record** — pendente
+- **security-audit-record** — fechada — [014](./specs/archive/014-feature-security-audit-record/)
+
+Relatório da execução: [report.md](./specs/report.md)
 
 ## Specs ativas
 
@@ -32,6 +34,7 @@ Nenhuma.
 
 ## Specs arquivadas
 
+- [014 — O registro da auditoria entra versionado em `docs/security/`](./specs/archive/014-feature-security-audit-record/spec.md) — `feature/014-security-audit-record`, 2 tickets
 - [013 — A auditoria de segurança da Cloudflare entra vendorizada](./specs/archive/013-feature-security-audit-vendor/spec.md) — `feature/013-security-audit-vendor`, 2 tickets
 - [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/archive/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, 11 tickets
 - [007 — Migração lista o que está fora do git e edita o alvo de symlink no repositório](./specs/archive/007-extension-migration-out-of-git/spec.md) — `extension/007-migration-out-of-git`, 4 tickets

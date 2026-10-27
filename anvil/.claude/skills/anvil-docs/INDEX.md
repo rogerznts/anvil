@@ -7,8 +7,8 @@ custom.
 ## Quem chama
 
 As skills de fluxo chamam **em silêncio**, sem perguntar, depois de criar uma
-spec, mudar o estado dos tickets ou arquivar. O usuário chama à mão quando
-quiser reconciliar.
+spec, mudar o estado dos tickets ou arquivar, e o verbo `security` depois de
+gravar um registro da auditoria. O usuário chama à mão quando quiser reconciliar.
 
 Só fale se encontrar link quebrado ou entrada obsoleta.
 
@@ -17,8 +17,8 @@ Só fale se encontrar link quebrado ou entrada obsoleta.
 1. **Carregar** [templates/docs-index.md](templates/docs-index.md).
 
 2. **Domínios base** — para cada um de `discovery/`, `prd/`, `architecture/`,
-   `ui/`, `qa/`, `project/`: se a pasta não existe, **não gere o link**. Índice
-   que aponta para pasta ausente é pior que índice incompleto.
+   `ui/`, `qa/`, `security/`, `project/`: se a pasta não existe, **não gere o
+   link**. Índice que aponta para pasta ausente é pior que índice incompleto.
 
 3. **Roteiro** — só quando `docs/specs/roadmap.md` existe. Sem ele, a seção
    não sai, nem o título: o índice fica como sem este passo. O estado de cada
