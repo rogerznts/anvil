@@ -5,6 +5,7 @@
 **Blocked by:** 04
 
 **Status:** resolved
+**Review:** round=1; sha=2ffd1c7; scope=full; verdict=pass; p1=none
 
 - [x] Reproduziu: a cilada entra no `RULE.md` do `anvil-stack-payload` no formato das outras, com o alcance do veredito do 04, e o título vira "As quatro ciladas".
 - [x] Nenhum número de projeto é citado na cilada.
@@ -21,3 +22,8 @@
   quarta não vem do upstream. O ADR-0006 e o `STACK-CONTRACT.md` ficam como
   estão: o primeiro é histórico, e o segundo usa "três ciladas" como exemplo de
   princípio, não como contagem da rule.
+- Review round=1 · P3: o comentário acima cita o ADR-0006 — a stack como camada
+  própria — sem a glosa na primeira menção; quem lê precisava abrir o ADR.
+- Review round=1 · P3: o `RULE.md` tem ~108 linhas contra as "menos de ~80" do
+  checklist do `STACK-CONTRACT.md` (já passava antes da cilada 4) — rule maior é
+  menos lida.

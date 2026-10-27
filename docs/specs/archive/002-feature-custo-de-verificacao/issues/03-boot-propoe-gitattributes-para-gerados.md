@@ -5,6 +5,7 @@
 **Blocked by:** Nenhum — pode começar agora.
 
 **Status:** resolved
+**Review:** round=1; sha=2ffd1c7; scope=full; verdict=pass; p1=none
 
 - [x] O boot lista os gerados achados, com tamanho e proporção do diff.
 - [x] A proposta espera aprovação; um `.gitattributes` existente é mesclado, nunca sobrescrito.
@@ -23,3 +24,9 @@
   dela, o diff do último commit caiu de 9.304 linhas para 783 bytes, com o `.ts`
   da migration e o `src/app.ts` visíveis e o `.json` como `Binary files differ`.
   `git diff --text` ainda mostra o snapshot inteiro.
+- Review round=1 · P3: o `README.md` diz que o boot escreve só `.claude/rules/`,
+  `docs/agents/` e `docs/`, e o fluxograma não mostra o `.gitattributes` — o
+  mantenedor não espera uma proposta de arquivo na raiz.
+- Review round=1 · P3: a spec põe lockfile entre os gerados da proposta; o boot o
+  separa ("Lockfile é proposta separada") sem o desvio registrado na spec — quem
+  lê a spec espera o lockfile na mesma proposta.

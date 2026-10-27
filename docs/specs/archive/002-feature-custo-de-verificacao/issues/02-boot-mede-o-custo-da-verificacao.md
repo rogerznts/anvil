@@ -5,6 +5,7 @@
 **Blocked by:** 01
 
 **Status:** resolved
+**Review:** round=1; sha=2ffd1c7; scope=full; verdict=pass; p1=none
 
 - [x] Instalação nova: o `anvil.md` sai com comando, custo medido, data, máquina e a instrução de correção no mesmo commit.
 - [x] Comando que não roda: fica gravado sem custo, com o motivo.
@@ -25,3 +26,16 @@
   `CLAUDE.md:3` (`~80s`) e `.claude/rules/project.md:3` (`cerca de 2 min`), os
   dois divergentes do medido: ficam apontados, com proposta de ponteiro, sem
   edição.
+- Review round=1 · P2: a spec manda gravar sem custo o comando que "falhar ou não
+  puder rodar"; o boot trata só "não roda" e "recusado" — uma suíte que termina
+  vermelha tem o tempo gravado como custo, o número errado que a spec evita.
+- Review round=1 · P2: o exemplo de `laço` e `gate` do boot não traz a máquina
+  nem a frase "Quem medir diferente corrige…" — quem copia o formato ao adotar o
+  laço curto perde a instrução que segura a fonte única.
+- Review round=1 · P2: o perfil define o gate como "a suíte inteira mais o
+  typecheck", e o exemplo de um comando do boot (`pnpm test`) não tem typecheck
+  nem o boot pede que o inclua — a prova do `anvil-auto` roda sem typecheck nos
+  projetos com o bloco padrão.
+- Review round=1 · P2: o cenário em `workspace/02-boot-custo/` foi exercitado
+  antes do rebase, que mudou o formato com laço (o `laço` foi para a prosa depois
+  do bloco) — o texto atual dessa parte não tem prova exercitada.

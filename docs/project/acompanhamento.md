@@ -198,3 +198,34 @@ fechamento.
   `origin/main`. Enquanto ninguém mexer, um `vendor-sync update` que traga mudança
   nesse padrão do upstream exige editar os dois, e o que ficar para trás passa a
   mentir.
+
+## Spec 002: o custo de verificar como dado do projeto
+
+Origem: `docs/specs/archive/002-feature-custo-de-verificacao/`, reaplicada sobre a
+`main` depois de ficar fora no PR #6. Rodada 1 dos tickets 01 e 02, no
+`## Comments` deles; os P3 ficam só nos tickets.
+
+- **A40 · o gate roda mais de uma vez por ticket no implementer.** Ticket 01,
+  rodada 1, P2 (Standards e Spec). O `anvil-implementer` roda o comando de
+  verificação, que é o gate, antes de cada commit, e um ticket tem de dois a
+  quatro. Enquanto ninguém mexer, sob o `anvil-auto` o gate roda bloqueante várias
+  vezes por ticket, contra o "uma vez por ticket" do perfil.
+- **A41 · o perfil promete custo num `anvil.md` que o bench não grava.** Ticket
+  01, rodada 1, P2 (Standards). O `anvil-bench` instala o perfil de verificação e
+  grava um `anvil.md` sem a seção do comando. Enquanto ninguém mexer, num projeto
+  bench o agente procura o custo e não acha.
+- **A42 · suíte vermelha vira custo gravado.** Ticket 02, rodada 1, P2 (Spec). A
+  spec manda gravar sem custo o comando que falhar; o boot trata só o que não
+  roda e o recusado. Enquanto ninguém mexer, o tempo de uma suíte que termina
+  vermelha entra no `anvil.md` como custo.
+- **A43 · o exemplo de `laço` e `gate` perde máquina e instrução de correção.**
+  Ticket 02, rodada 1, P2 (Standards). Enquanto ninguém mexer, quem copia o
+  formato ao adotar o laço curto grava custo sem máquina e sem a frase que segura
+  a fonte única.
+- **A44 · o gate do perfil tem typecheck e o bloco do boot não.** Ticket 02,
+  rodada 1, P2 (Standards e Spec). Enquanto ninguém mexer, a prova do `anvil-auto`
+  roda sem typecheck nos projetos com o bloco padrão, e o perfil diz o contrário.
+- **A45 · o formato com laço não foi exercitado depois do rebase.** Ticket 02,
+  rodada 1, P2 (Spec). O cenário de `workspace/02-boot-custo/` é anterior ao
+  `laço` em prosa depois do bloco. Enquanto ninguém mexer, esse texto do boot não
+  tem prova.

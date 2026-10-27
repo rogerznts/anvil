@@ -5,6 +5,7 @@
 **Blocked by:** Nenhum — pode começar agora.
 
 **Status:** resolved
+**Review:** round=1; sha=2ffd1c7; scope=full; verdict=pass; p1=none
 
 - [x] Projeto Payload sem customização em `workspace/`, com e sem o plugin multi-tenant.
 - [x] Controle positivo: `--sequence.shuffle` com isolamento sai verde em todas as rodadas.
