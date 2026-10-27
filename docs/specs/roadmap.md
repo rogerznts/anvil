@@ -14,6 +14,7 @@ Pronto quando: `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sa
 
 Tipo: feature
 Depende de: security-audit-vendor
+Spec: 014
 
 Entra: o verbo `security` do `anvil-docs`, que lê o `run-metadata.json`, o `coverage-ledger.json` e o `findings.json` de uma execução da auditoria e grava o registro da auditoria em `docs/security/audit-<data>-run-<N>.md`: commit e perfil auditados, cobertura declarada e lacunas, contagem por veredito e severidade, uma linha por achado com id e severidade, e o caminho do diretório da execução; o `docs/security/` como domínio do `anvil-docs`, listado pelo verbo `index`.
 Fica de fora: copiar para o repositório o `REPORT.md`, o `FINDINGS-DETAIL.md`, o `NEEDS-VALIDATION.md`, caminho de código ou reprodução de qualquer achado; abrir spec de correção a partir de um achado; nível de detalhe configurável por projeto.
