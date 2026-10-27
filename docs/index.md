@@ -1,6 +1,6 @@
 # Índice da documentação
 
-Last updated: 2026-10-16T05:28:58Z
+Last updated: 2026-10-27T00:09:16Z
 
 ## Visão geral
 
@@ -21,12 +21,18 @@ Last updated: 2026-10-16T05:28:58Z
 - **[Architecture](./architecture/)** — desenho do sistema, glossário e ADRs
 - **[Project](./project/plan.md)** — plano vivo e atualizações datadas
 
+## Roteiro
+
+- **security-audit-vendor** — fechada — [013](./specs/archive/013-feature-security-audit-vendor/)
+- **security-audit-record** — pendente
+
 ## Specs ativas
 
 Nenhuma.
 
 ## Specs arquivadas
 
+- [013 — A auditoria de segurança da Cloudflare entra vendorizada](./specs/archive/013-feature-security-audit-vendor/spec.md) — `feature/013-security-audit-vendor`, 2 tickets
 - [008 — Piloto automático: do grill ao fechamento sem pausa humana](./specs/archive/008-feature-anvil-auto/spec.md) — `feature/008-anvil-auto`, 11 tickets
 - [007 — Migração lista o que está fora do git e edita o alvo de symlink no repositório](./specs/archive/007-extension-migration-out-of-git/spec.md) — `extension/007-migration-out-of-git`, 4 tickets
 - [006 — Instalação por usuário, idioma no chat e cauda do `anvil-next`](./specs/archive/006-feature-user-install-language-next/spec.md) — `feature/006-user-install-language-next`, 7 tickets
@@ -50,7 +56,7 @@ Nenhuma.
 ### Architecture
 
 - [context.md](./architecture/context.md) — o glossário: curadoria, referências,
-  tickets e harness, com os termos a evitar.
+  segurança, tickets e harness, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
   impõe, como o estado é lido do disco, os três harnesses e a camada omp, com o
   piloto automático, e a herança do mosk.
@@ -83,6 +89,8 @@ Nenhuma.
     — o toolkit é instalado uma vez por usuário; o projeto fica só com rules e `docs/`
   - [adr-0014](./architecture/adr/adr-0014-piloto-automatico-fecha-sem-humano.md)
     — o piloto automático leva o roteiro ao fechamento sem humano; revê em parte o adr-0010 e o adr-0011
+  - [adr-0015](./architecture/adr/adr-0015-auditoria-de-seguranca-vendorizada-da-cloudflare.md)
+    — a auditoria de segurança é a skill da Cloudflare, vendorizada; o versionado é só o registro da auditoria
 
 ### Project
 
