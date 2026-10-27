@@ -24,6 +24,7 @@ Pronto quando: dados um `findings.json` e um `coverage-ledger.json` de exemplo q
 
 Tipo: extension
 Depende de: security-audit-record
+Spec: 015
 
 Entra: o verbo `security` deixa de recusar a execução pela forma dos campos de apresentação do `run-metadata.json`. Do `source_ref`, aceito como objeto com os nomes comuns (`commit`, `sha` ou `revision`; `dirty` ou `worktree_dirty`) ou como string, o script extrai só um SHA hexadecimal e um booleano; o que não reconhecer sai no registro como "não declarado em forma reconhecível". O `run_id` e o `incomplete_reason` só entram no registro quando são ficha de letras, dígitos, `-` e `_`, e senão saem como "não exibido". O `SECURITY.md` descreve as novas regras.
 Fica de fora: as recusas por arquivo faltando e por validador do upstream saindo diferente de 0, que continuam; tirar o commit do `git` do repositório na hora do registro; rodar uma auditoria real; qualquer campo novo no registro.
