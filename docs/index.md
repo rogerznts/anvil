@@ -1,20 +1,20 @@
 # Índice da documentação
 
-Last updated: 2026-10-27T13:01:01Z
+Last updated: 2026-10-28T22:48:55Z
 
 ## Visão geral
 
 - **[Discovery](./discovery/)** — pesquisa, briefings, brainstorming
-  - [gate-sem-criterio-de-parada.md](./discovery/gate-sem-criterio-de-parada.md)
-    — por que um par de gates independentes entra em laço num documento, e o que
-    muda nas skills
   - [adaptar-omp-ao-anvil.md](./discovery/adaptar-omp-ao-anvil.md) — proposta
     de integração do anvil com o omp, antes do grill
-  - [camadas-anvil-omp.md](./discovery/camadas-anvil-omp.md) — desenho em
-    mermaid das camadas, da instalação, da execução e da guarda de merge
   - [bench-autonomo.md](./discovery/bench-autonomo.md) — proposta para pôr o
     bench sobre o plan e o run e torná-lo autônomo da entrevista ao relatório,
     antes do grill
+  - [camadas-anvil-omp.md](./discovery/camadas-anvil-omp.md) — desenho em
+    mermaid das camadas, da instalação, da execução e da guarda de merge
+  - [gate-sem-criterio-de-parada.md](./discovery/gate-sem-criterio-de-parada.md)
+    — por que um par de gates independentes entra em laço num documento, e o que
+    muda nas skills
   - [piloto-automatico-decisoes-do-grill.md](./discovery/piloto-automatico-decisoes-do-grill.md)
     — handoff do grill das specs 007 e 008, com as decisões Q5–Q29 da 008 que
     não estão no ADR-0014
@@ -35,6 +35,7 @@ Nenhuma.
 
 ## Specs arquivadas
 
+- [016 — O grill pergunta pela ferramenta de pergunta do harness, em blocos de 10](./specs/archive/016-extension-grill-ask-rounds/spec.md) — `extension/016-grill-ask-rounds`, 3 tickets
 - [015 — O registro da auditoria aceita o metadado como a execução o grava](./specs/archive/015-extension-security-audit-record-metadata/spec.md) — `extension/015-security-audit-record-metadata`, 1 ticket
 - [014 — O registro da auditoria entra versionado em `docs/security/`](./specs/archive/014-feature-security-audit-record/spec.md) — `feature/014-security-audit-record`, 2 tickets
 - [013 — A auditoria de segurança da Cloudflare entra vendorizada](./specs/archive/013-feature-security-audit-vendor/spec.md) — `feature/013-security-audit-vendor`, 2 tickets
@@ -54,11 +55,11 @@ Nenhuma.
 
 ### Agents
 
+- [domain.md](./agents/domain.md) — o que ler antes de explorar, e o vocabulário
+  do glossário. Single-context, sob `docs/architecture/`.
 - [issue-tracker.md](./agents/issue-tracker.md) — o perfil que as skills de
   fluxo leem: specs e tickets versionados em `docs/specs/{NNN}-{tipo}-{nome}/`,
   com `Blocked by` e `Status`.
-- [domain.md](./agents/domain.md) — o que ler antes de explorar, e o vocabulário
-  do glossário. Single-context, sob `docs/architecture/`.
 - [verification.md](./agents/verification.md) — o critério de parada que as
   skills de verificação leem: classe do achado, orçamento de duas rodadas,
   escopo diff-only da segunda em diante, a régua própria da prosa, e quando a

@@ -2,7 +2,7 @@
 
 - Status: aceito
 - Data: 2026-10-28
-- Origem: [spec 016](../../specs/016-extension-grill-ask-rounds/spec.md)
+- Origem: [spec 016](../../specs/archive/016-extension-grill-ask-rounds/spec.md)
 - Exceção nomeada ao [ADR-0001](./adr-0001-skills-vendorizadas-seguem-o-padrao-original.md) — as skills vendorizadas seguem o padrão original —, que continua valendo
 
 ## Contexto

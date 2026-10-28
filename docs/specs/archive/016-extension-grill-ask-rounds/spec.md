@@ -1,6 +1,6 @@
 # 016 — O grill pergunta pela ferramenta de pergunta do harness, em blocos de 10
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Extensão do `anvil-grilling`, skill vendorizada do mattpocock com pin, que o
 `anvil-grill`, o `anvil-grill-me`, o `anvil-wayfinder` e o `anvil-bench` chamam.
