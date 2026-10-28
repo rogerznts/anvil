@@ -9,6 +9,7 @@
 **Review:** round=2; sha=536e15b; scope=diff:2ffd1c7..536e15b; verdict=pass; p1=none
 **PR:** https://github.com/rogerznts/anvil/pull/6
 **PR:** https://github.com/rogerznts/anvil/pull/10
+**PR:** https://github.com/rogerznts/anvil/pull/11
 
 - [x] Projeto Payload sem customização em `workspace/`, com e sem o plugin multi-tenant.
 - [x] Controle positivo: `--sequence.shuffle` com isolamento sai verde em todas as rodadas.
