@@ -27,7 +27,17 @@ Ver a spec, "Implementation Decisions › O delta no `anvil-grilling`" e "Intera
 
 **Prova**, em `workspace/91-grill-ask-rounds/` (fora do git), PLAN.md com 14 decisões e 3 ramos:
 
-- Claude Code, HOME real com a skill copiada para a fixture como `grill-016` (o HOME dev não tem login do Claude): estimativa de 14 antes da 1ª pergunta, 1º bloco 4+4+2 em três chamadas, estimativa subindo até 30. A pergunta "qual decisão reabrir" do ajuste saía sem recomendada; a última frase da skill foi reforçada e a reprova passou (`out-claude-adjust2/`).
+- Claude Code, HOME real com a skill copiada para a fixture como `grill-016` (o HOME dev não tem login do Claude): estimativa de 14 antes da 1ª pergunta, 1º bloco 4+4+2 em três chamadas, estimativa subindo até 30 (`out-claude/`). Nessa execução, a pergunta "qual decisão reabrir" do ajuste saía sem recomendada. A última frase da skill foi reforçada, e a reprova do caminho de ajuste, numa fixture menor de 3 decisões, passou (`out-claude-adjust2/`).
 - omp pelo `dev-run.sh -- omp`: 1º bloco de 10 numa chamada do `ask`, `recommended: 0` em todas as 33 perguntas, sem marca dupla.
 - Codex 0.162.1 em `codex exec`, HOME real com `grill-016`: blocos em texto compacto; `4x: …`, `12x: …` e uma frase solta viraram respostas custom.
 - Bench: instrução da linha 167 do `anvil-bench` no omp, 12 chamadas do `ask` com uma pergunta cada.
+
+**Review:** round=1; sha=9d02c50; scope=full; verdict=pass; p1=none
+
+## Comments
+
+- Review round=1 · dois P1 levantados e derrubados por evidência. (1) "Delta fora do seam": o `diff` contra o pin só tem hunks na linha 2 (`rename`) e nas linhas 8 a 22 do upstream, que são o parágrafo "Work the tree in rounds…" e o bloco "Format a round like so". O texto novo substitui esse bloco, e as linhas 24, 26 e 28 do upstream ficam verbatim. (2) "omp sem recomendada": nas 8 chamadas do `ask` em `out-omp/session.jsonl`, toda pergunta tem `recommended` e porquê na descrição. O mesmo vale para as 12 de `out-bench/`.
+- Review round=1 · P2 (Spec): na primeira execução no Claude Code, a pergunta "qual decisão" do ajuste saiu com `multiSelect`. Se isso se repetir, o operador marca duas decisões numa pergunta que a skill trata como uma. A reprova não repetiu, e a skill não proíbe por extenso.
+- Review round=1 · P2 (Spec): no Codex, a ferramenta oferecida em `codex exec` se chama `request_user_input_async`, e o modelo não a usou para os blocos. Ele a chamou uma vez no ajuste, sem opção custom. O fallback em texto cobriu o critério. Num Codex interativo que a ofereça, o comportamento não foi observado.
+- Review round=1 · P3 (Spec): os rótulos de exemplo da skill estão em inglês (`x) write your own`, "confirm", "adjust"), e a saída sai no idioma de comunicação. No Codex do HOME real, a skill de usuário `anvil-unslop` tirou o "—" e o "➡️" do formato compacto, e a leitura `1a`/`3x:` não mudou.
+- Review round=1 · P3 (Standards): a regra "recomendada + custom" aparece três vezes na skill (molde, lista e confirmação final). Foi preciso repeti-la para o ajuste porque, sem isso, o Claude Code deixava a pergunta de reabertura sem marca.
