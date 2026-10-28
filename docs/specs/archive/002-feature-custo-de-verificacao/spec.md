@@ -164,7 +164,9 @@ skills já leem.
   lockfiles, saída de codegen) ou por marca no próprio arquivo, e mede o peso de
   cada um no histórico recente do diff. Lista o que achou, com tamanho e
   proporção, e propõe as linhas `-diff linguist-generated=true`. Sem achado
-  relevante, não propõe nada.
+  relevante, não propõe nada. O lockfile, quando achado, vai numa proposta
+  separada: tirá-lo do diff esconde troca de dependência, e isso é decisão do
+  projeto.
 - **O `.gitattributes` se mescla, nunca se sobrescreve**, como o boot já faz com
   o `settings.json`.
 - **A cilada do `--no-isolate` é condicionada a uma reprodução.** Antes de
@@ -225,6 +227,8 @@ skills já leem.
 
 - A decisão "gate por ticket, em background, com rodada antes do merge" muda o
   critério de verificação que o ADR-0010 do anvil — a verificação tem critério
-  de parada — começou a escrever. No `archive`, ela é candidata a virar ADR
-  próprio (`0011`), com as perdas declaradas: o gate por ticket gasta mais CPU
-  que o gate por spec, de propósito.
+  de parada — começou a escrever. Ela virou o
+  [ADR-0020](../../../architecture/adr/adr-0020-gate-por-ticket-no-commit-que-fecha.md)
+  — o gate roda por ticket, no commit que o fecha —, com as perdas declaradas: o
+  gate por ticket gasta mais CPU que o gate por spec, de propósito. O número
+  `0011`, previsto aqui antes, foi tomado pelo ADR do omp como harness.

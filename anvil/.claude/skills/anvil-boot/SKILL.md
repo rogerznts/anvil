@@ -253,7 +253,10 @@ npm test
 
 - O título é este, exato, e debaixo dele vai **um** bloco `bash`, com o comando
   que roda a suíte inteira a partir da raiz do projeto, sem pedir nada no
-  terminal. Uma linha de prosa antes do bloco pode dizer o que ele cobre.
+  terminal. Quando a varredura achou um typecheck — um script `typecheck` no
+  manifesto, `tsc --noEmit`, `mypy`, `cargo check` —, ele entra no mesmo bloco,
+  depois da suíte, com `&&`: o bloco é o gate do perfil de verificação. Uma linha
+  de prosa antes do bloco pode dizer o que ele cobre.
 - O comando sai da varredura do passo 3, com caminho verificado: o script de
   teste do manifesto de pacote, o alvo do `Makefile`, o que o README ou o CI
   rodam. Um comando que o projeto não tem sai diferente de `0`, e nenhuma spec
@@ -345,14 +348,14 @@ suíte inteira a cada conferida, *porque é rápida*, ou pular a verificação,
 *porque é lenta*. Os dois erros vêm do dado, não da disciplina.
 
 **Meça, não estime.** Peça para rodar o comando uma vez: rodar a suíte pode levar
-minutos e mexer em banco de teste. Rode em background e cronometre. Com o tempo
-em mãos, a seção fica assim:
+minutos e mexer em banco de teste. Rode em background e cronometre. Só a rodada
+que sai `0` vira custo. Com o tempo em mãos, a seção fica assim:
 
 ~~~markdown
 ## Comando de verificação
 
 ```bash
-pnpm test
+pnpm test && pnpm typecheck
 ```
 
 Custo medido: 3min12s, em 2026-09-23, numa máquina Linux de 16 CPUs.
@@ -361,6 +364,9 @@ Quem medir diferente corrige este arquivo no mesmo commit. O critério de quando
 rodar a suíte está em `docs/agents/verification.md`.
 ~~~
 
+- **O comando sai diferente de `0`** → grave o comando sem custo, com uma linha
+  que diga a saída e a data, como "Sem custo: saiu 1 em 2026-09-23.", e mostre a
+  falha ao usuário. O tempo de uma rodada vermelha não é o custo da suíte.
 - **O comando não roda** (falta banco, dependência ou serviço) → grave o comando
   sem custo, com o motivo numa linha. Número estimado não se grava: é o defeito
   que esta seção existe para evitar.
@@ -370,30 +376,35 @@ rodar a suíte está em `docs/agents/verification.md`.
 de custo, aponta para o `anvil.md`. Número repetido em dois arquivos diverge no
 primeiro que alguém atualizar e esquecer o outro.
 
-Quando o projeto adotar o laço curto do perfil de verificação, a seção passa a ter
-dois comandos, cada um com o seu custo, nos termos do perfil. O bloco `bash`
-continua sendo o `gate`, a suíte inteira: é ele que o piloto automático roda como
-prova. O `laço` entra em prosa, depois do bloco:
+O boot não propõe o laço curto; quando e por que adotá-lo está no perfil de
+verificação. Num projeto que já o adotou, a seção fica assim, e cada comando tem
+o seu custo:
 
 ~~~markdown
 ## Comando de verificação
 
 ```bash
-pnpm test && npx tsc --noEmit
+pnpm test && pnpm typecheck
 ```
 
-- `gate`: o bloco acima. Custo medido: 16min, em 2026-09-23.
-- `laço`: `pnpm test:ticket`. Custo medido: 1min10s, em 2026-09-23.
+- gate: o bloco acima. Custo medido: 16min, em 2026-09-23, numa máquina Linux
+  de 16 CPUs.
+- `laço curto`: `pnpm test:ticket`. Custo medido: 1min10s, em 2026-09-23, na
+  mesma máquina.
+
+Quem medir diferente corrige este arquivo no mesmo commit. O critério de quando
+rodar cada um está em `docs/agents/verification.md`.
 ~~~
 
-O boot não propõe essa divisão. Ela se adota quando o laço passar de ~2 min, e o
-perfil diz por quê.
+Meça os dois do mesmo jeito: só a rodada que sai `0` vira custo.
 
 **Num `anvil.md` que já existe**, o comando configurado não se troca.
 
 - **Sem custo** → proponha medir e acrescentar, e espere aprovação.
 - **Com custo, e o medido difere** → mostre os dois, com a data de cada um, e
   espere aprovação para trocar.
+- **Sem o typecheck que a varredura achou** → proponha acrescentá-lo ao bloco,
+  depois da suíte, com `&&`, e espere aprovação. O resto do comando fica.
 - **Custo repetido fora do `anvil.md`** → procure tempo de teste em `CLAUDE.md` e
   nas outras rules. Aponte cada ocorrência, com arquivo e linha, e proponha
   trocá-la por um ponteiro para o `anvil.md`. Não edite sozinho: fora do bloco
@@ -452,6 +463,14 @@ Se a varredura encontrou uma stack conhecida — hoje, um `payload.config.ts` �
 A rule sai da skill `anvil-stack-payload`, arquivo `RULE.md`, com os `{{...}}`
 preenchidos pelo que a varredura achou. **Sem** as invariantes do bench — aquelas
 são decisão de produto do `/anvil-bench` e não valem para projeto comum.
+
+A linha do comando de teste é a exceção: o comando já mora na seção de
+verificação do `anvil.md`, e repeti-lo na rule cria a segunda cópia que diverge.
+Em vez de preencher o `{{TEST_COMMAND}}`, troque a linha inteira por:
+
+```markdown
+- **Comando de teste:** o bloco de `## Comando de verificação` do `.claude/rules/anvil.md`
+```
 
 ## 8. Guarda de merge
 

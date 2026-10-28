@@ -32,3 +32,5 @@
 - Review round=1 · P3: a spec põe lockfile entre os gerados da proposta; o boot o
   separa ("Lockfile é proposta separada") sem o desvio registrado na spec — quem
   lê a spec espera o lockfile na mesma proposta.
+- Correção da rodada 1: o desvio do lockfile entrou na spec, e o `README.md`
+  passou a citar a proposta de `.gitattributes`, no texto e no fluxograma.

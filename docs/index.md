@@ -110,6 +110,8 @@ Nenhuma.
     — o modo dev usa HOME privado por checkout, sem substituir a instalação publicada dos outros projetos
   - [adr-0019](./architecture/adr/adr-0019-auditoria-de-seguranca-vendorizada-da-cloudflare.md)
     — a auditoria de segurança é a skill da Cloudflare, vendorizada; o versionado é só o registro da auditoria
+  - [adr-0020](./architecture/adr/adr-0020-gate-por-ticket-no-commit-que-fecha.md)
+    — o gate roda por ticket, no commit que o fecha; commit do meio roda o laço curto se mudar código
 
 ### Project
 

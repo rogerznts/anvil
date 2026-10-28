@@ -164,3 +164,15 @@ _Avoid_: teste, smoke, cenário
 A prova cuja sessão não foi respondida pelo modelo pedido. Não conta como verde
 nem como vermelho, e se repete.
 _Avoid_: prova falha, prova inconclusiva
+
+**Gate**:
+A rodada da suíte inteira de um projeto, com o typecheck quando ele tem um, que
+libera o commit que fecha um ticket. No bench, cada item do `gates.md` também se
+chama gate: é outra coisa, o critério de pronto de um item do ledger.
+_Avoid_: suíte completa, CI, e "gate" para a revisão de código
+
+**Laço curto**:
+O que um projeto roda a cada conferida durante um ticket. Enquanto a suíte
+inteira cabe em ~2 min, é ela; depois disso, um comando seletivo à parte. Adia a
+descoberta, nunca substitui o gate.
+_Avoid_: laço (que é a revisão que não converge), teste rápido, smoke

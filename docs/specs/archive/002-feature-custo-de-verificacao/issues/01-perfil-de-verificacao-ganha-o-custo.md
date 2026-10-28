@@ -44,3 +44,13 @@
   candidato para a decisão do gate, mas o ADR-0011 — o omp como harness, com
   camada própria — já existe; o próximo livre é o `0020`. Quem segue o número
   cai noutra decisão.
+- Correção da rodada 1, decidida em grill com o usuário: o commit que fecha o
+  ticket roda o gate; commit do meio que muda código roda o `laço curto`, ou o
+  gate sem ele; commit só de registro não roda nada — no perfil e no
+  `anvil-implementer`. O perfil vale só para projeto com
+  `## Comando de verificação` (o bench prova pelo `--reverify`). "Laço" sozinho
+  fica para a revisão: o comando é `laço curto`, e **Gate** e **Laço curto**
+  entraram no glossário. A decisão virou o ADR-0020 — o gate roda por ticket, no
+  commit que o fecha —, e o ADR-0010 ganhou uma linha sobre o sentido antigo de
+  "gate". Os P3 de duplicação, da descrição no `anvil-docs` e das "três rodadas"
+  foram corrigidos.

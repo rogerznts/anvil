@@ -21,7 +21,7 @@
   título dela nomeia o plugin e o primeiro parágrafo diz para quem vale. Os
   lugares que citavam "três ciladas" foram atualizados: o `README.md`, o exemplo
   de proposta do passo 7 do `anvil-boot` e o `VENDOR.md`, que agora diz que a
-  quarta não vem do upstream. O ADR-0006 e o `STACK-CONTRACT.md` ficam como
+  quarta não vem do upstream. O ADR-0006 — a stack como camada própria — e o `STACK-CONTRACT.md` ficam como
   estão: o primeiro é histórico, e o segundo usa "três ciladas" como exemplo de
   princípio, não como contagem da rule.
 - Review round=1 · P3: o comentário acima cita o ADR-0006 — a stack como camada
@@ -29,3 +29,9 @@
 - Review round=1 · P3: o `RULE.md` tem ~108 linhas contra as "menos de ~80" do
   checklist do `STACK-CONTRACT.md` (já passava antes da cilada 4) — rule maior é
   menos lida.
+- Correção da rodada 1: a glosa do ADR-0006 entrou no comentário acima. O
+  `RULE.md` foi enxugado na prosa, sem perder cilada, bloco de código nem seção,
+  de 123 para 108 linhas; o resto acima de ~80 são os blocos de código, e fica
+  como P3 aceito. A linha `{{TEST_COMMAND}}` continua no template: o
+  `anvil-boot` a troca por um ponteiro para a seção de verificação do
+  `anvil.md`, e o bench segue preenchendo o comando do starter.

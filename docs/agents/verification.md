@@ -2,7 +2,7 @@
 
 Perfil que as skills de verificação leem. Ele responde **quando a verificação
 acaba** — a pergunta que nenhuma skill de revisão responde sozinha, e cuja
-ausência põe gate e trabalho em laço.
+ausência põe revisão e trabalho em laço.
 
 A decisão que originou este perfil é o ADR-0010 do anvil, escrito a partir de um
 caso medido: doze rodadas sobre código convergiram e acharam defeito real; três
@@ -95,21 +95,31 @@ Dois destes bastam para parar:
 
 ## Quando rodar a suíte
 
+Vale para o projeto cujo `.claude/rules/anvil.md` tem a seção
+`## Comando de verificação`. No bench, a prova é o `--reverify` dos ledgers, e
+esta seção não se aplica.
+
 O custo da verificação é dado do projeto, não estimativa: está medido e datado
-no `.claude/rules/anvil.md`, e é esse número que decide quantas vezes se roda. O
+nessa seção do `anvil.md`, e é esse número que decide quantas vezes se roda. O
 perfil não repete número nenhum. Quem medir diferente corrige o `anvil.md` no
 mesmo commit.
 
-**O gate é a suíte inteira mais o typecheck, e roda uma vez por ticket, nunca uma
-vez por spec.** Validar por spec parece mais barato em CPU. Mas quando a suíte
-fecha vermelha, você não tem um defeito: tem uma bissecção com N tickets
+**O gate é o bloco `bash` da seção: a suíte inteira, mais o typecheck quando o
+projeto tem um. Ele libera o commit que fecha o ticket, uma vez por ticket, nunca
+uma vez por spec.** Validar por spec parece mais barato em CPU. Mas quando a
+suíte fecha vermelha, você não tem um defeito: tem uma bissecção com N tickets
 candidatos, sobre commits já entrelaçados, e cada tentativa custa uma suíte
 inteira. O verde por ticket é o que faz do commit uma âncora confiável.
 
+**Os commits do meio do ticket.** Commit que muda código roda o laço curto, se o
+projeto tiver um; sem ele, roda o gate. Commit só de documento ou de registro,
+como a linha `Review:`, não roda nada. O commit que devolve o ticket a `resolved`
+depois de um P1 fecha o ticket de novo, e roda o gate.
+
 **O gate não prende o trabalho.** Dispare-o em background e siga com a
 documentação e o registro do ticket enquanto ele roda; o commit que fecha o
-ticket espera o verde. O tempo de máquina não é tempo seu. Três rodadas
-bloqueantes por ticket são insustentáveis; uma em background é barata.
+ticket espera o verde. O tempo de máquina não é tempo seu. A suíte inteira
+rodando bloqueante a cada commit do ticket é o custo que esta seção corta.
 
 **Antes do merge, a suíte inteira roda mais uma vez, sobre o branch completo.**
 Não é redundante com o gate por ticket: ela pega a interação entre tickets, que
@@ -118,22 +128,24 @@ rodada é a prova que ele roda antes de fechar a spec.
 
 ### O laço curto, quando a suíte começar a doer
 
-Enquanto a suíte inteira couber em ~2 min, ela **é** o laço: rode-a a cada
-conferida. A divisão abaixo se adota quando o laço passar disso, e não na
-instalação. Adotada cedo, vira cerimônia.
+Enquanto a suíte inteira couber em ~2 min, ela **é** o laço curto: rode-a a cada
+conferida. A divisão abaixo se adota quando passar disso, e não na instalação.
+Adotada cedo, vira cerimônia.
 
-Com a divisão, o `anvil.md` passa a ter dois comandos, cada um com seu custo
-medido:
+Com a divisão, a seção do `anvil.md` passa a ter dois comandos, cada um com seu
+custo medido:
 
-- **`laço`** — roda a cada conferida durante o ticket. O que é barato e
-  transversal roda **inteiro**: é onde vivem as redes que pegam o que nenhuma
-  seleção por assunto veria. Só o caro se seleciona pelo assunto do ticket, e
-  numa invocação só, porque o custo fixo de preparar o ambiente é pago por
-  invocação, não por arquivo.
-- **`gate`** — a suíte inteira mais o typecheck, uma vez por ticket, como acima.
-  Continua sendo o bloco `bash` da seção `## Comando de verificação`, o que o
-  piloto automático roda; o `laço` vai em prosa, depois dele.
+- **gate** — o bloco `bash`, como acima. É o que o piloto automático roda.
+- **`laço curto`** — em prosa, depois do bloco. Roda a cada conferida e nos
+  commits do meio que mudam código. O que é barato e transversal roda
+  **inteiro**: é onde vivem as redes que pegam o que nenhuma seleção por assunto
+  veria. Só o caro se seleciona pelo assunto do ticket, e numa invocação só,
+  porque o custo fixo de preparar o ambiente é pago por invocação, não por
+  arquivo.
 
-A seleção do laço **adia** a descoberta, nunca a dispensa. A variante perigosa é
-*"rodo só o selecionado e confio"*: aí ela deixa de ser otimização de laço e vira
-redução de cobertura. Seleção larga demais é o sinal de rodar o gate direto.
+A seleção do laço curto **adia** a descoberta, nunca a dispensa. A variante
+perigosa é *"rodo só o selecionado e confio"*: aí ela deixa de ser otimização e
+vira redução de cobertura. Seleção larga demais é o sinal de rodar o gate direto.
+
+A decisão está no ADR-0020 do anvil — o gate roda por ticket, no commit que o
+fecha.

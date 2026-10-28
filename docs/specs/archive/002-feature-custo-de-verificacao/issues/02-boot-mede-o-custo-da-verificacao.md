@@ -41,3 +41,17 @@
 - Review round=1 · P2: o cenário em `workspace/02-boot-custo/` foi exercitado
   antes do rebase, que mudou o formato com laço (o `laço` foi para a prosa depois
   do bloco) — o texto atual dessa parte não tem prova exercitada.
+- Correção da rodada 1, decidida em grill com o usuário: só a rodada que sai `0`
+  vira custo, e a vermelha grava "Sem custo: saiu N em <data>"; o typecheck
+  achado na varredura entra no bloco com `&&`; o exemplo de gate e `laço curto`
+  tem a máquina e a frase de correção; o boot aponta para o perfil em vez de
+  repetir a regra do laço curto.
+- Prova do A45, `workspace/02-boot-custo/proof.sh`, pelo helper do ADR-0017 — a
+  prova roda pelo caminho real —, com `/skill:anvil-boot` em sessão real e
+  `anthropic/claude-sonnet-5` em todas as mensagens, três fixtures (verde,
+  vermelha, laço curto). Vermelho no `770e6cb`: a suíte vermelha saiu sem a
+  linha de motivo com saída e data, e o laço curto sem a frase de correção.
+  Verde com a correção, código `0` nas três. Limite: o `770e6cb` já punha o
+  typecheck e já deixava a suíte vermelha sem custo por juízo do modelo, então a
+  prova não distingue o A44 nem a metade "sem custo" do A42; distingue o formato
+  da linha de motivo e a frase de correção do laço curto.

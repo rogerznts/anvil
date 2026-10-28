@@ -48,7 +48,7 @@ presuma que dá para só criar por cima.
 docs/
 ├── index.md                    gerado pelo verbo `index`
 ├── agents/issue-tracker.md     ●  o perfil que as skills de fluxo leem
-├── agents/verification.md      ●  o critério de parada que as skills de verificação leem
+├── agents/verification.md      ●  o critério de parada e a cadência da suíte que as skills de verificação leem
 ├── architecture/               ●  desenho do sistema
 │   ├── context.md                 glossário ubíquo (anvil-domain-modeling)
 │   ├── context-map.md             só em repositório multi-contexto
