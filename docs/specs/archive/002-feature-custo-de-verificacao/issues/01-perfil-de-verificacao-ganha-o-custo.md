@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=2ffd1c7; scope=full; verdict=pass; p1=none
+**Review:** round=2; sha=536e15b; scope=diff:2ffd1c7..536e15b; verdict=pass; p1=none
 **PR:** https://github.com/rogerznts/anvil/pull/6
 **PR:** https://github.com/rogerznts/anvil/pull/10
 
@@ -54,3 +55,9 @@
   commit que o fecha —, e o ADR-0010 ganhou uma linha sobre o sentido antigo de
   "gate". Os P3 de duplicação, da descrição no `anvil-docs` e das "três rodadas"
   foram corrigidos.
+- Review round=2 · P3: o `anvil-implementer` não traz a exclusão do bench —
+  num projeto bench ele aponta para uma seção do perfil que diz "não se aplica"
+  e fica sem cadência escrita.
+- Review round=2 · P3: o implementer não diz qual commit devolve o ticket a
+  `resolved` depois de um P1 — o agente pode rodar o gate num commit de registro
+  ou deixar de rodá-lo.

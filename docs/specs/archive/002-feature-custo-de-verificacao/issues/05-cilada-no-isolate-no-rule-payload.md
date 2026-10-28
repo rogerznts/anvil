@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=2ffd1c7; scope=full; verdict=pass; p1=none
+**Review:** round=2; sha=536e15b; scope=diff:2ffd1c7..536e15b; verdict=pass; p1=none
 **PR:** https://github.com/rogerznts/anvil/pull/6
 **PR:** https://github.com/rogerznts/anvil/pull/10
 
@@ -35,3 +36,5 @@
   como P3 aceito. A linha `{{TEST_COMMAND}}` continua no template: o
   `anvil-boot` a troca por um ponteiro para a seção de verificação do
   `anvil.md`, e o bench segue preenchendo o comando do starter.
+- Review round=2 · P3: a linha da rodada 1 diz "~108 linhas", mas o `RULE.md`
+  tinha 123 antes da correção — quem lê não sabe o que a rodada 1 mediu.

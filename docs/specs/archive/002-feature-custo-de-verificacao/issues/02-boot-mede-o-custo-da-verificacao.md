@@ -6,6 +6,7 @@
 
 **Status:** resolved
 **Review:** round=1; sha=2ffd1c7; scope=full; verdict=pass; p1=none
+**Review:** round=2; sha=536e15b; scope=diff:2ffd1c7..536e15b; verdict=pass; p1=none
 **PR:** https://github.com/rogerznts/anvil/pull/6
 **PR:** https://github.com/rogerznts/anvil/pull/10
 
@@ -55,3 +56,6 @@
   typecheck e já deixava a suíte vermelha sem custo por juízo do modelo, então a
   prova não distingue o A44 nem a metade "sem custo" do A42; distingue o formato
   da linha de motivo e a frase de correção do laço curto.
+- Review round=2 · P3: a User Story 13 da spec e o critério acima ainda dizem
+  `laço` e `gate` — quem lê a spec arquivada espera o rótulo solto que a decisão
+  trocou por `laço curto`.
