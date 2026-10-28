@@ -24,3 +24,11 @@ Cenários reais no omp pelo `dev-run.sh`, em `workspace/91-grill-ask-rounds/` (f
 - `out-rec-custom/`: reprova após explicitar que só selecionar a opção recomendada conta como aceitação. A resposta personalizada foi preservada literalmente e marcada como não aceita; as opções recomendadas selecionadas ficaram como aceitas. Prefixos preservados, escrita antes do resumo e nenhum commit novo.
 
 O `verify` final saiu 0. O delta contra o pin continua limitado a `rename` e à substituição do seam original das linhas 8–22.
+
+**Review:** round=1; sha=6ff025403dc2b463d9a19c45320dc32d0652856a; scope=full; verdict=pass; p1=none
+
+## Comments
+
+- Review round=1 · Standards: aprovado, sem achados acionáveis. Alteração coberta por `ask-rounds`, dentro da região substituída das linhas 8–22 do upstream; restante preservado.
+- Review round=1 · Spec: aprovado, sem achados P1/P2/P3. Conferidos os registros e JSONLs dos cenários main, spec com retomada e reprova custom.
+- Limite observado na prova de retomada: uma confirmação enviada pelo modelo dentro de `eval` expirou em 30 segundos; o modelo releu o registro e repetiu pelo `ask` direto, sem perder decisões nem alterar o resultado. O comportamento pertence à condução do harness, não ao protocolo de persistência.
