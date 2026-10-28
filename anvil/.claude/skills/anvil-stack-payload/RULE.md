@@ -1,19 +1,15 @@
 # Payload — regras sempre carregadas
 
-Este arquivo vira `.claude/rules/payload.md` no projeto. Ele é curto de propósito:
-carrega **só o que se erra sem saber que se está perto do erro**. O ofício —
-como escrever collection, hook, access control, query — está em `reference/`, e
-se carrega quando você sabe que precisa.
+Vira `.claude/rules/payload.md` no projeto. Carrega **só o que se erra sem saber
+que se está perto do erro**; o ofício está em `reference/`. O teste: *se a pessoa
+não abrir a referência, ela erra?* Se sim, é regra.
 
-O teste que decide o que entra aqui: *se a pessoa não abrir a referência, ela
-erra?* Se sim, é regra. Se não, é referência.
-
-## As três ciladas
+## As quatro ciladas
 
 ### 1. Local API ignora access control por padrão
 
-Passar `user` **não** aplica as permissões dele. Sem `overrideAccess: false` você
-escreve um furo de segurança achando que acertou.
+Passar `user` **não** aplica as permissões dele. Sem `overrideAccess: false`, é
+um furo de segurança que parece certo.
 
 ```ts
 // ERRADO — passa o usuário e ignora as permissões dele
@@ -23,15 +19,15 @@ await payload.find({ collection: 'posts', user: someUser })
 await payload.find({ collection: 'posts', user: someUser, overrideAccess: false })
 ```
 
-- `overrideAccess: true` (o padrão) — operação de servidor em que você confia:
-  cron, tarefa de sistema, seed.
-- `overrideAccess: false` — **sempre** que estiver agindo em nome de um usuário:
-  rota de API, webhook, server action.
+`overrideAccess: true`, o padrão, só em operação de servidor confiável (cron,
+seed). Agindo em nome de um usuário (rota, webhook, server action): **sempre**
+`false`.
 
 ### 2. Operação aninhada em hook sem `req` quebra a transação
 
-Sem passar `req`, a operação roda em **outra transação**. Se a de fora falhar, a
-de dentro já foi gravada — e você fica com dado órfão sem nenhum erro aparecendo.
+Sem `req`, a operação roda em **outra transação**: se a de fora falhar, a de
+dentro já gravou, e sobra dado órfão sem erro nenhum. **Toda** operação dentro de
+hook recebe o `req` do hook.
 
 ```ts
 // ERRADO — transação separada, atomicidade perdida
@@ -44,8 +40,6 @@ afterChange: [async ({ doc, req }) => {
   await req.payload.create({ collection: 'audit-log', data: { docId: doc.id }, req })
 }]
 ```
-
-Regra curta: **toda** operação dentro de hook recebe o `req` do hook.
 
 ### 3. Hook que dispara o próprio hook entra em loop
 
@@ -64,6 +58,20 @@ afterChange: [async ({ doc, req, context }) => {
 }]
 ```
 
+### 4. `--no-isolate` com o plugin multi-tenant cria dependência de ordem
+
+Vale para quem usa `@payloadcms/plugin-multi-tenant`. O plugin troca o `access`
+das coleções de tenant **no próprio objeto importado**. Sem isolamento, o arquivo
+de teste que importa a config muta a coleção que o seguinte importa, no mesmo
+worker. A suíte passa na primeira rodada; com `--sequence.shuffle`,
+`access.read` devolve `Promise{…}` em vez de `false`. Suíte pequena pode passar
+sempre, e quebra quando tiver mais arquivos que workers.
+
+- **O arquivo que falha é a vítima**: só importa a coleção. Não o conserte.
+- **Mantenha o isolamento** nos testes que importam a config ou uma coleção.
+- **O controle** é `--sequence.shuffle` **com** isolamento: se sai verde, a
+  fragilidade é da flag.
+
 ## Logger
 
 A assinatura não é a do `console`:
@@ -77,18 +85,17 @@ payload.logger.error({ message: '…', error: err })      // errado: as chaves s
 
 ## Fronteira de edição
 
-Preencha ao gerar a rule do projeto. O padrão, quando não houver decisão
-contrária:
+Preencha ao gerar a rule. O padrão, sem decisão contrária:
 
 - O agente edita `src/collections/`, `src/globals/`, `src/hooks/` e labels.
-- O agente **não** reescreve `docker-compose*`, arquivos de infraestrutura, nem a
-  base do `payload.config.ts` — só acrescenta collections à lista.
-- Toda collection nova é registrada em `payload.config.ts`.
+- O agente **não** reescreve `docker-compose*`, infraestrutura nem a base do
+  `payload.config.ts` — só acrescenta collections, e registra cada uma ali.
 
 ## Fatos deste projeto
 
-Preenchidos por `/anvil-boot` na varredura, ou por `/anvil-bench` na criação. O
-valor entra **sem** backtick — o template já os coloca:
+Preenchidos por `/anvil-boot` ou `/anvil-bench`; o valor entra **sem** backtick.
+O `/anvil-boot` troca a linha do comando de teste por um ponteiro para o
+`anvil.md`:
 
 - **Adapter de banco:** `{{DB_ADAPTER}}` — mongoose · postgres · sqlite
 - **Onde ficam as collections:** `{{COLLECTIONS_PATH}}`
@@ -97,7 +104,7 @@ valor entra **sem** backtick — o template já os coloca:
 
 ## Onde está o resto
 
-Chame a skill `anvil-stack-payload`. O `SKILL.md` dela tem uma tabela de tarefa →
-solução → arquivo, e o `reference/` tem onze documentos: `FIELDS`, `COLLECTIONS`,
-`HOOKS`, `ACCESS-CONTROL` (+ `-ADVANCED`), `QUERIES`, `ENDPOINTS`, `ADAPTERS`,
-`ADVANCED`, `FIELD-TYPE-GUARDS`, `PLUGIN-DEVELOPMENT`.
+Na skill `anvil-stack-payload`: o `SKILL.md` roteia tarefa → arquivo, e o
+`reference/` tem `FIELDS`, `COLLECTIONS`, `HOOKS`, `ACCESS-CONTROL`
+(+ `-ADVANCED`), `QUERIES`, `ENDPOINTS`, `ADAPTERS`, `ADVANCED`,
+`FIELD-TYPE-GUARDS` e `PLUGIN-DEVELOPMENT`.

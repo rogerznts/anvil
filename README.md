@@ -27,9 +27,10 @@ claude
 ```
 
 O boot escreve no projeto só o que é dele: `.claude/rules/`, os perfis em
-`docs/agents/` e a árvore de `docs/`. Sem instalação de usuário, ele mesmo a faz,
-com o mesmo dry-run. Para trocar de versão, `/anvil-update`, de qualquer
-diretório: um update atualiza todos os projetos da máquina de uma vez.
+`docs/agents/` e a árvore de `docs/`, e **propõe** um `.gitattributes` na raiz
+quando acha arquivo gerado pesando no diff da revisão. Sem instalação de usuário,
+ele mesmo a faz, com o mesmo dry-run. Para trocar de versão, `/anvil-update`, de
+qualquer diretório: um update atualiza todos os projetos da máquina de uma vez.
 
 ---
 
@@ -75,8 +76,8 @@ flowchart TD
     subgraph boot ["Boot — uma vez por projeto"]
         direction TB
         B --> B1["garante a instalação<br/>de usuário"]
-        B1 --> B2["varre o projeto"]
-        B2 --> B3[".claude/rules/<br/>project.md · anvil.md"]
+        B1 --> B2["varre o projeto<br/>propõe .gitattributes<br/>se achar gerado pesado"]
+        B2 --> B3[".claude/rules/<br/>project.md · anvil.md<br/>comando com custo medido"]
         B3 --> B4["anvil-docs, sem verbo<br/>escolhe scaffold ou adopt<br/>architecture · discovery<br/>specs · agents"]
         B4 --> B5["anvil-setup<br/>docs/agents/issue-tracker.md"]
         B5 --> B6{"achou<br/>payload.config.ts?"}
@@ -270,7 +271,7 @@ completos estão no
 
 | skill | para quê | origem |
 |---|---|---|
-| `anvil-stack-payload` | o ofício do Payload em 11 arquivos, mais a `RULE.md` com as três ciladas | payloadcms |
+| `anvil-stack-payload` | o ofício do Payload em 11 arquivos, mais a `RULE.md` com as quatro ciladas | payloadcms |
 | `anvil-bench` | leva quem não programa de uma necessidade até a ferramenta rodando | autoral + `unlazy` |
 
 O bench é autoral, mas carrega material de terceiro embaixo de `unlazy/`: o

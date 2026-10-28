@@ -25,7 +25,7 @@ operador na conversa.
    despacho** no `context`: nesse caso, use o `HEAD` de antes do primeiro despacho
    que o supervisor trouxe, e não o atual. Continue do que está no disco, os
    commits desde esse `HEAD` e a árvore suja, preservando ambos, sem `git checkout`,
-   `git stash` nem `git reset`. A verificação antes de cada commit continua valendo.
+   `git stash` nem `git reset`. A verificação dos commits continua valendo.
 3. Decida pelo estado gravado no ticket:
    - algum ticket do `Blocked by` não está `resolved`: pare sem mudar nada;
    - o `## Comments` tem a linha que o piloto grava,
@@ -51,7 +51,12 @@ operador na conversa.
 - No próprio ticket, mexa só no `Status:`, nas linhas `Review:`, nas caixas dos
   critérios e no `## Comments`. O resto do cabeçalho, como o `Blocked by`, fica.
 - Fique no branch atual. Commite nele, sem merge, push, PR nem archive.
-- Rode o comando de verificação das rules antes de cada commit.
+- Verifique pelo comando de verificação das rules, o gate, na cadência de
+  `docs/agents/verification.md`: o commit que marca o ticket `resolved`, inclusive
+  o que o devolve a `resolved` depois de um P1, roda o gate e espera o verde;
+  commit do meio que muda código roda o `laço curto` das rules, se houver, e o
+  gate se não houver; commit só de documento ou de registro, como a linha
+  `Review:`, não roda nada.
 - Onde uma skill manda perguntar ao usuário, a resposta vem do repositório: rules,
   spec, ADRs, código. Se ele não responde e a resposta muda o comportamento pedido,
   registre a pergunta no `## Comments` do ticket, commite o registro e pare sem

@@ -4,6 +4,7 @@
 - Data: 2026-09-21
 - Origem: [gate-sem-criterio-de-parada.md](../../discovery/gate-sem-criterio-de-parada.md), nota de campo do caso medido no `labstorm-idp`
 - Revisto em parte pelo [ADR-0014](./adr-0014-piloto-automatico-fecha-sem-humano.md): no piloto automático, a terceira rodada pode ser aberta por evidência nova de pesquisa, uma vez por ticket e nunca com sinal de laço
+- Termo: aqui, "gate" é a verificação por revisão. Desde o [ADR-0020](./adr-0020-gate-por-ticket-no-commit-que-fecha.md) — o gate roda por ticket, no commit que o fecha —, a palavra nomeia a suíte que fecha o ticket
 
 ## Contexto
 

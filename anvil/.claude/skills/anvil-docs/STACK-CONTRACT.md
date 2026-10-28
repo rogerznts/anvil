@@ -76,7 +76,9 @@ Um template, dois chamadores:
 ## Checklist para uma stack nova
 
 - [ ] `RULE.md` com as ciladas reais, a fronteira do que o agente pode editar, e
-      o comando de teste. Menos de ~80 linhas.
+      o comando de teste. Menos de ~80 linhas. No projeto comum, o `/anvil-boot`
+      troca a linha do comando por um ponteiro para a seção de verificação do
+      `anvil.md`; o bench a preenche com o comando do starter
 - [ ] `reference/` com o ofício, um arquivo por assunto, sem duplicar a rule
 - [ ] `SKILL.md` roteador: tabela tarefa → solução → arquivo. Não repete o que
       está no `reference/`
