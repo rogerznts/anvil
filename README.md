@@ -415,7 +415,8 @@ ours   = anvil/.claude/skills/<nome>/<arquivo>
 ```
 
 O catálogo de adaptações é **fechado**: `rename`, `invocable`, `docs-remap`,
-`decursor`, `tracker-profile`, `keep`/`strip`/`extra`. Se uma mudança não cabe em nenhuma, ela não deveria estar
+`decursor`, `tracker-profile`, `verification-profile`, `ask-rounds`,
+`keep`/`strip`/`extra`. Se uma mudança não cabe em nenhuma, ela não deveria estar
 sendo feita. E há uma lista do que **nunca** é adaptação: traduzir, enxugar,
 uniformizar vocabulário entre skills, corrigir erro do upstream.
 

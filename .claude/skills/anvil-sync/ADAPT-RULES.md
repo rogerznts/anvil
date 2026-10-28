@@ -14,6 +14,7 @@ O catálogo é fechado de propósito. Regra nova exige entrada aqui e um motivo.
 | `decursor` | julgamento | você, lendo o arquivo |
 | `tracker-profile` | julgamento | você, lendo o arquivo |
 | `verification-profile` | julgamento | você, lendo o arquivo |
+| `ask-rounds` | julgamento | você, lendo o arquivo |
 | `keep` / `strip` | declarativa | o script, pelo manifesto |
 
 ---
@@ -208,6 +209,56 @@ smells e os dois eixos. As trocas substantivas são só duas: fixed point e roda
 passam a vir do histórico `Review:`, e o resumo final deixa de ser contagem para
 virar veredito por P1. Num merge em que o upstream mexa nesses seams, a versão do
 anvil ganha.
+
+---
+
+## `ask-rounds` — julgamento
+
+Só no `anvil-grilling`. Troca o formato da rodada: em vez de um bloco de texto
+com todas as perguntas da frontier, o grill pergunta pela ferramenta de pergunta
+do harness, em blocos de até 10, e grava as decisões de cada bloco num arquivo de
+discovery.
+
+O delta fica restrito ao parágrafo "Work the tree in rounds…" e ao bloco "Format
+a round like so":
+
+```diff
+-Ask the whole frontier in one round: number each question and give your
+-recommended answer. Then wait for the user's answers before the next round.
++Before the first block, announce the estimated number of questions; announce
++the new estimate when the tree grows. Ask the frontier in blocks of at most 10
++with the `AskUserQuestion` tool (`request_user_input` in Codex), split into as
++many calls as the harness limit requires. Every question: short title, the
++recommended option first with a one-line why, and a custom option. After each
++block, append the decisions to the discovery file and summarise them in chat,
++one line each.
+
+-Format a round like so:
+-❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs…>
+-➡️ <your recommended answer>
++Without the tool, fall back to one line per question:
++N. <title> — a) … b) … x) write your own  ➡️ <recommended letter>: <why>
++and read answers like `1a 2c 3b` or `3x: <text>`.
++When the frontier is empty, the confirmation the upstream asks for is one last
++prompt with every decision: confirm (recommended), adjust, or custom.
+```
+
+**Por que existe.** O `adr-0021` — o grill pergunta pela ferramenta de pergunta
+do harness — decide que a rodada sai em blocos clicáveis, com estimativa e
+registro em disco. A skill do upstream prescreve o formato de texto
+literalmente, com modelo de saída. Uma rule do projeto que mande outro formato
+contradiz o modelo colado na skill, e diretiva que a skill contradiz perde: é o
+mesmo argumento do `verification-profile` sobre o brief do subagente.
+
+**Por que não é `decursor`.** O `decursor` traduz vocabulário do Cursor para o
+do Claude Code e só vale para skills do `pstack`. Aqui o upstream não nomeia
+ferramenta nenhuma; a mudança é de formato, não de vocabulário.
+
+**Estreita.** Árvore de decisões, frontier, fatos buscados por subagente e
+critério de término ficam verbatim, e o resto do arquivo também. O `anvil-grill`
+e o `anvil-grill-me` só chamam o `anvil-grilling` e não declaram a regra. Num
+merge em que o upstream mexa nesse seam, a versão do anvil ganha. Se o upstream
+adotar a mudança, a regra sai do manifesto no sync seguinte.
 
 ---
 

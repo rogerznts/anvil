@@ -3,6 +3,7 @@
 - Status: aceito
 - Data: 2026-08-28
 - Contexto: o anvil curadoriza 33 skills de quatro repositórios upstream e precisa re-sincronizá-las quando eles andarem.
+- Exceção nomeada no [ADR-0021](./adr-0021-grill-pergunta-pela-ferramenta-do-harness.md): o formato da rodada do `anvil-grilling` muda no arquivo da skill, pela regra `ask-rounds`
 
 ## Contexto
 

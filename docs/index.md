@@ -73,7 +73,7 @@ Nenhuma.
   piloto automático, e a herança do mosk.
 - **ADRs**
   - [adr-0001](./architecture/adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md)
-    — skills vendorizadas seguem o padrão original; o anvil impõe só o caminho em `docs/`
+    — skills vendorizadas seguem o padrão original; o anvil impõe só o caminho em `docs/`; **exceção nomeada no adr-0021**
   - [adr-0002](./architecture/adr/adr-0002-organizacao-documental-e-um-perfil-de-tracker.md)
     — a organização documental é um perfil de issue tracker
   - [adr-0003](./architecture/adr/adr-0003-sem-maquina-de-fases.md)
@@ -112,6 +112,8 @@ Nenhuma.
     — a auditoria de segurança é a skill da Cloudflare, vendorizada; o versionado é só o registro da auditoria
   - [adr-0020](./architecture/adr/adr-0020-gate-por-ticket-no-commit-que-fecha.md)
     — o gate roda por ticket, no commit que o fecha; commit do meio roda o laço curto se mudar código
+  - [adr-0021](./architecture/adr/adr-0021-grill-pergunta-pela-ferramenta-do-harness.md)
+    — o grill pergunta pela ferramenta de pergunta do harness, em blocos de até 10; exceção nomeada ao adr-0001, pela regra `ask-rounds`
 
 ### Project
 

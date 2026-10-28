@@ -81,7 +81,8 @@ do launcher atualiza os projetos sem tocar na fonte dev.
 
 A cópia no payload não é arquivo livre: tem pin e registro de adaptação. O
 catálogo é **fechado** — `rename`, `invocable`, `docs-remap`, `decursor`,
-`tracker-profile`, `keep`, `strip`, `extra`. Mudança que não cabe em nenhuma dessas não deveria estar sendo feita.
+`tracker-profile`, `verification-profile`, `ask-rounds`, `keep`, `strip`,
+`extra`. Mudança que não cabe em nenhuma dessas não deveria estar sendo feita.
 
 Nunca são adaptação: traduzir, enxugar, uniformizar vocabulário entre skills,
 corrigir erro do upstream.

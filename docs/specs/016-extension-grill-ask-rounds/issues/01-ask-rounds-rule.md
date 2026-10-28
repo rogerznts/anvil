@@ -4,10 +4,10 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] O catálogo lista `ask-rounds` na tabela, como julgamento aplicado à mão, e tem a seção da regra com o porquê, o diff do seam, o escopo estreito e a precedência do anvil no merge.
-- [ ] O manifesto declara `ask-rounds` no `adapt:` do `anvil-grilling`, e em nenhuma outra skill.
-- [ ] Num `sync` do `anvil-grilling` em cópia descartável, o `vendor-sync.sh` lista `ask-rounds` em "FALTA APLICAR À MÃO". Numa resolução de conflito, lista em "revise as regras de julgamento". O comentário de cabeçalho do script e o `SKILL.md` do `anvil-sync` citam a regra junto das outras de julgamento.
-- [ ] O ADR novo existe com status aceito. Ele nomeia a exceção ao `ADR-0001` sem revogá-lo e explica por que uma rule do projeto não basta. O índice de `docs/` e o `ADR-0001` apontam para ele, se já listam ADRs.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] O catálogo lista `ask-rounds` na tabela, como julgamento aplicado à mão, e tem a seção da regra com o porquê, o diff do seam, o escopo estreito e a precedência do anvil no merge.
+- [x] O manifesto declara `ask-rounds` no `adapt:` do `anvil-grilling`, e em nenhuma outra skill.
+- [x] Num `sync` do `anvil-grilling` em cópia descartável, o `vendor-sync.sh` lista `ask-rounds` em "FALTA APLICAR À MÃO". Numa resolução de conflito, lista em "revise as regras de julgamento". O comentário de cabeçalho do script e o `SKILL.md` do `anvil-sync` citam a regra junto das outras de julgamento.
+- [x] O ADR novo existe com status aceito. Ele nomeia a exceção ao `ADR-0001` sem revogá-lo e explica por que uma rule do projeto não basta. O índice de `docs/` e o `ADR-0001` apontam para ele, se já listam ADRs.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.

@@ -41,8 +41,9 @@ bash $S stats               # a métrica do README: linhas nossas contra o pin
 ```
 
 O script faz o **mecânico**: mover bytes, rodar `merge-file`, aplicar o `rename`,
-gravar o pin. Você faz o **julgamento**: `docs-remap`, `decursor` e `tracker-profile`, e resolver
-conflito. O script sinaliza o que falta, sempre.
+gravar o pin. Você faz o **julgamento**: `docs-remap`, `decursor`,
+`tracker-profile`, `verification-profile` e `ask-rounds`, e resolver conflito. O
+script sinaliza o que falta, sempre.
 
 ## Helper de prova
 

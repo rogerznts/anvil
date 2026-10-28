@@ -21,8 +21,8 @@
 #
 # O script faz o que é MECÂNICO: mover bytes, rodar merge-file, aplicar o
 # `rename` e o `invocable`. As regras de julgamento (`docs-remap`, `decursor`,
-# `tracker-profile`, `verification-profile`) ele apenas SINALIZA; quem aplica é a
-# skill anvil-sync, que sabe ler o que mudou.
+# `tracker-profile`, `verification-profile`, `ask-rounds`) ele apenas SINALIZA;
+# quem aplica é a skill anvil-sync, que sabe ler o que mudou.
 
 set -uo pipefail
 
@@ -298,6 +298,7 @@ cmd_vendor() {
     case ",$adapt," in *,decursor,*)   j="$j decursor" ;; esac
     case ",$adapt," in *,tracker-profile,*) j="$j tracker-profile" ;; esac
     case ",$adapt," in *,verification-profile,*) j="$j verification-profile" ;; esac
+    case ",$adapt," in *,ask-rounds,*) j="$j ask-rounds" ;; esac
     if [ -n "$j" ]; then
         echo
         echo "  FALTA APLICAR À MÃO:$j"
@@ -384,6 +385,7 @@ update_one() {
         case ",$adapt," in *,decursor,*)   j="$j decursor" ;; esac
         case ",$adapt," in *,tracker-profile,*) j="$j tracker-profile" ;; esac
         case ",$adapt," in *,verification-profile,*) j="$j verification-profile" ;; esac
+        case ",$adapt," in *,ask-rounds,*) j="$j ask-rounds" ;; esac
         [ -n "$j" ] && echo "    revise as regras de julgamento:$j"
     else
         echo "    pin NÃO atualizado — resolva os marcadores e rode 'resolved $name'."
