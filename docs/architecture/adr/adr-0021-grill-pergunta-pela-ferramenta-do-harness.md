@@ -4,6 +4,7 @@
 - Data: 2026-10-28
 - Origem: [spec 016](../../specs/archive/016-extension-grill-ask-rounds/spec.md)
 - Exceção nomeada ao [ADR-0001](./adr-0001-skills-vendorizadas-seguem-o-padrao-original.md) — as skills vendorizadas seguem o padrão original —, que continua valendo
+- Revisto em parte pelo [ADR-0024](./adr-0024-bench-sai-do-anvil.md): o `anvil-bench` sai, e deixa de estar entre as skills que carregam o `anvil-grilling`
 
 ## Contexto
 

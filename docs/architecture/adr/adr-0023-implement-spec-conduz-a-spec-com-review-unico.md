@@ -8,6 +8,7 @@
 - Revê em parte o [ADR-0012](./adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md): o paralelo vem da `anvil-implement-spec` com a isolação do omp, sem pedido
 - Revê em parte o [ADR-0014](./adr-0014-piloto-automatico-fecha-sem-humano.md): o despacho e o `PASS` do piloto automático
 - Revê em parte o [ADR-0020](./adr-0020-gate-por-ticket-no-commit-que-fecha.md): o gate deixa de ser por ticket no fluxo da spec
+- Revisto em parte pelo [ADR-0024](./adr-0024-bench-sai-do-anvil.md): o bench sai; a `anvil-implement-spec` não serve mais a ele, e o `PASS` do piloto é sempre o comando de verificação
 
 ## Contexto
 

@@ -2,6 +2,7 @@
 
 - Status: aceito
 - Data: 2026-08-28
+- Revisto em parte pelo [ADR-0024](./adr-0024-bench-sai-do-anvil.md): o bench sai, e o contrato de stack fica com três capacidades — ciladas e fronteira, ofício, comando de teste
 
 ## Contexto
 
