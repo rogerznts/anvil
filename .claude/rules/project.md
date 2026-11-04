@@ -109,6 +109,12 @@ Os cenários de infraestrutura — degit, corrida do `new-spec.sh`,
 `reset-install.sh`, guarda de merge, boot, adopt, scaffold, lock — são manuais e
 vivem em `workspace/01-…08-`, fora do git de propósito.
 
+As provas no harness real usam o modelo mais recente de cada família que o
+harness oferece — hoje `claude-sonnet-5-5` como padrão, `claude-haiku-5-5` e
+`claude-opus-5-5` —, pelo ID explícito, nunca pelo alias `-latest`: o
+`proof_verdict` compara o modelo de cada mensagem com o pedido. Saiu modelo
+novo, o padrão dos scripts de prova muda junto.
+
 ## Fluxo git
 
 Trabalho com spec vai num branch `{tipo}/{NNN}-{nome}`. Fecha com
