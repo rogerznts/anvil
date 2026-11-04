@@ -33,6 +33,16 @@ AGENTS="$ROOT/anvil/.claude/agents"
 
 die() { printf 'erro: %s\n' "$*" >&2; exit 1; }
 
+# HEAD do submodule. Submodule nao inicializado e uma pasta vazia, e o `git -C`
+# nela cai no repositorio do anvil: o HEAD lido seria o do anvil, e o `pull`
+# faria fetch, checkout e pull no anvil. Sai 1 quando a pasta nao e a raiz dele.
+sub_head() {
+    local dir="$ROOT/$1" top
+    top="$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null)" || return 1
+    [ "$(cd "$top" && pwd -P)" = "$(cd "$dir" && pwd -P)" ] || return 1
+    git -C "$dir" rev-parse HEAD
+}
+
 [ -f "$MANIFEST" ] || die "manifesto não encontrado em $MANIFEST"
 command -v python3 >/dev/null 2>&1 || die "python3 é necessário para ler o manifesto"
 python3 -c 'import yaml' 2>/dev/null || die "PyYAML é necessário: pip install pyyaml"
@@ -203,9 +213,9 @@ cmd_status() {
             printf '%-26s %-9s %-10s %s\n' "$name" "$state" '-' "$path"
             continue
         fi
-        head="$(git -C "$ROOT/$sub" rev-parse HEAD 2>/dev/null)"
+        head="$(sub_head "$sub")"
         if [ -z "$head" ]; then
-            printf '%-26s %-9s %-10s %s\n' "$name" "$state" 'ERRO' "submodule $sub ausente"
+            printf '%-26s %-9s %-10s %s\n' "$name" "$state" 'ERRO' "submodule $sub ausente ou não inicializado"
             continue
         fi
         if [ "$head" = "$pin" ]; then
@@ -239,6 +249,10 @@ cmd_pull() {
     local sub
     for sub in $(manifest_rows | cut -d$'\x1f' -f3 | sort -u); do
         [ -n "$sub" ] || continue
+        if ! sub_head "$sub" >/dev/null; then
+            printf '%s: não inicializado; rode git submodule update --init %s\n' "$sub" "$sub"
+            continue
+        fi
         printf '%s: %s -> ' "$sub" "$(git -C "$ROOT/$sub" rev-parse --short HEAD)"
         git -C "$ROOT/$sub" fetch -q origin 2>/dev/null
         git -C "$ROOT/$sub" checkout -q "$(git -C "$ROOT/$sub" rev-parse --abbrev-ref origin/HEAD | sed 's|^origin/||')" 2>/dev/null
@@ -259,7 +273,7 @@ cmd_vendor() {
     IFS=$'\x1f' read -r _ state sub path _ adapt keep strip extra <<< "$row"
     [ "$state" = "planned" ] || die "'$name' já está vendorizada. Use 'update $name'."
 
-    head="$(git -C "$ROOT/$sub" rev-parse HEAD)" || die "submodule $sub ausente"
+    head="$(sub_head "$sub")" || die "submodule $sub ausente ou não inicializado"
     dest="$PAYLOAD/$name"
 
     # Destino existente passa SO quando tudo que ja esta la e `keep`. E o caso
@@ -315,7 +329,7 @@ update_one() {
     IFS=$'\x1f' read -r _ state sub path pin adapt keep strip extra <<< "$row"
     [ "$state" = "vendored" ] || { echo "  $name: planned, use 'vendor'"; return 0; }
 
-    head="$(git -C "$ROOT/$sub" rev-parse HEAD)" || { echo "  $name: submodule ausente"; return 1; }
+    head="$(sub_head "$sub")" || { echo "  $name: submodule ausente ou não inicializado"; return 1; }
     dest="$PAYLOAD/$name"
     [ -d "$dest" ] || { echo "  $name: $dest não existe"; return 1; }
 
@@ -416,7 +430,7 @@ cmd_resolved() {
     left="$(grep -rlE '^(<<<<<<<|>>>>>>>) ' "$dest" 2>/dev/null)"
     [ -z "$left" ] || die "ainda há marcadores de conflito em:
 $left"
-    head="$(git -C "$ROOT/$sub" rev-parse HEAD)" || die "submodule $sub ausente"
+    head="$(sub_head "$sub")" || die "submodule $sub ausente ou não inicializado"
     case ",$adapt," in *,rename,*) apply_rename "$dest" "$name" ;; esac
     case ",$adapt," in *,invocable,*) apply_invocable "$dest" ;; esac
     set_pin "$name" "$head" || die "falha ao gravar o pin"
@@ -900,7 +914,7 @@ cmd_stats() {
 
         # Sem o pin, todo `git show` falha e cada arquivo cairia em "sem par":
         # o número sairia errado sem falha nenhuma.
-        if ! git -C "$ROOT/$sub" cat-file -e "$pin^{commit}" 2>/dev/null; then
+        if ! sub_head "$sub" >/dev/null || ! git -C "$ROOT/$sub" cat-file -e "$pin^{commit}" 2>/dev/null; then
             printf '%-26s ERRO submodule %s sem o pin %s\n' "$name" "$sub" "${pin:0:7}"
             erros=$((erros + 1)); continue
         fi
