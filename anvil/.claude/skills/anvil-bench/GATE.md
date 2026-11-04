@@ -18,10 +18,10 @@ quality_score: 90             # 0-100, calculado
 score_history: [61, 68, 90]   # a série, do primeiro gate ao atual
 status_reason: "uma ou duas frases sobre o veredito"
 updated: "2026-08-29T14:30:00Z"
-evidence_ref: qa-notes.md     # caminho relativo dentro da spec
+evidence_ref: gates.md       # o ledger da spec, relativo à pasta dela
 
 top_issues:
-  - id: QA-1                  # QA-# para gate, SEC-# para segurança
+  - id: QA-1                  # gates:<id> para gate caído, QA-# para P1 do review, SEC-# para segurança
     severity: high            # low | medium | high
     title: "Login aceita tentativas sem limite"
     finding: "Nenhum rate limit no endpoint de login (auth/login.ts:42-68)"
@@ -108,11 +108,18 @@ ledger que você não viu reexecutar.
 ou o piloto quando ele é o supervisor — escreve `docs/specs/<pasta>/gate.yaml` no
 formato de "O arquivo":
 
-- `gate`: `FAIL` quando o checker derrubou um gate com `CHECK:`; `CONCERNS`
-  quando a execução da `anvil-implement-spec` parou com P1 aberto na rodada 2,
-  ou quando só falta gate manual; `PASS` quando nenhuma das duas; `WAIVED` só com
-  os quatro campos de waiver. O checker decide `FAIL` e `PASS`; o `CONCERNS` vem
-  do relatório da execução;
+- `gate`, nesta ordem, e o primeiro que vale decide:
+  - `FAIL` quando o checker derrubou um gate com `CHECK:`, nesta spec ou numa
+    fechada, ou quando não rodou: saiu sem a linha `exit:`, com `refusal:` ou com
+    código fora de `0` e `1`;
+  - `CONCERNS` quando a execução da `anvil-implement-spec` parou com P1 aberto na
+    rodada 2, ou quando o ledger desta spec tem gate manual aberto;
+  - `PASS` só com `exit: 0` e `ALL MET`, ou com `exit: 1` em que todo id abaixo
+    de `UNMET:` é de gate manual de spec fechada;
+  - `WAIVED` só com os quatro campos de waiver.
+
+  O checker decide `FAIL` e `PASS`; o `CONCERNS` vem do relatório da execução e
+  do ledger;
 - `quality_score` pela contagem de "O score", anexado ao `score_history` que o
   arquivo já trazia;
 - `status_reason` com o `exit:` e a linha final do checker, e o P1 da rodada 2,
@@ -127,7 +134,7 @@ Commite o arquivo no branch da spec, antes de entregar ou de seguir:
 
 ```bash
 git add docs/specs/<pasta>/gate.yaml
-git commit -m "docs(spec): record the gate of spec <número>"
+git commit -m "docs(spec): record the gate of spec <number>"
 ```
 
 O `--reverify` do merge local, sob o piloto, não grava: ele só decide o merge, e a
