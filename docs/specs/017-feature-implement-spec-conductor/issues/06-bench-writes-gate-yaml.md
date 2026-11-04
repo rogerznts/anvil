@@ -7,6 +7,7 @@
 **Status:** claimed
 **Review:** round=1; sha=84d32f9; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=803ffe5; scope=diff:7e50b8c..803ffe5; verdict=fail; p1=open
+**Review:** round=3; sha=2e88b6b; scope=diff:745c504..2e88b6b; verdict=fail; p1=open
 
 - [x] O `GATE.md` e a fase Construir do `anvil-bench` dizem quando escrever o `gate.yaml`, com o quê e com qual commit.
 - [x] Num projeto do bench com uma entrada pequena, chamado direto no omp, o `gate.yaml` existe no branch da spec depois do `--reverify`, commitado, com o veredito igual ao da saída do checker e o score calculado pela contagem.
@@ -25,3 +26,7 @@
 - Review round=2 · P2 (Spec): `FAIL` e `CONCERNS` podem valer juntos sem precedência — dois leitores gravam vereditos e scores diferentes para a mesma volta.
 - Review round=2 · P2 (Spec): o exemplo de "O arquivo" ainda diz `QA-#` para gate e `evidence_ref: qa-notes.md`, contra a regra (`gates:<id>`, `gates.md`) — quem copia o exemplo grava ids que não batem com o checker.
 - Review round=2 · P3 (Standards): a mensagem de commit do exemplo saiu como `spec <número>`; as mensagens de commit são em inglês.
+- Review round=3, declarada pelo operador · P1 (Spec): `exit: 1` sem a linha `UNMET:` — container parado, `docker compose exec` que falha — cabia na regra do `PASS` por vacuidade, e o arquivo aprovaria um `--reverify` que não rodou. Corrigido em `a422a7c`, que define o `PASS` só pelas duas saídas limpas do checker e manda todo o resto para `FAIL`, ainda sem rodada que meça a correção.
+- Review round=3 · P2 (Spec): o `GATE.md` citava `refusal:`, que o `gate-check.mjs` não imprime; e o exemplo de `score_history` não era alcançável pela fórmula. Corrigidos em `a422a7c`.
+- Review round=3 · P2 (Spec), anterior ao ticket: "O score" não diz se `FAILs` e `CONCERNS` contam vereditos ou gates — dois leitores calculam scores diferentes para a mesma volta.
+- Prova `out-7`, sobre `2e88b6b`: o arquivo foi gravado e commitado depois do `--reverify`, com `evidence_ref: gates.md`; mas a sessão do bench gravou uma linha `Review:` com P1 aberto na rodada 2, descartou o P1 por conta própria, gravou `gate: PASS` e marcou o ticket `resolved` — pela regra seria `CONCERNS`, com a spec parada. O `updated` saiu com horário anterior ao `--reverify`. A causa não é o texto do `GATE.md`: o condutor descarta achado dos eixos, regra que o `anvil-implementer` tinha e que saiu com ele.
