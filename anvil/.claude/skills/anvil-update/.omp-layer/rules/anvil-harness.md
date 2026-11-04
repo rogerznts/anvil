@@ -18,3 +18,31 @@ assim o que elas mandam fazer:
 - `.claude/rules/*.md`, que o Claude Code carrega sozinho e o omp não: antes da
   primeira resposta da sessão, inclusive quando ela começa por `/skill:`, leia
   cada arquivo com `read`. É deles que vem o idioma de comunicação.
+
+## A `anvil-implement-spec` no omp
+
+O worktree por implementer e o merger da `anvil-implement-spec` são primitivas do
+omp, e não passos a executar à mão. Antes do primeiro despacho, leia o modo da
+isolação na raiz do projeto, com `omp config get task.isolation.enabled` e
+`omp config get task.isolation.merge`.
+
+- **Isolação ligada no modo branch** (`true` e `branch`): "each in its own
+  worktree on its own branch" é o `task` com `isolated: true`, um implementer por
+  ticket do frontier. O omp copia o checkout a partir do `HEAD` do branch da spec
+  e commita o trabalho num branch `omp/task/<id>`. O "merger subagent" é a
+  integração do omp: quando um implementer termina, o omp faz o cherry-pick dos
+  commits dele no branch da spec, um por vez. Não despache merger. O implementer
+  não faz merge da ponta do branch de integração antes de reportar: o omp aplica
+  os commits sobre a ponta atual, e um commit de merge entraria no cherry-pick.
+- **Sem o modo branch** (isolação desligada, ou ligada no modo `patch`): os
+  implementers rodam em série, um por vez, sem `isolated`, na árvore do branch da
+  spec, e commitam direto nele. Não há worktree a conferir, merge a fazer nem
+  worktree a limpar.
+- **Conflito na integração.** O resultado do `task` traz `Branch merge failed:
+  omp/task/<id>`. O ticket não entrou: ele volta ao frontier e é despachado de
+  novo, num implementer novo, sobre o branch da spec que já tem o que entrou. Os
+  commits dele anteriores ao conflito podem já estar no branch da spec, e o
+  trabalho inteiro fica no `omp/task/<id>`. Não resolva o conflito à mão.
+- **Limpeza.** O omp descarta a cópia isolada. Os branches `omp/task/*` já
+  integrados saem com `git branch -D`; o de um trabalho não integrado fica, e o
+  relatório o nomeia.

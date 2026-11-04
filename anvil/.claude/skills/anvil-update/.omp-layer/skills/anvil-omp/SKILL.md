@@ -13,13 +13,15 @@ a ela. Sem pergunta, mostre um resumo curto de cada seção.
 ## O que é
 
 O anvil roda em três harnesses: Claude Code, Codex e omp. Nos três as skills são as
-mesmas, e só no omp o fluxo pode ser conduzido, porque o omp tem `task`, agentes
-próprios e sessões filhas que nascem sem a conversa do pai.
+mesmas, e nos três a `anvil-implement-spec` conduz a spec. Só no omp o resto do
+fluxo pode ser conduzido — o planejamento e o piloto automático —, porque o omp
+tem `task`, agentes próprios e sessões filhas que nascem sem a conversa do pai.
 
 A camada omp é o que o anvil instala em `~/.omp/agent/`, uma vez por usuário, para
 isso: o hook que traz a guarda de merge para o omp, a rule que traduz o vocabulário
-do Claude Code nas skills, a rule com as diretivas do anvil, o agente que
-implementa um ticket, e as skills `anvil-plan`, `anvil-run`, `anvil-auto` e esta.
+do Claude Code nas skills, inclusive o worktree e o merge da `anvil-implement-spec`,
+a rule com as diretivas do anvil, o agente que implementa um ticket, e as skills
+`anvil-plan`, `anvil-run`, `anvil-auto` e esta.
 As skills do payload chegam ao omp pelo espelho `~/.agents/skills`. A lista exata
 do que está instalado são as linhas `omp:` do `~/.claude/anvil.lock`, uma por
 arquivo, com o caminho relativo a `~/.omp/agent/`.
@@ -56,6 +58,15 @@ tocado.
 - `/skill:anvil-plan <pedido>` conduz o planejamento na mesma janela: grill, spec e
   tickets. Entre uma etapa e outra propõe a próxima, ou um desvio como research ou
   prototype, e só carrega com o seu sim. No fim, indica `/clear` e o `anvil-run`.
+- `/skill:anvil-implement-spec` é o condutor da spec: no branch dela, despacha um
+  implementer novo por ticket do frontier, cada um chamando a `anvil-tdd`, junta
+  o trabalho no branch da spec, roda a `anvil-code-review` uma vez sobre o diff
+  da spec inteira, a partir do ponto em que o branch saiu do branch base, e põe um
+  implementer novo para corrigir tudo. Uma rodada 2 mede só o diff da correção:
+  P1 aberto nela para a execução, com o P1 no relatório, e os tickets não fecham.
+  Sem P1, fecha cada ticket com `Status: resolved`. Nenhum ticket ganha linha
+  `Review:`. Com a isolação no modo branch, os tickets independentes rodam ao
+  mesmo tempo; sem ela, um por vez. Ver "Isolação".
 - `/skill:anvil-run [NNN] [--parallel N]` implementa a spec ticket a ticket, cada
   ticket num implementer de contexto novo, com o review em dois eixos. Em série
   por padrão; com `--parallel N` e a isolação no modo branch, em levas de até N
@@ -189,6 +200,19 @@ no mesmo checkout é erro de operação, e nada o impede.
 
 ## Isolação
 
+A `/skill:anvil-implement-spec`, o condutor da spec, lê o modo da isolação antes
+do primeiro despacho, com `omp config get task.isolation.enabled` e
+`omp config get task.isolation.merge` na raiz do projeto, e a rule
+`anvil-harness` traduz o que a skill pede. Com a isolação no modo branch, o
+worktree e o branch de cada implementer são o `task` com `isolated: true`, e o
+"merger subagent" da skill é a integração do omp: o cherry-pick dos commits de
+cada implementer no branch da spec, quando ele termina. Os tickets do frontier
+rodam ao mesmo tempo, sem pedido. Sem isolação, ou fora do modo branch, os
+implementers rodam um por vez, na árvore do branch da spec. Um ticket cujo
+cherry-pick conflitou volta ao frontier e é despachado de novo sobre o que já
+entrou, e o trabalho dele fica no `omp/task/<id>`. A configuração que liga o modo
+branch é a do bloco abaixo.
+
 Com a isolação de tarefas do omp ligada, o `/skill:anvil-run` despacha cada
 implementer com `isolated: true`. Ele trabalha numa cópia isolada do checkout, e o
 omp traz os commits dele para o branch da spec. O `anvil-run` não adivinha o modo:
@@ -244,9 +268,12 @@ série. O relatório traz quantos tickets estavam prontos a cada rodada, na linh
 
 ## O que continua manual no Claude Code e no Codex
 
-Nos dois, a lista de skills é a mesma de sempre e nenhum comando acima existe. O
-fluxo segue à mão: `/anvil-grill`, `/anvil-to-spec`, `/anvil-to-tickets`, e depois
-uma sessão de `/anvil-implement` por ticket, um de cada vez. O `/anvil-bench`
+Nos dois, a lista de skills é a mesma de sempre, e dos comandos acima só existe a
+`/anvil-implement-spec`, que vem do payload e não da camada. O planejamento segue à
+mão: `/anvil-grill`, `/anvil-to-spec`, `/anvil-to-tickets`, e depois a
+`/anvil-implement-spec` conduz a spec com os subagentes e os worktrees do próprio
+harness, com o mesmo review único. O `/anvil-implement` fica para o ticket
+avulso, com o review por ticket. O `/anvil-bench`
 chamado direto, no Claude Code ou no omp sem o piloto, constrói uma entrada do
 roteiro, a que está em andamento ou, sem ela, a do `next:`, e para no fim da
 construção, com o archive e o merge listados na entrega para você. O Claude Code
@@ -259,8 +286,9 @@ pelo espelho `~/.agents/skills` e não tem guarda.
 - O `eval` escapa da guarda. O hook só intercepta o tool `bash`, e um `git merge`
   disparado de dentro do `eval` passa sem conferência. O que se digita no terminal
   também.
-- O frontier é em série sem isolação. O paralelo existe sob pedido,
-  `--parallel N`, e só com a isolação no modo branch.
+- O frontier é em série sem isolação. Na `anvil-implement-spec`, o paralelo vem
+  com a isolação no modo branch, sem pedido; na `anvil-run`, sob pedido,
+  `--parallel N`, e também só com ela.
 - O `task` não escolhe modelo por chamada. O implementer herda o modelo da sessão,
   e as linhas `runners`, `how-explorer`, `how-explainer`, `cross-judge`, `swarm workers` e `interrogate reviewers` do `.claude/rules/anvil.md`
   não têm efeito no omp. Para outro modelo, use `task.agentModelOverrides` na
