@@ -6,6 +6,7 @@
   alternativa "frontier em paralelo com worktree isolado" entra, sob pedido e só com
   a isolação do omp
 - Origem: spec 004, ticket 09 (`docs/specs/archive/004-extension-omp-layer-hardening/`)
+- Revisto em parte pelo [ADR-0023](./adr-0023-implement-spec-conduz-a-spec-com-review-unico.md): o paralelo vem da `anvil-implement-spec`, sem pedido, e continua só com a isolação no modo branch
 
 ## Contexto
 

@@ -92,15 +92,15 @@ Nenhuma.
   - [adr-0009](./architecture/adr/adr-0009-toolkit-instalado-fica-versionado.md)
     — o toolkit instalado fica versionado; o boot não escreve no `.gitignore`; **revogado pelo adr-0013**
   - [adr-0010](./architecture/adr/adr-0010-verificacao-tem-criterio-de-parada.md)
-    — a verificação tem critério de parada, e ele é ausência de P1
+    — a verificação tem critério de parada, e ele é ausência de P1; **revisto em parte pelo adr-0023**
   - [adr-0011](./architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md)
-    — o omp é harness de primeira classe, com camada própria; a orquestração volta só nela; **emendado pelo adr-0013**
+    — o omp é harness de primeira classe, com camada própria; a orquestração volta só nela; **emendado pelo adr-0013**; **revisto em parte pelo adr-0023**
   - [adr-0012](./architecture/adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md)
-    — o frontier roda em paralelo sob pedido, só com a isolação do omp no modo branch
+    — o frontier roda em paralelo sob pedido, só com a isolação do omp no modo branch; **revisto em parte pelo adr-0023**
   - [adr-0013](./architecture/adr/adr-0013-toolkit-instalado-por-usuario.md)
     — o toolkit é instalado uma vez por usuário; o projeto fica só com rules e `docs/`
   - [adr-0014](./architecture/adr/adr-0014-piloto-automatico-fecha-sem-humano.md)
-    — o piloto automático leva o roteiro ao fechamento sem humano; revê em parte o adr-0010 e o adr-0011; **revisto em parte pelo adr-0015**
+    — o piloto automático leva o roteiro ao fechamento sem humano; revê em parte o adr-0010 e o adr-0011; **revisto em parte pelo adr-0015 e pelo adr-0023**
   - [adr-0015](./architecture/adr/adr-0015-branch-base-declarado-ou-detectado.md)
     — um branch base só, declarado nas rules ou detectado, de onde todo trabalho sai e para onde volta
   - [adr-0016](./architecture/adr/adr-0016-skills-de-git-servem-gitea-e-github.md)
@@ -112,11 +112,13 @@ Nenhuma.
   - [adr-0019](./architecture/adr/adr-0019-auditoria-de-seguranca-vendorizada-da-cloudflare.md)
     — a auditoria de segurança é a skill da Cloudflare, vendorizada; o versionado é só o registro da auditoria
   - [adr-0020](./architecture/adr/adr-0020-gate-por-ticket-no-commit-que-fecha.md)
-    — o gate roda por ticket, no commit que o fecha; commit do meio roda o laço curto se mudar código
+    — o gate roda por ticket, no commit que o fecha; commit do meio roda o laço curto se mudar código; **revisto em parte pelo adr-0023**
   - [adr-0021](./architecture/adr/adr-0021-grill-pergunta-pela-ferramenta-do-harness.md)
     — o grill pergunta pela ferramenta de pergunta do harness, em blocos de até 10; exceção nomeada ao adr-0001, pela regra `ask-rounds`
   - [adr-0022](./architecture/adr/adr-0022-ui-so-com-hallmark-e-taste.md)
     — a camada de UI fica com dois métodos, hallmark e taste; o redesign e os quatro presets saem com o upstream; revê em parte o adr-0005
+  - [adr-0023](./architecture/adr/adr-0023-implement-spec-conduz-a-spec-com-review-unico.md)
+    — a `implement-spec` conduz a spec nos três harnesses, com um review só no fim e rodada 2 sobre a correção; o `PASS` não lê `Review:`; revê em parte os adr-0010, adr-0011, adr-0012, adr-0014 e adr-0020
 
 ### Project
 

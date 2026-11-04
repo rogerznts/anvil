@@ -6,6 +6,7 @@
 - Revisto em parte pelo [ADR-0012](./adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md): o frontier em paralelo entra, sob pedido e com a isolação do omp
 - Emendado pelo [ADR-0013](./adr-0013-toolkit-instalado-por-usuario.md): a camada omp vai para `~/.omp/agent/`, pegajosa pela linha `omp:` do lock de usuário, e o espelho vai para `~/.agents/skills`
 - Revisto em parte pelo [ADR-0014](./adr-0014-piloto-automatico-fecha-sem-humano.md): o `anvil-auto` responde às pausas e fecha a spec sem humano, só com `PASS`
+- Revisto em parte pelo [ADR-0023](./adr-0023-implement-spec-conduz-a-spec-com-review-unico.md): o condutor da spec passa a ser a `anvil-implement-spec`, do payload, e a camada só a traduz para o omp
 
 ## Contexto
 

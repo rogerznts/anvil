@@ -10,7 +10,7 @@
 - [ ] O review roda uma vez sobre o diff da spec inteira, e nenhum ticket ganha linha `Review:`.
 - [ ] Com um P1 plantado que a correção não resolve, a execução termina com o P1 da rodada 2 no relatório e não marca a spec como pronta.
 - [ ] Sem a isolação no modo branch, os implementers rodam um por vez na árvore da spec.
-- [ ] O ADR novo existe, aceito, e os cinco ADRs revistos apontam para ele; `docs/index.md` o lista.
-- [ ] `docs/agents/verification.md` e o template do `anvil-docs` descrevem o review único da spec e o review por ticket do `anvil-implement` avulso.
-- [ ] O delta da `implement-spec` contra o pin fica restrito à rodada 2, declarado como `verification-profile` no manifesto e no catálogo.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] O ADR novo existe, aceito, e os cinco ADRs revistos apontam para ele; `docs/index.md` o lista.
+- [x] `docs/agents/verification.md` e o template do `anvil-docs` descrevem o review único da spec e o review por ticket do `anvil-implement` avulso.
+- [x] O delta da `implement-spec` contra o pin fica restrito à rodada 2, declarado como `verification-profile` no manifesto e no catálogo.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
