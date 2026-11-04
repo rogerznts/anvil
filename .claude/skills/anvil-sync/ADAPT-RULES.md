@@ -202,11 +202,13 @@ no passo do review:
 ```diff
 -7. Once all tickets are complete, call the Skill tool with `anvil-code-review` on the integration branch. Fix all issues …
 +7. … on the integration branch, with the point where it left the base branch
-+(`git merge-base <base> HEAD`) as the fixed point. Fix all issues … If the fix
-+changed anything, call `anvil-code-review` again as round 2, with the tip the
-+first review measured as the fixed point and its findings to remeasure, so it
-+reads only the fix's diff. Per `docs/agents/verification.md`, a P1 still open in
-+round 2 stops the run before step 8: report it. Write no `Review:` line.
++(`git merge-base <base> HEAD`) as the fixed point. Fix all issues … Then call
++`anvil-code-review` again as round 2, with the tip the first review measured as
++the fixed point and its findings to remeasure, so it reads only the fix's diff;
++a fix that changed nothing leaves round 1's P1 open. Per
++`docs/agents/verification.md`, a P1 still open after round 2 stops the run
++before step 8: leave the tickets unresolved and report it. Write no `Review:`
++line.
 ```
 
 **Por que existe.** O `adr-0010` — a verificação tem critério de parada, e ele é

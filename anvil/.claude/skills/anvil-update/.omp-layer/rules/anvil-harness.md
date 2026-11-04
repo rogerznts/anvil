@@ -26,18 +26,26 @@ omp, e não passos a executar à mão. Antes do primeiro despacho, leia o modo d
 isolação na raiz do projeto, com `omp config get task.isolation.enabled` e
 `omp config get task.isolation.merge`.
 
+- **Quem implementa.** Cada implementer é um item do `task` com o agente padrão,
+  `task`, nunca o `anvil-implementer` nem outro agente que rode review: o
+  implementer recebe o ticket, chama a `anvil-tdd`, commita e não grava linha
+  `Review:`. O review é só o do passo 7, sobre a spec.
 - **Isolação ligada no modo branch** (`true` e `branch`): "each in its own
-  worktree on its own branch" é o `task` com `isolated: true`, um implementer por
-  ticket do frontier. O omp copia o checkout a partir do `HEAD` do branch da spec
-  e commita o trabalho num branch `omp/task/<id>`. O "merger subagent" é a
-  integração do omp: quando um implementer termina, o omp faz o cherry-pick dos
-  commits dele no branch da spec, um por vez. Não despache merger. O implementer
-  não faz merge da ponta do branch de integração antes de reportar: o omp aplica
-  os commits sobre a ponta atual, e um commit de merge entraria no cherry-pick.
-- **Sem o modo branch** (isolação desligada, ou ligada no modo `patch`): os
-  implementers rodam em série, um por vez, sem `isolated`, na árvore do branch da
-  spec, e commitam direto nele. Não há worktree a conferir, merge a fazer nem
-  worktree a limpar.
+  worktree on its own branch" é o `task` com `isolated: true` em **todo** item,
+  um implementer por ticket do frontier. O omp copia o checkout a partir do `HEAD`
+  do branch da spec e commita o trabalho num branch `omp/task/<id>`. O "merger
+  subagent" é a integração do omp: quando um implementer termina, o omp faz o
+  cherry-pick dos commits dele no branch da spec, um por vez. Não despache
+  merger. O implementer não faz merge da ponta do branch de integração antes de
+  reportar: o omp aplica os commits sobre a ponta atual, e um commit de merge
+  entraria no cherry-pick.
+- **Sem o modo branch** (isolação desligada, ou ligada no modo `patch`): um item
+  por chamada do `task`, sem `isolated`, e a próxima chamada só depois do
+  resultado da anterior. Cada implementer trabalha na árvore do branch da spec e
+  commita o próprio trabalho nele antes de reportar. Não há worktree a conferir,
+  merge a fazer nem worktree a limpar.
+- **Nunca dois implementers na mesma chamada sem `isolated: true`.** Dividiriam a
+  árvore, o banco e o gate, e um commit levaria o trabalho do outro.
 - **Conflito na integração.** O resultado do `task` traz `Branch merge failed:
   omp/task/<id>`. O ticket não entrou: ele volta ao frontier e é despachado de
   novo, num implementer novo, sobre o branch da spec que já tem o que entrou. Os
