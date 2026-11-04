@@ -4,7 +4,8 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** claimed
+**Review:** round=1; sha=006c27b; scope=full; verdict=fail; p1=open
 
 - [ ] `anvil/.claude/skills/anvil-bench/` e `anvil/.claude/skills/anvil-stack-payload/bench/` não existem; `anvil-skills.yaml`, o `vendor-sync.sh` e o `anvil.lock` não citam o `unlazy` nem o bench.
 - [ ] O `anvil-auto` e o `anvil-omp` não têm modo bench: nenhum `--bench`, nenhuma seção "No bench", e o piloto só entra pelo grill.
@@ -13,3 +14,8 @@
 - [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0, e o bloco `ANVIL:DIRECTIVES` do `CLAUDE.md` raiz continua igual ao `claude_boot.md`.
 
 ## Comments
+
+- Implementado em `4de0494` (skill e bench do payload), `9860b7f` (`--infra` do `proof.sh`), `e896998` (README, arquitetura, plano) e `006c27b` (ADR-0024). Saiu também o submodule `references/unlazy`, por decisão do operador. `verify: limpo`; o bloco de diretivas é igual ao `claude_boot.md`.
+- Review round=1 · P1 (Spec): o `docs/index.md` listava o `discovery/bench-autonomo.md` como proposta, sem dizer que o modo saiu — quem segue o índice lê como vivo um modo removido. O documento é registro histórico e fica; o índice passa a marcá-lo como histórico, pelo ADR-0024.
+- Review round=1 · P2 (Spec): a busca por `--infra` e a comparação das diretivas não foram concluídas pelo eixo. Rodadas pela sessão principal: `--infra` só aparece em ADRs e no histórico do git; o bloco de diretivas é igual.
+- Review round=1 · P3 (Standards): o cabeçalho do ADR-0024 truncava "a única" sem o substantivo — corrigido. P3: a linha do `docs/index.md` sobre o ADR-0006 ainda diz "seis capacidades"; é o resumo da decisão de então, marcado "revisto em parte pelo adr-0024", e fica.
