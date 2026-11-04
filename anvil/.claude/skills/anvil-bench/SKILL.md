@@ -338,6 +338,13 @@ do diagrama roda depois da execução e reexecuta o ledger da spec e o de cada s
 do roteiro já fechada — ele não lê o que o agente disse ter feito, nem o relatório
 da execução.
 
+**Você conduz e não implementa.** Carregue a `anvil-implement-spec` e siga-a
+passo a passo, com o mapeamento de harness da camada omp quando houver. Você não
+escreve código do ticket nem da correção: cada ticket sai de um implementer
+despachado por você, e a correção da rodada 1 sai de outro implementer novo, mesmo
+quando a entrada tem um ticket só. Os tickets só ficam `resolved` no passo 8 da
+skill, depois das duas rodadas.
+
 Uma linha visível de progresso por fase. Detalhe vai para `build-log.md`, e toda
 decisão que você tomou sozinha vai para `decisions-log.md` — é o que permite
 alguém auditar depois o que foi convenção e o que foi pedido.
