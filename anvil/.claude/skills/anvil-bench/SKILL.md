@@ -40,11 +40,11 @@ chamado com `--bench`. Ele carrega esta skill para a entrada e conduz o resto:
   do sim, com a rule já atualizada com os módulos e os papéis reais.
 - O ledger de cada spec, da fase 4, é o piloto que roda, no começo de cada spec,
   e ele também escreve o `decisions-log.md` de cada uma.
-- A fase 5 é a corrente do piloto: ele despacha os tickets, roda o comando do
-  [GATE.md](GATE.md) como supervisor, lê a saída pela seção "Sob o piloto
-  automático" de lá, onde mora a regra do gate manual aberto, e fecha a spec.
-  *Uma entrada do roteiro* não roda, e a fase 6 é o fim do piloto, em português
-  simples.
+- A fase 5 é a corrente do piloto: ele roda a `anvil-implement-spec` sobre a spec,
+  roda o comando do [GATE.md](GATE.md) como supervisor, lê a saída pela seção "Sob
+  o piloto automático" de lá, onde mora a regra do gate manual aberto, e fecha a
+  spec. *Uma entrada do roteiro* não roda, e a fase 6 é o fim do piloto, em
+  português simples.
 
 ## Fluxo
 
@@ -313,24 +313,30 @@ Nada disto aparece para quem pediu a ferramenta (INV-6).
 ### 5. Construir
 
 ```
-anvil-to-spec  →  anvil-to-tickets  →  [ anvil-implement + anvil-tdd ]  →  anvil-code-review  →  gate
-                                          ↑                                        │
-                                          └──────── até 2 rodadas ─────────────────┘
+anvil-to-spec  →  anvil-to-tickets  →  anvil-implement-spec  →  gate
+                                       ├─ um implementer novo por ticket, com anvil-tdd
+                                       ├─ anvil-code-review da spec inteira (rodada 1)
+                                       └─ correção + anvil-code-review do diff dela (rodada 2)
 ```
 
 Este é o único lugar do anvil que roda sem parar a cada decisão. O fundamento é
 a **audiência**: quem está do outro lado não tem como responder "os testes de
 integração falharam, quer que eu ajuste o mock?".
 
-A condição de parada é mecânica e está em [GATE.md](GATE.md). Teto de **duas
-rodadas** por ticket, o orçamento do ADR-0010 — a verificação tem critério de
-parada, e a terceira rodada é escolha declarada de um humano —, que vale no
-resto do anvil: a rodada 1 mede o ticket inteiro, a rodada 2 mede o diff da
-correção, e cada uma deixa a sua linha `Review:` no ticket. A rodada 2 que não
-aprova trava o ticket: o veredito é `CONCERNS`, o loop para e reporta, e o ticket
-entra na entrega como pendência. A terceira rodada não é do bench. O `gate` do
-diagrama reexecuta o ledger da spec e o de cada spec do roteiro já fechada — ele
-não lê o que o agente disse ter feito.
+A condição de parada é mecânica e está em [GATE.md](GATE.md). A construção é a
+`anvil-implement-spec` sobre a spec da entrada, no branch dela, e o bench é quem a
+conduz: cada ticket sai de um implementer de contexto novo, sem review por ticket.
+Teto de **duas rodadas** por spec, o orçamento do ADR-0010 — a verificação tem
+critério de parada, e a terceira rodada é escolha declarada de um humano —, que o
+ADR-0023 — a `anvil-implement-spec` conduz a spec com um review único — passou a
+contar por spec: a rodada 1 mede o diff da spec inteira, quando todos os tickets
+ficaram prontos, e a rodada 2 mede só o diff da correção. Nenhuma rodada deixa
+linha `Review:`. Com P1 ainda aberto na rodada 2, a spec para antes de os tickets
+fecharem: o veredito é `CONCERNS`, o loop para e reporta, e o que o P1 deixa de
+fora entra na entrega como pendência. A terceira rodada não é do bench. O `gate`
+do diagrama roda depois da execução e reexecuta o ledger da spec e o de cada spec
+do roteiro já fechada — ele não lê o que o agente disse ter feito, nem o relatório
+da execução.
 
 Uma linha visível de progresso por fase. Detalhe vai para `build-log.md`, e toda
 decisão que você tomou sozinha vai para `decisions-log.md` — é o que permite
@@ -385,8 +391,8 @@ Com `PASS`: o endereço, as credenciais e um resumo do que a ferramenta faz, em
 linguagem de negócio.
 
 Com `CONCERNS` ou `FAIL`: diga o que falta, em uma frase, **sem despejar log**.
-Ticket travado na rodada 2 entra aqui como pendência declarada, dita como o que a
-pessoa ainda não consegue fazer na ferramenta.
+A spec parada com P1 na rodada 2 entra aqui como pendência declarada, dita como o
+que a pessoa ainda não consegue fazer na ferramenta.
 
 Numa retomada, a entrega diz também, com qualquer veredito e em uma frase
 simples, de onde a construção partiu: do que já estava combinado por escrito, ou

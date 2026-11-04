@@ -92,8 +92,8 @@ Contexto e limites do material adotado: [unlazy/VENDOR.md](unlazy/VENDOR.md).
 | veredito | quando | o loop |
 |---|---|---|
 | `PASS` | o `--reverify` dos ledgers sai `0`: smoke, testes de módulo acumulados e asserts de negócio, **todos** verdes, nesta spec e nas já fechadas | para, entrega |
-| `CONCERNS` | ticket travado em `round=2` — a rodada 2 dele não aprovou, e a última `Review:` está em `round=2` com `verdict=fail` —, ou defeito que não bloqueia | para, reporta o que falta |
-| `FAIL` | defeito bloqueante — P1 na `Review:` da rodada 1, ou gate derrubado pelo `--reverify` | volta para o `anvil-implement` se o ticket ainda tem rodada; no teto, para e reporta o que falta |
+| `CONCERNS` | a rodada 2 da spec ainda tem P1 — a execução da `anvil-implement-spec` parou antes de fechar os tickets —, ou defeito que não bloqueia | para, reporta o que falta |
+| `FAIL` | defeito bloqueante — gate derrubado pelo `--reverify` depois da execução da `anvil-implement-spec`, nesta spec ou numa já fechada | para, reporta o que falta |
 | `WAIVED` | alguém aceitou explicitamente o defeito | para, com os quatro campos de waiver preenchidos |
 
 **Só o veredito decide.** O score não termina loop nenhum.
@@ -117,34 +117,34 @@ Ele existe para tornar a **trajetória** visível:
 
 - dois `FAIL` com score parado → estagnação. Hora de parar e devolver, não de
   tentar de novo.
-- dois `FAIL` com score subindo → convergência lenta. Vale a próxima volta, se o
-  ticket ainda tem rodada.
+- dois `FAIL` com score subindo → convergência lenta. Vale a próxima volta, se a
+  spec ainda tem rodada.
 
 `score_history` é acumulado: o arquivo é reescrito a cada volta, então score que
 não for anexado ali se perde.
 
 ## O teto de duas rodadas
 
-Por ticket, não por spec. É o orçamento do ADR-0010 — a verificação tem critério
-de parada, e a terceira rodada é escolha declarada de um humano —, o mesmo que
-vale no resto do anvil, com as classes e a persistência de
-`docs/agents/verification.md`:
+Por spec. É o orçamento do ADR-0010 — a verificação tem critério de parada, e a
+terceira rodada é escolha declarada de um humano —, que o ADR-0023 — a
+`anvil-implement-spec` conduz a spec com um review único — passou a contar por
+spec, com as classes de `docs/agents/verification.md`:
 
-- a **rodada 1** mede o ticket inteiro;
-- a **rodada 2** mede o diff da correção: remede os achados da rodada 1 e o que a
-  correção pode ter quebrado.
+- a **rodada 1** mede o diff da spec inteira, quando todos os tickets ficaram
+  prontos;
+- a **rodada 2** mede o diff da correção que um implementer novo fez de tudo o
+  que a rodada 1 levantou: remede os achados dela e o que a correção pode ter
+  quebrado.
 
-Cada rodada deixa uma linha `Review:` no ticket, e é por ela que se conta: o
-disco diz em que rodada o ticket está, não a memória da sessão. Um gate derrubado
-pelo `--reverify` também gasta a rodada em que caiu, e o ticket volta para a
-seguinte.
+Quem conta as rodadas é a execução da `anvil-implement-spec`. O gate roda uma
+vez, depois da execução.
 
-A rodada 2 que não aprova **trava** o ticket: a última `Review:` dele fica em
-`round=2` com `verdict=fail`. O veredito é `CONCERNS`, e o loop **para** — não
-insiste, não abre uma terceira rodada com outra abordagem. O gate que cai depois
-da rodada 2 também esgota o teto: o veredito fica `FAIL`, e o loop para do mesmo
-jeito. Em qualquer dos dois casos, o que continua aberto vai para a entrega como
-pendência declarada; no ticket travado, os P1 ficam no `## Comments` dele.
+Com P1 ainda aberto na rodada 2, a spec **para**: a execução não fecha os
+tickets, o veredito é `CONCERNS`, e o loop não insiste, não abre uma terceira
+rodada com outra abordagem. O gate que o `--reverify` derruba depois da execução
+não reabre a spec: o veredito fica `FAIL`, e o loop para do mesmo jeito. Em
+qualquer dos dois casos, o que continua aberto vai para a entrega como pendência
+declarada, e os P1 da rodada 2 vão para o `build-log.md`.
 
 A terceira rodada não é do bench. O motivo é o mesmo que justifica o loop
 existir: quem está esperando a ferramenta não tem como julgar se ela vale a pena.
@@ -154,18 +154,19 @@ Parar e dizer o que falta é mais honesto que continuar tentando.
 
 No omp, quando o bench é a entrada do piloto automático, a skill `anvil-auto`, o
 supervisor é o piloto. Ele roda o comando de "A evidência" no `PASS` de cada spec,
-depois que o despacho acabou, e lê a saída por esta regra. Ela é a única do gate
-manual sob o piloto: o `anvil-auto` e o [SKILL.md](SKILL.md) apontam para cá.
+depois que a execução da `anvil-implement-spec` acabou, e lê a saída por esta
+regra. Ela é a única do gate manual sob o piloto: o `anvil-auto` e o
+[SKILL.md](SKILL.md) apontam para cá.
 
 O id que o checker imprime, `gates:<id do item>`, é único no checklist e diz de
 que ledger é o gate. Um gate sem `CHECK:` é manual.
 
 - o gate com `CHECK:` que cai, nesta spec ou numa fechada, ou o checker que não
-  roda, é o `FAIL` no teto, haja ou não gate manual desta spec aberto: nenhum
-  ticket volta ao despacho sem a rodada extra, e o piloto pesquisa em fontes
+  roda, é o `FAIL` no teto, haja ou não gate manual desta spec aberto: a spec não
+  volta à `anvil-implement-spec` sem a rodada extra, e o piloto pesquisa em fontes
   primárias antes de travar. A rodada extra que a pesquisa abre, com evidência
-  nova, é a exceção que o piloto declara no ticket, e não uma terceira rodada do
-  bench;
+  nova, uma vez por spec, é a exceção que o piloto registra no relatório, e não
+  uma terceira rodada do bench;
 - sem gate com `CHECK:` caído, o gate manual aberto no ledger desta spec deixa a
   spec parada por decisão, à espera de quem confere;
 - o gate manual aberto no ledger de uma spec fechada é dela e não segura esta;
@@ -184,8 +185,8 @@ o corte do branch: sobre o merge preparado, sem o `docs/specs/<pasta>/gates.md`,
 porque a pasta da spec já está em `docs/specs/archive/` e o ledger dela vem no
 `$fechados`. Ali, a regra acima só diz que saída vale o `PASS`. Qualquer outra
 aborta o merge e deixa a spec parada por decisão, já arquivada no branch, sem
-pesquisa e sem rodada extra, como diz o `anvil-auto`: a spec não volta ao
-despacho, e quem decide qual spec cede é o operador.
+pesquisa e sem rodada extra, como diz o `anvil-auto`: a spec não volta à
+`anvil-implement-spec`, e quem decide qual spec cede é o operador.
 
 ## Nova evidência
 
