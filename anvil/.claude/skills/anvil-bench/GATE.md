@@ -13,8 +13,8 @@ melhor para um humano ler. Aqui não há humano lendo a cada volta.
 `docs/specs/<pasta>/gate.yaml`, reescrito a cada volta:
 
 ```yaml
-gate: PASS                    # PASS | CONCERNS | FAIL | WAIVED
-quality_score: 90             # 0-100, calculado
+gate: CONCERNS                # PASS | CONCERNS | FAIL | WAIVED
+quality_score: 90             # 0-100, calculado: um P1 aberto da rodada 2
 score_history: [60, 80, 90]   # a série, do primeiro gate ao atual
 status_reason: "uma ou duas frases sobre o veredito"
 updated: "2026-08-29T14:30:00Z"
@@ -91,9 +91,9 @@ Contexto e limites do material adotado: [unlazy/VENDOR.md](unlazy/VENDOR.md).
 
 | veredito | quando | o loop |
 |---|---|---|
-| `PASS` | o `--reverify` dos ledgers sai `0`: smoke, testes de módulo acumulados e asserts de negócio, **todos** verdes, nesta spec e nas já fechadas | para, entrega |
-| `CONCERNS` | a rodada 2 da spec ainda tem P1 — a execução da `anvil-implement-spec` parou antes de fechar os tickets —, ou defeito que não bloqueia | para, reporta o que falta |
-| `FAIL` | defeito bloqueante — gate derrubado pelo `--reverify` depois da execução da `anvil-implement-spec`, nesta spec ou numa já fechada | para, reporta o que falta |
+| `PASS` | o `--reverify` dos ledgers sai `0` com `ALL MET`, ou sai `1` só com gate manual de spec já fechada aberto: smoke, testes de módulo acumulados e asserts de negócio, **todos** verdes, nesta spec e nas já fechadas | para, entrega |
+| `CONCERNS` | a rodada 2 da spec ainda tem P1 — a execução da `anvil-implement-spec` parou antes de fechar os tickets —, ou gate manual desta spec aberto, sem gate com `CHECK:` caído | para, reporta o que falta |
+| `FAIL` | defeito bloqueante — gate com `CHECK:` derrubado pelo `--reverify` depois da execução da `anvil-implement-spec`, nesta spec ou numa já fechada —, ou o checker que não roda | para, reporta o que falta |
 | `WAIVED` | alguém aceitou explicitamente o defeito | para, com os quatro campos de waiver preenchidos |
 
 **Só o veredito decide.** O score não termina loop nenhum.
@@ -118,6 +118,11 @@ formato de "O arquivo":
     nenhum gate com `CHECK:`;
   - `PASS` só com `exit: 0` e a linha `ALL MET`, ou com `exit: 1` e a linha
     `UNMET:` em que cada id da linha de baixo é de gate manual de spec fechada.
+
+  O checker lista só os 12 primeiros ids e põe o resto em `+N more`. Com a cauda,
+  conte nos ledgers os gates manuais abertos — sem `CHECK:` e sem `[x]` — das
+  specs fechadas e desta: se a soma não é o número que o `UNMET:` traz, algum
+  gate com `CHECK:` caiu na cauda, e o `gate` é `FAIL`.
 
   `WAIVED` substitui o `FAIL` ou o `CONCERNS` só quando alguém aceitou o defeito,
   com os quatro campos de waiver; nunca substitui o `PASS`. O checker decide
@@ -150,8 +155,10 @@ pasta da spec já está arquivada.
 quality_score = 100 − (20 × FAILs) − (10 × CONCERNS)
 ```
 
-Limitado a `0..100`. **Calculado por contagem, nunca estimado** — é isso que
-torna a série comparável entre voltas.
+`FAILs` é o número de gates com `CHECK:` caídos; `CONCERNS` é o número de P1
+abertos da rodada 2 mais o de gates manuais desta spec abertos; o checker que não
+roda vale `quality_score: 0`. Limitado a `0..100`. **Calculado por
+contagem, nunca estimado** — é isso que torna a série comparável entre voltas.
 
 Ele existe para tornar a **trajetória** visível:
 
@@ -212,8 +219,9 @@ que ledger é o gate. Um gate sem `CHECK:` é manual.
 - o gate manual aberto no ledger de uma spec fechada é dela e não segura esta;
 - sem gate manual desta spec aberto e sem gate com `CHECK:` caído, a saída vale o
   `PASS`: o `exit: 0` com a linha `ALL MET`, ou o `exit: 1` com a linha `UNMET:`
-  em que cada id da linha de baixo é de gate manual de spec fechada. Qualquer
-  outra saída é o checker que não roda.
+  em que cada id da linha de baixo é de gate manual de spec fechada, com a cauda
+  `+N more` contada como diz "Grave o veredito". Qualquer outra saída é o checker
+  que não roda.
 
 Cada gate manual aberto, desta spec ou de uma fechada, vai para "o que ainda
 espera decisão", no relatório, como pergunta, também quando um `CHECK:` caiu e a
