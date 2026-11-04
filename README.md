@@ -54,7 +54,7 @@ O resultado, medido em 2026-11-04 com
 | linhas dos arquivos que existem no pin e no payload | 88.157 |
 | **linhas nossas que diferem do upstream** | **215 — 0,24%** |
 | arquivos deixados de fora (`strip`) | 63 |
-| arquivos do anvil dentro de skill vendorizada (`keep`) | 36 arquivos · 8.442 linhas |
+| arquivos do anvil dentro de skill vendorizada (`keep`) | 36 arquivos · 8.458 linhas |
 | material trazido de fora da árvore da skill (`extra`, inclui o `unlazy` do bench) | 45 arquivos · 4.305 linhas · 9 nossas |
 | arquivo sem par, fora da conta | 0 |
 

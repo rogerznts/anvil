@@ -4,7 +4,7 @@
 
 **Blocked by:** 02, 03
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] Nenhuma referência viva ao `anvil-run`, ao `anvil-implementer` ou ao `frontier.sh` fora de ADRs antigos, specs arquivadas e `references/`.
 - [x] Numa instalação de usuário descartável com a versão anterior, o `reset-install.sh` remove os três.
@@ -12,3 +12,7 @@
 - [x] A cauda de roteamento no `claude_boot.md` e no `CLAUDE.md` do repositório lista a `anvil-implement-spec` e não o `anvil-run`.
 - [x] README, overview, glossário e `docs/index.md` descrevem a `implement-spec` como o condutor nos três harnesses.
 - [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+
+## Comments
+
+- Prova: `reset-install.sh` numa instalação descartável com o payload anterior remove `agents/anvil-implementer.md`, `skills/anvil-run/SKILL.md` e `skills/anvil-run/frontier.sh`; o grep não acha referência viva fora de ADRs antigos, archive, discovery e references.

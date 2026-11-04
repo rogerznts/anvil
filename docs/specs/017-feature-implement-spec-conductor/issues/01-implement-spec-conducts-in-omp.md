@@ -4,13 +4,20 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] No omp, sobre uma spec de três tickets (dois independentes, um que depende dos dois), a skill deixa os três `resolved` no branch da spec, com os dois independentes isolados quando a isolação está no modo branch.
-- [ ] O review roda uma vez sobre o diff da spec inteira, e nenhum ticket ganha linha `Review:`.
-- [ ] Com um P1 plantado que a correção não resolve, a execução termina com o P1 da rodada 2 no relatório e não marca a spec como pronta.
-- [ ] Sem a isolação no modo branch, os implementers rodam um por vez na árvore da spec.
+- [x] No omp, sobre uma spec de três tickets (dois independentes, um que depende dos dois), a skill deixa os três `resolved` no branch da spec, com os dois independentes isolados quando a isolação está no modo branch.
+- [x] O review roda uma vez sobre o diff da spec inteira, e nenhum ticket ganha linha `Review:`.
+- [x] Com um P1 plantado que a correção não resolve, a execução termina com o P1 da rodada 2 no relatório e não marca a spec como pronta.
+- [x] Sem a isolação no modo branch, os implementers rodam um por vez na árvore da spec.
 - [x] O ADR novo existe, aceito, e os cinco ADRs revistos apontam para ele; `docs/index.md` o lista.
 - [x] `docs/agents/verification.md` e o template do `anvil-docs` descrevem o review único da spec e o review por ticket do `anvil-implement` avulso.
 - [x] O delta da `implement-spec` contra o pin fica restrito à rodada 2, declarado como `verification-profile` no manifesto e no catálogo.
 - [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+
+## Comments
+
+- Prova no omp real, `workspace/93-implement-spec/out-A2` e `out-B3`, depois de `4b3f510`: três itens com `isolated: true` e integração pelo omp (`omp/task/*`); um review sobre o diff da spec; nenhuma `Review:` em ticket; o P1 plantado para a execução na rodada 2 sem fechar ticket; sem isolação, um implementer por vez. A primeira prova (`out-A`, `out-B`, `out-B2`) reprovou três critérios: o condutor usava o `anvil-implementer` e não isolava, e a rodada 2 pulava quando a correção não mudava nada. Corrigido em `4b3f510` e `311a85f`.
+- Review da spec · rodada 1 · P1 (Standards, reclassificado pelo condutor): o gate da spec, prometido pelo ADR-0023 e pelo perfil, não rodava fora do piloto — quem seguisse a skill fecharia tickets sem gate. Corrigido em `6049def`.
+- Review da spec · rodada 2 · P1 (Spec): o gate do passo 7 valia também no bench, onde o perfil diz que ele não se aplica — o bench pararia por uma suíte que não é a prova dele. Corrigido em `cfcee20`, apontando o passo 7 para o perfil.
+- Achado fora do escopo · P2: no Claude Code, sem a integração do omp, o merge do passo 4 e do passo 5 da `implement-spec` é bloqueado pela guarda de merge enquanto a spec está aberta; a integração prevista pela guarda é `git cherry-pick`. Esta execução integrou por cherry-pick. Quem conduzir no Claude Code esbarra na guarda até alguém traduzir o merge da skill para cherry-pick na rule de harness desse harness.

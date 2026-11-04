@@ -4,11 +4,17 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Sobre um roteiro de uma entrada com a spec de três tickets, o piloto fecha com `PASS`, faz o archive e o merge, e a guarda de merge libera, sem ler linha `Review:`.
-- [ ] Com o P1 plantado que a correção não resolve, o piloto para a spec com o motivo e não faz archive nem merge.
-- [ ] Com evidência nova de pesquisa, o piloto abre uma rodada a mais da spec uma vez só, e o relatório a registra.
+- [x] Sobre um roteiro de uma entrada com a spec de três tickets, o piloto fecha com `PASS`, faz o archive e o merge, e a guarda de merge libera, sem ler linha `Review:`.
+- [x] Com o P1 plantado que a correção não resolve, o piloto para a spec com o motivo e não faz archive nem merge.
+- [x] Com evidência nova de pesquisa, o piloto abre uma rodada a mais da spec uma vez só, e o relatório a registra.
 - [x] O `anvil-auto` não chama mais o `frontier.sh` nem o `anvil-implementer`.
 - [x] O perfil de tracker do `anvil-docs` e o `docs/agents/issue-tracker.md` não descrevem mais a linha do piloto no ticket.
 - [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+
+## Comments
+
+- Prova no omp real: `workspace/94-pilot-implement-spec/out-A` e `out-B` (fecha com `PASS`, archive e merge sem ler `Review:`; para com P1 sem archive nem merge) e `out-A3` (regressão verde depois da terceira rodada); `workspace/96-pilot-research-round/out-3` (rodada a mais por pesquisa aberta uma vez, registrada no relatório, spec fechada).
+- Review da spec · rodada 3, declarada pelo operador: a prova `96-…/out-1` mostrou o piloto revertendo arquivos com implementer em segundo plano ainda vivo e aceitando "impossível" sem pesquisar. Corrigido em `e49c986` e `7fed9de` (o review da rodada 3 achou a contradição entre seções que `7fed9de` fecha).
+- Review da spec · rodada 3 · P3: o brief da rodada 2 do review depois de uma rodada a mais não aponta o arquivo da pesquisa, embora a skill peça o ponteiro em todo brief — o revisor da rodada pode não ler a evidência que a abriu.
