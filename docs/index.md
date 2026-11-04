@@ -9,7 +9,7 @@ Last updated: 2026-10-28T22:48:55Z
     de integração do anvil com o omp, antes do grill
   - [bench-autonomo.md](./discovery/bench-autonomo.md) — proposta para pôr o
     bench sobre o plan e o run e torná-lo autônomo da entrevista ao relatório,
-    antes do grill
+    antes do grill; histórico: o bench saiu do anvil pelo adr-0024
   - [camadas-anvil-omp.md](./discovery/camadas-anvil-omp.md) — desenho em
     mermaid das camadas, da instalação, da execução e da guarda de merge
   - [gate-sem-criterio-de-parada.md](./discovery/gate-sem-criterio-de-parada.md)
