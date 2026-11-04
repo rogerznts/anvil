@@ -347,7 +347,9 @@ despachado por você, mesmo quando a entrada tem um ticket só. O brief do
 implementer não pede para mexer no `Status:`: os tickets só ficam `resolved` no
 passo 8 da skill, depois das duas rodadas. Qualquer achado da rodada 1, P2 e P3
 inclusive, vai para um implementer novo de correção, e a rodada 2 mede o diff
-dele.
+dele. O veredito é dos eixos: você não descarta nem reclassifica achado deles, e
+um P1 aberto na rodada 2 para a spec com `CONCERNS`, sem `resolved` e sem linha
+`Review:` em ticket.
 
 Uma linha visível de progresso por fase. Detalhe vai para `build-log.md`, e toda
 decisão que você tomou sozinha vai para `decisions-log.md` — é o que permite

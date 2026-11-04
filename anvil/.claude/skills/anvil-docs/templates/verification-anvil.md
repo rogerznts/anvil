@@ -53,9 +53,12 @@ A revisão roda em um de dois lugares, conforme quem conduz:
   todos os tickets estão prontos. A rodada 1 mede o diff da spec inteira, com o
   fixed point no ponto em que o branch da spec saiu do branch base
   (`git merge-base <base> HEAD`). Um implementer novo corrige tudo o que ela
-  levantou, P2 e P3 inclusive. A rodada 2 mede só o diff dessa correção, com o
-  `HEAD` que a rodada 1 mediu como fixed point. **P1 aberto na rodada 2 para a
-  execução**: os tickets não fecham, e o P1 vai para quem conduz. Nenhuma linha
+  levantou, P2 e P3 inclusive; só a rodada 1 sem achado nenhum dispensa a
+  correção e a rodada 2. A rodada 2 mede só o diff dessa correção, com o `HEAD`
+  que a rodada 1 mediu como fixed point. **P1 aberto na rodada 2 para a
+  execução**: os tickets não fecham, e o P1 vai para quem conduz. P2 e P3 da
+  rodada 2 vão para o relatório e não seguram o fechamento. **O veredito é dos
+  eixos:** quem conduz não descarta nem reclassifica achado deles. Nenhuma linha
   `Review:` é gravada: o que vale é o relatório da execução e o gate.
 - **O ticket avulso, pelo `anvil-implement`.** Um review por ticket, com a
   rodada persistida no próprio ticket, como descrevem as seções *Persistência da

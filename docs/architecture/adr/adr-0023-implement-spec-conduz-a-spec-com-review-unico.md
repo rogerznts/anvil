@@ -42,10 +42,13 @@ fecha com `Status: resolved`, como o perfil de tracker manda.
 **O review é um só, da spec inteira.** Com todos os tickets prontos, a
 `anvil-code-review` roda uma vez sobre o diff da spec, com o fixed point no ponto
 em que o branch da spec saiu do branch base. Um implementer novo corrige tudo o
-que ela levantou. Uma rodada 2 mede só o diff dessa correção, e P1 aberto nela
-para a execução e vai para quem conduz, como o critério de parada do ADR-0010 — a
-verificação tem critério de parada, e ele é ausência de P1 — manda. Nenhuma linha
-`Review:` é gravada: o que vale é o resultado da execução e o gate.
+que ela levantou, P2 e P3 inclusive, como o "Fix all issues" da skill diz; só a
+rodada sem achado nenhum dispensa a correção. Uma rodada 2 mede só o diff dessa
+correção, e P1 aberto nela para a execução e vai para quem conduz, como o
+critério de parada do ADR-0010 — a verificação tem critério de parada, e ele é
+ausência de P1 — manda. O veredito é dos eixos: quem conduz não descarta nem
+reclassifica achado. Nenhuma linha `Review:` é gravada: o que vale é o resultado
+da execução e o gate.
 
 **O delta no texto vendorizado é a rodada 2, pela regra `verification-profile`.**
 A regra passa a valer para a `anvil-implement-spec` no menor delta possível: um

@@ -127,7 +127,8 @@ formato de "O arquivo":
   arquivo já trazia;
 - `status_reason` com o `exit:` e a linha final do checker, e o P1 da rodada 2,
   quando houver;
-- `updated` com o horário em que o `--reverify` terminou, em UTC;
+- `updated` com a saída de `date -u +%Y-%m-%dT%H:%M:%SZ`, rodado logo depois do
+  `--reverify`, nunca com um horário escrito de cabeça;
 - `evidence_ref` com o caminho do ledger da spec relativo à pasta dela,
   `gates.md`;
 - `top_issues` com cada gate caído pelo id qualificado que o checker imprime,

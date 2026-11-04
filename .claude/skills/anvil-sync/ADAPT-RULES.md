@@ -202,10 +202,12 @@ no passo do review:
 ```diff
 -7. Once all tickets are complete, call the Skill tool with `anvil-code-review` on the integration branch. Fix all issues …
 +7. … on the integration branch, with the point where it left the base branch
-+(`git merge-base <base> HEAD`) as the fixed point. Fix all issues … Then call
-+`anvil-code-review` again as round 2, with the tip the first review measured as
-+the fixed point and its findings to remeasure, so it reads only the fix's diff;
-+a fix that changed nothing leaves round 1's P1 open. Per
++(`git merge-base <base> HEAD`) as the fixed point. Fix all issues … : every
++finding, P1, P2 and P3 alike; only a round with no finding at all skips the fix
++and round 2. Then call `anvil-code-review` again as round 2, with the tip the
++first review measured as the fixed point and its findings to remeasure, so it
++reads only the fix's diff; a fix that changed nothing leaves round 1's P1 open.
++The verdict is the axes': never drop or reclassify a finding they raised. Per
 +`docs/agents/verification.md`, a P1 still open after round 2 stops the run
 +before step 8: leave the tickets unresolved and report it. Then, where that
 +profile says the gate applies, run it once on the integration branch; a red
@@ -228,9 +230,10 @@ smells e os dois eixos. As trocas substantivas são só duas: fixed point e roda
 passam a vir do histórico `Review:`, e o resumo final deixa de ser contagem para
 virar veredito por P1. Na `anvil-implement-spec` o review é um só, da spec
 inteira, e não deixa registro: o delta é a rodada 2, o fixed point das duas
-rodadas, que a skill dá em vez do histórico, e o gate da spec, que roda onde o
-perfil diz que se aplica; o frontier, os worktrees e o merge ficam como o
-upstream escreveu. Quem decide isso é o `adr-0023` — a
+rodadas, que a skill dá em vez do histórico, a correção de todo achado da rodada
+1 com o veredito dos eixos intocado, e o gate da spec, que roda onde o perfil diz
+que se aplica; o frontier, os worktrees e o merge ficam como o upstream escreveu.
+Quem decide isso é o `adr-0023` — a
 `implement-spec` conduz a spec com um review só no fim. Num merge em que o
 upstream mexa nesses seams, a versão do anvil ganha.
 
