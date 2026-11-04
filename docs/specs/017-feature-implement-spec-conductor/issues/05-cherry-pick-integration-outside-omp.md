@@ -4,9 +4,18 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** claimed
+**Review:** round=1; sha=500ec49; scope=full; verdict=fail; p1=open
 
-- [ ] O bloco de diretivas do `claude_boot.md` traduz o merge dos passos 4 e 5 da `implement-spec` para rebase e cherry-pick, e diz que vale só onde o harness não integra sozinho; o bloco do `CLAUDE.md` da raiz fica igual byte a byte.
-- [ ] O texto vendorizado da `implement-spec` não muda.
-- [ ] Numa spec de dois tickets independentes, conduzida pela `implement-spec` no Claude Code com worktrees, os dois trabalhos chegam ao branch da spec sem a guarda bloquear nada.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] O bloco de diretivas do `claude_boot.md` traduz o merge dos passos 4 e 5 da `implement-spec` para rebase e cherry-pick, e diz que vale só onde o harness não integra sozinho; o bloco do `CLAUDE.md` da raiz fica igual byte a byte.
+- [x] O texto vendorizado da `implement-spec` não muda.
+- [x] Numa spec de dois tickets independentes, conduzida pela `implement-spec` no Claude Code com worktrees, os dois trabalhos chegam ao branch da spec sem a guarda bloquear nada.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+
+## Comments
+
+- Prova no Claude Code real, `workspace/97-implement-spec-claude/out/`: worktree e branch `impl-001-t01`/`impl-001-t02` por implementer; `git rebase feature/001-carrinho` nos dois; integração por `git cherry-pick` (`76d168e`, `64a6410`); 20 chamadas `PreToolUse:Bash` com `hook_success` e nenhum bloqueio; `node --test` 5/5. Controle à mão: `git merge impl-001-t01` na fixture sai 2 com "Bloqueado"; `cherry-pick` e `rebase` saem 0.
+- Review round=1 · P1 (Standards): a frase do nome dos branches dos implementers ("não leva o padrão `tipo/NNN-` no nome, como `impl-017-t01`") se lê como se `impl-017-t01` fosse o nome bloqueado — quem mantém o fluxo pode renomear branches ou desligar a regra por um risco que não existe.
+- Review round=1 · P2 (Spec) contestado: "integração sem método comprovado" — o `session.jsonl` da prova tem os comandos `git rebase feature/001-carrinho` e `git cherry-pick $(git merge-base …)..impl-001-t02`, citados no relatório da prova; o revisor não leu o jsonl até o fim.
+- Review round=1 · P3 (Spec): o `guard-controle.txt` registra `rc=141` (SIGPIPE do `| head`) ao lado do `rc=2` do controle sem `head` — quem lê pode duvidar do código de saída do bloqueio.
+- Fora do ticket · P2: na prova, a rodada 1 achou só P3 e a sessão não despachou correção, embora o passo 7 da `implement-spec` diga "Fix all issues"; o bench fazia o mesmo antes de `b1bc1e2`. Fora do bench, um P2/P3 achado pode ficar sem correção.
