@@ -92,11 +92,11 @@ skills:
   - { name: anvil-to-questionnaire,   source: mattpocock, path: skills/productivity/to-questionnaire,   pin: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d, state: vendored, adapt: [rename], strip: [agents] }
 
   # ---- pstack --------------------------------------------------------------
-  - { name: anvil-unslop,    source: pstack, path: skills/unslop,      pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db, state: vendored, adapt: [rename] }
-  - { name: anvil-how,       source: pstack, path: skills/how,         pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db, state: vendored, adapt: [rename, decursor, invocable] }
-  - { name: anvil-architect, source: pstack, path: skills/architect,   pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db, state: vendored, adapt: [rename, decursor, invocable] }
-  - { name: anvil-arena,     source: pstack, path: skills/arena,       pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db, state: vendored, adapt: [rename, decursor, invocable] }
-  - { name: anvil-poteto,    source: pstack, path: skills/poteto-mode, pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db, state: vendored, adapt: [rename, decursor],
+  - { name: anvil-unslop,    source: pstack, path: skills/unslop,      pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename] }
+  - { name: anvil-how,       source: pstack, path: skills/how,         pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, decursor, invocable] }
+  - { name: anvil-architect, source: pstack, path: skills/architect,   pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, decursor, docs-remap, invocable] }
+  - { name: anvil-arena,     source: pstack, path: skills/arena,       pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, decursor, invocable] }
+  - { name: anvil-poteto,    source: pstack, path: skills/poteto-mode, pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, decursor],
       strip: [scripts, references, "playbooks/autonomous-run.md", "playbooks/autopilot-full.md",
               "playbooks/autopilot-stack.md", "playbooks/babysit.md", "playbooks/eval.md",
               "playbooks/hillclimb.md", "playbooks/multi-phase-plan.md", "playbooks/opening-a-pr.md",
@@ -106,13 +106,13 @@ skills:
               "playbooks/authoring-a-skill.md", "playbooks/shipping.md"] }
 
   # ---- pstack: principles ----
-  # As 23 principle-* do upstream vêm como REFERENCES de uma skill só. Elas têm
-  # disable-model-invocation e nunca disparam sozinhas, então 23 lugares no
+  # As 24 principle-* do upstream vêm como REFERENCES de uma skill só. Elas têm
+  # disable-model-invocation e nunca disparam sozinhas, então 24 lugares no
   # namespace não se pagam. Três skills as citam — poteto, architect e arena —
   # logo o lugar compartilhado é uma skill, não a pasta de uma delas.
   - name: anvil-principles
     source: pstack
-    pin: ecc249f1e306fc64ddf83c7bed16cacf7c2239db
+    pin: bb68f2365eceafa0cb2d253112f675acf5f144cc
     state: vendored
     path: ""                 # sem árvore própria: esta skill é só o índice + extras
     adapt: []
@@ -125,6 +125,7 @@ skills:
       - "skills/principle-exhaust-the-design-space/SKILL.md::references/exhaust-the-design-space.md"
       - "skills/principle-experience-first/SKILL.md::references/experience-first.md"
       - "skills/principle-fix-root-causes/SKILL.md::references/fix-root-causes.md"
+      - "skills/principle-explain-the-number/SKILL.md::references/explain-the-number.md"
       - "skills/principle-foundational-thinking/SKILL.md::references/foundational-thinking.md"
       - "skills/principle-guard-the-context-window/SKILL.md::references/guard-the-context-window.md"
       - "skills/principle-laziness-protocol/SKILL.md::references/laziness-protocol.md"
