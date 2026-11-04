@@ -789,10 +789,11 @@ entrada:
   vez à `anvil-implement-spec`, do passo 4, como diz "Abrir a rodada" para o
   ticket que não fechou, sem pesquisa e sem a linha da rodada a mais.
 - Com o critério incumprível, a spec fica parada, como diz "Parada", e a
-  contradição vai para "o que ainda espera decisão". A incumpribilidade que só se
-  sustenta numa afirmação de fato público — "a API não permite", "o formato não
-  suporta" — não é contradição enquanto a "Pesquisa antes de travar" não a
-  confirmar: pesquise primeiro. Achada antes de os tickets
+  contradição vai para "o que ainda espera decisão". Um critério que só parece
+  incumprível por uma afirmação de fato público — "a API não permite", "o formato
+  não suporta" — ainda não é contradição: é o implementer bloqueado por fato
+  desconhecido, e segue "Pesquisa antes de travar"; só vira contradição se a
+  pesquisa a confirmar. A contradição achada antes de os tickets
   estarem completos, ao escrever a spec ou os tickets, ela deixa o rascunho fora de
   commit. Commite no branch da spec o que você escreveu na pasta dela, só essa
   pasta, e só então siga a "Parada":
@@ -816,12 +817,13 @@ a parada pode ser falta de uma informação pública. São três as paradas téc
 - **implementer bloqueado por fato desconhecido**: o ticket que não fechou porque
   o implementer parou, no que devolveu ou no `## Comments` do ticket, numa
   pergunta que uma fonte pública responde, como o comportamento de uma
-  ferramenta, de uma biblioteca, de uma API ou de um formato. A pergunta sobre o
-  que o operador quer é decisão.
+  ferramenta, de uma biblioteca, de uma API ou de um formato. Inclui o
+  implementer que declara o pedido impossível por esse comportamento. A pergunta
+  sobre o que o operador quer é decisão.
 
 A parada por decisão não pesquisa e vai direto para "Parada": a spec que a regra
 do `GATE.md` deixa parada por decisão no `--reverify`, o PR aberto, a contradição
-com o roteiro, a decisão aberta do `map.md`, o merge bloqueado pela guarda,
+com o roteiro que não depende de fato público, a decisão aberta do `map.md`, o merge bloqueado pela guarda,
 abortado por conflito ou abortado pela conferência do merge, e o ticket que não
 fechou sem pergunta de fato.
 
