@@ -15,7 +15,7 @@ melhor para um humano ler. Aqui não há humano lendo a cada volta.
 ```yaml
 gate: PASS                    # PASS | CONCERNS | FAIL | WAIVED
 quality_score: 90             # 0-100, calculado
-score_history: [61, 68, 90]   # a série, do primeiro gate ao atual
+score_history: [60, 80, 90]   # a série, do primeiro gate ao atual
 status_reason: "uma ou duas frases sobre o veredito"
 updated: "2026-08-29T14:30:00Z"
 evidence_ref: gates.md       # o ledger da spec, relativo à pasta dela
@@ -110,16 +110,19 @@ formato de "O arquivo":
 
 - `gate`, nesta ordem, e o primeiro que vale decide:
   - `FAIL` quando o checker derrubou um gate com `CHECK:`, nesta spec ou numa
-    fechada, ou quando não rodou: saiu sem a linha `exit:`, com `refusal:` ou com
-    código fora de `0` e `1`;
+    fechada, ou quando a saída não é uma das duas formas do `PASS` abaixo nem o
+    `UNMET:` só de gate manual desta spec — container parado, `exit: 2`,
+    `HANDOFF REQUIRED:`, `exit: 1` sem a linha `UNMET:`, saída sem `exit:`;
   - `CONCERNS` quando a execução da `anvil-implement-spec` parou com P1 aberto na
-    rodada 2, ou quando o ledger desta spec tem gate manual aberto;
-  - `PASS` só com `exit: 0` e `ALL MET`, ou com `exit: 1` em que todo id abaixo
-    de `UNMET:` é de gate manual de spec fechada;
-  - `WAIVED` só com os quatro campos de waiver.
+    rodada 2, ou quando a linha abaixo de `UNMET:` traz gate manual desta spec e
+    nenhum gate com `CHECK:`;
+  - `PASS` só com `exit: 0` e a linha `ALL MET`, ou com `exit: 1` e a linha
+    `UNMET:` em que cada id da linha de baixo é de gate manual de spec fechada.
 
-  O checker decide `FAIL` e `PASS`; o `CONCERNS` vem do relatório da execução e
-  do ledger;
+  `WAIVED` substitui o `FAIL` ou o `CONCERNS` só quando alguém aceitou o defeito,
+  com os quatro campos de waiver; nunca substitui o `PASS`. O checker decide
+  `FAIL` e `PASS`; o `CONCERNS` vem do relatório da execução e da linha
+  `UNMET:`;
 - `quality_score` pela contagem de "O score", anexado ao `score_history` que o
   arquivo já trazia;
 - `status_reason` com o `exit:` e a linha final do checker, e o P1 da rodada 2,
@@ -207,8 +210,9 @@ que ledger é o gate. Um gate sem `CHECK:` é manual.
   spec parada por decisão, à espera de quem confere;
 - o gate manual aberto no ledger de uma spec fechada é dela e não segura esta;
 - sem gate manual desta spec aberto e sem gate com `CHECK:` caído, a saída vale o
-  `PASS`: o `exit: 0` com `ALL MET`, ou o `exit: 1` em que todo id abaixo de
-  `UNMET:` é de gate manual de spec fechada.
+  `PASS`: o `exit: 0` com a linha `ALL MET`, ou o `exit: 1` com a linha `UNMET:`
+  em que cada id da linha de baixo é de gate manual de spec fechada. Qualquer
+  outra saída é o checker que não roda.
 
 Cada gate manual aberto, desta spec ou de uma fechada, vai para "o que ainda
 espera decisão", no relatório, como pergunta, também quando um `CHECK:` caiu e a
