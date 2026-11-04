@@ -3,7 +3,7 @@
 Toolkit de skills para Claude Code. Sucede o [mosk](https://github.com/rogerznts/mosk),
 trocando agentes-como-persona por um conjunto curado de skills de terceiros.
 
-**O anvil não escreve as próprias skills de trabalho.** Ele curadoriza 36 skills
+**O anvil não escreve as próprias skills de trabalho.** Ele curadoriza 38 skills
 de seis repositórios upstream, mantidos como submodules em `references/`, e as
 vendoriza com adaptação registrada num manifesto — de forma que continuem
 atualizáveis quando o upstream andar.
@@ -45,17 +45,17 @@ Isso é possível porque as skills do Matt Pocock não têm caminho fixo: elas l
 documental do anvil é um perfil de tracker** — ao lado de github, gitlab e local
 — e não um alvo de reescrita.
 
-O resultado, medido em 2026-09-25 com
+O resultado, medido em 2026-11-04 com
 `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh stats`:
 
 | | |
 |---|---|
-| skills `vendored` no manifesto | 36 entradas: as 35 skills curadas e o `anvil-bench`, autoral, que traz o `unlazy`. 34 têm árvore no upstream; `anvil-principles` e `anvil-bench` são só `keep` e `extra` |
-| linhas dos arquivos que existem no pin e no payload | 21.676 |
-| **linhas nossas que diferem do upstream** | **204 — 0,94%** |
-| arquivos deixados de fora (`strip`) | 59 |
-| arquivos do anvil dentro de skill vendorizada (`keep`) | 35 arquivos · 7.868 linhas |
-| material trazido de fora da árvore da skill (`extra`, inclui o `unlazy` do bench) | 47 arquivos · 5.966 linhas · 8 nossas |
+| skills `vendored` no manifesto | 39 entradas: as 38 skills curadas e o `anvil-bench`, autoral, que traz o `unlazy`. 37 têm árvore no upstream; `anvil-principles` e `anvil-bench` são só `keep` e `extra` |
+| linhas dos arquivos que existem no pin e no payload | 88.157 |
+| **linhas nossas que diferem do upstream** | **215 — 0,24%** |
+| arquivos deixados de fora (`strip`) | 63 |
+| arquivos do anvil dentro de skill vendorizada (`keep`) | 36 arquivos · 8.442 linhas |
+| material trazido de fora da árvore da skill (`extra`, inclui o `unlazy` do bench) | 45 arquivos · 4.305 linhas · 9 nossas |
 | arquivo sem par, fora da conta | 0 |
 
 *Linha nossa* é a que está no payload e não está na versão do pin. A definição
@@ -205,20 +205,26 @@ merge` passa sem mensagem. Num projeto anvil, ela lê a spec do projeto e chama 
 | `anvil-arena` | N candidatos em paralelo, um juiz independente, enxerta o melhor de cada | pstack |
 | `anvil-prototype` | protótipo descartável para responder uma pergunta de design que só se responde vendo rodar. A decisão volta para o documento; o protótipo morre fora da main | mattpocock |
 | `anvil-wayfinder` | trabalho grande demais para uma sessão: mapa de tickets de decisão | mattpocock |
-| `anvil-principles` | os 23 princípios que `poteto`, `architect` e `arena` citam | pstack |
+| `anvil-principles` | os 24 princípios que `poteto`, `architect` e `arena` citam | pstack |
 | `anvil-poteto` | modo de trabalho: todolist, playbook por formato de tarefa, prosa sem gordura | pstack |
+| `anvil-swarm` | espalha N workers em paralelo e devolve um relatório só: cobertura, corrida, exploração | pstack |
+| `anvil-interrogate` | revisão adversarial: adversários tentam quebrar a mudança, e só sobrevive achado provado por execução | pstack |
+| `anvil-benchmark-checklist` | confere uma medição de desempenho antes de reportar ou agir sobre ela | pstack |
+| `anvil-in-your-own-words` | reformula, com as próprias palavras, o objetivo do usuário; o `interrogate` parte dela | pstack |
 
 ### Interface
 
 O `anvil-ui` é **roteador**: escolhe um método e só um, porque `hallmark` e
 `taste` são rivais — um entrega um tema como material, o outro parte de uma ideia
-tirada do assunto e mede a página num navegador real.
+tirada do assunto e mede a página num navegador real. Quem parte de uma
+referência passa antes pelo `anvil-ui-study`, que entrega ao hallmark.
 
 | skill | para quê | origem |
 |---|---|---|
 | `anvil-ui` | decide qual método usar antes de qualquer código | autoral |
 | `anvil-ui-hallmark` | página nova a partir de um tema sorteado de um catálogo de 50 e de uma forma entre 21 macroestruturas; escopo próprio de componente, com os oito estados; `redesign` e `audit` só quando nomeado | hallmark |
 | `anvil-ui-taste` | página e tela de app, novas ou existentes: três de 20 direções contra um inventário do assunto, inspector em navegador real e crítica por screenshots. Pede Node 22+ e Chrome | taste |
+| `anvil-ui-study` | extrai o DNA de design de uma URL ou screenshot de referência, recusa cópia e template pago, e grava um `design.md` que o hallmark lê como sistema travado | autoral |
 
 ### Escrita e comunicação
 
