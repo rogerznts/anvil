@@ -24,8 +24,9 @@ corrigir**:
 | **P3** | precisão, forma, intervalo de citação | nota |
 
 **O veredito é sobre P1.** P2 e P3 saem no relatório e viram linha no ticket de
-acompanhamento; não seguram fechamento. Achado cujo corpo não consegue nomear a
-decisão que muda é P3 por construção.
+acompanhamento; não seguram fechamento. No fluxo da spec, a correção da rodada 1
+cobre P2 e P3 também, como diz *Onde a revisão roda*. Achado cujo corpo não consegue
+nomear a decisão que muda é P3 por construção.
 
 Quem revisa declara a classe **e a consequência na mesma frase** — "P1: um time
 que leia isto liga a permissão ao papel errado". Consequência escrita é
