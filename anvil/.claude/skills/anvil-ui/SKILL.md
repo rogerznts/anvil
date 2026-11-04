@@ -1,6 +1,6 @@
 ---
 name: anvil-ui
-description: "Roteador da camada de interface: decide QUAL método de design usar antes de qualquer código. Use ao construir landing page, portfólio, componente, ou ao redesenhar uma tela existente — e sempre que houver dúvida entre hallmark e taste, que são métodos rivais e não podem rodar juntos."
+description: "Roteador da camada de interface: decide QUAL método de design usar antes de qualquer código. Use ao construir ou redesenhar página, site, tela de app ou componente — e sempre que houver dúvida entre hallmark e taste, que são métodos rivais e não podem rodar juntos."
 ---
 
 # Roteador de interface
@@ -13,64 +13,50 @@ Esta skill escolhe **um**, e só um.
 
 ## O despacho
 
-| O pedido | Método | Por quê |
-|---|---|---|
-| Já existe código, e a tarefa é modernizar | **anvil-ui-redesign** | audit-first: lê o que existe, extrai os tokens de marca, documenta o que funciona, e só então mexe |
-| Landing ou portfólio, e o projeto já usa um design system (shadcn, Material, Fluent, Carbon, Radix) | **anvil-ui-taste** | roteia para o sistema oficial em vez de inventar CSS. *"Never invent CSS for things that have a package"* |
-| Produto novo · componente isolado · partir de uma referência visual | **anvil-ui-hallmark** | é o único que cobre componente (exige os 8 estados) e o único com o verbo `study`, que extrai o DNA de uma URL ou screenshot |
+A primeira linha que casar decide.
 
-**Nenhuma linha casou, ou mais de uma casou?** Três perguntas em ordem, e a
-primeira que responder decide:
+| # | O pedido | Método | Por quê |
+|---|---|---|---|
+| 1 | O usuário nomeia um dos dois: Hallmark, `/hallmark`, um tema do catálogo do hallmark, taste ou tasteskill | **o nomeado** | o pedido já escolheu. É também a única porta para o `redesign` e o `audit` do hallmark, que ele só roda quando nomeado |
+| 2 | Mexe num design que já existe: redesenhar, restyle, polir, revisar | **anvil-ui-taste** | o hallmark manda não rodar em design existente sem ser nomeado. O taste trata redesign, restyle e review de página ou de tela de app como caso próprio, com medição antes e depois |
+| 3 | Um componente isolado e novo: botão, input, card, modal, nav, footer | **anvil-ui-hallmark** | tem escopo próprio de componente: entrega o componente e um preview que mostra os oito estados. O taste trata componente como caso à parte, sem esse preview |
+| 4 | Pede um visual que a casa do taste proíbe: monospace fora de código, fio fino, gradiente, sombra em repouso — o brutalista, o terminal, o soft | **anvil-ui-hallmark** | o taste proíbe esses recursos sem exceção. O hallmark pergunta o tom e tem esses materiais no catálogo de temas, como `brutal`, `terminal` e `console` |
+| 5 | Página ou tela de app nova num projeto que já tem build de um dos dois: `.hallmark/` ou `.taste-skill/` na raiz | **o mesmo** | o projeto já guarda o estado do método — o log de rotação do hallmark em `.hallmark/log.json`, a folha de direção do taste em `.taste-skill/direction.json` —, e trocar de método no meio do projeto o perde |
+| 6 | Qualquer outro pedido: página, site ou tela de app nova | **anvil-ui-taste** | o escopo declarado mais largo — página e tela de app, nova ou existente — e um gate que mede em navegador real em três larguras |
 
-1. **É dashboard, tabela de dados, formulário multi-etapa ou editor de código?**
-   O taste declara esses fora de escopo. → **hallmark**.
-2. **O projeto já tem design system instalado?** Inventar tokens novos brigaria
-   com ele. → **taste**.
-3. **Nenhuma das duas.** → **hallmark**, que tem o escopo mais largo e é o único
-   que cobre componente isolado.
+A linha 6 existe para a tabela ser **total**: sempre há uma resposta, e ela
+nunca é "os dois".
 
-A terceira existe para a tabela ser **total**: sempre há uma resposta, e ela
-nunca é "os dois". O caso que mais cai aqui é *página nova num projeto que já
-existe mas não tem design system* — não é modernização, não é roteável para um
-sistema oficial, e "produto novo" descreve mal. É hallmark.
+**Dependência.** O taste precisa de Node 22+ e de um Chrome, Edge ou Chromium
+para o `inspect.mjs`; sem eles, ele mesmo degrada para o `lint.mjs` e para
+screenshots por outra via, e diz isso no relatório. Falta de ferramenta não muda
+o despacho: avise o usuário na linha da escolha.
 
 ## Por que não os dois
 
 | | hallmark | taste |
 |---|---|---|
-| Decide por | catálogo: 1 de 21 macroestruturas + 1 de 20 temas OKLCH + arquétipos de nav e footer | 3 dials numéricos — `DESIGN_VARIANCE`, `MOTION_INTENSITY`, `VISUAL_DENSITY` |
-| Design system | **inventa** os tokens, emite `tokens.css` | **roteia para o oficial**, não escreve CSS que já vem em pacote |
-| Memória entre builds | `.hallmark/log.json`, rotaciona contra os 3 últimos | rotação declarada, sem estado |
-| Carga | progressiva: 107 arquivos, ~5–7 por build | monolítico: 1.206 linhas de uma vez |
-| Escopo | qualquer UI, inclusive componente | só landing, portfólio, redesign |
-| Gate final | 58 portas do slop-test | 80 checkboxes de pre-flight |
+| Declara-se para | site e página nova; design existente só quando nomeado (`redesign`, `audit`) | construir, redesenhar, restyle, polir ou revisar página pública, e tela de app |
+| Decide por | `theme.mjs deal`: três temas de um catálogo de 50, e o agente escolhe o que o material aguenta; `theme.mjs draw` sorteia a forma entre 21 macroestruturas, o hero, a nav e o footer. Rota `custom` só quando pedida | `draw.mjs`: três de 20 direções, e o agente escolhe contra um inventário do assunto; a direção escolhida dá a folha com tipo, paleta, hero, seções e movimento |
+| Antes de construir | uma mensagem com quatro perguntas: material, público, uso, tom | não pergunta: lê o brief, decide e declara a leitura numa linha |
+| Memória entre builds | `.hallmark/log.json` no projeto | `~/.taste-skill/history.json`, do usuário; a folha do build em `.taste-skill/` no projeto |
+| Tokens | o `theme.mjs scaffold` escreve `tokens.css` e `base.css` | tokens da folha como custom properties; `assets/base.css` é base opcional |
+| Marca ou design system do projeto | o pre-flight preserva fontes, paleta e espaçamento; um `design.md` trava o sistema | `--keep palette,type`: o deal dá só a composição |
+| Tela de app | `flow.md` § App screens | `references/app-screens.md`, com run e deal próprios (`draw.mjs --app`) |
+| Gate | o Floor de 16 itens e o `sloplint.mjs --render`, depois uma revisão em contexto novo | `lint.mjs` e `inspect.mjs` a 1440, 768 e 390, depois crítica dos screenshots por rubrica, até três rodadas |
+| Dependências | Node opcional: sem ele, o tema sai à mão do `references/themes/index.json`; o render usa `puppeteer-core` | Node 22+ e Chrome, Edge ou Chromium |
 
-Eles concordam no catálogo de vícios — ambos banem em-dash, ambos proíbem a
-paleta bege/latão que todo LLM produz, ambos exigem rotação. **Divergem no
-método**: um manda emitir OKLCH próprio, o outro proíbe escrever CSS quando
-existe pacote. Escolha um e siga até o fim.
-
-## Presets de estilo
-
-Aplicados **por cima** do método, nunca no lugar dele. São especificação de
-fonte, paleta e layout — tema, não processo — então não conflitam com o método
-escolhido.
-
-- **anvil-ui-brutalist** — industrial, CRT, tipografia suíça. Painel denso de
-  dados, portfólio, editorial que quer parecer planta baixa desclassificada
-- **anvil-ui-minimalist** — contenção, espaço negativo, hierarquia por escala
-- **anvil-ui-soft** — orgânico, curvas amplas, paleta quente
-- **anvil-ui-stitch** — texturado, costurado, materialidade
-
-Chame o preset **depois** do método, quando o usuário pedir uma estética nomeada
-ou quando a referência dele claramente cair numa delas.
+Concordam no catálogo de vícios — ambos banem eyebrow, rótulo em caixa-alta
+espaçada, métrica e depoimento inventados, e exigem `prefers-reduced-motion`.
+**Divergem no método**: o hallmark parte de um tema como material e do que o
+usuário tem para mostrar; o taste parte de uma ideia tirada do assunto e mede a
+casa num navegador real. Escolha um e siga até o fim.
 
 ## Antes de despachar
 
-Uma pergunta, no máximo, e só se o pedido for genuinamente ambíguo. O `taste`
-tem um portão de inferência de brief e o `hallmark` tem um portão de contexto de
-design — os dois já perguntam o que precisam. Perguntar aqui também é atrito
-duplicado.
+Uma pergunta, no máximo, e só se o pedido for genuinamente ambíguo entre duas
+linhas. O hallmark já pergunta material, público, uso e tom; o taste decide e
+declara a leitura. Perguntar aqui também é atrito duplicado.
 
-Declare o método escolhido numa linha antes de chamar, dizendo por quê. Quem lê
-depois precisa saber que houve escolha, não sorteio.
+Declare o método escolhido numa linha antes de chamar, com o número da linha do
+despacho e o porquê. Quem lê depois precisa saber que houve escolha, não sorteio.

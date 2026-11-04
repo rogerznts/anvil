@@ -19,9 +19,8 @@ com adaptação registrada — ver
 │  architect · arena · unslop · how · poteto · principles   │
 │  cursor/plugins (pstack) · 6 skills                       │
 ├─ interface ──────────────────────────────────────────────┤
-│  anvil-ui (roteador) → hallmark | taste | redesign        │
-│                      + presets brutalist/minimalist/…     │
-│  Nutlope/hallmark + Leonxlnx/taste-skill · 7 skills       │
+│  anvil-ui (roteador) → hallmark | taste                   │
+│  Nutlope/hallmark + Leonxlnx/taste-skill · 2 skills       │
 │  payloadcms/skills · 1 skill (a stack)                    │
 ├─ stack ──────────────────────────────────────────────────┤
 │  anvil-stack-payload: RULE · reference/ · bench/          │

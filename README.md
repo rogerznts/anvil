@@ -211,21 +211,14 @@ merge` passa sem mensagem. Num projeto anvil, ela lê a spec do projeto e chama 
 ### Interface
 
 O `anvil-ui` é **roteador**: escolhe um método e só um, porque `hallmark` e
-`taste` são rivais — um manda emitir OKLCH próprio, o outro proíbe escrever CSS
-quando existe pacote oficial.
+`taste` são rivais — um entrega um tema como material, o outro parte de uma ideia
+tirada do assunto e mede a página num navegador real.
 
 | skill | para quê | origem |
 |---|---|---|
 | `anvil-ui` | decide qual método usar antes de qualquer código | autoral |
-| `anvil-ui-hallmark` | 21 macroestruturas, 20 temas, 58 portas anti-slop, e o verbo `study` que extrai DNA de uma referência | hallmark |
-| `anvil-ui-taste` | 3 dials numéricos e roteamento para design system oficial | taste |
-| `anvil-ui-redesign` | audit-first sobre código existente | taste |
-| `anvil-ui-brutalist` | preset: industrial, terminal CRT, tipografia suíça | taste |
-| `anvil-ui-minimalist` | preset: editorial contido, monocromático quente, bento plano | taste |
-| `anvil-ui-soft` | preset: acabamento de agência — fontes, espaçamento, sombras, cartões | taste |
-| `anvil-ui-stitch` | preset: gera `DESIGN.md` semântico para o Google Stitch | taste |
-
-Preset é **tema, não processo** — aplicado por cima do método, nunca no lugar dele.
+| `anvil-ui-hallmark` | página nova a partir de um tema sorteado de um catálogo de 50 e de uma forma entre 21 macroestruturas; escopo próprio de componente, com os oito estados; `redesign` e `audit` só quando nomeado | hallmark |
+| `anvil-ui-taste` | página e tela de app, novas ou existentes: três de 20 direções contra um inventário do assunto, inspector em navegador real e crítica por screenshots. Pede Node 22+ e Chrome | taste |
 
 ### Escrita e comunicação
 

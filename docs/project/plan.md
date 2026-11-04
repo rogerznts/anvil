@@ -11,7 +11,7 @@ trabalho e o que cada etapa entrega.
 
 ---
 
-## Roster — 43 skills
+## Roster — 38 skills
 
 **Fluxo (5)** `anvil-grill` ← grill-with-docs · `anvil-to-spec` ·
 `anvil-to-tickets` · `anvil-implement` · `anvil-code-review`
@@ -31,8 +31,7 @@ delegando para `grilling`, e viram no-op.
 **pstack (5)** `anvil-unslop` · `anvil-how` · `anvil-architect` · `anvil-arena` ·
 `anvil-poteto`
 
-**UI (7)** `anvil-ui-hallmark` · `-taste` · `-redesign` · `-brutalist` ·
-`-minimalist` · `-soft` · `-stitch`
+**UI (2)** `anvil-ui-hallmark` · `-taste`
 
 **Autorais (10)** `anvil-docs` · `anvil-stack-payload` · `anvil-ui` (roteador) ·
 `anvil-boot` · `anvil-update` · `anvil-bench` · `tea-commit` · `tea-open-pr` ·
@@ -174,8 +173,8 @@ obrigatório, órfãos calculados pelo `anvil.lock`, protegidos `.claude/rules`,
 6. **`adopt` num `docs/` bagunçado de mentira** — com monolito, ticket órfão e
    arquivo ambíguo, exercitando os três caminhos. É a peça mais perigosa do
    toolkit e a que menos se testa sozinha.
-7. **Roteador de UI** — três pedidos despacham para redesign, taste e hallmark, e
-   nunca dois ao mesmo tempo.
+7. **Roteador de UI** — redesign de página existente, componente isolado e página
+   nova despacham para taste, hallmark e taste, e nunca dois ao mesmo tempo.
 8. **Camada de stack** — `overrideAccess: false` aparece sem ninguém ter aberto o
    `reference/QUERIES.md`.
 

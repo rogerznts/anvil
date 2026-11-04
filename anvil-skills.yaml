@@ -150,24 +150,20 @@ skills:
   - name: anvil-ui-hallmark
     source: hallmark
     path: skills/hallmark
-    pin: 13ac0ec7e148655948100b6396439e481361d690
+    pin: de4999e0cd7a7a41df0b4e6903fa02fe9f1492a8
     state: vendored
     adapt: [rename]
-    # Material que o hallmark referencia e que o upstream guarda FORA de
-    # skills/hallmark/. O tokens.css e portante: os valores de eixo por tema,
-    # que a regra de diversificacao le, vivem nos comentarios dele.
-    extra:
-      - "site/css/tokens.css::references/themes.css"
-      - "docs/recipes.md::docs/recipes.md"
-      - "docs/study-examples.md::docs/study-examples.md"
-  - { name: anvil-ui-taste,    source: taste,    path: skills/taste-skill,     pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
-  - { name: anvil-ui-redesign, source: taste,    path: skills/redesign-skill,  pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
-
-  # ---- UI: presets ---------------------------------------------------------
-  - { name: anvil-ui-brutalist,  source: taste, path: skills/brutalist-skill,  pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
-  - { name: anvil-ui-minimalist, source: taste, path: skills/minimalist-skill, pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
-  - { name: anvil-ui-soft,       source: taste, path: skills/soft-skill,       pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
-  - { name: anvil-ui-stitch,     source: taste, path: skills/stitch-skill,     pin: c184364c58658b2f131b4ae8bd3d206cabb3deee, state: vendored, adapt: [rename] }
+    # O agents/openai.yaml é metadado do Codex, fora como nas skills do
+    # mattpocock. Os extras de antes (tokens.css, docs/recipes.md,
+    # docs/study-examples.md) saíram: o upstream os removeu, e os temas viraram
+    # dados em references/themes/.
+    strip: [agents]
+  # O upstream virou uma skill só, a design-taste-frontend (tasteskill v2), e
+  # tirou redesign-skill e os presets brutalist, minimalist, soft e stitch: eles
+  # saíram daqui também (ADR-0022). Fora, deliberadamente: evals/, os briefs para
+  # testar a skill contra um baseline, e o README.md da pasta, a página de
+  # instalação para humanos. O SKILL.md não carrega nenhum dos dois.
+  - { name: anvil-ui-taste, source: taste, path: skills/taste-skill, pin: 12af471f627f866411b4bd785b19646d3672784c, state: vendored, adapt: [rename], strip: [evals, README.md] }
 
   # ---- cloudflare ----------------------------------------------------------
   # A pasta inteira, testes e validadores inclusos (ADR-0019). O README.md e o

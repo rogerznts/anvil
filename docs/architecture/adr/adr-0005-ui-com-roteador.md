@@ -2,6 +2,7 @@
 
 - Status: aceito
 - Data: 2026-08-28
+- Revisto em parte pelo [ADR-0022](./adr-0022-ui-so-com-hallmark-e-taste.md): o redesign e os quatro presets saem, e o roteador escolhe só entre hallmark e taste
 
 ## Contexto
 

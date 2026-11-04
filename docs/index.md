@@ -82,7 +82,7 @@ Nenhuma.
   - [adr-0004](./architecture/adr/adr-0004-sync-por-merge-3-way-sem-cache.md)
     — sync por merge 3-way, com o pin do submodule como base
   - [adr-0005](./architecture/adr/adr-0005-ui-com-roteador.md)
-    — a camada de UI tem roteador: hallmark e taste são métodos rivais
+    — a camada de UI tem roteador: hallmark e taste são métodos rivais; **revisto em parte pelo adr-0022**
   - [adr-0006](./architecture/adr/adr-0006-stack-como-camada-propria.md)
     — stack é camada própria, com contrato de seis capacidades
   - [adr-0007](./architecture/adr/adr-0007-equipe-por-papel-sobre-agent-teams.md)
@@ -115,6 +115,8 @@ Nenhuma.
     — o gate roda por ticket, no commit que o fecha; commit do meio roda o laço curto se mudar código
   - [adr-0021](./architecture/adr/adr-0021-grill-pergunta-pela-ferramenta-do-harness.md)
     — o grill pergunta pela ferramenta de pergunta do harness, em blocos de até 10; exceção nomeada ao adr-0001, pela regra `ask-rounds`
+  - [adr-0022](./architecture/adr/adr-0022-ui-so-com-hallmark-e-taste.md)
+    — a camada de UI fica com dois métodos, hallmark e taste; o redesign e os quatro presets saem com o upstream; revê em parte o adr-0005
 
 ### Project
 
