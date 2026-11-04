@@ -336,7 +336,8 @@ fecharem: o veredito é `CONCERNS`, o loop para e reporta, e o que o P1 deixa de
 fora entra na entrega como pendência. A terceira rodada não é do bench. O `gate`
 do diagrama roda depois da execução e reexecuta o ledger da spec e o de cada spec
 do roteiro já fechada — ele não lê o que o agente disse ter feito, nem o relatório
-da execução. Cada `--reverify` termina com o `gate.yaml` da spec escrito e
+da execução para decidir se o produto funciona. Cada `--reverify` da spec, fora o
+do merge local sob o piloto, termina com o `gate.yaml` da spec escrito e
 commitado, como diz "Grave o veredito" no [GATE.md](GATE.md).
 
 **Você conduz e não implementa.** Carregue a `anvil-implement-spec` e siga-a

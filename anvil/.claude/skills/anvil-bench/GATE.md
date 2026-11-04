@@ -10,7 +10,7 @@ melhor para um humano ler. Aqui não há humano lendo a cada volta.
 
 ## O arquivo
 
-`docs/specs/{id}/gate.yaml`, reescrito a cada volta:
+`docs/specs/<pasta>/gate.yaml`, reescrito a cada volta:
 
 ```yaml
 gate: PASS                    # PASS | CONCERNS | FAIL | WAIVED
@@ -105,16 +105,29 @@ diferença tem que aparecer no `status_reason`. Não escreva `PASS` sobre um
 ledger que você não viu reexecutar.
 
 **Grave o veredito.** Depois de cada `--reverify` da spec, quem o rodou — o bench,
-ou o piloto quando ele é o supervisor — escreve `docs/specs/{id}/gate.yaml` no
-formato de "O arquivo": o `gate` tirado da saída do checker por esta tabela, o
-`quality_score` pela contagem de "O score", o score anexado ao `score_history`
-que o arquivo já trazia, o `status_reason` com o `exit:` e a linha final do
-checker, e cada gate caído em `top_issues` pelo id qualificado. Commite o arquivo
-no branch da spec, antes de entregar ou de seguir:
+ou o piloto quando ele é o supervisor — escreve `docs/specs/<pasta>/gate.yaml` no
+formato de "O arquivo":
+
+- `gate`: `FAIL` quando o checker derrubou um gate com `CHECK:`; `CONCERNS`
+  quando a execução da `anvil-implement-spec` parou com P1 aberto na rodada 2,
+  ou quando só falta gate manual; `PASS` quando nenhuma das duas; `WAIVED` só com
+  os quatro campos de waiver. O checker decide `FAIL` e `PASS`; o `CONCERNS` vem
+  do relatório da execução;
+- `quality_score` pela contagem de "O score", anexado ao `score_history` que o
+  arquivo já trazia;
+- `status_reason` com o `exit:` e a linha final do checker, e o P1 da rodada 2,
+  quando houver;
+- `updated` com o horário em que o `--reverify` terminou, em UTC;
+- `evidence_ref` com o caminho do ledger da spec relativo à pasta dela,
+  `gates.md`;
+- `top_issues` com cada gate caído pelo id qualificado que o checker imprime,
+  `gates:<id>`, e cada P1 aberto da rodada 2 como `QA-<n>`, estável entre voltas.
+
+Commite o arquivo no branch da spec, antes de entregar ou de seguir:
 
 ```bash
 git add docs/specs/<pasta>/gate.yaml
-git commit -m "docs(spec): record the gate of spec <number>"
+git commit -m "docs(spec): record the gate of spec <número>"
 ```
 
 O `--reverify` do merge local, sob o piloto, não grava: ele só decide o merge, e a
