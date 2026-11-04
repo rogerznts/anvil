@@ -167,9 +167,10 @@ omp sem a isolação no modo branch —, os dois merges da skill viram:
 - **passo 5**, o merger: `git cherry-pick <base>..<branch do implementer>` no
   branch da spec, com o branch dele já rebaseado.
 
-O branch de cada implementer não leva o padrão `tipo/NNN-` no nome, como
-`impl-017-t01`: a guarda lê esse padrão como spec e bloquearia o merge dele. No
-omp com a isolação no modo branch, o omp integra, e esta seção não se aplica.
+Dê ao branch de cada implementer um nome sem barra seguida de número, como
+`impl-017-t01`. A guarda lê como branch de spec todo nome com `<tipo>/<NNN>-`,
+como `feature/017-t01`, e bloquearia o merge dele. No omp com a isolação no modo
+branch, o omp integra, e esta seção não se aplica.
 
 ## Citar id sempre com a glosa
 
