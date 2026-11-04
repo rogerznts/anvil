@@ -45,9 +45,25 @@ Não conte achados. Uma mentira de contrato e um intervalo de linha errado conta
   cada rodada custou. A terceira rodada existe — como escolha declarada, não como
   inércia.
 
-## Persistência da rodada
+## Onde a revisão roda: na spec ou no ticket
 
-O ticket persiste cada rodada numa linha `Review:` definida em
+A revisão roda em um de dois lugares, conforme quem conduz:
+
+- **A spec inteira, pela `anvil-implement-spec`.** Um review só, depois que
+  todos os tickets estão prontos. A rodada 1 mede o diff da spec inteira, com o
+  fixed point no ponto em que o branch da spec saiu do branch base
+  (`git merge-base <base> HEAD`). Um implementer novo corrige tudo o que ela
+  levantou, P2 e P3 inclusive. A rodada 2 mede só o diff dessa correção, com o
+  `HEAD` que a rodada 1 mediu como fixed point. **P1 aberto na rodada 2 para a
+  execução**: os tickets não fecham, e o P1 vai para quem conduz. Nenhuma linha
+  `Review:` é gravada: o que vale é o relatório da execução e o gate.
+- **O ticket avulso, pelo `anvil-implement`.** Um review por ticket, com a
+  rodada persistida no próprio ticket, como descrevem as seções *Persistência da
+  rodada no ticket avulso* e *O que fazer com o resultado no ticket avulso*.
+
+## Persistência da rodada no ticket avulso
+
+No ticket avulso, o ticket persiste cada rodada numa linha `Review:` definida em
 `docs/agents/issue-tracker.md`:
 
 ```markdown
@@ -83,7 +99,7 @@ Dois destes bastam para parar:
 - nenhum achado nomeia uma decisão que muda;
 - mesmo custo por rodada, achado menor.
 
-## O que fazer com o resultado
+## O que fazer com o resultado no ticket avulso
 
 - **P1** volta para o trabalho: grave a linha da rodada com `verdict=fail`, mude
   o `Status:` do ticket de `resolved` para `claimed`, e corrija. A rodada seguinte
@@ -105,11 +121,18 @@ perfil não repete número nenhum. Quem medir diferente corrige o `anvil.md` no
 mesmo commit.
 
 **O gate é o bloco `bash` da seção: a suíte inteira, mais o typecheck quando o
-projeto tem um. Ele libera o commit que fecha o ticket, uma vez por ticket, nunca
-uma vez por spec.** Validar por spec parece mais barato em CPU. Mas quando a
-suíte fecha vermelha, você não tem um defeito: tem uma bissecção com N tickets
-candidatos, sobre commits já entrelaçados, e cada tentativa custa uma suíte
-inteira. O verde por ticket é o que faz do commit uma âncora confiável.
+projeto tem um. No ticket avulso, pelo `anvil-implement`, ele libera o commit que
+fecha o ticket, uma vez por ticket.** Validar por spec parece mais barato em CPU.
+Mas quando a suíte fecha vermelha, você não tem um defeito: tem uma bissecção com
+N tickets candidatos, sobre commits já entrelaçados, e cada tentativa custa uma
+suíte inteira. O verde por ticket é o que faz do commit uma âncora confiável.
+
+**No fluxo da spec, pela `anvil-implement-spec`, o gate roda uma vez, sobre o
+branch da spec inteiro, depois da correção do review e antes de os tickets
+fecharem.** Quem conduz o roda, e vermelho os tickets não fecham. Os commits de
+cada implementer seguem a regra dos commits do meio, abaixo. A bissecção volta a
+ser possível, e é o custo aceito para pagar um review e um gate por spec, e não
+um por ticket.
 
 **Os commits do meio do ticket.** Commit que muda código roda o laço curto, se o
 projeto tiver um; sem ele, roda o gate. Commit só de documento ou de registro,
@@ -122,9 +145,10 @@ ticket espera o verde. O tempo de máquina não é tempo seu. A suíte inteira
 rodando bloqueante a cada commit do ticket é o custo que esta seção corta.
 
 **Antes do merge, a suíte inteira roda mais uma vez, sobre o branch completo.**
-Não é redundante com o gate por ticket: ela pega a interação entre tickets, que
-nenhum gate individual viu. No piloto automático, a skill `anvil-auto`, essa
-rodada é a prova que ele roda antes de fechar a spec.
+No ticket avulso, não é redundante com o gate por ticket: ela pega a interação
+entre tickets, que nenhum gate individual viu. No fluxo da spec, o gate da spec é
+essa rodada. No piloto automático, a skill `anvil-auto`, essa rodada é a prova
+que ele roda antes de fechar a spec.
 
 ### O laço curto, quando a suíte começar a doer
 
@@ -148,4 +172,5 @@ perigosa é *"rodo só o selecionado e confio"*: aí ela deixa de ser otimizaç�
 vira redução de cobertura. Seleção larga demais é o sinal de rodar o gate direto.
 
 A decisão está no ADR-0020 do anvil — o gate roda por ticket, no commit que o
-fecha.
+fecha —, revista no fluxo da spec pelo ADR-0023 do anvil — a `implement-spec`
+conduz a spec com um review só no fim.

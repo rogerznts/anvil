@@ -196,6 +196,19 @@ subagentes, agregação e entrega ao caller:
 +comments with class and consequence.
 ```
 
+Na `anvil-implement-spec`, que conduz a spec inteira, o delta é um parágrafo só,
+no passo do review:
+
+```diff
+-7. Once all tickets are complete, call the Skill tool with `anvil-code-review` on the integration branch. Fix all issues …
++7. … on the integration branch, with the point where it left the base branch
++(`git merge-base <base> HEAD`) as the fixed point. Fix all issues … If the fix
++changed anything, call `anvil-code-review` again as round 2, with the tip the
++first review measured as the fixed point and its findings to remeasure, so it
++reads only the fix's diff. Per `docs/agents/verification.md`, a P1 still open in
++round 2 stops the run before step 8: report it. Write no `Review:` line.
+```
+
 **Por que existe.** O `adr-0010` — a verificação tem critério de parada, e ele é
 ausência de P1 — decide que a régua de parada chega às skills como perfil do
 projeto. A skill do upstream sabe **como achar** e não diz **quando parar**;
@@ -210,8 +223,12 @@ contradiz perde: o subagente devolve o que o prompt pediu.
 skills, e o resto de cada arquivo fica verbatim — inclusive a linha de base de
 smells e os dois eixos. As trocas substantivas são só duas: fixed point e rodada
 passam a vir do histórico `Review:`, e o resumo final deixa de ser contagem para
-virar veredito por P1. Num merge em que o upstream mexa nesses seams, a versão do
-anvil ganha.
+virar veredito por P1. Na `anvil-implement-spec` o review é um só, da spec
+inteira, e não deixa registro: o delta é a rodada 2 e o fixed point das duas
+rodadas, que a skill dá em vez do histórico, e o frontier, os worktrees e o merge
+ficam como o upstream escreveu. Quem decide isso é o `adr-0023` — a
+`implement-spec` conduz a spec com um review só no fim. Num merge em que o
+upstream mexa nesses seams, a versão do anvil ganha.
 
 ---
 
