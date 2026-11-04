@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-- [ ] O diagrama e o texto de "Construir" do `anvil-bench` descrevem a `implement-spec` e o gate do ledger, sem `anvil-implement` por ticket.
-- [ ] O `GATE.md` não cita mais rodada nem `Review:` por ticket, e os vereditos `CONCERNS` e `FAIL` dizem a condição da spec.
+- [x] O diagrama e o texto de "Construir" do `anvil-bench` descrevem a `implement-spec` e o gate do ledger, sem `anvil-implement` por ticket.
+- [x] O `GATE.md` não cita mais rodada nem `Review:` por ticket, e os vereditos `CONCERNS` e `FAIL` dizem a condição da spec.
 - [ ] Num projeto do bench com uma entrada pequena, chamado direto no omp, o bench constrói pela `implement-spec` e o veredito sai do `--reverify` do ledger.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
