@@ -169,6 +169,10 @@ anvil-distill
 anvil-how
 anvil-architect
 anvil-arena
+anvil-swarm
+anvil-interrogate
+anvil-benchmark-checklist
+anvil-in-your-own-words
 anvil-principles
 anvil-prototype
 anvil-unslop

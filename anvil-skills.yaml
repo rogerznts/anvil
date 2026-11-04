@@ -99,6 +99,10 @@ skills:
   - { name: anvil-how,       source: pstack, path: skills/how,         pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, decursor, invocable] }
   - { name: anvil-architect, source: pstack, path: skills/architect,   pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, decursor, docs-remap, invocable] }
   - { name: anvil-arena,     source: pstack, path: skills/arena,       pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, decursor, invocable] }
+  - { name: anvil-swarm,     source: pstack, path: skills/swarm,       pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, decursor, invocable] }
+  - { name: anvil-interrogate, source: pstack, path: skills/interrogate, pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, decursor, invocable] }
+  - { name: anvil-benchmark-checklist, source: pstack, path: skills/benchmark-checklist, pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, invocable] }
+  - { name: anvil-in-your-own-words, source: pstack, path: skills/in-your-own-words, pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, invocable] }
   - { name: anvil-poteto,    source: pstack, path: skills/poteto-mode, pin: bb68f2365eceafa0cb2d253112f675acf5f144cc, state: vendored, adapt: [rename, decursor],
       strip: [scripts, references, "playbooks/autonomous-run.md", "playbooks/autopilot-full.md",
               "playbooks/autopilot-stack.md", "playbooks/babysit.md", "playbooks/eval.md",

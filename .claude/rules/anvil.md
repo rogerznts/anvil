@@ -19,9 +19,12 @@ rodar a verificação está em `docs/agents/verification.md`.
 
 ## Modelos por papel
 
-Lidos por `anvil-arena`, `anvil-how` e `anvil-architect`.
+Lidos por `anvil-arena`, `anvil-how`, `anvil-architect`, `anvil-swarm` e
+`anvil-interrogate`.
 
 - `runners`: `opus`, `fable`, `sonnet`
 - `how-explorer`: `sonnet`
 - `how-explainer`: `opus`
 - `cross-judge`: `opus`, `fable`, `sonnet`
+- `swarm workers`: `sonnet`
+- `interrogate reviewers`: `opus`, `sonnet`

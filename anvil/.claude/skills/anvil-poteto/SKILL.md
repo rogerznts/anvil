@@ -21,14 +21,14 @@ Remaining triggers:
 - About to `AskUserQuestion` on a "which approach", "how should I", or "what should this do" fork → classify it before you ask. If the answer is a fact you could observe by running something (behavior, timing, layout, output, perf, even whether an eval separates), it is not the human's to answer. Sketch it via the **anvil-prototype** skill and let the result decide. If the task is a read-only Investigation whose deliverable is a cited answer, stay in it and answer from the evidence rather than building a sketch. Reserve the question for a genuine product or preference call no experiment can settle. Under a full-autonomy grant, decide a call the grant covers, act on it, and report it, with no reply word and no offer. Under the grant, for a call only the operator can make, apply a default, report it with a full explanation, and say in plain words what the operator could tell you to do instead. The operator answers in their own words. Never give a shorthand token to type back. Gates the operator named and the Always-pause list in Autonomy still need the operator.
 - Any code → name the data shape first, and choose its organizing structure per the **anvil-principles** skill, `references/model-the-domain.md`.
 - Code crossing a function boundary → the **anvil-architect** skill, parallel design exploration before implementing.
-- Parallel fan-out → the **swarm** skill for coverage matrices, races, gauntlets, and exploration partitions. Use **anvil-arena** for design or code bakeoffs with base selection and grafting.
-- Contested design → the **interrogate** skill (multi-model adversarial) before shipping.
+- Parallel fan-out → the **anvil-swarm** skill for coverage matrices, races, gauntlets, and exploration partitions. Use **anvil-arena** for design or code bakeoffs with base selection and grafting.
+- Contested design → the **anvil-interrogate** skill (multi-model adversarial) before shipping.
 - Nontrivial multi-step → write the throughput checkpoint (Feature step 3).
 - Any prose surface, your reply to the user included → the **anvil-unslop** skill. Write the reply per **Writing the reply**. Agent-facing prose also follows the **anvil-writing-for-agents** skill.
 - Docs, RFCs, readmes, PR descriptions, or commit messages → the **technical-writing** skill (`/technical-writing`).
 - Before review → the **no-comments** skill (`/no-comments`).
 - Shipping UI / IDE / CLI → exercise the real surface yourself before handing anything over. For bug fixes, reproduce on the same surface first. Hand to the user only under the narrow Bug fix step 1 exception.
-- Running a benchmark, measuring perf yourself, or reporting a speedup or regression you measured → the **benchmark-checklist** skill before you report or act on the number.
+- Running a benchmark, measuring perf yourself, or reporting a speedup or regression you measured → the **anvil-benchmark-checklist** skill before you report or act on the number.
 - Asked to land or ship a green stack → the **Shipping** playbook (the **anvil-open-pr** skill). Green is not safe. Nothing gets armed before an independent per-PR verdict, and only the contiguous verified run from the root lands.
 - An automated reviewer or security bot commented → skeptical posture. They catch real bugs and also file non-issues and nitpicks, so assess each on its merits and dismiss noise with a concrete reason instead of churning code.
 - Broken skill mid-task → fix it in its own PR. Don't block. Don't silently work around it.

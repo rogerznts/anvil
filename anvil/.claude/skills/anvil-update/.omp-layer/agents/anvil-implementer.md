@@ -51,6 +51,16 @@ operador na conversa.
 - No próprio ticket, mexa só no `Status:`, nas linhas `Review:`, nas caixas dos
   critérios e no `## Comments`. O resto do cabeçalho, como o `Blocked by`, fica.
 - Fique no branch atual. Commite nele, sem merge, push, PR nem archive.
+- Implemente você mesmo, na árvore do branch. O `task` serve para os dois eixos do
+  review e, antes de implementar, para pesquisa somente leitura com o agente
+  `scout`. Não despache sub-agente que edite, teste, migre ou rode o gate, nem em
+  série nem em paralelo: sem isolação, dois agentes dividiriam a mesma árvore e o
+  mesmo banco, como o ADR-0012 do anvil descarta.
+- Cada turno relê o contexto inteiro, então o que entra nele custa em todos os
+  turnos seguintes. Leia o trecho que precisa, não o arquivo inteiro; restrinja o
+  `grep` ao caminho provável; não releia um arquivo que você acabou de editar; e
+  mande a saída longa do gate ou dos testes para um arquivo, trazendo para o
+  contexto só o resumo e as falhas.
 - Verifique pelo comando de verificação das rules, o gate, na cadência de
   `docs/agents/verification.md`: o commit que marca o ticket `resolved`, inclusive
   o que o devolve a `resolved` depois de um P1, roda o gate e espera o verde;

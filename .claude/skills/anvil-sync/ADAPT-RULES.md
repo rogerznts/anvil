@@ -118,6 +118,8 @@ Só para skills do `pstack`, que são escritas para o Cursor.
 | `AskQuestion` | `AskUserQuestion` |
 | frontmatter `mode` · `icon` · `color` · `reminder` | **descartar** — não existem no Claude Code |
 | slugs `gpt-5.6-sol-max`, `grok-4.6-fast-xhigh`, `claude-fable-5-thinking-max` | variantes Claude |
+| `subagent_type: generalPurpose` | `subagent_type: general-purpose` |
+| `environment: "cloud"` · `cloud_base_branch` | **descartar** — agente na nuvem do Cursor; no Claude Code o subagente roda local, e a isolação é worktree |
 | skill de outro plugin (`cursor-team-kit`) | remover a referência, ou apontar para a equivalente do anvil |
 
 `disable-model-invocation: true` **é suportado** pelo Claude Code, e o

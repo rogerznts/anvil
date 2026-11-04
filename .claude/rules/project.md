@@ -92,7 +92,7 @@ O julgamento está em `.claude/skills/anvil-sync/SKILL.md`, o catálogo em
 nada disso aqui — são a fonte, isto é o ponteiro.
 
 Skill autoral — `anvil-boot`, `anvil-update`, `anvil-docs`, `anvil-ui`,
-`anvil-distill`, `anvil-bench`, `anvil-commit`, `anvil-open-pr`,
+`anvil-ui-study`, `anvil-distill`, `anvil-bench`, `anvil-commit`, `anvil-open-pr`,
 `anvil-open-fast-pr` e `anvil-prune-branches` — não tem upstream, e se
 edita direto no payload. A ressalva é o
 `anvil-bench`: o que está em `anvil-bench/unlazy/` é material do

@@ -4,6 +4,7 @@
 skill: anvil-architect
 skill: anvil-arena
 skill: anvil-bench
+skill: anvil-benchmark-checklist
 skill: anvil-boot
 skill: anvil-browser-qa
 skill: anvil-code-review
@@ -20,6 +21,8 @@ skill: anvil-handoff
 skill: anvil-how
 skill: anvil-implement-spec
 skill: anvil-implement
+skill: anvil-in-your-own-words
+skill: anvil-interrogate
 skill: anvil-next
 skill: anvil-open-fast-pr
 skill: anvil-open-pr
@@ -33,12 +36,14 @@ skill: anvil-retro
 skill: anvil-security-audit
 skill: anvil-setup
 skill: anvil-stack-payload
+skill: anvil-swarm
 skill: anvil-tdd
 skill: anvil-teach
 skill: anvil-to-questionnaire
 skill: anvil-to-spec
 skill: anvil-to-tickets
 skill: anvil-ui-hallmark
+skill: anvil-ui-study
 skill: anvil-ui-taste
 skill: anvil-ui
 skill: anvil-unslop

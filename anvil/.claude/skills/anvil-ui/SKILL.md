@@ -22,10 +22,16 @@ A primeira linha que casar decide.
 | 3 | Um componente isolado e novo: botão, input, card, modal, nav, footer | **anvil-ui-hallmark** | tem escopo próprio de componente: entrega o componente e um preview que mostra os oito estados. O taste trata componente como caso à parte, sem esse preview |
 | 4 | Pede um visual que a casa do taste proíbe: monospace fora de código, fio fino, gradiente, sombra em repouso — o brutalista, o terminal, o soft | **anvil-ui-hallmark** | o taste proíbe esses recursos sem exceção. O hallmark pergunta o tom e tem esses materiais no catálogo de temas, como `brutal`, `terminal` e `console` |
 | 5 | Página ou tela de app nova num projeto que já tem build de um dos dois: `.hallmark/` ou `.taste-skill/` na raiz | **o mesmo** | o projeto já guarda o estado do método — o log de rotação do hallmark em `.hallmark/log.json`, a folha de direção do taste em `.taste-skill/direction.json` —, e trocar de método no meio do projeto o perde |
-| 6 | Qualquer outro pedido: página, site ou tela de app nova | **anvil-ui-taste** | o escopo declarado mais largo — página e tela de app, nova ou existente — e um gate que mede em navegador real em três larguras |
+| 6 | Extrair o design de uma URL ou de um screenshot de referência: estudar, ler o DNA, "quero que fique como este site" | **anvil-ui-study** | nem o hallmark nem o taste leem uma referência desde que o hallmark tirou o verbo `study`. O study recusa template pago, diagnostica antes de qualquer código e leva só a estrutura, nunca o pixel; ele não constrói |
+| 7 | Qualquer outro pedido: página, site ou tela de app nova | **anvil-ui-taste** | o escopo declarado mais largo — página e tela de app, nova ou existente — e um gate que mede em navegador real em três larguras |
 
-A linha 6 existe para a tabela ser **total**: sempre há uma resposta, e ela
+A linha 7 existe para a tabela ser **total**: sempre há uma resposta, e ela
 nunca é "os dois".
+
+A linha 6 não é um terceiro método. O study termina entregando ao hallmark: grava
+o DNA como `design.md` na raiz do projeto e chama o **anvil-ui-hallmark**, que lê
+esse arquivo como sistema travado. Um build que parte de um study é, portanto,
+sempre do hallmark, nunca do taste.
 
 **Dependência.** O taste precisa de Node 22+ e de um Chrome, Edge ou Chromium
 para o `inspect.mjs`; sem eles, ele mesmo degrada para o `lint.mjs` e para
