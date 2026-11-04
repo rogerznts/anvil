@@ -59,8 +59,11 @@ A revisão roda em um de dois lugares, conforme quem conduz:
   que a rodada 1 mediu como fixed point. **P1 aberto na rodada 2 para a
   execução**: os tickets não fecham, e o P1 vai para quem conduz. P2 e P3 da
   rodada 2 vão para o relatório e não seguram o fechamento. **O veredito é dos
-  eixos:** quem conduz não descarta nem reclassifica achado deles. Nenhuma linha
-  `Review:` é gravada: o que vale é o relatório da execução e o gate.
+  eixos:** quem conduz não descarta nem reclassifica achado deles. Achado que
+  quem conduz julga errado volta ao eixo que o levantou, com o motivo, antes da
+  correção: o eixo mantém, e ele vai à correção, ou retira, e ele sai pela
+  palavra do eixo. Nenhuma linha `Review:` é gravada: o que vale é o relatório da
+  execução e o gate.
 - **O ticket avulso, pelo `anvil-implement`.** Um review por ticket, com a
   rodada persistida no próprio ticket, como descrevem as seções *Persistência da
   rodada no ticket avulso* e *O que fazer com o resultado no ticket avulso*.

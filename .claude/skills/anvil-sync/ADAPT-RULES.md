@@ -207,7 +207,10 @@ no passo do review:
 +and round 2. Then call `anvil-code-review` again as round 2, with the tip the
 +first review measured as the fixed point and its findings to remeasure, so it
 +reads only the fix's diff; a fix that changed nothing leaves round 1's P1 open.
-+The verdict is the axes': never drop or reclassify a finding they raised. Per
++The verdict is the axes': never drop or reclassify a finding they raised. A
++finding you judge wrong goes back to the axis that raised it, with your reason,
++before the fix: if the axis keeps it, it goes to the fix; if the axis withdraws
++it, it leaves on the axis's word. Per
 +`docs/agents/verification.md`, a P1 still open after round 2 stops the run
 +before step 8: leave the tickets unresolved and report it. Then, where that
 +profile says the gate applies, run it once on the integration branch; a red
