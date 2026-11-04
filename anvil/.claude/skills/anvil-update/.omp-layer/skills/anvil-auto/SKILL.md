@@ -485,16 +485,27 @@ O passo 9, a limpeza, roda sempre, também quando a execução para antes do pas
 devolveu, com o fixed point e os achados, os commits da correção e o branch
 `omp/task/*` de trabalho não integrado que a rule de harness manda nomear.
 
+**Nada se decide com implementer rodando.** A skill despacha implementers em
+segundo plano. Antes de qualquer decisão — esta lista, uma contradição, uma
+parada, o gate ou o passo 8 —, espere com `wait` até todo implementer despachado
+devolver o resultado, inclusive o que mandou mensagem no meio dizendo que está
+bloqueado. Enquanto houver um vivo, não rode `git checkout`, `git restore`,
+`git reset`, `git stash` nem `git clean`, não commite e não grave relatório: o
+trabalho dele estaria em disco e seria perdido ou misturado. Uma mensagem de
+implementer no meio da execução é informação, não resultado.
+
 Com a skill terminada, decida pelo que a execução e o disco mostram, nesta ordem:
 
 - **P1 aberto na rodada 2**: siga "Pesquisa antes de travar".
 - **Gate saindo diferente de `0`**: siga "Pesquisa antes de travar".
 - **Ticket que não fechou**: o implementer dele parou sem terminar, com erro ou
   cancelado, ou o ticket ficou sem `Status: resolved` depois do passo 8. Leia o
-  que o implementer devolveu e o `## Comments` do ticket. Uma contradição entre o
-  código e a entrada segue "Contradição com o roteiro"; uma pergunta de fato, que
-  uma fonte pública responde, segue "Pesquisa antes de travar"; o resto para a
-  spec, como diz "Parada".
+  que o implementer devolveu e o `## Comments` do ticket. Uma afirmação de que o
+  pedido é impossível pelo comportamento de uma ferramenta, biblioteca, API ou
+  formato é pergunta de fato, e segue "Pesquisa antes de travar" antes de qualquer
+  contradição. Uma contradição entre o código e a entrada que não depende de fato
+  público segue "Contradição com o roteiro"; o resto para a spec, como diz
+  "Parada".
 - **Todo ticket `resolved`**: siga para o `PASS`.
 
 ### `PASS`
@@ -778,7 +789,10 @@ entrada:
   vez à `anvil-implement-spec`, do passo 4, como diz "Abrir a rodada" para o
   ticket que não fechou, sem pesquisa e sem a linha da rodada a mais.
 - Com o critério incumprível, a spec fica parada, como diz "Parada", e a
-  contradição vai para "o que ainda espera decisão". Achada antes de os tickets
+  contradição vai para "o que ainda espera decisão". A incumpribilidade que só se
+  sustenta numa afirmação de fato público — "a API não permite", "o formato não
+  suporta" — não é contradição enquanto a "Pesquisa antes de travar" não a
+  confirmar: pesquise primeiro. Achada antes de os tickets
   estarem completos, ao escrever a spec ou os tickets, ela deixa o rascunho fora de
   commit. Commite no branch da spec o que você escreveu na pasta dela, só essa
   pasta, e só então siga a "Parada":
@@ -1096,6 +1110,10 @@ o anvil, como na entrega do bench chamado direto.
   laço, ou numa spec que já tem a linha `- Rodada a mais: aberta` numa pesquisa.
 - Implementar, corrigir ou commitar código no lugar dos implementers da
   `anvil-implement-spec`, ou gravar linha `Review:` num ticket.
+- Decidir, reverter arquivos, commitar ou gravar relatório com implementer ainda
+  rodando.
+- Deixar uma spec parada por "impossível" de implementer sem a "Pesquisa antes de
+  travar", quando a impossibilidade é afirmação de fato público.
 - Resolver conflito de merge fora do `docs/index.md`, ou fazer o merge de um PR.
 - Trocar de branch fora dos passos da corrente: a volta ao branch base depois do
   `new-spec.sh`, o `git checkout -B` do branch recém-criado, a ida ao branch base
