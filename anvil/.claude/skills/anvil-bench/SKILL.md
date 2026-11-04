@@ -341,9 +341,11 @@ da execução.
 **Você conduz e não implementa.** Carregue a `anvil-implement-spec` e siga-a
 passo a passo, com o mapeamento de harness da camada omp quando houver. Você não
 escreve código do ticket nem da correção: cada ticket sai de um implementer
-despachado por você, e a correção da rodada 1 sai de outro implementer novo, mesmo
-quando a entrada tem um ticket só. Os tickets só ficam `resolved` no passo 8 da
-skill, depois das duas rodadas.
+despachado por você, mesmo quando a entrada tem um ticket só. O brief do
+implementer não pede para mexer no `Status:`: os tickets só ficam `resolved` no
+passo 8 da skill, depois das duas rodadas. Qualquer achado da rodada 1, P2 e P3
+inclusive, vai para um implementer novo de correção, e a rodada 2 mede o diff
+dele.
 
 Uma linha visível de progresso por fase. Detalhe vai para `build-log.md`, e toda
 decisão que você tomou sozinha vai para `decisions-log.md` — é o que permite
