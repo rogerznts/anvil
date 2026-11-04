@@ -9,8 +9,9 @@
 
 - [x] O passo 7 da `anvil-implement-spec` diz que todo achado da rodada 1, P2 e P3 inclusive, vai ao implementer de correção, que só a rodada sem achado dispensa a correção e a rodada 2, e que o condutor não descarta nem reclassifica achado; o catálogo reproduz o delta.
 - [x] `docs/agents/verification.md` e o template do `anvil-docs` dizem a regra da correção para o fluxo da spec, sem mudar a do ticket avulso; o ADR-0023 a registra.
-- [x] O `GATE.md` manda tirar o `updated` de um `date -u` rodado logo depois do `--reverify`.
-- [ ] Num projeto do bench no omp real, com rodada 1 com achado, a correção sai de um implementer novo, a rodada 2 mede o diff dela, nenhum achado de eixo é descartado pelo condutor, nenhuma linha `Review:` é gravada e o `updated` do `gate.yaml` é posterior ao fim do `--reverify`.
+- [x] ~~O `GATE.md` manda tirar o `updated` de um `date -u` rodado logo depois do `--reverify`.~~ Superado: o `GATE.md` sai com o bench no ticket 08.
+- [ ] O passo 7 dá ao condutor uma saída para o achado que ele julga errado: ele o devolve ao eixo que o levantou, com o motivo; o eixo mantém, e o achado vai à correção, ou retira, e o achado sai pela palavra do eixo. O condutor nunca o descarta sozinho. O catálogo reproduz o delta, e o perfil de verificação e o ADR-0023 dizem o mesmo.
+- [ ] Numa spec com rodada 1 com achado, conduzida pela `implement-spec` no omp real com o `claude-sonnet-5-5`, fora do bench, a correção sai de um implementer novo, a rodada 2 mede o diff dela, nenhum achado é descartado pelo condutor sem a palavra do eixo e nenhuma linha `Review:` é gravada.
 - [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
 
 ## Comments
@@ -19,3 +20,4 @@
 - Review round=1 · P2 (Standards): a frase de parada do bench lia "para" como preposição — reescrita em `3297465`.
 - Review round=1 · P3 (Standards): o corpo do ADR-0010 não cita a exceção do fluxo da spec; só o cabeçalho "Revisto em parte" aponta o ADR-0023.
 - Prova `out-8`, sobre `c26b9cf`, critério 4 **falha**: a rodada 1 achou um P1 e dois P3; a correção saiu de um implementer novo (`6c5e163`) e a rodada 2 mediu `7032ddd..6c5e163`, sem linha `Review:` em ticket e com `updated` de `date -u` — mas o condutor descartou os dois P3 como "acceptable" e não rodou o `--reverify` (ver o ticket 06).
+- Causa do descarte na `out-8`: os dois P3 eram falsos positivos — o eixo Spec chamou de "scope creep" o `gates.md` e o `decisions-log.md`, que o bench exige —, e "corrigir tudo" não tinha saída para achado errado: corrigir apagaria o ledger. O condutor acertou no mérito e desobedeceu a regra. Daí o critério da devolução ao eixo.

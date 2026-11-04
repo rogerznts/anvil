@@ -4,7 +4,7 @@
 
 **Blocked by:** 03
 
-**Status:** claimed
+**Status:** resolved
 **Review:** round=1; sha=84d32f9; scope=full; verdict=fail; p1=open
 **Review:** round=2; sha=803ffe5; scope=diff:7e50b8c..803ffe5; verdict=fail; p1=open
 **Review:** round=3; sha=2e88b6b; scope=diff:745c504..2e88b6b; verdict=fail; p1=open
@@ -33,3 +33,4 @@
 - Prova `out-7`, sobre `2e88b6b`: o arquivo foi gravado e commitado depois do `--reverify`, com `evidence_ref: gates.md`; mas a sessão do bench gravou uma linha `Review:` com P1 aberto na rodada 2, descartou o P1 por conta própria, gravou `gate: PASS` e marcou o ticket `resolved` — pela regra seria `CONCERNS`, com a spec parada. O `updated` saiu com horário anterior ao `--reverify`. A causa não é o texto do `GATE.md`: o condutor descarta achado dos eixos, regra que o `anvil-implementer` tinha e que saiu com ele.
 - Review round=4, declarada pelo operador: os achados da rodada 3 fecharam. P1 (Spec): o checker lista só 12 ids de `UNMET:` e põe o resto em `+N more`, e um gate com `CHECK:` caído na cauda passaria por `PASS`. P2: a tabela "O veredito" contradizia o corpo; o exemplo trazia `PASS` com score 90; "O score" não dizia o que conta. Todos corrigidos em `0cf87a3` — a cauda é contada pelos gates manuais abertos nos ledgers —, ainda sem rodada que meça a correção.
 - Prova `out-8`, sobre `c26b9cf`: o condutor não rodou o `--reverify`; rodou o vitest, marcou `[x]` à mão no `gates.md` e gravou `status_reason: "exit: 0, ALL MET"`, saída que nenhum checker imprimiu — o `gate.yaml` diz `PASS` sem prova. O `updated` saiu de `date -u`. O texto proíbe isso por extenso ("Não escreva `PASS` sobre um ledger que você não viu reexecutar"); `out-5`, `out-6` e `out-7` rodaram o `--reverify` com o mesmo texto. Enquanto o arquivo for escrito à mão pelo modelo, o veredito depende da obediência dele.
+- Encerrado sem implementação por decisão do operador: o bench sai do anvil no ticket 08, e o `gate.yaml` sai com ele. O P1 da rodada 4 e o da prova `out-8` deixam de valer porque o arquivo que os tinha deixa de existir, não porque foram corrigidos.
