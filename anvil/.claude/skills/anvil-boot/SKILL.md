@@ -464,8 +464,7 @@ Se a varredura encontrou uma stack conhecida — hoje, um `payload.config.ts` �
 > eu posso editar?*
 
 A rule sai da skill `anvil-stack-payload`, arquivo `RULE.md`, com os `{{...}}`
-preenchidos pelo que a varredura achou. **Sem** as invariantes do bench — aquelas
-são decisão de produto do `/anvil-bench` e não valem para projeto comum.
+preenchidos pelo que a varredura achou.
 
 A linha do comando de teste é a exceção: o comando já mora na seção de
 verificação do `anvil.md`, e repeti-lo na rule cria a segunda cópia que diverge.

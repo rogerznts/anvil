@@ -17,7 +17,7 @@ Fora o documento, o sistema de referência e o código do projeto são **somente
 nenhum arquivo editado, criado, movido ou apagado neles, e nenhum comando que os
 altere: `git fetch`, `pull`, `checkout`, `submodule update`, instalador de
 dependência, build, formatter, nem executar o sistema de referência ou os testes do
-projeto, que deixam cache como `.pytest_cache` e `.unlazy/`. Comando git de leitura
+projeto, que deixam cache como `.pytest_cache`. Comando git de leitura
 — `log`, `show`, `rev-parse`, `ls-files`, `ls-tree`, `status` — é livre.
 
 ## A stack do projeto

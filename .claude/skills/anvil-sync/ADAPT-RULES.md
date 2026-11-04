@@ -300,7 +300,7 @@ Vivem no manifesto, e o script obedece.
 mescla, não os apaga por não existirem upstream, e não reclama deles.
 
 ```yaml
-keep: [RULE.md, VENDOR.md, bench]
+keep: [RULE.md, VENDOR.md]
 ```
 
 **`strip`** — arquivos do upstream deliberadamente fora. Registrados para o

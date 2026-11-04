@@ -119,8 +119,7 @@ Dois destes bastam para parar:
 ## Quando rodar a suíte
 
 Vale para o projeto cujo `.claude/rules/anvil.md` tem a seção
-`## Comando de verificação`. No bench, a prova é o `--reverify` dos ledgers, e
-esta seção não se aplica.
+`## Comando de verificação`.
 
 O custo da verificação é dado do projeto, não estimativa: está medido e datado
 nessa seção do `anvil.md`, e é esse número que decide quantas vezes se roda. O

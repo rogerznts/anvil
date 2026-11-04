@@ -24,7 +24,7 @@ Confundir as duas coisas é o erro caro daqui.
 | `.claude/skills/anvil-sync/` | a ferramenta de manutenção. É do repositório e **não vai no degit** |
 | `.claude/settings.json` | o hook da guarda de merge deste repositório, que chama a guarda direto do payload, `anvil/.claude/skills/anvil-docs/scripts/guard-spec-merge.sh` |
 | `anvil-skills.yaml` | o manifesto de curadoria. Também não vai no degit |
-| `references/` — upstream vendorizado | submodule com pin, listado em `sources:` no manifesto. De onde vem o que é vendorizado: skills e, no caso do `unlazy`, material de terceiro dentro do `anvil-bench`. **O pin é a base do merge 3-way** |
+| `references/` — upstream vendorizado | submodule com pin, listado em `sources:` no manifesto. De onde vem o que é vendorizado. **O pin é a base do merge 3-way** |
 | `references/` — sistema de referência | sistema de terceiro estudado para portar algo, fora do manifesto. Entra passageiro, fora do git por `.git/info/exclude`, ou versionado como submodule, com pin. **Não é base de merge**: o `mosk` — o toolkit de agentes-persona que o anvil sucede — está aqui |
 | `docs/` | a documentação do próprio anvil |
 | `workspace/` | projetos descartáveis para exercitar o toolkit. Fora do git |
@@ -92,12 +92,9 @@ O julgamento está em `.claude/skills/anvil-sync/SKILL.md`, o catálogo em
 nada disso aqui — são a fonte, isto é o ponteiro.
 
 Skill autoral — `anvil-boot`, `anvil-update`, `anvil-docs`, `anvil-ui`,
-`anvil-ui-study`, `anvil-distill`, `anvil-bench`, `anvil-commit`, `anvil-open-pr`,
+`anvil-ui-study`, `anvil-distill`, `anvil-commit`, `anvil-open-pr`,
 `anvil-open-fast-pr` e `anvil-prune-branches` — não tem upstream, e se
-edita direto no payload. A ressalva é o
-`anvil-bench`: o que está em `anvil-bench/unlazy/` é material do
-`unlazy`, que vem de upstream com pin e registro no manifesto, e segue a regra de
-skill vendorizada.
+edita direto no payload.
 
 ## Como se verifica
 

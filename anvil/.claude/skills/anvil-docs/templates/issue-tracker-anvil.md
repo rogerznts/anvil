@@ -118,11 +118,10 @@ cobrem mais de uma spec. Nenhum dos dois é spec, e a guarda de merge não os l�
 
 - `docs/specs/roadmap.md` — o **roteiro**: o plano de várias specs que o piloto
   automático, a skill `anvil-auto`, executa. Há um roteiro ativo por projeto.
-  Quem o escreve é o piloto, no fim do grill, ou o `anvil-bench`, no fim da
-  entrevista, e o commita na `main` depois do sim sobre o texto, que no bench é a
-  versão em português simples. Depois disso, só se acrescenta a linha `Spec:` de
-  uma entrada quando a spec dela nasce. O histórico do roteiro fica no git, sem
-  arquivo de versão.
+  Quem o escreve é o piloto, no fim do grill, e o commita na `main` depois do sim
+  sobre o texto. Depois disso, só se acrescenta a linha `Spec:` de uma entrada
+  quando a spec dela nasce. O histórico do roteiro fica no git, sem arquivo de
+  versão.
 - `docs/specs/report.md` — o **relatório** da execução do piloto: o que foi
   feito, o que foi decidido sem humano, onde a corrente parou e, por último, o
   que ainda espera decisão, cada item como pergunta. O piloto o escreve à medida
@@ -163,9 +162,8 @@ Pronto quando: …
 - `Tipo:` é um dos tipos do `new-spec.sh`.
 - `Depende de:` é uma lista de nomes separados por vírgula. Vazia ou ausente,
   a entrada não tem dependência.
-- `Cobre:` traz os ids do `docs/qa/checklist.yaml` e só existe no bench.
 - `Spec:` não existe enquanto a spec não nasce, e só quem abre a spec da entrada
-  o escreve: o piloto, ou o bench chamado direto.
+  o escreve: o piloto.
 - `Entra:`, `Fica de fora:` e `Pronto quando:` vêm do grill, e o piloto nunca os
   edita.
 - A ordem das seções é a ordem do roteiro.

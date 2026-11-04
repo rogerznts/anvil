@@ -277,8 +277,8 @@ cmd_vendor() {
     dest="$PAYLOAD/$name"
 
     # Destino existente passa SO quando tudo que ja esta la e `keep`. E o caso
-    # de adotar material upstream DENTRO de uma skill autoral: o anvil-bench tem
-    # SKILL.md e GATE.md nossos, e o unlazy entra embaixo de unlazy/. Qualquer
+    # de adotar material upstream DENTRO de uma skill com arquivos nossos: o que
+    # e nosso fica no keep, e o upstream entra ao lado. Qualquer
     # arquivo fora do keep significa sobrescrever trabalho, e a recusa continua.
     if [ -e "$dest" ]; then
         while IFS= read -r f; do

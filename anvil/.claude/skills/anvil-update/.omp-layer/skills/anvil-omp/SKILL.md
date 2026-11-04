@@ -67,7 +67,7 @@ tocado.
   Sem P1, fecha cada ticket com `Status: resolved`. Nenhum ticket ganha linha
   `Review:`. Com a isolação no modo branch, os tickets independentes rodam ao
   mesmo tempo; sem ela, um por vez. Ver "Isolação".
-- `/skill:anvil-auto [--bench] <pedido>` é o piloto automático: leva um roteiro de
+- `/skill:anvil-auto <pedido>` é o piloto automático: leva um roteiro de
   várias specs do grill ao fechamento, com um sim seu só. Ver "Piloto automático".
 - `/skill:anvil-browser-qa` faz o QA de browser, quando a spec tem tela. Nem a
   `anvil-implement-spec` nem uma skill da camada o dispara.
@@ -85,17 +85,15 @@ comando do `bash` traz um aviso de que a guarda está desligada, até um
 
 O `/skill:anvil-auto <pedido>` leva um pedido que ocupa várias specs do grill ao
 fechamento, e você participa uma vez só. Ele tem trava de invocação: roda quando
-você o chama, nunca por conta do modelo. Com `--bench`, ou num projeto que tem a
-rule da stack do bench, a entrada é a entrevista do `anvil-bench`, para quem não
-programa, e não o `anvil-grill`. Nenhum outro sinal liga o modo bench.
+você o chama, nunca por conta do modelo. A entrada é o `anvil-grill`.
 
 **Largada.** Antes de escrever qualquer arquivo, o piloto recusa o perfil do
 tracker que não é o `docs/specs`, com a mesma recusa do `anvil-plan`; a árvore
 suja, porque ele commita no branch base — a `main`, a `master` ou o que a seção
 `## Git` de `.claude/rules/anvil.md` declara — e o que é seu entraria num commit
-dele; o projeto cujo branch base o resolvedor não decide, com o motivo dele; e,
-fora do bench, o `.claude/rules/anvil.md` sem a seção `## Comando de verificação`
-com um bloco `bash`, que o `/anvil-boot` grava em projeto novo. Só a recusa do
+dele; o projeto cujo branch base o resolvedor não decide, com o motivo dele; e o
+`.claude/rules/anvil.md` sem a seção `## Comando de verificação` com um bloco
+`bash`, que o `/anvil-boot` grava em projeto novo. Só a recusa do
 branch base para a largada: a de forge ou de login, como num Gitea sem `tea` ou
 sem a seção `## Git`, fica para o fechamento por PR. Chamado no branch
 de uma spec aberta do roteiro, ele retoma a spec do ponto que o disco indica e
@@ -105,11 +103,11 @@ refaz a conferência do `--pr`, o push e o `/anvil-open-pr`; pelo merge local, o
 com o PR aberto, recusa. Em outro branch, como o de uma spec que já chegou ao
 branch base ou o de uma spec que não é de entrada do roteiro, ele recusa.
 
-**O único sim.** O grill, ou a entrevista, cobre o trabalho inteiro: as specs, a
-ordem, o escopo, o que fica de fora e o critério de pronto de cada uma. No fim, o
-piloto escreve o **roteiro** em `docs/specs/roadmap.md`, valida e mostra o texto,
-que no bench é a versão em português simples. A sua confirmação sobre esse texto
-é o único sim da execução, e com ela o roteiro é commitado no branch base. Um roteiro
+**O único sim.** O grill cobre o trabalho inteiro: as specs, a ordem, o escopo, o
+que fica de fora e o critério de pronto de cada uma. No fim, o piloto escreve o
+**roteiro** em `docs/specs/roadmap.md`, valida e mostra o texto. A sua
+confirmação sobre esse texto é o único sim da execução, e com ela o roteiro é
+commitado no branch base. Um roteiro
 que já existe com entrada inacabada é editado pelo grill, não substituído: uma
 entrada inacabada só sai com a sua resposta sobre ela.
 
@@ -121,14 +119,13 @@ do roteiro e só quando as dependências da entrada fecharam:
 - roda o `anvil-to-spec` e o `anvil-to-tickets` e responde às pausas deles com a
   opção recomendada pela skill ou, sem recomendação, a mais conservadora;
 - implementa a spec pela `anvil-implement-spec`, com a tradução da rule
-  `anvil-harness`, e responde às pausas dela como às do planejamento. Fora do
-  bench, com o review da spec terminado sem P1 aberto, roda o comando de
-  verificação no branch da spec, o gate do fluxo da spec, e só com ele saindo `0`
-  os tickets fecham com `Status: resolved`;
+  `anvil-harness`, e responde às pausas dela como às do planejamento. Com o
+  review da spec terminado sem P1 aberto, roda o comando de verificação no
+  branch da spec, o gate do fluxo da spec, e só com ele saindo `0` os tickets
+  fecham com `Status: resolved`;
 - fecha a spec só com `PASS`: todo ticket `resolved` e o comando de verificação
   rodado por ele saindo `0`. A linha `Review:` não entra no `PASS`: o review da
-  spec não deixa registro em disco. No bench, o `--reverify` dos gates desta spec
-  e das já fechadas toma o lugar do comando;
+  spec não deixa registro em disco;
 - fecha com o archive e, nesta ordem: sem remoto, o merge local no branch base;
   com uma rule que manda fechar sem PR, ou sem o passo `/anvil-open-pr` no perfil
   do tracker, o merge local, sem consultar o forge; senão, o forge que o resolvedor
@@ -145,10 +142,8 @@ do roteiro e só quando as dependências da entrada fecharam:
   volta ao branch base. No
   merge local, quando o branch base andou desde o corte do branch, como
   quando uma spec irmã fechou nesse meio-tempo, ele prepara o merge sem commitá-lo
-  e roda a verificação sobre o estado combinado: o comando de verificação ou, no
-  bench, o `--reverify`. Com o comando saindo `0` fora do bench, ou, no bench, com
-  o `--reverify` na saída que vale o `PASS` pela regra do `GATE.md`, commita o
-  merge; com qualquer outra saída, aborta o merge, e a spec fica parada, já
+  e roda o comando de verificação sobre o estado combinado. Com ele saindo `0`,
+  commita o merge; com qualquer outra saída, aborta o merge, e a spec fica parada, já
   arquivada no branch, com a pergunta de qual spec cede;
 - numa parada técnica, como P1 aberto na rodada 2 do review da spec, verificação
   que falha ou implementer bloqueado por fato desconhecido, pesquisa em fontes
@@ -233,10 +228,7 @@ Nos dois, a lista de skills é a mesma de sempre, e dos comandos acima só exist
 mão: `/anvil-grill`, `/anvil-to-spec`, `/anvil-to-tickets`, e depois a
 `/anvil-implement-spec` conduz a spec com os subagentes e os worktrees do próprio
 harness, com o mesmo review único. O `/anvil-implement` fica para o ticket
-avulso, com o review por ticket. O `/anvil-bench`
-chamado direto, no Claude Code ou no omp sem o piloto, constrói uma entrada do
-roteiro, a que está em andamento ou, sem ela, a do `next:`, e para no fim da
-construção, com o archive e o merge listados na entrega para você. O Claude Code
+avulso, com o review por ticket. O Claude Code
 tem a guarda de merge pelo hook do `~/.claude/settings.json`, que o
 `/anvil-update` registra. O Codex lê as skills
 pelo espelho `~/.agents/skills` e não tem guarda.

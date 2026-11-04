@@ -187,8 +187,8 @@ confira o gatilho do `adopt`, em [Verbos](#verbos). Com gatilho, **pare e use
 
 ## Contrato de stack
 
-Adicionar uma stack ao anvil é preencher seis lacunas conhecidas, sem tocar no
-fluxo do bench. O contrato está em [STACK-CONTRACT.md](STACK-CONTRACT.md).
+Adicionar uma stack ao anvil é preencher três lacunas conhecidas. O contrato está
+em [STACK-CONTRACT.md](STACK-CONTRACT.md).
 
 ## Verificação
 
