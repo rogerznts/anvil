@@ -104,6 +104,22 @@ que nenhum teste alcança — ele volta a ser leitura do `anvil-code-review`, e 
 diferença tem que aparecer no `status_reason`. Não escreva `PASS` sobre um
 ledger que você não viu reexecutar.
 
+**Grave o veredito.** Depois de cada `--reverify` da spec, quem o rodou — o bench,
+ou o piloto quando ele é o supervisor — escreve `docs/specs/{id}/gate.yaml` no
+formato de "O arquivo": o `gate` tirado da saída do checker por esta tabela, o
+`quality_score` pela contagem de "O score", o score anexado ao `score_history`
+que o arquivo já trazia, o `status_reason` com o `exit:` e a linha final do
+checker, e cada gate caído em `top_issues` pelo id qualificado. Commite o arquivo
+no branch da spec, antes de entregar ou de seguir:
+
+```bash
+git add docs/specs/<pasta>/gate.yaml
+git commit -m "docs(spec): record the gate of spec <number>"
+```
+
+O `--reverify` do merge local, sob o piloto, não grava: ele só decide o merge, e a
+pasta da spec já está arquivada.
+
 ## O score
 
 ```
