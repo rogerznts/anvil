@@ -154,10 +154,13 @@ anvil-domain-modeling
 anvil-to-spec
 anvil-to-tickets
 anvil-implement
+anvil-implement-spec
 anvil-tdd
 anvil-diagnose
 anvil-codebase-design
 anvil-code-review
+anvil-pr
+anvil-retro
 anvil-docs
 anvil-setup
 anvil-research

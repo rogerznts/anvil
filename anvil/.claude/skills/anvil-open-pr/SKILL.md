@@ -123,25 +123,11 @@ git diff <base>..<branch> --stat
 
 **Title:** Conventional Commits format (e.g., `feat(module): short description`, `fix(module): short description`).
 
-**Body**, the same for every type:
+**Body:** call the Skill tool with `anvil-pr` and write the body with its
+template — Summary, Evidence and Merge Danger. Then append the spec section,
+the same for every type:
 
 ```
-## Summary
-
-- <bullet: what this PR does, high level>
-
-## Details
-
-**How:** <explanation of how the changes were implemented>
-
-- <bullet per relevant change group>
-
-**Why:** <motivation, business rule, or problem being solved>
-
-## Impact
-
-- <bullet: effect on the user or system>
-
 ## Spec
 
 `docs/specs/archive/<spec-dir>/spec.md`

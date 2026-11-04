@@ -70,6 +70,9 @@ skills:
   - { name: anvil-to-tickets,   source: mattpocock, path: skills/engineering/to-tickets,               pin: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d, state: vendored, adapt: [rename, invocable], strip: [agents] }
   - { name: anvil-implement,    source: mattpocock, path: skills/engineering/implement,                pin: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d, state: vendored, adapt: [rename, invocable, verification-profile], strip: [agents] }
   - { name: anvil-code-review,  source: mattpocock, path: skills/engineering/code-review,              pin: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d, state: vendored, adapt: [rename, verification-profile], strip: [agents] }
+  - { name: anvil-implement-spec, source: mattpocock, path: skills/engineering/implement-spec,        pin: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d, state: vendored, adapt: [rename], strip: [agents] }
+  - { name: anvil-pr,           source: mattpocock, path: skills/engineering/pr,                       pin: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d, state: vendored, adapt: [rename, docs-remap], strip: [agents] }
+  - { name: anvil-retro,        source: mattpocock, path: skills/engineering/retro,                    pin: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d, state: vendored, adapt: [rename], strip: [agents] }
 
   # ---- mattpocock: setup e dependências ocultas ----------------------------
   - { name: anvil-setup,           source: mattpocock, path: skills/engineering/setup-matt-pocock-skills, pin: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d, state: vendored, adapt: [rename, docs-remap, tracker-profile, invocable], strip: [agents] }

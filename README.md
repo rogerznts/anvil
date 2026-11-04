@@ -159,8 +159,10 @@ do lock.
 
 **O que segue manual.** No Claude Code e no Codex, a lista de skills é a de sempre
 e nenhum desses comandos existe. O fluxo é `/anvil-grill`, `/anvil-to-spec`,
-`/anvil-to-tickets` e uma sessão de `/anvil-implement` por ticket. O Claude Code
-tem a guarda pelo hook do `~/.claude/settings.json`, e o Codex não tem guarda.
+`/anvil-to-tickets` e uma sessão de `/anvil-implement` por ticket, ou o
+`/anvil-implement-spec`, que conduz a spec inteira com um implementer por ticket,
+cada um no próprio worktree, e revisa uma vez só no fim. O Claude Code tem a
+guarda pelo hook do `~/.claude/settings.json`, e o Codex não tem guarda.
 
 **A guarda vale para toda a máquina, mas só age em projeto anvil**, o que tem a
 rule `.claude/rules/anvil.md` que o boot escreve. Num outro repositório, `git
@@ -180,6 +182,7 @@ merge` passa sem mensagem. Num projeto anvil, ela lê a spec do projeto e chama 
 | `anvil-to-tickets` | corta a spec em tickets *tracer bullet*, cada um declarando o que o bloqueia | mattpocock |
 | `anvil-implement` | constrói a partir do ticket; chama `tdd` e `code-review` por dentro | mattpocock |
 | `anvil-code-review` | revisa o diff em dois eixos independentes — Standards e Spec | mattpocock |
+| `anvil-implement-spec` | conduz a spec inteira num branch de integração: um implementer novo por ticket, em worktree próprio, e um review só no fim. O condutor do omp continua sendo o `anvil-run`, com review por ticket | mattpocock |
 | `anvil-tdd` | ciclo vermelho-verde que produz teste que se mantém, em seams acordados | mattpocock |
 | `anvil-browser-qa` | gera checklist de browser e conduz testes assistidos ou autônomos, com evidência visual | autoral |
 
@@ -236,6 +239,7 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 | `anvil-to-questionnaire` | vira o que você não sabe responder num questionário para outra pessoa | mattpocock |
 | `anvil-teach` | ensina um conceito, com aulas em HTML e registro de aprendizado | mattpocock |
 | `anvil-handoff` | compacta a sessão num documento para outro agente continuar | mattpocock |
+| `anvil-retro` | retrospectiva de uma sessão: sugere melhorias no ambiente do agente — navegação, checks, padrões, economia de ferramenta | mattpocock |
 | `anvil-next` | escolhe a próxima rota e gera um prompt curto para continuar em outra sessão | autoral |
 
 ### Infraestrutura do toolkit
@@ -248,7 +252,8 @@ Preset é **tema, não processo** — aplicado por cima do método, nunca no lug
 | `anvil-setup` | escreve o perfil do issue tracker que o fluxo lê | mattpocock |
 | `anvil-wizard` | gera um wizard em bash para o passo que só um humano pode fazer | mattpocock |
 | `anvil-commit` | commit em Conventional Commits, sem pular hook | autoral |
-| `anvil-open-pr` · `anvil-open-fast-pr` | PR no GitHub ou no Gitea, para o branch base, **um por spec**: o corpo lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
+| `anvil-open-pr` · `anvil-open-fast-pr` | PR no GitHub ou no Gitea, para o branch base, **um por spec**: o corpo segue a `anvil-pr` e lista a spec e seus tickets, e cada ticket ganha a URL do PR de volta | autoral |
+| `anvil-pr` | o molde do corpo do PR: resumo visual, evidência antes e depois, e o risco do merge | mattpocock |
 | `anvil-prune-branches` | atualiza o branch base e remove branch local cujo remoto sumiu | autoral |
 
 ### Segurança
