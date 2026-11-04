@@ -9,6 +9,6 @@
 - [ ] Sobre um roteiro de uma entrada com a spec de três tickets, o piloto fecha com `PASS`, faz o archive e o merge, e a guarda de merge libera, sem ler linha `Review:`.
 - [ ] Com o P1 plantado que a correção não resolve, o piloto para a spec com o motivo e não faz archive nem merge.
 - [ ] Com evidência nova de pesquisa, o piloto abre uma rodada a mais da spec uma vez só, e o relatório a registra.
-- [ ] O `anvil-auto` não chama mais o `frontier.sh` nem o `anvil-implementer`.
-- [ ] O perfil de tracker do `anvil-docs` e o `docs/agents/issue-tracker.md` não descrevem mais a linha do piloto no ticket.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] O `anvil-auto` não chama mais o `frontier.sh` nem o `anvil-implementer`.
+- [x] O perfil de tracker do `anvil-docs` e o `docs/agents/issue-tracker.md` não descrevem mais a linha do piloto no ticket.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
