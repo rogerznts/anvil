@@ -159,8 +159,7 @@ _Avoid_: prova falha, prova inconclusiva
 **Gate**:
 A rodada da suíte inteira de um projeto, com o typecheck quando ele tem um, que
 libera o commit que fecha um ticket avulso ou, no fluxo da spec, o fechamento dos
-tickets, rodada uma vez sobre o branch da spec. No bench, cada item do `gates.md`
-também se chama gate: é outra coisa, o critério de pronto de um item do ledger.
+tickets, rodada uma vez sobre o branch da spec.
 _Avoid_: suíte completa, CI, e "gate" para a revisão de código
 
 **Laço curto**:

@@ -23,11 +23,11 @@ com adaptação registrada — ver
 │  Nutlope/hallmark + Leonxlnx/taste-skill · 2 skills       │
 │  payloadcms/skills · 1 skill (a stack)                    │
 ├─ stack ──────────────────────────────────────────────────┤
-│  anvil-stack-payload: RULE · reference/ · bench/          │
-│  contrato de 6 capacidades                                │
+│  anvil-stack-payload: RULE · reference/                   │
+│  contrato de 3 capacidades                                │
 └───────────────────────────────────────────────────────────┘
-      apoiadas por 10 skills autorais: docs · boot · update ·
-      bench · ui · distill · commit · open-pr · open-fast-pr ·
+      apoiadas por 9 skills autorais: docs · boot · update ·
+      ui · distill · commit · open-pr · open-fast-pr ·
       prune-branches
 ```
 
@@ -109,14 +109,8 @@ todos resolved                    → implementado
 pasta sob specs/archive/          → arquivado
 ```
 
-Duas exceções com fundamento: o `/anvil-bench`, headless, grava `gate.yaml`
-porque um loop precisa de parada mecânica; e o hook de merge, que varre
-`issues/` atrás de ticket aberto.
-
-O mesmo bench é o único lugar com **ledger de gates** (`gates.md`, do unlazy
-adotado sob `anvil-bench/unlazy/`). Ele não contradiz a regra de estado lido: o
-ledger é declaração, e o que decide o veredito é a **reexecução** dos comandos
-pelo supervisor — nunca a leitura da marca que o agente deixou nele.
+Uma exceção com fundamento: o hook de merge, que varre `issues/` atrás de ticket
+aberto.
 
 ## Idioma
 

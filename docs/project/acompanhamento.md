@@ -142,11 +142,6 @@ spec afirmam.
   `origin` e o upstream no `.git/config` da fixture. Enquanto ninguém mexer, uma
   fixture reaproveitada entre execuções sai `2` na execução seguinte; as provas de
   hoje recriam a fixture a cada vez.
-- **A28 · o volume do app sobra depois da derrubada da infra do prefixo.** Ticket
-  04, rodada 1, P2. O `--teardown` tira os containers da rede do prefixo, mas não
-  os volumes do compose do app, como o `node_modules`. Enquanto ninguém mexer,
-  cada prova do bench que não derruba o app com o compose dele deixa um volume
-  órfão na máquina; o B1 do ticket 09 derruba.
 
 ## Spec 011: branch base e forge neutro
 

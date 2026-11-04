@@ -50,12 +50,12 @@ O resultado, medido em 2026-11-04 com
 
 | | |
 |---|---|
-| skills `vendored` no manifesto | 39 entradas: as 38 skills curadas e o `anvil-bench`, autoral, que traz o `unlazy`. 37 têm árvore no upstream; `anvil-principles` e `anvil-bench` são só `keep` e `extra` |
+| skills `vendored` no manifesto | 38 entradas, as 38 skills curadas. 37 têm árvore no upstream; `anvil-principles` é só `keep` e `extra` |
 | linhas dos arquivos que existem no pin e no payload | 88.157 |
 | **linhas nossas que diferem do upstream** | **215 — 0,24%** |
 | arquivos deixados de fora (`strip`) | 63 |
-| arquivos do anvil dentro de skill vendorizada (`keep`) | 36 arquivos · 8.458 linhas |
-| material trazido de fora da árvore da skill (`extra`, inclui o `unlazy` do bench) | 45 arquivos · 4.305 linhas · 9 nossas |
+| arquivos do anvil dentro de skill vendorizada (`keep`) | 5 arquivos · 458 linhas |
+| material trazido de fora da árvore da skill (`extra`) | 24 arquivos · 435 linhas · 9 nossas |
 | arquivo sem par, fora da conta | 0 |
 
 *Linha nossa* é a que está no payload e não está na versão do pin. A definição
@@ -63,7 +63,7 @@ inteira, com o que conta à parte, está no próprio script.
 
 Em dezessete dessas skills, os arquivos pareados têm **uma linha** de delta: o
 `name:` do frontmatter. O que conta à parte fica fora dessa linha — o
-`anvil-stack-payload` está entre as dezessete e carrega 29 arquivos `keep`.
+`anvil-stack-payload` está entre as dezessete e carrega 2 arquivos `keep`.
 
 ---
 
@@ -276,24 +276,11 @@ o que foi coberto e quantos achados houve, sem caminho nem reprodução. Os moti
 completos estão no
 [ADR-0019](docs/architecture/adr/adr-0019-auditoria-de-seguranca-vendorizada-da-cloudflare.md).
 
-### Stack e bench
+### Stack
 
 | skill | para quê | origem |
 |---|---|---|
 | `anvil-stack-payload` | o ofício do Payload em 11 arquivos, mais a `RULE.md` com as quatro ciladas | payloadcms |
-| `anvil-bench` | leva quem não programa de uma necessidade até a ferramenta rodando | autoral + `unlazy` |
-
-O bench é autoral, mas carrega material de terceiro embaixo de `unlazy/`: o
-[unlazy](https://github.com/Leonxlnx/unlazy) (MIT), que transforma o critério de
-pronto acordado na entrevista num **ledger de gates executável**. O loop do bench
-é headless, então o veredito não pode ser leitura de auto-relato — ele é a
-reexecução do ledger pelo supervisor, com `gate-check --reverify`.
-
-Ele entra como material, não como skill, porque a `description` do upstream
-dispara em *"long or multi-part task"* e se auto-invocaria dentro do
-`/anvil-implement`. O que ficou de fora, e por quê, está em
-`anvil-bench/unlazy/VENDOR.md` — inclusive o Stop hook, que competiria com o teto
-de duas rodadas do próprio bench.
 
 ---
 
