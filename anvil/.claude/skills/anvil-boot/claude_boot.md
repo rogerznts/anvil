@@ -133,7 +133,7 @@ lista de skills do contexto, que o harness pode cortar.
 - `anvil-to-tickets`
 - `anvil-implement` — rodado direto na sessão; a cauda vem depois de gravada a
   linha `Review:`, seja `verdict=pass` ou `verdict=fail`
-- `anvil-run`
+- `anvil-implement-spec`
 - `anvil-browser-qa`
 - `anvil-diagnose`
 - `anvil-prototype`
@@ -143,20 +143,16 @@ lista de skills do contexto, que o harness pode cortar.
 
 A cauda não dispara:
 
-- dentro de subagente, inclusive do `anvil-implementer`: só a sessão principal
-  gera o prompt da próxima sessão;
+- dentro de subagente, inclusive dos implementers da `anvil-implement-spec`: só a
+  sessão principal gera o prompt da próxima sessão;
 - quando a skill para numa pergunta ao usuário: ela ainda não terminou;
-- quando a própria skill já invocou o `anvil-next` no fim, como o `anvil-run` faz
-  ao fechar a spec;
 - dentro de uma execução do `anvil-auto`: quem decide o próximo passo ali é o
   piloto, que termina oferecendo um grill novo.
 
 Fora da lista — `anvil-commit`, `anvil-tdd`, `anvil-code-review` e `anvil-handoff`,
 por exemplo —, o `anvil-next` roda só a pedido do usuário, e a skill termina sem
 prompt nem sugestão de próxima sessão. Esta lista é o único lugar a editar para
-mudar quais skills têm cauda, com uma exceção: o `anvil-run` invoca o
-`anvil-next` com foco no próprio relatório final, e tirá-lo da lista não desliga
-isso — é a skill dele que muda.
+mudar quais skills têm cauda.
 
 ## Citar id sempre com a glosa
 

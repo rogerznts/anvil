@@ -114,9 +114,9 @@ o sim, siga a skill dessa etapa do ponto em que ela parou.
 
 Com os tickets publicados, rode o script de novo. Com `next: end`, o planejamento
 acabou. Mostre ao operador a linha `handoff` do script, que diz `/clear` e depois
-`/skill:anvil-run NNN` com o número da spec, sem executar nenhum dos dois. O
-`/clear` vem antes porque o `anvil-run` lê o estado dos tickets, e esta conversa só
-ocuparia a janela do supervisor.
+`/skill:anvil-implement-spec` com a pasta da spec, sem executar nenhum dos dois. O
+`/clear` vem antes porque a `anvil-implement-spec` lê a spec e os tickets do disco,
+e esta conversa só ocuparia a janela de quem conduz a execução.
 
 ## Nunca
 
@@ -126,4 +126,4 @@ ocuparia a janela do supervisor.
   `anvil-to-spec` e `anvil-to-tickets`.
 - Gravar a etapa em arquivo, campo ou ticket.
 - Responder a uma pausa no lugar do operador.
-- Trocar de branch por conta própria, ou rodar o `anvil-run`.
+- Trocar de branch por conta própria, ou rodar a `anvil-implement-spec`.

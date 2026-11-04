@@ -5,7 +5,7 @@
 # Uso, de dentro do repositorio, com o anvil na instalacao de usuario:
 #   bash ~/.claude/skills/anvil-docs/scripts/roadmap.sh [--skip "nome nome"]
 #
-# Saida em linhas "chave: valor", como o stage.sh e o frontier.sh; as chaves e os
+# Saida em linhas "chave: valor", como o stage.sh da anvil-plan; as chaves e os
 # estados sao em ingles e estaveis, e o motivo para o operador e em pt-BR.
 #   roadmap: docs/specs/roadmap.md, ou none sem o arquivo (e entao so next: none)
 #   entry: <nome> state=<estado> spec=<NNN|-> depends=<a,b|-> reason=<motivo>
@@ -16,7 +16,7 @@
 #   refusal: <motivo>, uma por problema, quando o roteiro nao pode terminar: nome
 #          fora de kebab-case, nome repetido, Depende de: para nome inexistente,
 #          ciclo, Tipo: fora dos tipos do new-spec.sh. Com recusa nao ha entry nem
-#          frontier, o next e none e o script sai com 2, como o frontier.sh.
+#          frontier, o next e none e o script sai com 2.
 #          Argumento invalido e chamada fora de um repositorio git saem so com a
 #          linha refusal:, tambem com 2
 #
@@ -192,10 +192,9 @@ branch_of() {  # <numero sem zeros>: o branch local de spec com esse numero
     done
 }
 
-# Le o valor do Blocked by em blocker_list, os numeros sem zeros a esquerda: a
-# mesma leitura do frontier.sh da anvil-run. Vazio ou "Nenhum"/"None" e sem
-# bloqueador; o item que cita um ADR-NNNN perde a citacao e sai se sobrar so um
-# "ver" ou "see". Qualquer outra coisa da unreadable=1.
+# Le o valor do Blocked by em blocker_list, os numeros sem zeros a esquerda. Vazio
+# ou "Nenhum"/"None" e sem bloqueador; o item que cita um ADR-NNNN perde a citacao
+# e sai se sobrar so um "ver" ou "see". Qualquer outra coisa da unreadable=1.
 read_blockers() {
     local rest="$1," item
     blocker_list=""; unreadable=""
@@ -217,9 +216,9 @@ resolved() { [ "${tstatus[$1]:-}" = resolved ]; }
 # Estado de uma spec achada fora de archive/, em found_state e found_reason. open
 # quando falta spec.md ou ticket de implementacao, ou quando ha ticket a
 # despachar. stopped quando nao ha. Ticket de implementacao e o sem Type:, como no
-# stage.sh da anvil-plan: com Type:, e decisao do wayfinder. A despachar e o que o
-# frontier.sh da anvil-run poe no frontier, lido como ele le, sobre todos os
-# tickets: nao resolved, nao travado, com o Blocked by legivel e todo resolved.
+# stage.sh da anvil-plan: com Type:, e decisao do wayfinder. A despachar e o que
+# entra no frontier da anvil-implement-spec, pelo grafo do Blocked by, sobre todos
+# os tickets: nao resolved, nao travado, com o Blocked by legivel e todo resolved.
 spec_state() {  # <fonte> <pasta> <onde>
     local src="$1" dir="$2" where="$3" f p n text review round verdict
     local order="" impl=0 ready="" locked="" closure changed rest="" all_resolved=yes
