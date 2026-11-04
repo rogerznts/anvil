@@ -6,9 +6,9 @@
 
 **Status:** ready-for-agent
 
-- [ ] Nenhuma referência viva ao `anvil-run`, ao `anvil-implementer` ou ao `frontier.sh` fora de ADRs antigos, specs arquivadas e `references/`.
-- [ ] Numa instalação de usuário descartável com a versão anterior, o `reset-install.sh` remove os três.
-- [ ] O `stage.sh` termina com o `handoff` para a `implement-spec`, e o `anvil-plan` indica essa skill no fim.
-- [ ] A cauda de roteamento no `claude_boot.md` e no `CLAUDE.md` do repositório lista a `anvil-implement-spec` e não o `anvil-run`.
-- [ ] README, overview, glossário e `docs/index.md` descrevem a `implement-spec` como o condutor nos três harnesses.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] Nenhuma referência viva ao `anvil-run`, ao `anvil-implementer` ou ao `frontier.sh` fora de ADRs antigos, specs arquivadas e `references/`.
+- [x] Numa instalação de usuário descartável com a versão anterior, o `reset-install.sh` remove os três.
+- [x] O `stage.sh` termina com o `handoff` para a `implement-spec`, e o `anvil-plan` indica essa skill no fim.
+- [x] A cauda de roteamento no `claude_boot.md` e no `CLAUDE.md` do repositório lista a `anvil-implement-spec` e não o `anvil-run`.
+- [x] README, overview, glossário e `docs/index.md` descrevem a `implement-spec` como o condutor nos três harnesses.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
