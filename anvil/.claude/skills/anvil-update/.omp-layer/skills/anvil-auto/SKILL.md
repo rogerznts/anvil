@@ -466,12 +466,11 @@ piloto, a skill muda em quatro pontos:
    `PASS`.
 2. **O brief** de cada subagente leva a pasta da spec, o branch e a linha com o
    idioma de saída, além dos ponteiros que a skill manda passar.
-3. **O gate**, entre o passo 7 e o 8, fora do bench. Com o review terminado sem
-   P1 aberto, rode no branch da spec o comando de verificação pelo script, como
-   diz o `PASS`, e anote o `HEAD` em que ele rodou: é o gate do fluxo da spec de
-   `docs/agents/verification.md`. Saindo `0`, siga para o passo 8. Diferente de
-   `0`, os tickets não fecham: pule o passo 8. No bench, não há gate aqui: o passo
-   8 segue o 7, e a prova é o `--reverify` do `PASS`.
+3. **O gate do passo 7**, fora do bench, roda pelo script, como diz o `PASS`, e
+   nunca por comando digitado por você. Anote o `HEAD` em que ele rodou. Saindo
+   `0`, siga para o passo 8. Diferente de `0`, os tickets não fecham: pule o passo
+   8. No bench, o gate do passo 7 não roda: o passo 8 segue o review, e a prova é
+   o `--reverify` do `PASS`.
 4. **O passo 8** grava `Status: resolved` em cada ticket de `issues/`, como o
    perfil do tracker manda, sem linha `Review:`, e você o commita no branch da
    spec:

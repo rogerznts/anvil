@@ -207,8 +207,10 @@ no passo do review:
 +the fixed point and its findings to remeasure, so it reads only the fix's diff;
 +a fix that changed nothing leaves round 1's P1 open. Per
 +`docs/agents/verification.md`, a P1 still open after round 2 stops the run
-+before step 8: leave the tickets unresolved and report it. Write no `Review:`
-+line.
++before step 8: leave the tickets unresolved and report it. Then run the
++project's verification command, the gate in `docs/agents/verification.md`,
++once on the integration branch; a red gate stops the run before step 8 too.
++Write no `Review:` line.
 ```
 
 **Por que existe.** O `adr-0010` — a verificação tem critério de parada, e ele é
