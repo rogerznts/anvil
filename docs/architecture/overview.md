@@ -54,7 +54,7 @@ mesmo passo mantém. Ver
 [adr-0011](./adr/adr-0011-omp-como-harness-com-camada-propria.md),
 [adr-0012](./adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md),
 [adr-0014](./adr/adr-0014-piloto-automatico-fecha-sem-humano.md) e os termos
-em [context.md](./context.md).
+em [glossary.md](./glossary.md).
 
 O desenvolvimento do próprio anvil abre uma sessão explícita com HOME privado
 por checkout. Ali os links de skills, agentes e camada omp apontam à fonte, e os
@@ -71,7 +71,7 @@ integralmente das skills originais.
 docs/
 ├── index.md                    auto-gerado
 ├── agents/issue-tracker.md     o perfil que as skills de fluxo leem
-├── architecture/               context.md · context-map.md · adr/
+├── architecture/               glossary.md · glossary-map.md · adr/
 ├── discovery/                  ●  anvil-research
 ├── specs/                      ●
 │   ├── {NNN}-{tipo}-{nome}/       ← só a PASTA é do anvil

@@ -28,11 +28,11 @@ que vai dentro dela.
 - a checagem do layout antigo imprime alguma linha:
 
   ```bash
-  ls -d CONTEXT.md CONTEXT-MAP.md 2>/dev/null; find docs/adr -type f 2>/dev/null
+  ls -d CONTEXT.md CONTEXT-MAP.md GLOSSARY.md GLOSSARY-MAP.md docs/architecture/context.md docs/architecture/context-map.md 2>/dev/null; find docs/adr -type f 2>/dev/null
   ```
 
   Sem glob: no zsh, um `docs/adr/*` que não casa aborta o comando inteiro e
-  esconde o `CONTEXT.md`.
+  esconde o glossário.
 
 O glossário e os ADRs do layout antigo moram fora de `docs/`, e contam **mesmo
 com `docs/` ausente ou só com os README de domínio**. O perfil de domínio que o
@@ -50,8 +50,8 @@ docs/
 ├── agents/issue-tracker.md     ●  o perfil que as skills de fluxo leem
 ├── agents/verification.md      ●  o critério de parada e a cadência da suíte que as skills de verificação leem
 ├── architecture/               ●  desenho do sistema
-│   ├── context.md                 glossário ubíquo (anvil-domain-modeling)
-│   ├── context-map.md             só em repositório multi-contexto
+│   ├── glossary.md                glossário ubíquo (anvil-domain-modeling)
+│   ├── glossary-map.md            só em repositório multi-contexto
 │   └── adr/                       decisões, uma por arquivo
 ├── discovery/                  ●  pesquisa e notas (anvil-research, anvil-distill)
 ├── specs/                      ●
@@ -87,7 +87,7 @@ Duas camadas espelhadas: **base**, que é a verdade do projeto hoje, e
 
 | domínio | quem |
 |---|---|
-| `architecture/context.md` e `adr/` | `anvil-grill` e `anvil-domain-modeling`, enquanto decidem |
+| `architecture/glossary.md` e `adr/` | `anvil-grill` e `anvil-domain-modeling`, enquanto decidem |
 | `discovery/` | `anvil-research` — ele diz *"salve onde o repositório já guarda essas notas"*, então escreve aqui se a pasta existir. E `anvil-distill`, que destila um sistema de referência: aqui fora de branch de spec; num branch de spec, em `specs/{id}/discovery/` |
 | `specs/{id}/spec.md` | `anvil-to-spec`. **Inclui as User Stories** — no anvil a spec é a unidade, e absorve o que num PRD seria épico e story |
 | `specs/{id}/issues/` | `anvil-to-tickets` |

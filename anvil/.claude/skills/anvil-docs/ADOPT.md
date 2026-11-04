@@ -27,8 +27,10 @@ Leia antes de propor. Enumere e reporte como tabela — *caminho · o que parece
 ser · para onde iria* — sem mover nada:
 
 - `docs/` — todo arquivo e pasta, inclusive os soltos na raiz
-- a raiz do repositório — `CONTEXT.md`, `CONTEXT-MAP.md`, `ARCHITECTURE.md`,
-  `ROADMAP.md` e afins
+- a raiz do repositório — `CONTEXT.md`, `CONTEXT-MAP.md`, `GLOSSARY.md`,
+  `GLOSSARY-MAP.md`, `ARCHITECTURE.md`, `ROADMAP.md` e afins
+- `docs/architecture/context.md` e `context-map.md` — o glossário no layout
+  anterior do anvil
 - `docs/adr/`, `src/*/docs/adr/` — ADRs em layout antigo
 - `.scratch/` — sinal de que o perfil de tracker local já esteve em uso
 - `.claude/rules/` e `.claude/skills/` — o que já existe
@@ -65,7 +67,7 @@ Para cada artefato, decida **lendo**:
 | pesquisa, entrevista, brainstorming, análise de mercado | `docs/discovery/` |
 | escopo de produto, requisitos, épicos | `docs/prd/` |
 | desenho do sistema, stack, integrações, decisões | `docs/architecture/` — decisões sob `adr/` |
-| glossário, vocabulário ubíquo do domínio | `docs/architecture/context.md` |
+| glossário, vocabulário ubíquo do domínio | `docs/architecture/glossary.md` |
 | fluxos, wireframes, spec de front-end, design system | `docs/ui/` |
 | estratégia de teste, gates, avaliação de NFR | `docs/qa/` |
 | plano não-técnico, acompanhamento datado | `docs/project/` |
@@ -96,10 +98,13 @@ enquanto move dezenas de arquivos. Para cada par:
 Dois tickets para a mesma story é pior que nenhum: o segundo passa na revisão
 como trabalho pendente que já foi feito.
 
-**`CONTEXT.md` na raiz** vai para `docs/architecture/context.md`; `CONTEXT-MAP.md`
-para `docs/architecture/context-map.md`; `docs/adr/` para
-`docs/architecture/adr/`. Depois de mover, avise que quem referenciava os
-caminhos antigos precisa ser atualizado — e liste quem eram.
+**`CONTEXT.md` ou `GLOSSARY.md` na raiz** e o **`docs/architecture/context.md`**
+do layout anterior do anvil vão para `docs/architecture/glossary.md`;
+`CONTEXT-MAP.md`, `GLOSSARY-MAP.md` e `docs/architecture/context-map.md` para
+`docs/architecture/glossary-map.md`; `docs/adr/` para `docs/architecture/adr/`.
+Mova com `git mv`. Depois de mover, avise que quem referenciava os caminhos
+antigos precisa ser atualizado — e liste quem eram, inclusive
+`docs/agents/domain.md`.
 
 ## 4. Retrofit das specs
 

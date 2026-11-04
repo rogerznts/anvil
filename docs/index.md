@@ -67,7 +67,7 @@ Nenhuma.
 
 ### Architecture
 
-- [context.md](./architecture/context.md) — o glossário: curadoria, harness, git
+- [glossary.md](./architecture/glossary.md) — o glossário: curadoria, harness, git
   e forge, referências, segurança, tickets e verificação, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
   impõe, como o estado é lido do disco, os três harnesses e a camada omp, com o

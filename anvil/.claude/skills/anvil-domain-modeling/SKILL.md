@@ -1,11 +1,11 @@
 ---
 name: anvil-domain-modeling
-description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a CONTEXT.md, or recording or editing an ADR.
+description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or editing an ADR.
 ---
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `docs/architecture/context.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Actively build and sharpen the project's domain model as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `docs/architecture/glossary.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
 ## File structure
 
@@ -15,37 +15,37 @@ Most repos have a single context:
 /
 ├── docs/
 │   └── architecture/
-│       ├── context.md
+│       ├── glossary.md
 │       └── adr/
 │           ├── 0001-event-sourced-orders.md
 │           └── 0002-postgres-for-write-model.md
 └── src/
 ```
 
-If `docs/architecture/context-map.md` exists, the repo has multiple contexts. The map points to where each one lives:
+If `docs/architecture/glossary-map.md` exists, the repo has multiple contexts. The map points to where each one lives:
 
 ```
 /
 ├── docs/
 │   └── architecture/
-│       ├── context-map.md
+│       ├── glossary-map.md
 │       └── adr/                      ← system-wide decisions
 ├── src/
 │   ├── ordering/
-│   │   ├── CONTEXT.md                ← per-context, lives with its code
+│   │   ├── GLOSSARY.md
 │   │   └── docs/adr/                 ← context-specific decisions
 │   └── billing/
-│       ├── CONTEXT.md
+│       ├── GLOSSARY.md
 │       └── docs/adr/
 ```
 
-Create files lazily: only when you have something to write. If no `docs/architecture/context.md` exists, create one when the first term is resolved. If no `docs/architecture/adr/` exists, create it when the first ADR is needed.
+Create files lazily: only when you have something to write. If no `docs/architecture/glossary.md` exists, create one when the first term is resolved. If no `docs/architecture/adr/` exists, create it when the first ADR is needed.
 
 ## During the session
 
 ### Challenge against the glossary
 
-When the user uses a term that conflicts with the existing language in `docs/architecture/context.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y. Which is it?"
+When the user uses a term that conflicts with the existing language in `docs/architecture/glossary.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y. Which is it?"
 
 ### Sharpen fuzzy language
 
@@ -59,11 +59,11 @@ When domain relationships are being discussed, stress-test them with specific sc
 
 When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
 
-### Update CONTEXT.md inline
+### Update GLOSSARY.md inline
 
-When a term is resolved, update `docs/architecture/context.md` right there. Don't batch these up: capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+When a term is resolved, update `docs/architecture/glossary.md` right there. Don't batch these up: capture them as they happen. Use the format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md).
 
-`docs/architecture/context.md` should be totally devoid of implementation details. Do not treat `docs/architecture/context.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+`docs/architecture/glossary.md` should be totally devoid of implementation details. Do not treat `docs/architecture/glossary.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
 ### Offer ADRs sparingly
 

@@ -90,7 +90,7 @@ flowchart TD
 
     subgraph janela ["Uma janela de contexto só — não compactar"]
         direction TB
-        C -->|"context.md + ADRs"| D["/anvil-to-spec"]
+        C -->|"glossary.md + ADRs"| D["/anvil-to-spec"]
         D -->|"new-spec.sh reserva 012 no origin<br/>docs/specs/012-feature-cupom/spec.md"| E["/anvil-to-tickets"]
         E -->|"issues/01…NN.md<br/>Blocked by · Status"| F["/clear"]
     end
@@ -297,7 +297,7 @@ skills originais.
 docs/
 ├── index.md                       auto-gerado
 ├── agents/issue-tracker.md     ●  o perfil que o fluxo lê
-├── architecture/               ●  context.md · adr/
+├── architecture/               ●  glossary.md · adr/
 ├── discovery/                  ●  anvil-research
 ├── specs/                      ●
 │   ├── 012-feature-checkout-coupon/     ← só a PASTA é do anvil

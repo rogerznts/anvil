@@ -77,13 +77,14 @@ frontmatter resolvido a favor do upstream traria a trava de volta em silêncio. 
 Só para os caminhos da tabela — glossário, mapa de contextos e ADRs —, que no
 anvil moram **dentro de `docs/`**, e só quando o modelo de pastas do anvil difere
 do que a skill assume. Vale para o caminho que a skill escreve e para o que ela
-lê, manda ler ou descreve ao usuário: skill que procura `CONTEXT.md` na raiz não
+lê, manda ler ou descreve ao usuário: skill que procura `GLOSSARY.md` na raiz não
 acha o glossário do anvil, mesmo sem escrever nada.
 
 | Upstream | Anvil |
 |---|---|
-| `CONTEXT.md` na raiz | `docs/architecture/context.md` |
-| `CONTEXT-MAP.md` na raiz | `docs/architecture/context-map.md` |
+| `GLOSSARY.md` na raiz | `docs/architecture/glossary.md` |
+| `GLOSSARY-MAP.md` na raiz | `docs/architecture/glossary-map.md` |
+| `CONTEXT.md` e `CONTEXT-MAP.md` legados, quando a skill os cita como layout anterior | `docs/architecture/context.md` e `docs/architecture/context-map.md`, o layout anterior do anvil |
 | `docs/adr/` | `docs/architecture/adr/` |
 
 **Não é para caminho que o perfil de tracker já resolve.** Antes de aplicar,
