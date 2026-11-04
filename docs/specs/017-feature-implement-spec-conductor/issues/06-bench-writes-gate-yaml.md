@@ -6,6 +6,7 @@
 
 **Status:** claimed
 **Review:** round=1; sha=84d32f9; scope=full; verdict=fail; p1=open
+**Review:** round=2; sha=803ffe5; scope=diff:7e50b8c..803ffe5; verdict=fail; p1=open
 
 - [x] O `GATE.md` e a fase Construir do `anvil-bench` dizem quando escrever o `gate.yaml`, com o quê e com qual commit.
 - [x] Num projeto do bench com uma entrada pequena, chamado direto no omp, o `gate.yaml` existe no branch da spec depois do `--reverify`, commitado, com o veredito igual ao da saída do checker e o score calculado pela contagem.
@@ -20,3 +21,7 @@
 - Review round=1 · P2 (Spec): o exemplo de "O arquivo" usa `QA-1` em `top_issues`, e a regra usa o id qualificado `gates:<id>` para gate caído — quem escreve a segunda volta não sabe qual forma manter.
 - Review round=1 · P3 (Standards): placeholders `{id}`, `<pasta>` e `<number>` misturados na mesma seção.
 - Fora do ticket · P2: na prova, a rodada 1 achou só P2/P3 e a sessão não corrigiu nem rodou a rodada 2, embora o `anvil-bench` mande; o mesmo aconteceu no Claude Code (ticket 05). Decisão pendente do operador: o "Fix all issues" da `implement-spec` contra o "P2 e P3 registram e seguem" do ADR-0010.
+- Review round=2 · P1 (Spec): a regra nova faz o `gate` cair em `PASS` quando nem `FAIL` nem `CONCERNS` valem, e o checker que não roda não está em nenhum dos dois — um `--reverify` quebrado grava `PASS`, e o arquivo aprova a spec sem prova.
+- Review round=2 · P2 (Spec): `FAIL` e `CONCERNS` podem valer juntos sem precedência — dois leitores gravam vereditos e scores diferentes para a mesma volta.
+- Review round=2 · P2 (Spec): o exemplo de "O arquivo" ainda diz `QA-#` para gate e `evidence_ref: qa-notes.md`, contra a regra (`gates:<id>`, `gates.md`) — quem copia o exemplo grava ids que não batem com o checker.
+- Review round=2 · P3 (Standards): a mensagem de commit do exemplo saiu como `spec <número>`; as mensagens de commit são em inglês.
