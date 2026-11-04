@@ -57,7 +57,8 @@ _Avoid_: instalação local, instalação legada
 
 **Harness**:
 O programa que executa o agente e lê o payload: Claude Code, Codex ou omp. O
-Claude Code é a referência. Só o omp automatiza o fluxo; nos outros ele é manual.
+Claude Code é a referência. Nos três, a `anvil-implement-spec` conduz a spec; só o
+omp conduz também o planejamento e o piloto automático.
 _Avoid_: runtime, executor, cliente
 
 **Camada de harness**:
@@ -67,9 +68,9 @@ sinal dele.
 _Avoid_: adapter, plugin, integração
 
 **Condutor**:
-Skill da camada omp que encadeia as skills do fluxo por conta do operador,
-parando em cada pausa humana: `anvil-plan` no planejamento, `anvil-run` na
-implementação.
+Skill que encadeia as skills do fluxo por conta do operador: a `anvil-plan`, da
+camada omp, no planejamento, parando em cada pausa humana, e a
+`anvil-implement-spec`, do payload, na implementação da spec, nos três harnesses.
 _Avoid_: orquestrador, pipeline, flow
 
 **Piloto automático**:
@@ -143,16 +144,6 @@ _Avoid_: relatório, report, laudo
 Os tickets cujos bloqueadores já estão todos resolvidos.
 _Avoid_: fila, backlog, próximos
 
-**Despacho interrompido**:
-O despacho de um ticket ao implementer que volta sem o relatório dele: cancelado,
-com erro ou sem os três campos.
-_Avoid_: despacho falho, implementer morto, ticket caído
-
-**Retomada do despacho**:
-O despacho de novo, na mesma execução, de um ticket cujo despacho foi
-interrompido, continuando do que ele deixou no disco.
-_Avoid_: redespacho, retry, retomada (que é rodar a skill de novo)
-
 ### Verificação
 
 **Prova**:
@@ -167,8 +158,9 @@ _Avoid_: prova falha, prova inconclusiva
 
 **Gate**:
 A rodada da suíte inteira de um projeto, com o typecheck quando ele tem um, que
-libera o commit que fecha um ticket. No bench, cada item do `gates.md` também se
-chama gate: é outra coisa, o critério de pronto de um item do ledger.
+libera o commit que fecha um ticket avulso ou, no fluxo da spec, o fechamento dos
+tickets, rodada uma vez sobre o branch da spec. No bench, cada item do `gates.md`
+também se chama gate: é outra coisa, o critério de pronto de um item do ledger.
 _Avoid_: suíte completa, CI, e "gate" para a revisão de código
 
 **Laço curto**:

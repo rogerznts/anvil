@@ -95,9 +95,9 @@ flowchart TD
         E -->|"issues/01…NN.md<br/>Blocked by · Status"| F["/clear"]
     end
 
-    F --> G["/anvil-implement<br/>um ticket por vez"]
-    G -->|"chama por dentro"| H["/anvil-tdd"]
-    H --> I["/anvil-code-review<br/>Standards + Spec"]
+    F --> G["/anvil-implement-spec<br/>um implementer novo por ticket<br/>no branch da spec"]
+    G -->|"cada implementer chama"| H["/anvil-tdd"]
+    H --> I["/anvil-code-review<br/>uma vez, sobre a spec inteira<br/>rodada 2 só sobre a correção"]
     I --> J{"todos os tickets<br/>Status: resolved?"}
     J -->|não| G
     J -->|sim| P["/anvil-docs archive<br/>promove ADR · move p/ archive/"]
@@ -116,8 +116,9 @@ flowchart TD
 
 O `grill → to-spec → to-tickets` roda numa **janela só**, sem compactar. É o que
 o fluxo do Matt exige, e é o que faz o encadeamento funcionar sem estado em
-disco. Depois cada `implement` começa do zero, e **o ticket é o estado**:
-`Blocked by` carrega a ordem, `Status` carrega o progresso.
+disco. Depois a `implement-spec` põe um implementer novo, que começa do zero, em
+cada ticket, e **o ticket é o estado**: `Blocked by` carrega a ordem, `Status`
+carrega o progresso. O ticket avulso, fora de uma spec, segue no `/anvil-implement`.
 
 **O `archive` vem antes do PR, não depois do merge.** Promover o ADR e mover a
 spec são mudança em arquivo, e depois do merge não sobra branch onde commitar —
@@ -129,11 +130,15 @@ revisado, e a guarda de merge impõe a ordem.
 
 ---
 
-## Três harnesses, e só o omp conduz
+## Três harnesses, um condutor de spec
 
-O anvil roda no Claude Code, no Codex e no omp. As skills são as mesmas nos três.
-Só no omp o fluxo é conduzido, porque ele tem `task`, agentes próprios e sessões
-filhas que nascem sem a conversa do pai — ver
+O anvil roda no Claude Code, no Codex e no omp. As skills são as mesmas nos três,
+e nos três a `anvil-implement-spec` conduz a spec: um implementer novo por ticket,
+cada um no próprio worktree, tudo junto no branch da spec e um review só no fim —
+ver [adr-0023](docs/architecture/adr/adr-0023-implement-spec-conduz-a-spec-com-review-unico.md).
+Só no omp o resto do fluxo é conduzido, o planejamento e o piloto automático,
+porque ele tem `task`, agentes próprios e sessões filhas que nascem sem a conversa
+do pai — ver
 [adr-0011](docs/architecture/adr/adr-0011-omp-como-harness-com-camada-propria.md).
 
 **Como a camada chega.** O reset da instalação de usuário procura o omp: o
@@ -153,16 +158,16 @@ do lock.
 | | |
 |---|---|
 | `/skill:anvil-plan <pedido>` | conduz grill, to-spec e to-tickets na mesma janela. Entre uma etapa e outra propõe a próxima ou um desvio, como research ou prototype, e só carrega com o seu sim |
-| `/skill:anvil-run [NNN] [--parallel N]` | implementa a spec ticket a ticket, cada um num `anvil-implementer` de contexto novo, com o review em dois eixos. Em série por padrão; com `--parallel N` e a isolação do omp no modo branch, em levas de até N tickets do frontier, cada implementer num workspace isolado — ver [adr-0012](docs/architecture/adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md). Termina com relatório e próximo passo, e nunca faz QA, archive ou PR |
+| `/skill:anvil-implement-spec` | conduz a spec, como nos outros harnesses. A rule da camada traduz o worktree de cada implementer no `task` com `isolated: true` e o merge na integração do omp no modo branch, e aí os tickets independentes rodam ao mesmo tempo; sem esse modo, um por vez |
 | `/skill:anvil-omp` | o manual da camada: detecção, limites e como removê-la |
 | guarda de merge | um hook em `~/.omp/agent/hooks/pre/` chama o mesmo `guard-spec-merge.sh` do Claude Code, da instalação de usuário |
 
-**O que segue manual.** No Claude Code e no Codex, a lista de skills é a de sempre
-e nenhum desses comandos existe. O fluxo é `/anvil-grill`, `/anvil-to-spec`,
-`/anvil-to-tickets` e uma sessão de `/anvil-implement` por ticket, ou o
-`/anvil-implement-spec`, que conduz a spec inteira com um implementer por ticket,
-cada um no próprio worktree, e revisa uma vez só no fim. O Claude Code tem a
-guarda pelo hook do `~/.claude/settings.json`, e o Codex não tem guarda.
+**O que segue manual.** No Claude Code e no Codex, a lista de skills é a de sempre,
+e dos comandos acima só a `/anvil-implement-spec` existe, porque vem do payload. O
+fluxo é `/anvil-grill`, `/anvil-to-spec`, `/anvil-to-tickets` e a
+`/anvil-implement-spec`, com os subagentes e os worktrees do próprio harness; o
+`/anvil-implement` fica para o ticket avulso. O Claude Code tem a guarda pelo hook
+do `~/.claude/settings.json`, e o Codex não tem guarda.
 
 **A guarda vale para toda a máquina, mas só age em projeto anvil**, o que tem a
 rule `.claude/rules/anvil.md` que o boot escreve. Num outro repositório, `git
@@ -182,7 +187,7 @@ merge` passa sem mensagem. Num projeto anvil, ela lê a spec do projeto e chama 
 | `anvil-to-tickets` | corta a spec em tickets *tracer bullet*, cada um declarando o que o bloqueia | mattpocock |
 | `anvil-implement` | constrói a partir do ticket; chama `tdd` e `code-review` por dentro | mattpocock |
 | `anvil-code-review` | revisa o diff em dois eixos independentes — Standards e Spec | mattpocock |
-| `anvil-implement-spec` | conduz a spec inteira num branch de integração: um implementer novo por ticket, em worktree próprio, e um review só no fim. O condutor do omp continua sendo o `anvil-run`, com review por ticket | mattpocock |
+| `anvil-implement-spec` | conduz a spec inteira num branch de integração, nos três harnesses: um implementer novo por ticket, em worktree próprio, e um review só no fim, com a rodada 2 só sobre a correção | mattpocock |
 | `anvil-tdd` | ciclo vermelho-verde que produz teste que se mantém, em seams acordados | mattpocock |
 | `anvil-browser-qa` | gera checklist de browser e conduz testes assistidos ou autônomos, com evidência visual | autoral |
 

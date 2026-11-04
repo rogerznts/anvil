@@ -70,7 +70,8 @@ Nenhuma.
 - [glossary.md](./architecture/glossary.md) — o glossário: curadoria, harness, git
   e forge, referências, segurança, tickets e verificação, com os termos a evitar.
 - [overview.md](./architecture/overview.md) — as quatro camadas, o que o anvil
-  impõe, como o estado é lido do disco, os três harnesses e a camada omp, com o
+  impõe, como o estado é lido do disco, os três harnesses, com a
+  `anvil-implement-spec` conduzindo a spec nos três, e a camada omp, com o
   piloto automático, e a herança do mosk.
 - **ADRs**
   - [adr-0001](./architecture/adr/adr-0001-skills-vendorizadas-seguem-o-padrao-original.md)

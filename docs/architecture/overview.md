@@ -40,20 +40,24 @@ usuário, e o projeto guarda só rules e `docs/` — ver
 lê vem numa **camada de harness**, instalada pelo boot e pelo update quando o
 harness é detectado e mantida depois pela linha `omp:` do lock de usuário. Hoje há
 uma, a camada omp, em `~/.omp/agent/`: a guarda de merge como hook do omp, a rule
-que traduz o vocabulário do Claude Code, a rule com as diretivas, o agente
-`anvil-implementer`, os condutores `anvil-plan` e `anvil-run`, o piloto automático
-`anvil-auto` e o manual `anvil-omp`. Só no omp o fluxo é conduzido; no Claude Code
-e no Codex ele segue manual. A `anvil-run` despacha os tickets em série e, sob
-pedido e com a isolação do omp no modo branch, em paralelo, em levas de tickets do
-frontier. O `anvil-auto` é peça à parte, e não um condutor: depois de um grill só,
-que escreve o roteiro de várias specs em `docs/specs/roadmap.md`, ele leva cada
-entrada da spec ao fechamento sem pausa humana, só com `PASS` e sem contornar a
-guarda. O Codex e o omp leem as skills pelo espelho `~/.agents/skills`, que o
-mesmo passo mantém. Ver
+que traduz o vocabulário do Claude Code, inclusive o worktree e o merge da
+`anvil-implement-spec`, a rule com as diretivas, o condutor `anvil-plan`, o piloto
+automático `anvil-auto` e o manual `anvil-omp`. A spec é conduzida nos três
+harnesses pela `anvil-implement-spec`, que vem do payload: um implementer novo por
+ticket, cada um no próprio worktree, tudo junto no branch da spec e um review só
+no fim. No omp, o worktree é o `task` isolado, e com a isolação no modo branch os
+tickets do frontier rodam ao mesmo tempo; sem ela, um por vez. Só no omp o resto
+do fluxo é conduzido: o planejamento, pelo `anvil-plan`, e o piloto automático; no
+Claude Code e no Codex o planejamento segue manual. O `anvil-auto` é peça à parte,
+e não um condutor: depois de um grill só, que escreve o roteiro de várias specs em
+`docs/specs/roadmap.md`, ele leva cada entrada da spec ao fechamento sem pausa
+humana, só com `PASS` e sem contornar a guarda. O Codex e o omp leem as skills
+pelo espelho `~/.agents/skills`, que o mesmo passo mantém. Ver
 [adr-0011](./adr/adr-0011-omp-como-harness-com-camada-propria.md),
 [adr-0012](./adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md),
-[adr-0014](./adr/adr-0014-piloto-automatico-fecha-sem-humano.md) e os termos
-em [glossary.md](./glossary.md).
+[adr-0014](./adr/adr-0014-piloto-automatico-fecha-sem-humano.md),
+[adr-0023](./adr/adr-0023-implement-spec-conduz-a-spec-com-review-unico.md) e os
+termos em [glossary.md](./glossary.md).
 
 O desenvolvimento do próprio anvil abre uma sessão explícita com HOME privado
 por checkout. Ali os links de skills, agentes e camada omp apontam à fonte, e os
