@@ -155,6 +155,22 @@ por exemplo —, o `anvil-next` roda só a pedido do usuário, e a skill termina
 prompt nem sugestão de próxima sessão. Esta lista é o único lugar a editar para
 mudar quais skills têm cauda.
 
+## Integração na `anvil-implement-spec`
+
+A guarda de merge bloqueia `git merge` enquanto a spec está aberta e deixa passar
+o `git cherry-pick`, que é como se integra trabalho com a spec aberta. Onde o
+harness não integra sozinho o trabalho dos implementers — Claude Code, Codex, ou
+omp sem a isolação no modo branch —, os dois merges da skill viram:
+
+- **passo 4**, trazer a ponta do branch de integração: o implementer faz
+  `git rebase <branch da spec>` no branch dele, em vez do merge;
+- **passo 5**, o merger: `git cherry-pick <base>..<branch do implementer>` no
+  branch da spec, com o branch dele já rebaseado.
+
+O branch de cada implementer não leva o padrão `tipo/NNN-` no nome, como
+`impl-017-t01`: a guarda lê esse padrão como spec e bloquearia o merge dele. No
+omp com a isolação no modo branch, o omp integra, e esta seção não se aplica.
+
 ## Citar id sempre com a glosa
 
 Todo identificador citado — `FR-009`, `NFR-002`, `SC-004`, `QA-1` — carrega o
