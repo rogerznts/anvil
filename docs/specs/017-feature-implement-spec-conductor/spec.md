@@ -179,8 +179,9 @@ avulso, com o review por ticket de hoje.
 
 ## Out of Scope
 
-- Mudar o texto vendorizado da `implement-spec` além da rodada 2 e do mapeamento
-  de harness, que fica na rule da camada omp.
+- Mudar o texto vendorizado da `implement-spec` além da rodada 2, do gate da spec
+  (que o perfil de verificação decide onde se aplica) e do mapeamento de harness,
+  que fica na rule da camada omp.
 - Mudar o `anvil-implement` e o review por ticket dele.
 - Gravar o veredito do review em disco: decisão do operador, o gate basta.
 - Resolver conflito de cherry-pick do omp automaticamente: continua como o ADR-0012

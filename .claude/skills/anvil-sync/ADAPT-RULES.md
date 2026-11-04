@@ -207,10 +207,9 @@ no passo do review:
 +the fixed point and its findings to remeasure, so it reads only the fix's diff;
 +a fix that changed nothing leaves round 1's P1 open. Per
 +`docs/agents/verification.md`, a P1 still open after round 2 stops the run
-+before step 8: leave the tickets unresolved and report it. Then run the
-+project's verification command, the gate in `docs/agents/verification.md`,
-+once on the integration branch; a red gate stops the run before step 8 too.
-+Write no `Review:` line.
++before step 8: leave the tickets unresolved and report it. Then, where that
++profile says the gate applies, run it once on the integration branch; a red
++gate stops the run before step 8 too. Write no `Review:` line.
 ```
 
 **Por que existe.** O `adr-0010` — a verificação tem critério de parada, e ele é
@@ -228,9 +227,10 @@ skills, e o resto de cada arquivo fica verbatim — inclusive a linha de base de
 smells e os dois eixos. As trocas substantivas são só duas: fixed point e rodada
 passam a vir do histórico `Review:`, e o resumo final deixa de ser contagem para
 virar veredito por P1. Na `anvil-implement-spec` o review é um só, da spec
-inteira, e não deixa registro: o delta é a rodada 2 e o fixed point das duas
-rodadas, que a skill dá em vez do histórico, e o frontier, os worktrees e o merge
-ficam como o upstream escreveu. Quem decide isso é o `adr-0023` — a
+inteira, e não deixa registro: o delta é a rodada 2, o fixed point das duas
+rodadas, que a skill dá em vez do histórico, e o gate da spec, que roda onde o
+perfil diz que se aplica; o frontier, os worktrees e o merge ficam como o
+upstream escreveu. Quem decide isso é o `adr-0023` — a
 `implement-spec` conduz a spec com um review só no fim. Num merge em que o
 upstream mexa nesses seams, a versão do anvil ganha.
 
