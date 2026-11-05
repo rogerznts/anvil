@@ -4,11 +4,13 @@
 
 **Blocked by:** 02, 03
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] A `SKILL.md` do `anvil-boot` tem a pergunta, o formato da seção `## Worktrees`, o `workz init -y` condicional, a gravação mesclada dos dois ganchos e a conferência de disparo, e o passo 8 cita a exceção.
-- [ ] Num projeto descartável, seguindo o passo à mão, o `.claude/settings.json` termina com os dois ganchos e com o que já tinha; rodar de novo não duplica a entrada.
-- [ ] O ADR novo existe, com status aceito, e está no índice dos ADRs em `docs/index.md`.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0, e o bloco `ANVIL:DIRECTIVES` do `CLAUDE.md` raiz continua igual ao `claude_boot.md`.
+- [x] A `SKILL.md` do `anvil-boot` tem a pergunta, o formato da seção `## Worktrees`, o `workz init -y` condicional, a gravação mesclada dos dois ganchos e a conferência de disparo, e o passo 8 cita a exceção.
+- [x] Num projeto descartável, seguindo o passo à mão, o `.claude/settings.json` termina com os dois ganchos e com o que já tinha; rodar de novo não duplica a entrada.
+- [x] O ADR novo existe, com status aceito, e está no índice dos ADRs em `docs/index.md`.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0, e o bloco `ANVIL:DIRECTIVES` do `CLAUDE.md` raiz continua igual ao `claude_boot.md`.
 
 ## Comments
+
+- Implementado em `0e0ab06`, com o ADR-0025 no índice. Prova num projeto descartável com o HOME dev: o `.workz.toml` saiu do `workz init -y`; a mescla dos ganchos manteve o `PreToolUse` e as permissões que o arquivo tinha e, rodada duas vezes, não duplicou; a conferência do boot, com o comando exato por `$HOME`, imprimiu `gancho: cria …--worktree-anvil-boot-check` e `gancho: remove`.

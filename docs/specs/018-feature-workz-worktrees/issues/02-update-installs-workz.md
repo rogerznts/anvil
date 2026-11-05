@@ -4,12 +4,14 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Num HOME dev com `workz` no `PATH`, o dry-run e a execução relatam a versão e não chamam o `brew`.
-- [ ] Num HOME dev sem `workz` no `PATH` e com `brew`, o dry-run diz que vai instalar pelo Homebrew, e a execução roda `brew install rohansx/tap/workz` — provado com um `brew` falso no `PATH` que registra a chamada.
-- [ ] Sem `workz` e sem `brew`, o dry-run e a execução relatam a URL da `v0.11.0` e não instalam nada; um `brew` que falha também termina com a URL no relatório e o update saindo 0.
-- [ ] A `SKILL.md` do `anvil-update` cita o passo no contrato e no relato.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] Num HOME dev com `workz` no `PATH`, o dry-run e a execução relatam a versão e não chamam o `brew`.
+- [x] Num HOME dev sem `workz` no `PATH` e com `brew`, o dry-run diz que vai instalar pelo Homebrew, e a execução roda `brew install rohansx/tap/workz` — provado com um `brew` falso no `PATH` que registra a chamada.
+- [x] Sem `workz` e sem `brew`, o dry-run e a execução relatam a URL da `v0.11.0` e não instalam nada; um `brew` que falha também termina com a URL no relatório e o update saindo 0.
+- [x] A `SKILL.md` do `anvil-update` cita o passo no contrato e no relato.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
 
 ## Comments
+
+- Implementado em `051f8b3`. Prova em HOME descartável, com `PATH` controlado e `--from` em `anvil/`: com `workz` presente, relata `workz 0.11.0` sem chamar o `brew`; sem `workz` e com `brew`, o dry-run anuncia e a execução roda `brew install rohansx/tap/workz`; sem `brew`, e com `brew` saindo 1, relata a URL da `v0.11.0` e o update sai 0. `verify: limpo`.

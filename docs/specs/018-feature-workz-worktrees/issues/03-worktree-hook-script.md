@@ -4,13 +4,15 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Num repositório descartável com `node_modules`, `.env` ignorados e a seção `## Worktrees` com `provisionar: workz sync --quiet`, `printf '{"name":"t1"}' | workz-worktree.sh create` imprime uma linha só, o caminho `<pai>/<repo>--worktree-t1`, que existe, está no branch `worktree-t1`, tem o `.env` e o `node_modules` do checkout principal.
-- [ ] Com `provisionar: workz sync --isolated --quiet`, o worktree criado tem `.env.local` com o bloco gerenciado do workz.
-- [ ] `printf '{"worktree_path":"<caminho>"}' | workz-worktree.sh remove` remove o worktree e o branch `worktree-t1`; `workz-worktree.sh remove <caminho>` faz o mesmo.
-- [ ] Sem a seção `## Worktrees`, sem `workz` no `PATH`, ou com um `provisionar` que sai 1, o `create` sai diferente de `0`, não imprime nada no stdout e não deixa worktree nem branch.
-- [ ] Um segundo `create` com o mesmo nome devolve o mesmo caminho, sem erro.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] Num repositório descartável com `node_modules`, `.env` ignorados e a seção `## Worktrees` com `provisionar: workz sync --quiet`, `printf '{"name":"t1"}' | workz-worktree.sh create` imprime uma linha só, o caminho `<pai>/<repo>--worktree-t1`, que existe, está no branch `worktree-t1`, tem o `.env` e o `node_modules` do checkout principal.
+- [x] Com `provisionar: workz sync --isolated --quiet`, o worktree criado tem `.env.local` com o bloco gerenciado do workz.
+- [x] `printf '{"worktree_path":"<caminho>"}' | workz-worktree.sh remove` remove o worktree e o branch `worktree-t1`; `workz-worktree.sh remove <caminho>` faz o mesmo.
+- [x] Sem a seção `## Worktrees`, sem `workz` no `PATH`, ou com um `provisionar` que sai 1, o `create` sai diferente de `0`, não imprime nada no stdout e não deixa worktree nem branch.
+- [x] Um segundo `create` com o mesmo nome devolve o mesmo caminho, sem erro.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
 
 ## Comments
+
+- Implementado em `c157d7f`. Prova em repositório descartável com `package.json`: o `create` imprimiu só `<pai>/proj--worktree-t1`, no branch `worktree-t1`, com `.env` copiado e `node_modules` ligado ao principal; com `--isolated`, o `.env.local` ganhou o bloco gerenciado; o `remove` pelo JSON e pelo argumento apagou worktree e branch; sem seção, sem `workz` e com `provisionar` saindo 1, rc 1, stdout vazio e nada sobrando; o segundo `create` devolveu o mesmo caminho. Casos extras: `worktree_path` no `create`, nome com `/`, chamada de dentro de outro worktree, JSON inválido.

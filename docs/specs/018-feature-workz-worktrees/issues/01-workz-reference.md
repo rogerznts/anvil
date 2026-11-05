@@ -4,10 +4,12 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] `references/workz` existe como submodule, registrado no `.gitmodules`, com o `HEAD` no commit da tag `v0.11.0`.
-- [ ] O `anvil-skills.yaml` não lista o workz em `sources:`, e o `.claude/rules/project.md` o cita como sistema de referência versionado, com pin.
-- [ ] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
+- [x] `references/workz` existe como submodule, registrado no `.gitmodules`, com o `HEAD` no commit da tag `v0.11.0`.
+- [x] O `anvil-skills.yaml` não lista o workz em `sources:`, e o `.claude/rules/project.md` o cita como sistema de referência versionado, com pin.
+- [x] `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh verify` sai 0.
 
 ## Comments
+
+- Implementado em `84db170`: `references/workz` no commit `23999fd`, da tag `v0.11.0`; fora de `sources:` do manifesto; linha de sistema de referência no `.claude/rules/project.md`. `verify: limpo`.
