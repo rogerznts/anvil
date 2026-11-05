@@ -2,7 +2,7 @@
 
 - Status: aceito
 - Data: 2026-11-04
-- Origem: [spec 017](../../specs/017-feature-implement-spec-conductor/spec.md), ticket 08 — o anvil deixa de ter o bench
+- Origem: [spec 017](../../specs/archive/017-feature-implement-spec-conductor/spec.md), ticket 08 — o anvil deixa de ter o bench
 - Revê em parte o [ADR-0003](./adr-0003-sem-maquina-de-fases.md): a exceção do `/anvil-bench` sai, e o hook de merge fica como a única exceção
 - Revê em parte o [ADR-0006](./adr-0006-stack-como-camada-propria.md): o contrato de stack fica com três capacidades, sem as do bench
 - Revê em parte o [ADR-0014](./adr-0014-piloto-automatico-fecha-sem-humano.md): o piloto automático entra só pelo grill, e o `PASS` do bench sai

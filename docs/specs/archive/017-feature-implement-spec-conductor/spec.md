@@ -1,12 +1,17 @@
 # 017 — A `implement-spec` conduz a spec, com um review só no fim, e substitui o `anvil-run`
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 O anvil passa a implementar uma spec inteira pela `anvil-implement-spec`, vendorizada
 do mattpocock, nos três harnesses. Ela substitui o condutor autoral `anvil-run`, da
 camada omp, e o laço de despacho por ticket do piloto automático, o `anvil-auto`.
 Com ela saem o agente `anvil-implementer` e o script `frontier.sh`. A verificação
 deixa de ser por ticket e passa a ser um review só, da spec inteira, no fim.
+
+> **Revisto pelo [ADR-0024](../../../architecture/adr/adr-0024-bench-sai-do-anvil.md)
+> no ticket 08 desta spec:** o `anvil-bench` saiu do anvil. O que esta spec diz do
+> bench — o parágrafo sobre ele em *Solution*, as histórias 16 e 17 e a seção
+> *O bench* — ficou como registro do desenho e não descreve mais o toolkit.
 
 ## Problem Statement
 

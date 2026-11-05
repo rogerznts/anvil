@@ -35,6 +35,7 @@ Nenhuma.
 
 ## Specs arquivadas
 
+- [017 — A `implement-spec` conduz a spec, com um review só no fim, e substitui o `anvil-run`](./specs/archive/017-feature-implement-spec-conductor/spec.md) — `feature/017-implement-spec-conductor`, 8 tickets
 - [016 — O grill pergunta pela ferramenta de pergunta do harness, em blocos de 10](./specs/archive/016-extension-grill-ask-rounds/spec.md) — `extension/016-grill-ask-rounds`, 3 tickets
 - [015 — O registro da auditoria aceita o metadado como a execução o grava](./specs/archive/015-extension-security-audit-record-metadata/spec.md) — `extension/015-security-audit-record-metadata`, 1 ticket
 - [014 — O registro da auditoria entra versionado em `docs/security/`](./specs/archive/014-feature-security-audit-record/spec.md) — `feature/014-security-audit-record`, 2 tickets

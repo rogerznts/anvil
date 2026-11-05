@@ -2,7 +2,7 @@
 
 - Status: aceito
 - Data: 2026-11-04
-- Origem: [spec 017](../../specs/017-feature-implement-spec-conductor/spec.md), a `implement-spec` conduz a spec e substitui o `anvil-run`
+- Origem: [spec 017](../../specs/archive/017-feature-implement-spec-conductor/spec.md), a `implement-spec` conduz a spec e substitui o `anvil-run`
 - Revê em parte o [ADR-0010](./adr-0010-verificacao-tem-criterio-de-parada.md): o orçamento de duas rodadas passa a ser por spec no fluxo da spec
 - Revê em parte o [ADR-0011](./adr-0011-omp-como-harness-com-camada-propria.md): o condutor do omp passa a ser a `anvil-implement-spec`
 - Revê em parte o [ADR-0012](./adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md): o paralelo vem da `anvil-implement-spec` com a isolação do omp, sem pedido
