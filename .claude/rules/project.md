@@ -126,3 +126,22 @@ passo `/anvil-open-pr`: aqui não há PR, e a spec fecha com o merge local. O qu
 guarda de merge exige para liberar está no mesmo perfil. Ela confere o `git
 merge` disparado da `main` ou do branch da spec, e é um hook do Claude Code: só vê
 comando do agente, não o que se digita no terminal.
+
+## Versão e release
+
+Cada bloco de atualização que sobe para o GitHub — uma spec fechada, ou uma
+sincronização de upstreams — ganha uma tag anotada `vX.Y.Z` na `main` e uma
+release no GitHub com as notas do bloco, em pt-BR. A tag sai depois do merge e
+antes do push, e sobe junto com a `main`:
+
+```bash
+git tag -a vX.Y.Z -m "anvil vX.Y.Z"
+git push origin main vX.Y.Z
+gh release create vX.Y.Z --title "vX.Y.Z — <bloco>" --notes-file <notas>
+```
+
+A numeração segue SemVer em `0.x`: **minor** para bloco com spec, skill nova ou
+mudança de contrato, inclusive a que quebra compatibilidade; **patch** para bloco
+só de `fix` ou `chore`. A `1.0.0` é decisão do operador, não contagem. A
+primeira tag, `v0.19.0`, foi calculada pelos blocos que entraram na `main` desde
+o commit inicial: 0.1.0 para o payload inicial e um passo por bloco depois dele.
