@@ -31,10 +31,11 @@ Relatório da execução: [report.md](./specs/report.md)
 
 ## Specs ativas
 
-- [018 — O workz prepara os worktrees dos implementers, e o anvil o instala e o configura](./specs/018-feature-workz-worktrees/spec.md) — `feature/018-workz-worktrees`, 5 tickets
+Nenhuma.
 
 ## Specs arquivadas
 
+- [018 — O workz prepara os worktrees dos implementers, e o anvil o instala e o configura](./specs/archive/018-feature-workz-worktrees/spec.md) — `feature/018-workz-worktrees`, 5 tickets
 - [017 — A `implement-spec` conduz a spec, com um review só no fim, e substitui o `anvil-run`](./specs/archive/017-feature-implement-spec-conductor/spec.md) — `feature/017-implement-spec-conductor`, 8 tickets
 - [016 — O grill pergunta pela ferramenta de pergunta do harness, em blocos de 10](./specs/archive/016-extension-grill-ask-rounds/spec.md) — `extension/016-grill-ask-rounds`, 3 tickets
 - [015 — O registro da auditoria aceita o metadado como a execução o grava](./specs/archive/015-extension-security-audit-record-metadata/spec.md) — `extension/015-security-audit-record-metadata`, 1 ticket

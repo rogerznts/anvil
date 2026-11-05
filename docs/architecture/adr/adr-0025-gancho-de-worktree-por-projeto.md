@@ -2,7 +2,7 @@
 
 - Status: aceito
 - Data: 2026-11-04
-- Origem: [spec 018](../../specs/018-feature-workz-worktrees/spec.md), o workz prepara os worktrees dos implementers
+- Origem: [spec 018](../../specs/archive/018-feature-workz-worktrees/spec.md), o workz prepara os worktrees dos implementers
 - Revê em parte o [ADR-0013](./adr-0013-toolkit-instalado-por-usuario.md): o boot volta a escrever um hook no `.claude/settings.json` do projeto, só para o worktree
 
 ## Contexto

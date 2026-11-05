@@ -1,6 +1,6 @@
 # 018 — O workz prepara os worktrees dos implementers, e o anvil o instala e o configura
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 O anvil passa a usar o [workz](https://github.com/rohansx/workz) para preparar os
 worktrees que a `anvil-implement-spec` cria, um por implementer. O `anvil-update`
