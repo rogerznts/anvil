@@ -182,8 +182,9 @@ printf '{"name":"impl-018-t01"}' | bash "$HOME/.claude/skills/anvil-docs/scripts
 ```
 
 O stdout é só o caminho do worktree, no branch `worktree-<nome>`, a partir do
-`HEAD` do checkout principal; é esse caminho que vai no brief. No **passo 9**,
-remova cada um com `bash "$HOME/.claude/skills/anvil-docs/scripts/workz-worktree.sh" remove <caminho>`,
+`HEAD` do checkout principal; é esse caminho que vai no brief. No **passo 9 da
+`anvil-implement-spec`**, a limpeza dos worktrees, remova cada um com
+`bash "$HOME/.claude/skills/anvil-docs/scripts/workz-worktree.sh" remove <caminho>`,
 que também apaga o branch e libera a porta alocada. O gancho `WorktreeCreate` do
 projeto faz o mesmo para o worktree que o Claude Code cria sozinho, com
 `isolation: "worktree"` ou `claude --worktree`; o de subagente também sai pelo
