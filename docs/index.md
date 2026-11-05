@@ -31,7 +31,7 @@ Relatório da execução: [report.md](./specs/report.md)
 
 ## Specs ativas
 
-Nenhuma.
+- [018 — O workz prepara os worktrees dos implementers, e o anvil o instala e o configura](./specs/018-feature-workz-worktrees/spec.md) — `feature/018-workz-worktrees`, 5 tickets
 
 ## Specs arquivadas
 
