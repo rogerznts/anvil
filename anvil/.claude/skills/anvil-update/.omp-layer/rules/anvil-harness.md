@@ -40,6 +40,12 @@ isolação na raiz do projeto, com `omp config get task.isolation.enabled` e
   merger. O implementer não faz merge da ponta do branch de integração antes de
   reportar: o omp aplica os commits sobre a ponta atual, e um commit de merge
   entraria no cherry-pick.
+- **Worktree pelo workz.** Num projeto com a seção `## Worktrees` no
+  `.claude/rules/anvil.md`, o brief de cada implementer isolado manda rodar o
+  comando da linha `provisionar:` na raiz da cópia isolada, antes de começar o
+  ticket: ele traz o `.env` e as dependências do checkout principal e, quando o
+  projeto pediu, o bloco de portas e banco do `.env.local`. A isolação do omp
+  continua criando e descartando a cópia; não chame o `workz-worktree.sh`.
 - **Sem o modo branch** (isolação desligada, ou ligada no modo `patch`): um item
   por chamada do `task`, sem `isolated`, e a próxima chamada só depois do
   resultado da anterior. Cada implementer trabalha na árvore do branch da spec e

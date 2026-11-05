@@ -40,6 +40,10 @@
 # A guarda de merge entra no ~/.claude/settings.json como uma entrada a mais em
 # hooks.PreToolUse, achada pelo comando exato; o resto do arquivo fica. O hook do
 # omp vem com a camada.
+# Depois do payload, o workz, que prepara os worktrees dos implementers: no PATH,
+# só a versão é relatada; ausente, no macOS com brew no PATH, entra por
+# `brew install rohansx/tap/workz`; fora disso, o relatório aponta a release
+# v0.11.0 para o usuário instalar. Um brew que falha não aborta o reset.
 # Nada é escrito em projeto, e nada é commitado. Rodado de dentro de um projeto
 # anvil — o que tem .claude/rules/anvil.md —, o relatório confere os perfis de
 # docs/agents/ contra o template novo e aponta o /anvil-boot quando divergem. Tirar
@@ -443,6 +447,19 @@ if [ ! -f "$FROM_ABS/.claude/skills/anvil-docs/scripts/guard-spec-merge.sh" ]; t
 elif ! command -v python3 >/dev/null 2>&1; then estado_guarda="sem-python"
 else estado_guarda="$(guarda_settings estado)"; fi
 
+# O workz prepara os worktrees dos implementers. Presente no PATH, so a versao e
+# relatada. Ausente, so o macOS com brew no PATH instala, pelo tap do autor; fora
+# disso, o relatorio aponta a release para o usuario instalar. Um brew que falha
+# nao aborta o reset: o relatorio diz a falha e a URL.
+WORKZ_URL="https://github.com/rohansx/workz/releases/tag/v0.11.0"
+WORKZ_BREW="brew install rohansx/tap/workz"
+versao_workz=""
+if command -v workz >/dev/null 2>&1; then
+    estado_workz="presente"
+    versao_workz="$(workz --version 2>/dev/null | head -n 1 || true)"
+elif [ "$(uname -s)" = Darwin ] && command -v brew >/dev/null 2>&1; then estado_workz="brew"
+else estado_workz="manual"; fi
+
 # --- o projeto de onde roda ---------------------------------------------------
 # Projeto anvil e o que tem a rule de configuracao que o boot escreve. A raiz vem
 # do git, ou do diretorio corrente fora de repositorio.
@@ -540,6 +557,11 @@ case "$estado_guarda" in
     nova)         echo "guarda de merge em ~/.claude/settings.json: hook PreToolUse/Bash novo; o resto do arquivo fica" ;;
     em-dia)       echo "guarda de merge em ~/.claude/settings.json: hook em dia" ;;
     *)            echo "ATENÇÃO, guarda de merge: ~/.claude/settings.json fica intocado ($([ "$estado_guarda" = sem-python ] && echo "sem python3 para editá-lo" || echo "não é um objeto JSON com hooks.PreToolUse em lista")); registre à mão o hook PreToolUse/Bash com o comando: $GUARDA_CMD" ;;
+esac
+case "$estado_workz" in
+    presente) echo "workz: presente, ${versao_workz:-versão não informada}" ;;
+    brew)     echo "workz: ausente, será instalado com: $WORKZ_BREW" ;;
+    manual)   echo "ATENÇÃO, workz: ausente e sem Homebrew no macOS, não será instalado; instale da release v0.11.0: $WORKZ_URL" ;;
 esac
 if [ -n "$PROJETO" ]; then
     echo "projeto anvil em $PROJETO: nada é escrito nele; perfis de docs/agents/ conferidos contra o template novo"
@@ -643,5 +665,20 @@ case "$estado_guarda" in
     arquivo-novo|nova) guarda_settings escreve ;;
 esac
 
+# workz: so o caso brew executa algo. A saida do brew vai para stderr, e o
+# relatorio fica no stdout.
+resultado_workz=""
+if [ "$estado_workz" = brew ]; then
+    if $WORKZ_BREW >&2; then
+        resultado_workz="workz: instalado com: $WORKZ_BREW"
+        if command -v workz >/dev/null 2>&1; then
+            resultado_workz="$resultado_workz ($(workz --version 2>/dev/null | head -n 1 || true))"
+        fi
+    else
+        resultado_workz="ATENÇÃO, workz: $WORKZ_BREW falhou (saída $?); instale da release v0.11.0: $WORKZ_URL"
+    fi
+fi
+
 echo
 echo "pronto. $(conta "$novo") skills e $(conta "$novo_ag") agentes instalados em ~/.claude, $(conta "$orfaos$orfaos_ag") órfão(s) removido(s)."
+if [ -n "$resultado_workz" ]; then echo "$resultado_workz"; fi

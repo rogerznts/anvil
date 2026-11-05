@@ -21,6 +21,7 @@ projetos da máquina de uma vez. O destino é o diretório do usuário:
 | camada omp | `~/.omp/agent/{skills,rules,agents,hooks/pre}` |
 | diretivas | o bloco `ANVIL:DIRECTIVES` do `~/.claude/CLAUDE.md` e, no omp, a rule `~/.omp/agent/rules/anvil-directives.md` |
 | guarda de merge | no Claude Code, um hook `PreToolUse`/`Bash` no `~/.claude/settings.json` que chama o `guard-spec-merge.sh` das skills instaladas; no omp, o hook da camada |
+| workz | o binário `workz` no `PATH`, instalado pelo Homebrew no macOS quando falta |
 
 O que é de cada projeto — `.claude/rules/`, os perfis em `docs/agents/` e o resto
 de `docs/` — não é tocado. O update **nunca commita**. A única escrita em projeto é
@@ -70,6 +71,13 @@ resto do arquivo fica. Settings que não é um objeto JSON com `hooks.PreToolUse
 lista, ou máquina sem `python3`, deixa o arquivo intocado, e o dry-run diz o
 comando para registrar à mão. No omp, a guarda é o hook da camada em
 `~/.omp/agent/hooks/pre/`.
+
+O **workz** prepara os worktrees dos implementers, e o reset o confere depois de
+instalar o payload. Presente no `PATH`, só a versão é relatada. Ausente, no macOS
+com `brew` no `PATH`, o reset roda `brew install rohansx/tap/workz`. Ausente em
+outro caso, nada é instalado, e o relatório manda instalar da release `v0.11.0`:
+`https://github.com/rohansx/workz/releases/tag/v0.11.0`. Um `brew install` que
+falha não aborta o update: o relatório diz a falha e a mesma URL.
 
 **Por que reset e não `degit --force`:** o `--force` sobrescreve arquivo a
 arquivo e **nunca apaga**. Uma skill que deixou de existir upstream ficaria no
@@ -161,7 +169,9 @@ linhas `omp:` do lock ficam como estavam.
 Depois, as diretivas do `~/.claude/CLAUDE.md`: arquivo novo, bloco novo no topo,
 bloco em dia ou bloco que será substituído. E a guarda de merge do
 `~/.claude/settings.json`: arquivo novo, hook novo, hook em dia, ou um `ATENÇÃO`
-quando o arquivo fica intocado.
+quando o arquivo fica intocado. E o workz: presente, com a versão; ausente e
+instalado pelo Homebrew; ou um `ATENÇÃO` com a URL da release `v0.11.0`, quando
+não há Homebrew no macOS.
 
 Por último, o projeto: *fora de projeto anvil*, ou o projeto onde roda, com uma
 linha `BOOT PENDENTE` para cada perfil de `docs/agents/` ausente ou divergente do
@@ -270,6 +280,9 @@ sem a cópia: aponte o `/anvil-boot`, que traz o perfil do template.
 - as diretivas: o bloco do `~/.claude/CLAUDE.md` criado, trocado ou em dia
 - a guarda de merge: o hook do `~/.claude/settings.json` registrado agora, já em
   dia, ou o `ATENÇÃO` com o comando para registrar à mão
+- o workz: a versão presente, o `brew install` que rodou agora, ou o `ATENÇÃO`
+  com a URL da release `v0.11.0` — sem Homebrew no macOS ou com o `brew install`
+  que falhou
 - o que há de novo no toolkit
 - o que ficou no disco para você decidir
 - **o que o update não toca e pode ter ficado para trás.** Os perfis em

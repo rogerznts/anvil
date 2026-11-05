@@ -6,6 +6,7 @@
 - Emenda o [ADR-0011](./adr-0011-omp-como-harness-com-camada-propria.md): a camada omp e o espelho `.agents/skills` passam à instalação de usuário, e a linha `omp:` que torna a camada pegajosa passa a ser a do lock de usuário
 - Origem: spec 006 (`docs/specs/archive/006-feature-user-install-language-next/`)
 - Revisto em parte pelo [ADR-0018 — HOME dev por checkout](./adr-0018-dev-home-isolado-por-checkout.md): a ligação de desenvolvimento deixa o HOME real; a instalação publicada permanece por usuário.
+- Revisto em parte pelo [ADR-0025](./adr-0025-gancho-de-worktree-por-projeto.md): o boot grava no `.claude/settings.json` do projeto os ganchos de worktree do workz, só no projeto que usa o workz.
 
 ## Contexto
 
