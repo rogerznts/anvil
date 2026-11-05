@@ -100,7 +100,7 @@ Relatório da execução: [report.md](./specs/report.md)
   - [adr-0012](./architecture/adr/adr-0012-frontier-em-paralelo-com-isolacao-do-omp.md)
     — o frontier roda em paralelo sob pedido, só com a isolação do omp no modo branch; **revisto em parte pelo adr-0023**
   - [adr-0013](./architecture/adr/adr-0013-toolkit-instalado-por-usuario.md)
-    — o toolkit é instalado uma vez por usuário; o projeto fica só com rules e `docs/`
+    — o toolkit é instalado uma vez por usuário; o projeto fica só com rules e `docs/`; **revisto em parte pelo adr-0025**
   - [adr-0014](./architecture/adr/adr-0014-piloto-automatico-fecha-sem-humano.md)
     — o piloto automático leva o roteiro ao fechamento sem humano; revê em parte o adr-0010 e o adr-0011; **revisto em parte pelo adr-0015, pelo adr-0023 e pelo adr-0024**
   - [adr-0015](./architecture/adr/adr-0015-branch-base-declarado-ou-detectado.md)
@@ -123,6 +123,8 @@ Relatório da execução: [report.md](./specs/report.md)
     — a `implement-spec` conduz a spec nos três harnesses, com um review só no fim e rodada 2 sobre a correção; o `PASS` não lê `Review:`; revê em parte os adr-0010, adr-0011, adr-0012, adr-0014 e adr-0020; **revisto em parte pelo adr-0024**
   - [adr-0024](./architecture/adr/adr-0024-bench-sai-do-anvil.md)
     — o bench sai do anvil, com o material de terceiro dele, o starter e os scripts do `anvil-stack-payload`, o modo bench do piloto e o `--infra` da prova; revê em parte os adr-0003, adr-0006, adr-0014, adr-0017, adr-0021 e adr-0023
+  - [adr-0025](./architecture/adr/adr-0025-gancho-de-worktree-por-projeto.md)
+    — o gancho de worktree do workz fica no `.claude/settings.json` do projeto, só no projeto que usa o workz; revê em parte o adr-0013
 
 ### Project
 

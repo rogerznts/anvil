@@ -235,7 +235,8 @@ puro, sem frontmatter.
 - **`anvil.md`** — sempre. A configuração resolvida: idioma de comunicação
   (default pt-BR), o comando de verificação com o custo medido, a seção Git, a
   lista de modelos por papel que o `anvil-arena`, o `anvil-how` e o
-  `anvil-architect` leem, e a seção de instalação, para quem clona o projeto.
+  `anvil-architect` leem, a seção de instalação, para quem clona o projeto, e,
+  quando o projeto usa o workz, a seção de worktrees.
 - **`frontend.md`** — só se houver código de frontend.
 
 A seção de verificação do `anvil.md` é contrato com o piloto automático, a skill
@@ -337,11 +338,72 @@ O segundo comando mostra o que entra e o que fica; o terceiro instala. Para
 trocar de versão depois, rode `/anvil-update`.
 ```
 
+A seção de worktrees do `anvil.md` liga o [workz](https://github.com/rohansx/workz)
+aos worktrees que a `anvil-implement-spec` cria, um por implementer. É opcional:
+pergunte se o projeto usa o workz, junto com o resto da proposta, e ofereça os dois
+comandos:
+
+- `workz sync --quiet` — o econômico, proposto: dependências ligadas ao checkout
+  principal e `.env` copiado, sem porta, banco nem container;
+- `workz sync --isolated --quiet` — para o projeto cujos testes precisam de porta
+  ou banco próprios: acrescenta o bloco gerenciado no `.env.local`.
+
+Com não, a seção fica de fora e nada do resto deste trecho roda. Com sim, e com
+`command -v workz` achando o binário, grave a seção com o comando escolhido, sem
+prosa na linha de valor:
+
+```markdown
+## Worktrees
+
+provisionar: workz sync --quiet
+```
+
+Depois, da raiz do projeto:
+
+1. Sem `.workz.toml`, rode `workz init -y`. Com ele, deixe-o como está: o
+   `post_start` dele é do `workz start` humano, e o `sync` do implementer não o
+   roda.
+2. Grave no `.claude/settings.json` do projeto os ganchos `WorktreeCreate` e
+   `WorktreeRemove` do Claude Code, com estes comandos exatos:
+
+   ```json
+   {
+     "hooks": {
+       "WorktreeCreate": [
+         { "hooks": [ { "type": "command", "command": "bash \"$HOME/.claude/skills/anvil-docs/scripts/workz-worktree.sh\" create" } ] }
+       ],
+       "WorktreeRemove": [
+         { "hooks": [ { "type": "command", "command": "bash \"$HOME/.claude/skills/anvil-docs/scripts/workz-worktree.sh\" remove" } ] }
+       ]
+     }
+   }
+   ```
+
+   Mescle com o que o arquivo tem: ache a entrada pelo comando exato e
+   acrescente só a que falta; nunca sobrescreva o arquivo nem outro gancho. O
+   `WorktreeCreate` substitui a criação de worktree inteira do Claude Code, e por
+   isso mora no projeto e não no usuário — o ADR-0025 do anvil registra a exceção.
+3. Confirme que dispara. Da raiz:
+
+   ```bash
+   p="$(printf '{"name":"anvil-boot-check"}' | bash "$HOME/.claude/skills/anvil-docs/scripts/workz-worktree.sh" create)" &&
+       test -d "$p" && echo "gancho: cria $p" &&
+       bash "$HOME/.claude/skills/anvil-docs/scripts/workz-worktree.sh" remove "$p" &&
+       test ! -e "$p" && echo "gancho: remove"
+   ```
+
+   As duas linhas de saída provam o gancho. Sem elas, mostre o erro do script e
+   registre a pendência no relatório do passo 10.
+
+Sem `workz` no `PATH`, não grave a seção nem os ganchos: diga que o `/anvil-update`
+instala o workz e registre a pendência no relatório.
+
 Num `anvil.md` que já existe sem a seção de verificação, sem a seção Git, sem a
-lista de modelos ou sem a seção de instalação, proponha acrescentar só o que
-falta, sem mexer no resto. Para a seção Git ausente, siga a detecção e confirmação
-acima; valor já configurado não se troca. O comando de teste que um boot antigo
-gravou sob outro título é o que a seção de verificação leva.
+lista de modelos, sem a seção de instalação ou sem a de worktrees, proponha
+acrescentar só o que falta, sem mexer no resto. Para a seção Git ausente, siga a
+detecção e confirmação acima; valor já configurado não se troca. O comando de
+teste que um boot antigo gravou sob outro título é o que a seção de verificação
+leva.
 
 ### O custo da verificação
 
@@ -484,7 +546,8 @@ A guarda vem da instalação de usuário e vale para todo projeto anvil da máqu
 o hook do Claude Code fica no `~/.claude/settings.json`, e o do omp na camada em
 `~/.omp/agent/hooks/pre/`. Ela reconhece o projeto pela rule `anvil.md` do passo
 4, e fora de projeto anvil não faz nada. **O boot não escreve hook nem script no
-projeto.**
+projeto**, com uma exceção: os ganchos de worktree do workz, do passo 4, que só o
+projeto com a seção `## Worktrees` recebe, como registra o ADR-0025 do anvil.
 
 **Confirme que ela dispara.** Instalar sem verificar é repetir o erro que a guarda
 existe para evitar. Da raiz do projeto:
