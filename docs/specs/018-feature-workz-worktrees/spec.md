@@ -60,10 +60,13 @@ implementer nasce e quando a execução termina.
   próprios troca o comando por `workz sync --isolated --quiet`. O `post_start` do
   `.workz.toml` não roda pelo `sync`, então o container do ERP não sobe para
   implementer.
-- **Limpeza.** No passo 9 da `implement-spec`, quem conduz remove o worktree de
-  cada implementer pelo mesmo script. No omp, a isolação do próprio harness
-  continua criando e removendo; o brief do implementer manda rodar o comando da
-  seção `## Worktrees` no início, quando o projeto a tem.
+- **Criação e limpeza na `implement-spec`.** Quem conduz cria o worktree de cada
+  implementer pelo mesmo script, e não por `git worktree add`: na prova da 017 no
+  Claude Code, o condutor criou os worktrees pelo Bash, e o gancho
+  `WorktreeCreate` não dispara nesse caminho. No passo 9, remove cada um pelo
+  script. No omp, a isolação do próprio harness continua criando e removendo; o
+  brief do implementer manda rodar o comando da seção `## Worktrees` no início,
+  quando o projeto a tem.
 
 ## User Stories
 
@@ -132,10 +135,12 @@ provisionar: workz sync --quiet
 
 ### A `implement-spec`
 
-- Claude Code: a diretiva "Integração na `anvil-implement-spec`" do
-  `claude_boot.md` ganha a limpeza: no passo 9, num projeto com a seção
-  `## Worktrees`, quem conduz roda o `remove` do script para cada worktree de
-  implementer, porque o Claude Code não chama o `WorktreeRemove` para subagente.
+- Claude Code e Codex: a diretiva "Integração na `anvil-implement-spec`" do
+  `claude_boot.md` manda, num projeto com a seção `## Worktrees`, criar o worktree
+  de cada implementer com o `create` do script — o caminho que ele imprime vai no
+  brief — e, no passo 9, remover cada um com o `remove`. O gancho cobre o worktree
+  que o Claude Code cria sozinho; o de subagente sai pelo `remove`, porque o
+  Claude Code não chama o `WorktreeRemove` para ele.
 - omp: a rule de harness da camada manda o brief do implementer rodar o
   `provisionar:` no próprio worktree antes de começar, quando o projeto tem a
   seção. A isolação do omp continua criando e removendo o worktree.

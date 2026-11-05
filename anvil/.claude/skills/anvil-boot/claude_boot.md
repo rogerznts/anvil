@@ -172,14 +172,23 @@ como `feature/017-t01`, e bloquearia o merge dele. No omp com a isolação no mo
 branch, o omp integra, e os dois merges acima não se aplicam.
 
 **Worktrees pelo workz.** Num projeto com a seção `## Worktrees` no
-`.claude/rules/anvil.md`, o worktree de cada implementer sai preparado pelo
-workz. No Claude Code, o gancho `WorktreeCreate` do projeto o cria e roda o
-`provisionar:` da seção; o Claude Code não chama o `WorktreeRemove` para
-subagente, então no **passo 9** remova cada worktree de implementer com
-`bash "$HOME/.claude/skills/anvil-docs/scripts/workz-worktree.sh" remove <caminho>`,
-que também apaga o branch e libera a porta alocada. Onde o harness cria o
-worktree sem esse gancho, o brief do implementer manda rodar o `provisionar:` na
-raiz do próprio worktree antes de começar.
+`.claude/rules/anvil.md`, quem conduz cria o worktree de cada implementer pelo
+script do anvil, que o põe na convenção do workz e roda o `provisionar:` da seção,
+em vez de `git worktree add`:
+
+```bash
+printf '{"name":"impl-018-t01"}' | bash "$HOME/.claude/skills/anvil-docs/scripts/workz-worktree.sh" create
+```
+
+O stdout é só o caminho do worktree, no branch `worktree-<nome>`, a partir do
+`HEAD` do checkout principal; é esse caminho que vai no brief. No **passo 9**,
+remova cada um com `bash "$HOME/.claude/skills/anvil-docs/scripts/workz-worktree.sh" remove <caminho>`,
+que também apaga o branch e libera a porta alocada. O gancho `WorktreeCreate` do
+projeto faz o mesmo para o worktree que o Claude Code cria sozinho, com
+`isolation: "worktree"` ou `claude --worktree`; o de subagente também sai pelo
+`remove` no passo 9, porque o Claude Code não chama o `WorktreeRemove` para ele.
+No omp com a isolação no modo branch, a cópia é do omp, e o brief manda rodar o
+`provisionar:` na raiz dela.
 
 ## Citar id sempre com a glosa
 
