@@ -170,7 +170,17 @@ omp sem a isolação no modo branch —, os dois merges da skill viram:
 Dê ao branch de cada implementer um nome sem barra seguida de número, como
 `impl-017-t01`. A guarda lê como branch de spec todo nome com `<tipo>/<NNN>-`,
 como `feature/017-t01`, e bloquearia o merge dele. No omp com a isolação no modo
-branch, o omp integra, e esta seção não se aplica.
+branch, o omp integra, e os dois merges acima não se aplicam.
+
+**Worktrees pelo workz.** Num projeto com a seção `## Worktrees` no
+`.claude/rules/anvil.md`, o worktree de cada implementer sai preparado pelo
+workz. No Claude Code, o gancho `WorktreeCreate` do projeto o cria e roda o
+`provisionar:` da seção; o Claude Code não chama o `WorktreeRemove` para
+subagente, então no **passo 9** remova cada worktree de implementer com
+`bash "$HOME/.claude/skills/anvil-docs/scripts/workz-worktree.sh" remove <caminho>`,
+que também apaga o branch e libera a porta alocada. Onde o harness cria o
+worktree sem esse gancho, o brief do implementer manda rodar o `provisionar:` na
+raiz do próprio worktree antes de começar.
 
 ## Citar id sempre com a glosa
 
