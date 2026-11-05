@@ -4,7 +4,7 @@
 #
 #   . .claude/skills/anvil-sync/scripts/proof.sh
 #
-#   proof_prepare [--remote] [--forge [--tea-login <l>]... [--labels <r>]] [--infra] [--dep <skill>]...
+#   proof_prepare [--remote] [--forge [--tea-login <l>]... [--labels <r>]] [--dep <skill>]...
 #       Cria o diretório da execução, $PROOF_RUN, com nome único (mktemp -d), e
 #       nele o overlay de config do omp, $PROOF_CONFIG: skills.customDirectories
 #       com as skills do payload e da camada omp desta árvore, que têm precedência
@@ -32,14 +32,7 @@
 #       que o gh label list e o tea labels list falsos devolvem, na cor ededed e sem
 #       descrição; vazio, o repositório sem rótulo. Sem --labels, os rótulos são os
 #       que o GitHub cria num repositório novo. O remoto e os falsos, com a
-#       configuração deles, saem com $PROOF_RUN. --infra liga o prefixo de execução
-#       do infra.sh do bench, ANVIL_INFRA_PREFIX, com o id da execução, exportado
-#       para o script da prova e para a sessão: todo infra.sh que eles rodam usa a
-#       infra do prefixo, com compose, rede, registro e volumes próprios.
-#       ANVIL_PROJECTS_DIR recebe $PROOF_RUN/projects se não estiver definido,
-#       para o script da prova, a sessão e o teardown usarem o mesmo registro
-#       apesar dos HOMEs diferentes. A limpeza a derruba (infra.sh --teardown,
-#       da fonte) antes de remover $PROOF_RUN, também na falha e na interrupção.
+#       configuração deles, saem com $PROOF_RUN.
 #       --dep <skill>, uma vez por skill, valida o nome e o diretório fonte de
 #       uma dependência da prova. Não exige links no HOME pessoal: os caminhos
 #       ~/.claude/skills/<skill>/… da sessão vêm do HOME dev preparado pelo launcher.
@@ -97,7 +90,6 @@ esac
 _PROOF_SKILLS="$(cd "$_PROOF_SCRIPTS/../../../.." && pwd)/anvil/.claude/skills"
 _PROOF_PID=""
 _PROOF_FORGE=""
-_PROOF_INFRA=""
 PROOF_RUN=""
 PROOF_CONFIG=""
 PROOF_REMOTE=""
@@ -134,28 +126,21 @@ _proof_publish() {
 }
 
 _proof_cleanup() {
-    local out
     if [ -n "$_PROOF_PID" ]; then
         kill "$_PROOF_PID" 2>/dev/null
         wait "$_PROOF_PID" 2>/dev/null
         _PROOF_PID=""
-    fi
-    if [ -n "$_PROOF_INFRA" ]; then
-        out="$(ANVIL_INFRA_PREFIX="$_PROOF_INFRA" bash "$_PROOF_SKILLS/anvil-stack-payload/bench/infra.sh" --teardown 2>&1)" \
-            || echo "proof: a derrubada da infra do prefixo $_PROOF_INFRA falhou: $out" >&2
-        _PROOF_INFRA=""
     fi
     [ -z "$PROOF_RUN" ] || rm -rf "$PROOF_RUN"
 }
 
 proof_prepare() {
     [ -z "$PROOF_RUN" ] || _proof_refuse "proof_prepare já rodou nesta execução: $PROOF_RUN"
-    local remote="" forge="" infra="" logins="" labels="" labels_set="" tool tmp="${TMPDIR:-/tmp}"
+    local remote="" forge="" logins="" labels="" labels_set="" tool tmp="${TMPDIR:-/tmp}"
     while [ $# -gt 0 ]; do
         case "$1" in
             --remote) remote=1 ;;
             --forge) forge=1 ;;
-            --infra) infra=1 ;;
             --dep)
                 [ $# -ge 2 ] || _proof_refuse "--dep pede o nome de uma skill"
                 case "$2" in
@@ -210,13 +195,6 @@ proof_prepare() {
             && printf '%s' "$logins" > "$PROOF_RUN/forge-tea-logins" \
             && { [ -z "$labels_set" ] || printf '%s' "$labels" > "$PROOF_RUN/forge-labels"; } \
             || _proof_refuse "não deu para criar o gh e o tea falsos em $_PROOF_FORGE"
-    fi
-    if [ -n "$infra" ]; then
-        export ANVIL_PROJECTS_DIR="${ANVIL_PROJECTS_DIR:-$PROOF_RUN/projects}"
-        # O id da execução é o sufixo do mktemp, em hexadecimal: o prefixo do infra.sh
-        # só aceita minúsculas, e o sufixo distingue maiúsculas.
-        _PROOF_INFRA="proof-$(printf '%s' "${PROOF_RUN##*.}" | od -An -tx1 | tr -d ' \n')"
-        export ANVIL_INFRA_PREFIX="$_PROOF_INFRA"
     fi
 }
 

@@ -33,12 +33,12 @@ delegando para `grilling`, e viram no-op.
 
 **UI (2)** `anvil-ui-hallmark` · `-taste`
 
-**Autorais (10)** `anvil-docs` · `anvil-stack-payload` · `anvil-ui` (roteador) ·
-`anvil-boot` · `anvil-update` · `anvil-bench` · `tea-commit` · `tea-open-pr` ·
+**Autorais (9)** `anvil-docs` · `anvil-stack-payload` · `anvil-ui` (roteador) ·
+`anvil-boot` · `anvil-update` · `tea-commit` · `tea-open-pr` ·
 `tea-open-fast-pr` · `tea-prune-branches`
 
-**Camada omp (4, fora da contagem)** `anvil-plan` · `anvil-run` · `anvil-auto` ·
-`anvil-omp` — autorais, dentro da `anvil-update` em `.omp-layer/`, e instaladas só
+**Camada omp (3, fora da contagem)** `anvil-plan` · `anvil-auto` · `anvil-omp` —
+autorais, dentro da `anvil-update` em `.omp-layer/`, e instaladas só
 onde há omp.
 
 ### Fora do roster, e por quê
@@ -98,8 +98,7 @@ sem dizer · o padrão é mover · mostra o plano inteiro antes de tocar em nada
 Reorganizar a skill já presente nas três camadas do
 [adr-0006](../architecture/adr/adr-0006-stack-como-camada-propria.md): as 3
 ciladas e a fronteira de edição para `RULE.md`; enxugar o `SKILL.md` de 409 para
-~120 l mantendo a tabela roteadora; trazer starter, scripts e INV-1..6 do mosk
-para `bench/`.
+~120 l mantendo a tabela roteadora.
 
 **Pendência que precisa ser resolvida aqui:** identificar a origem upstream da
 skill e registrá-la no manifesto. Sem origem rastreável ela é autoral e fica fora
@@ -127,16 +126,11 @@ na skill.
 4. pstack (5) — exercita `decursor`
 5. UI (7) + o roteador
 
-### Fase 5 — `anvil-bench`
+### Fase 5 — o bench
 
-Sem persona, com INV-1..6 (em `anvil-stack-payload/bench/`) e `loop-until-green`
-com teto de 3 tentativas. O build loop chama as skills novas: `anvil-grill` (só
-negócio) → `anvil-to-spec` → `anvil-to-tickets` → `anvil-implement` + `anvil-tdd`
-→ `anvil-code-review` → gate.
-
-Único lugar com `gate.yaml`, `quality_score` e `score_history`. O que continua
-específico do bench é a ausência de jargão: nunca dizer "porta", "container",
-"migration" ou "commit" para o usuário leigo.
+Feita e depois retirada: o bench saiu do anvil pelo
+[adr-0024](../architecture/adr/adr-0024-bench-sai-do-anvil.md), com o starter, os
+scripts e as invariantes que vinham do mosk.
 
 ### Fase 6 — `anvil-boot` e `anvil-update`
 
@@ -209,8 +203,7 @@ obrigatório, órfãos calculados pelo `anvil.lock`, protegidos `.claude/rules`,
 | `claude_boot.md` + R1 do `output-contract.md` | 69 + 193 | `anvil-boot` ✅ |
 | `create-new-feature.sh` — reserva o número atomicamente no `origin` num ref imutável `refs/spec-numbers/<NNN>`; corrida contra outro processo no remoto, coisa que prompt nenhum faz | 575 | `anvil-to-spec` |
 | `reset-install.sh` — calcula órfãos; `degit --force` sobrescreve mas nunca apaga | 240 | `anvil-update` |
-| `payload-rule-tmpl.md` + `payload-starter/` + 3 `.sh` | 77 l + 23 arq + 737 l | `anvil-stack-payload/bench/` |
-| `qa-evidence-contract.md` — `quality_score = 100 − 20×FAIL − 10×CONCERNS`, só faz sentido havendo loop | 58 | `anvil-bench` |
+| `payload-rule-tmpl.md` | 77 | `anvil-stack-payload` (`RULE.md`) |
 
 ---
 

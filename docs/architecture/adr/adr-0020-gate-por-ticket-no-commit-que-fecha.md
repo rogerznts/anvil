@@ -3,6 +3,7 @@
 - Status: aceito
 - Data: 2026-10-27
 - Origem: [spec 002](../../specs/archive/002-feature-custo-de-verificacao/spec.md), o custo de verificar como dado do projeto, e a rodada 1 da revisão dela sobre a `main` de 2026-10-27
+- Revisto em parte pelo [ADR-0023](./adr-0023-implement-spec-conduz-a-spec-com-review-unico.md): no fluxo da spec, o gate roda uma vez sobre o branch da spec; no ticket avulso, nada muda
 
 ## Contexto
 

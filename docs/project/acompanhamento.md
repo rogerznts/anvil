@@ -18,19 +18,22 @@ condutores presos ao perfil `docs/specs`, frontier em paralelo e `verify` no bas
 - **A12 · adaptador de tracker para os condutores.** Out of Scope da spec 004,
   registrado no fechamento, sem classe: é escopo, não achado de review. Com
   outro perfil do `anvil-setup` (GitHub, GitLab, markdown local), a `anvil-plan` e
-  a `anvil-run` recusam com o nome do perfil, e o fluxo segue à mão. Conduzir
-  nesses perfis pede um frontier e uma retomada que leiam issues do tracker, e
-  antes disso decidir como spec e ticket aparecem em cada um, o que é decisão de
-  grill. Não há projeto usando outro perfil com omp. Enquanto ninguém mexer, quem
-  usa outro perfil no omp não tem condução.
+  o `anvil-auto` recusam com o nome do perfil, e o fluxo segue à mão até a
+  `anvil-implement-spec`, que vem do payload e não recusa perfil. Conduzir o
+  planejamento nesses perfis pede decidir como spec e ticket aparecem em cada um,
+  o que é decisão de grill. Não há projeto usando outro perfil com omp. Enquanto
+  ninguém mexer, quem usa outro perfil no omp não tem o planejamento conduzido nem
+  o piloto automático.
 - **A14 · a `anvil-to-tickets` escreve o título no `Blocked by`.** Ticket 11 da
-  spec 004, achado do ponta a ponta antes da rodada 1, sem classe: o `frontier.sh`
-  fez o que a spec pede, e o defeito é da skill vendorizada. O ticket 02 saiu com
+  spec 004, achado do ponta a ponta antes da rodada 1, sem classe: o leitor de
+  `Blocked by` do condutor de então fez o que a spec pede, e o defeito é da skill
+  vendorizada. O ticket 02 saiu com
   `Blocked by: 01: Contar severidades de 0 a 3 em arquivo válido`, o formato que o
-  template da skill vendorizada aceita. O `frontier.sh` o deixou fora do frontier
-  como bloqueio ilegível, como a spec pede, e o operador corrigiu a linha para
-  `01`. Enquanto ninguém mexer, toda spec planejada pelo `anvil-plan` pode sair
-  com tickets parados até o operador reescrever a linha.
+  template da skill vendorizada aceita. O leitor o deixou fora do frontier como
+  bloqueio ilegível, como a spec pede, e o operador corrigiu a linha para `01`.
+  Enquanto ninguém mexer, o `roadmap.sh` lê a linha do mesmo jeito, e uma spec
+  planejada pelo `anvil-plan` pode aparecer parada no roteiro até o operador
+  reescrever a linha.
 
 ## Spec 006: instalação por usuário, idioma no chat e cauda do `anvil-next`
 
@@ -139,11 +142,6 @@ spec afirmam.
   `origin` e o upstream no `.git/config` da fixture. Enquanto ninguém mexer, uma
   fixture reaproveitada entre execuções sai `2` na execução seguinte; as provas de
   hoje recriam a fixture a cada vez.
-- **A28 · o volume do app sobra depois da derrubada da infra do prefixo.** Ticket
-  04, rodada 1, P2. O `--teardown` tira os containers da rede do prefixo, mas não
-  os volumes do compose do app, como o `node_modules`. Enquanto ninguém mexer,
-  cada prova do bench que não derruba o app com o compose dele deixa um volume
-  órfão na máquina; o B1 do ticket 09 derruba.
 
 ## Spec 011: branch base e forge neutro
 

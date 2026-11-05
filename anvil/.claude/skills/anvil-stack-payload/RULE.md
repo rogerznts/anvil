@@ -93,7 +93,7 @@ Preencha ao gerar a rule. O padrão, sem decisão contrária:
 
 ## Fatos deste projeto
 
-Preenchidos por `/anvil-boot` ou `/anvil-bench`; o valor entra **sem** backtick.
+Preenchidos por `/anvil-boot`; o valor entra **sem** backtick.
 O `/anvil-boot` troca a linha do comando de teste por um ponteiro para o
 `anvil.md`:
 

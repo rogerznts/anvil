@@ -1,6 +1,7 @@
 # ADR-0017 — A prova roda pelo caminho real, isolada, e pode sair inválida
 
 - Revisto em parte pelo [ADR-0018 — HOME dev por checkout](./adr-0018-dev-home-isolado-por-checkout.md): o launcher da prova resolve suas dependências no HOME privado, sem exigir links globais.
+- Revisto em parte pelo [ADR-0024](./adr-0024-bench-sai-do-anvil.md): o bench sai, e o prefixo de execução do `infra.sh`, o `--infra`, sai da prova.
 
 - Status: aceito
 - Data: 2026-10-23

@@ -3,6 +3,7 @@
 - Status: aceito
 - Data: 2026-08-28
 - Contexto: o mosk mantinha `current_phase` em `spec-meta.yaml` e um `pipeline.yaml` de 378 linhas. O anvil abandona os agentes-como-persona.
+- Revisto em parte pelo [ADR-0024](./adr-0024-bench-sai-do-anvil.md): o bench sai, e o hook de merge fica como a única exceção
 
 ## Contexto
 

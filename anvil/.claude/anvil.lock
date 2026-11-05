@@ -3,7 +3,6 @@
 # 'vendor-sync.sh lock'. Nao edite a mao.
 skill: anvil-architect
 skill: anvil-arena
-skill: anvil-bench
 skill: anvil-benchmark-checklist
 skill: anvil-boot
 skill: anvil-browser-qa

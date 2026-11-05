@@ -35,7 +35,7 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 6. If this changes the **frontier** of available tickets, kick off more **implementer subagents** to work on the new tickets. This allows for maximum concurrency.
 
-7. Once all tickets are complete, call the Skill tool with `anvil-code-review` on the integration branch. Fix all issues raised by the code review in a single fresh **implementer subagent**.
+7. Once all tickets are complete, call the Skill tool with `anvil-code-review` on the integration branch, with the point where it left the base branch (`git merge-base <base> HEAD`) as the fixed point. Fix all issues raised by the code review in a single fresh **implementer subagent**: every finding, P1, P2 and P3 alike; only a round with no finding at all skips the fix and round 2. Then call `anvil-code-review` again as round 2, with the tip the first review measured as the fixed point and its findings to remeasure, so it reads only the fix's diff; a fix that changed nothing leaves round 1's P1 open. The verdict is the axes': never drop or reclassify a finding they raised. A finding you judge wrong goes back to the axis that raised it, with your reason, before the fix: if the axis keeps it, it goes to the fix; if the axis withdraws it, it leaves on the axis's word. Per `docs/agents/verification.md`, a P1 still open after round 2 stops the run before step 8: leave the tickets unresolved and report it. Then, where that profile says the gate applies, run it once on the integration branch; a red gate stops the run before step 8 too. Write no `Review:` line.
 
 8. If a draft PR exists, mark it ready for review. Otherwise, resolve each ticket the way the issue tracker closes work, and report the integration branch.
 

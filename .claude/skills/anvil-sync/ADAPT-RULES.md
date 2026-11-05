@@ -196,6 +196,27 @@ subagentes, agregação e entrega ao caller:
 +comments with class and consequence.
 ```
 
+Na `anvil-implement-spec`, que conduz a spec inteira, o delta é um parágrafo só,
+no passo do review:
+
+```diff
+-7. Once all tickets are complete, call the Skill tool with `anvil-code-review` on the integration branch. Fix all issues …
++7. … on the integration branch, with the point where it left the base branch
++(`git merge-base <base> HEAD`) as the fixed point. Fix all issues … : every
++finding, P1, P2 and P3 alike; only a round with no finding at all skips the fix
++and round 2. Then call `anvil-code-review` again as round 2, with the tip the
++first review measured as the fixed point and its findings to remeasure, so it
++reads only the fix's diff; a fix that changed nothing leaves round 1's P1 open.
++The verdict is the axes': never drop or reclassify a finding they raised. A
++finding you judge wrong goes back to the axis that raised it, with your reason,
++before the fix: if the axis keeps it, it goes to the fix; if the axis withdraws
++it, it leaves on the axis's word. Per
++`docs/agents/verification.md`, a P1 still open after round 2 stops the run
++before step 8: leave the tickets unresolved and report it. Then, where that
++profile says the gate applies, run it once on the integration branch; a red
++gate stops the run before step 8 too. Write no `Review:` line.
+```
+
 **Por que existe.** O `adr-0010` — a verificação tem critério de parada, e ele é
 ausência de P1 — decide que a régua de parada chega às skills como perfil do
 projeto. A skill do upstream sabe **como achar** e não diz **quando parar**;
@@ -210,8 +231,14 @@ contradiz perde: o subagente devolve o que o prompt pediu.
 skills, e o resto de cada arquivo fica verbatim — inclusive a linha de base de
 smells e os dois eixos. As trocas substantivas são só duas: fixed point e rodada
 passam a vir do histórico `Review:`, e o resumo final deixa de ser contagem para
-virar veredito por P1. Num merge em que o upstream mexa nesses seams, a versão do
-anvil ganha.
+virar veredito por P1. Na `anvil-implement-spec` o review é um só, da spec
+inteira, e não deixa registro: o delta é a rodada 2, o fixed point das duas
+rodadas, que a skill dá em vez do histórico, a correção de todo achado da rodada
+1 com o veredito dos eixos intocado, e o gate da spec, que roda onde o perfil diz
+que se aplica; o frontier, os worktrees e o merge ficam como o upstream escreveu.
+Quem decide isso é o `adr-0023` — a
+`implement-spec` conduz a spec com um review só no fim. Num merge em que o
+upstream mexa nesses seams, a versão do anvil ganha.
 
 ---
 
@@ -273,7 +300,7 @@ Vivem no manifesto, e o script obedece.
 mescla, não os apaga por não existirem upstream, e não reclama deles.
 
 ```yaml
-keep: [RULE.md, VENDOR.md, bench]
+keep: [RULE.md, VENDOR.md]
 ```
 
 **`strip`** — arquivos do upstream deliberadamente fora. Registrados para o

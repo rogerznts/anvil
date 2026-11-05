@@ -94,11 +94,6 @@ Para provar o que acontece quando o PR não sai, a prova cria o arquivo de pedid
 `$PROOF_RUN/pr-create-fails` depois do `proof_prepare`: com ele, o `gh pr create`
 e o `tea pr create` saem `1`, sem URL, com a mensagem do CLI real sem autenticação
 no stderr, e a chamada fica no `forge.jsonl`; o resto do forge falso não muda.
-Para provas do bench com a stack de pé, o
-`proof_prepare --infra` liga o prefixo de execução do `infra.sh` com o id da
-execução, no script da prova e na sessão. Se não houver `ANVIL_PROJECTS_DIR`,
-exporta `$PROOF_RUN/projects`: o registro tem o mesmo caminho no pai, na sessão
-com HOME dev e no teardown. A limpeza derruba essa infra no fim.
 
 Os códigos de saída do helper são `0` verde, `1` vermelho, `2` ambiente ou uso
 recusado — ferramenta fora do `PATH`, opção inválida, dependência declarada ausente

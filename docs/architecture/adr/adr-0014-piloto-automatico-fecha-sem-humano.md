@@ -4,6 +4,8 @@
 - Data: 2026-10-14
 - Revê em parte o [ADR-0011](./adr-0011-omp-como-harness-com-camada-propria.md), só para quem dispara o piloto automático
 - Revê em parte o [ADR-0010](./adr-0010-verificacao-tem-criterio-de-parada.md): a terceira rodada pode ser aberta pelo piloto, por evidência nova de pesquisa
+- Revisto em parte pelo [ADR-0023](./adr-0023-implement-spec-conduz-a-spec-com-review-unico.md): o piloto implementa pela `anvil-implement-spec`, e o `PASS` não lê `Review:`; a rodada a mais por pesquisa é uma por spec
+- Revisto em parte pelo [ADR-0024](./adr-0024-bench-sai-do-anvil.md): o bench sai; o piloto entra só pelo grill, e o `PASS` é sempre o comando de verificação
 
 ## Contexto
 

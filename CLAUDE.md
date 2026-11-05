@@ -134,7 +134,7 @@ lista de skills do contexto, que o harness pode cortar.
 - `anvil-to-tickets`
 - `anvil-implement` — rodado direto na sessão; a cauda vem depois de gravada a
   linha `Review:`, seja `verdict=pass` ou `verdict=fail`
-- `anvil-run`
+- `anvil-implement-spec`
 - `anvil-browser-qa`
 - `anvil-diagnose`
 - `anvil-prototype`
@@ -144,20 +144,33 @@ lista de skills do contexto, que o harness pode cortar.
 
 A cauda não dispara:
 
-- dentro de subagente, inclusive do `anvil-implementer`: só a sessão principal
-  gera o prompt da próxima sessão;
+- dentro de subagente, inclusive dos implementers da `anvil-implement-spec`: só a
+  sessão principal gera o prompt da próxima sessão;
 - quando a skill para numa pergunta ao usuário: ela ainda não terminou;
-- quando a própria skill já invocou o `anvil-next` no fim, como o `anvil-run` faz
-  ao fechar a spec;
 - dentro de uma execução do `anvil-auto`: quem decide o próximo passo ali é o
   piloto, que termina oferecendo um grill novo.
 
 Fora da lista — `anvil-commit`, `anvil-tdd`, `anvil-code-review` e `anvil-handoff`,
 por exemplo —, o `anvil-next` roda só a pedido do usuário, e a skill termina sem
 prompt nem sugestão de próxima sessão. Esta lista é o único lugar a editar para
-mudar quais skills têm cauda, com uma exceção: o `anvil-run` invoca o
-`anvil-next` com foco no próprio relatório final, e tirá-lo da lista não desliga
-isso — é a skill dele que muda.
+mudar quais skills têm cauda.
+
+## Integração na `anvil-implement-spec`
+
+A guarda de merge bloqueia `git merge` enquanto a spec está aberta e deixa passar
+o `git cherry-pick`, que é como se integra trabalho com a spec aberta. Onde o
+harness não integra sozinho o trabalho dos implementers — Claude Code, Codex, ou
+omp sem a isolação no modo branch —, os dois merges da skill viram:
+
+- **passo 4**, trazer a ponta do branch de integração: o implementer faz
+  `git rebase <branch da spec>` no branch dele, em vez do merge;
+- **passo 5**, o merger: `git cherry-pick <base>..<branch do implementer>` no
+  branch da spec, com o branch dele já rebaseado.
+
+Dê ao branch de cada implementer um nome sem barra seguida de número, como
+`impl-017-t01`. A guarda lê como branch de spec todo nome com `<tipo>/<NNN>-`,
+como `feature/017-t01`, e bloquearia o merge dele. No omp com a isolação no modo
+branch, o omp integra, e esta seção não se aplica.
 
 ## Citar id sempre com a glosa
 

@@ -46,7 +46,6 @@ emit() {  # <next> <reason>: o do diz o que a skill faz com o next
 # Perfil do tracker: so o do anvil, cujo titulo nomeia docs/specs, guarda spec e
 # tickets onde este script le. Com outro perfil do anvil-setup (GitHub, GitLab,
 # markdown local) ou sem o arquivo, ecoa o motivo da recusa; com o docs/specs, nada.
-# O mesmo texto sai no frontier.sh da anvil-run.
 tracker_refusal() {
     local profile=docs/agents/issue-tracker.md title
     if [ ! -f "$profile" ]; then
@@ -129,7 +128,7 @@ done
 if [ -f "$dir/spec.md" ]; then
     if [ "$tickets" -gt 0 ]; then
         emit end "a spec.md existe e há $tickets ticket(s) de implementação em issues/"
-        echo "handoff: /clear, e depois /skill:anvil-run $num"
+        echo "handoff: /clear, e depois /skill:anvil-implement-spec $dir"
     else
         emit anvil-to-tickets "a spec.md existe e não há ticket de implementação"
     fi
