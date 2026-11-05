@@ -19,3 +19,6 @@
 [submodule "references/security-audit-skill"]
 	path = references/security-audit-skill
 	url = https://github.com/cloudflare/security-audit-skill.git
+[submodule "references/workz"]
+	path = references/workz
+	url = https://github.com/rohansx/workz

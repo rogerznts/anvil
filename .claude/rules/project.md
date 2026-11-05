@@ -25,7 +25,7 @@ Confundir as duas coisas é o erro caro daqui.
 | `.claude/settings.json` | o hook da guarda de merge deste repositório, que chama a guarda direto do payload, `anvil/.claude/skills/anvil-docs/scripts/guard-spec-merge.sh` |
 | `anvil-skills.yaml` | o manifesto de curadoria. Também não vai no degit |
 | `references/` — upstream vendorizado | submodule com pin, listado em `sources:` no manifesto. De onde vem o que é vendorizado. **O pin é a base do merge 3-way** |
-| `references/` — sistema de referência | sistema de terceiro estudado para portar algo, fora do manifesto. Entra passageiro, fora do git por `.git/info/exclude`, ou versionado como submodule, com pin. **Não é base de merge**: o `mosk` — o toolkit de agentes-persona que o anvil sucede — está aqui |
+| `references/` — sistema de referência | sistema de terceiro estudado para portar algo, fora do manifesto. Entra passageiro, fora do git por `.git/info/exclude`, ou versionado como submodule, com pin. **Não é base de merge**: o `mosk` — o toolkit de agentes-persona que o anvil sucede — está aqui, e o `workz`, com pin na release que o `anvil-update` instala, a `v0.11.0` |
 | `docs/` | a documentação do próprio anvil |
 | `workspace/` | projetos descartáveis para exercitar o toolkit. Fora do git |
 
