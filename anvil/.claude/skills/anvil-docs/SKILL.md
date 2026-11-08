@@ -199,7 +199,7 @@ a raiz do `git`, ou o diretório corrente no caso do `find-dupes`.
   declaradas ficam sob os domínios canônicos. Consultivo, não bloqueia.
 - `bash ~/.claude/skills/anvil-docs/scripts/validate.sh ship-ready [branch...]` —
   a spec do branch atual, e a de cada branch passado, está fechada (tickets
-  `resolved`) **e arquivada**, lida do commit de cada um. É o que o hook de merge
+  `resolved`, sem caixa `- [ ]` aberta) **e arquivada**, lida do commit de cada um. É o que o hook de merge
   chama, passando os branches que o `git merge` nomeia, e é o que impõe o
   `archive` antes do merge ou do PR.
 - `bash ~/.claude/skills/anvil-docs/scripts/find-dupes.sh docs` — conteúdo

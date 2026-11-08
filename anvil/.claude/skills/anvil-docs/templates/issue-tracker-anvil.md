@@ -89,9 +89,11 @@ prefixo numérico em `docs/specs/`.
 Qualquer ticket cujos bloqueadores estejam todos `resolved`. Numa cadeia
 puramente linear isso é de cima para baixo.
 
-Ao concluir um ticket, marque `Status: resolved` e commite. O hook de merge varre
-`issues/` no commit do branch atrás de arquivo sem essa marca e bloqueia o merge
-enquanto houver.
+Ao concluir um ticket, marque `[x]` em cada critério de aceite que o trabalho
+entregou, marque `Status: resolved` e commite. O critério que deixou de valer não
+fica aberto: vira `- [x] ~~critério~~ — motivo`. O hook de merge varre `issues/`
+no commit do branch atrás de arquivo sem `Status: resolved`, ou com ele e alguma
+caixa `- [ ]` ainda aberta, e bloqueia o merge enquanto houver.
 
 ## Fechar a spec
 

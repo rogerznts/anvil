@@ -24,9 +24,10 @@ pelo `tea` (`tea pr create`). O move só conta depois de commitado.
 
 ## Pré-condição
 
-Todo ticket em `issues/` com `Status: resolved`. Se houver ticket aberto, **pare
-e liste quais** — é a mesma checagem que o hook de merge faz, e adiantá-la aqui
-poupa o usuário de descobrir no merge.
+Todo ticket em `issues/` com `Status: resolved` e sem caixa `- [ ]` aberta. Se
+houver ticket aberto, ou resolvido com caixa aberta, **pare e liste quais** — é a
+mesma checagem que o hook de merge faz, e adiantá-la aqui poupa o usuário de
+descobrir no merge.
 
 O usuário pode arquivar mesmo assim, se disser explicitamente. Nesse caso,
 registre no relatório final quais tickets ficaram abertos.

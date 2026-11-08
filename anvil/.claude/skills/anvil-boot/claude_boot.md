@@ -171,6 +171,13 @@ Dê ao branch de cada implementer um nome sem barra seguida de número, como
 como `feature/017-t01`, e bloquearia o merge dele. No omp com a isolação no modo
 branch, o omp integra, e os dois merges acima não se aplicam.
 
+**Caixas dos critérios.** O brief de cada implementer manda marcar `[x]` nas
+caixas do próprio ticket que o trabalho entregou, no mesmo commit, sem tocar no
+`Status:` nem em outro ticket. No **passo 8**, quem conduz confere as caixas de
+cada ticket antes de marcar `Status: resolved`: o critério que deixou de valer
+vira `- [x] ~~critério~~ — motivo`, nunca fica aberto. A guarda de merge recusa
+ticket `resolved` com `- [ ]`.
+
 **Worktrees pelo workz.** Num projeto com a seção `## Worktrees` no
 `.claude/rules/anvil.md`, quem conduz cria o worktree de cada implementer pelo
 script do anvil, que o põe na convenção do workz e roda o `provisionar:` da seção,

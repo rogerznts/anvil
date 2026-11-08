@@ -100,7 +100,7 @@ cmd_ship_ready() {
 }
 
 check_spec() {
-    local root="$1" ref="$2" branch="$3" spec_dir open_tickets total resolved f
+    local root="$1" ref="$2" branch="$3" spec_dir open_tickets unchecked total resolved f body n
     # Branch sem número não tem spec. Isso é o esperado para chore/, docs/, ci/ —
     # o número é o que marca "isto tem spec".
     if ! printf '%s' "$branch" | grep -qE '(^|/)[a-z]+/[0-9]{3}-'; then
@@ -125,13 +125,19 @@ check_spec() {
         return 1
     fi
 
-    total=0; resolved=0; open_tickets=""
+    total=0; resolved=0; open_tickets=""; unchecked=""
     while IFS= read -r f; do
         case "$f" in *.md) ;; *) continue ;; esac
         total=$((total + 1))
-        if read_entry "$root" "$ref" "$spec_dir/issues/$f" |
+        body="$(read_entry "$root" "$ref" "$spec_dir/issues/$f")"
+        if printf '%s\n' "$body" |
             grep -E '^\*{0,2}Status:?\*{0,2}[[:space:]]*resolved[[:space:]]*$' >/dev/null; then
             resolved=$((resolved + 1))
+            # Resolver é marcar o que foi entregue: caixa aberta num ticket fechado
+            # é critério sem prova, ou esquecimento. O critério que deixou de valer
+            # fica marcado e riscado, com o motivo.
+            n="$(printf '%s\n' "$body" | grep -cE '^[[:space:]]*[-*] \[ \]')"
+            [ "$n" -eq 0 ] || unchecked="$unchecked  - $f ($n)\n"
         else
             open_tickets="$open_tickets  - $f\n"
         fi
@@ -148,6 +154,14 @@ EOF
         echo "spec $(basename "$spec_dir"): $resolved de $total tickets resolvidos."
         echo "Ainda abertos:"
         printf '%b' "$open_tickets"
+        return 1
+    fi
+
+    if [ -n "$unchecked" ]; then
+        echo "spec $(basename "$spec_dir"): ticket resolved com caixa de critério aberta."
+        echo "Marque [x] o que foi entregue; o critério que deixou de valer fica"
+        echo "'- [x] ~~critério~~ — motivo'. Caixas abertas:"
+        printf '%b' "$unchecked"
         return 1
     fi
 
@@ -224,7 +238,8 @@ validate.sh <subcomando>
                           está fechada e arquivada (default)
   docs-paths [--quiet]    as saídas ficam sob os domínios canônicos
 
-ship-ready sai 1 quando há ticket sem `Status: resolved`, ou quando a spec ainda
+ship-ready sai 1 quando há ticket sem `Status: resolved`, ticket resolved com
+caixa `- [ ]` aberta, ou quando a spec ainda
 não está sob docs/specs/archive/. Lê o commit de cada branch, o atual pelo HEAD:
 o que não foi commitado não conta. É o que o hook de merge lê. docs-paths é
 consultivo e nunca deve bloquear nada.

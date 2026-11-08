@@ -28,9 +28,10 @@ isolação na raiz do projeto, com `omp config get task.isolation.enabled` e
 
 - **Quem implementa.** Cada implementer é um item do `task` com o agente padrão,
   `task`, nunca um agente que rode review: o implementer recebe o ticket, chama a
-  `anvil-tdd`, commita e não grava linha `Review:` nem mexe no `Status:` do
-  ticket. Quem fecha os tickets é o passo 8, e o review é só o do passo 7, sobre a
-  spec.
+  `anvil-tdd`, marca `[x]` nas caixas do próprio ticket que o trabalho entregou e
+  commita junto, e não grava linha `Review:` nem mexe no `Status:` do ticket nem
+  em outro ticket. Quem fecha os tickets é o passo 8, que confere as caixas e marca
+  `Status: resolved`, e o review é só o do passo 7, sobre a spec.
 - **Isolação ligada no modo branch** (`true` e `branch`): "each in its own
   worktree on its own branch" é o `task` com `isolated: true` em **todo** item,
   um implementer por ticket do frontier. O omp copia o checkout a partir do `HEAD`
