@@ -241,7 +241,7 @@ pelo espelho `~/.agents/skills` e não tem guarda.
 - O frontier é em série sem isolação. Na `anvil-implement-spec`, o paralelo vem
   com a isolação no modo branch, sem pedido.
 - O `task` não escolhe modelo por chamada. O implementer herda o modelo da sessão,
-  e as linhas `runners`, `how-explorer`, `how-explainer`, `cross-judge`, `swarm workers` e `interrogate reviewers` do `.claude/rules/anvil.md`
+  e as linhas `runners`, `cross-judge`, `swarm workers` e `interrogate reviewers` do `.claude/rules/anvil.md`
   não têm efeito no omp. Para outro modelo, use `task.agentModelOverrides` na
   configuração do omp.
 - O `anvil-plan` e o `anvil-auto` recusam fora do perfil `docs/specs`. O

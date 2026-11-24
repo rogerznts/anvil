@@ -3,13 +3,14 @@ name: anvil-arena
 description: "Spawn N parallel candidates at the same task, pick a base, graft the strongest parts of the losers into it. Use for /arena, 'arena this', 'throw it in the arena', or when one attempt at a non-trivial artifact would lock in the wrong shape."
 ---
 
-> **Nota de adaptação.** Upstream, esta skill roda cada candidato numa família
-> de modelo diferente — Claude e Grok — e é dessa diversidade que vem boa
-> parte do valor. O Claude Code só endereça modelos Claude, então a premissa
-> degrada: os candidatos variam por modelo, não por família. O que sobrevive
-> intacto é o **cross-judge** — um juiz independente, que não escreveu nenhum
-> candidato, pontuando contra a rubrica. Se na prática o bakeoff não se
-> sustentar sem a diversidade de família, é essa parte que vale manter.
+> **Nota de adaptação.** Upstream, esta skill roda os candidatos em modelos de
+> fornecedores diferentes — Fable, Opus e Gemini — e o juiz nunca é do
+> fornecedor da sessão. É dessa diversidade que vem boa parte do valor. O Claude
+> Code só endereça modelos Claude, então a premissa degrada: os candidatos
+> variam por modelo, não por fornecedor. O que sobrevive intacto é o
+> **cross-judge** — um juiz independente, que não escreveu nenhum candidato,
+> pontuando contra a rubrica. Se na prática o bakeoff não se sustentar sem a
+> diversidade de fornecedor, é essa parte que vale manter.
 
 # Arena
 
@@ -21,7 +22,7 @@ Every candidate gets the same prompt, so the prompt is the contract.
 
 1. State the artifact each candidate is producing.
 2. Derive the rubric, 3-6 concrete gradeable criteria for what success looks like on *this* task. It is the picker's tool in Phase D. Candidates only see the task.
-3. Pick the runners. Use the `runners` list in `.claude/rules/anvil.md`. If the rule or that list is missing, default to one each on `opus` and `sonnet`. An `auto` or `inherit-parent` entry in this list means the parent model, so omit `model` for it. If the Task tool rejects a configured entry, run that seat on `opus` and say so. Spawn more runners when the arena covers multiple design directions. Use the same model N times when the work is generation-bound rather than judgment-sensitive. Pick each subagent's reasoning level and fast or standard speed for the job, per the Subagents section of the **anvil-poteto** skill.
+3. Pick the runners from the `runners` list in `.claude/rules/anvil.md`, by default `fable`, `opus`, and `sonnet`. An `auto` or `inherit-parent` entry is the parent model, so omit `model` and spawn `general-purpose`. If the Task tool rejects a model, use the nearest valid model or drop the seat, keep at least two runners, and say so. Spawn more for multiple design directions, and repeat one model when the work is generation-bound, not judgment-sensitive. Pick each subagent's reasoning level per the Subagents section of the **anvil-poteto** skill.
 4. Give each candidate its own output location (a git worktree where possible, otherwise `/tmp/arena-<slug>/candidate-<n>/`), per the **separate-before-serializing-shared-state** principle skill.
 
 ## Phase B: Fan out
@@ -32,7 +33,7 @@ If a candidate produces no output, proceed with N-1 and note the dropout.
 
 ## Phase C: Cross-judge
 
-After all Phase B candidates complete, choose one model from the `cross-judge` list in `.claude/rules/anvil.md`. If the rule or that list is missing, choose from `opus` and `sonnet`. Spawn one readonly judge subagent. Prefer a model other than the parent's. An `auto` or `inherit-parent` entry is the parent model, so it never judges. If the Task tool rejects an entry, move to the next entry. If none runs, skip the judge, pick the base alone in Phase D, and say so. The judge sees the rubric and the candidates by path label, scores each criterion, and recommends a base with rationale. It runs in parallel with your reading in Phase D. Don't spawn it while candidates are still writing.
+After all Phase B candidates complete, spawn one readonly judge from the `cross-judge` list in `.claude/rules/anvil.md`, by default `opus`, `sonnet`. Prefer a model other than the parent's, so use the first entry that differs from it. An `auto` or `inherit-parent` entry is the parent model. If you do not know the parent's model, use the first real entry and say that the check did not run. If the Task tool rejects a model, use the next entry, or skip the judge, and say so. While you read in Phase D, the judge scores each candidate, by path label, on each rubric criterion and recommends a base.
 
 ## Phase D: Pick a base
 

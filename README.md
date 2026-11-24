@@ -45,25 +45,25 @@ Isso é possível porque as skills do Matt Pocock não têm caminho fixo: elas l
 documental do anvil é um perfil de tracker** — ao lado de github, gitlab e local
 — e não um alvo de reescrita.
 
-O resultado, medido em 2026-11-04 com
+O resultado, medido em 2026-11-24 com
 `bash .claude/skills/anvil-sync/scripts/vendor-sync.sh stats`:
 
 | | |
 |---|---|
 | skills `vendored` no manifesto | 38 entradas, as 38 skills curadas. 37 têm árvore no upstream; `anvil-principles` é só `keep` e `extra` |
-| linhas dos arquivos que existem no pin e no payload | 88.157 |
-| **linhas nossas que diferem do upstream** | **215 — 0,24%** |
-| arquivos deixados de fora (`strip`) | 63 |
+| linhas dos arquivos que existem no pin e no payload | 284.024 |
+| **linhas nossas que diferem do upstream** | **213 — 0,07%** |
+| arquivos deixados de fora (`strip`) | 58 |
 | arquivos do anvil dentro de skill vendorizada (`keep`) | 5 arquivos · 458 linhas |
-| material trazido de fora da árvore da skill (`extra`) | 24 arquivos · 435 linhas · 9 nossas |
+| material trazido de fora da árvore da skill (`extra`) | 24 arquivos · 337 linhas · 1 nossa |
 | arquivo sem par, fora da conta | 0 |
 
 *Linha nossa* é a que está no payload e não está na versão do pin. A definição
 inteira, com o que conta à parte, está no próprio script.
 
-Em dezessete dessas skills, os arquivos pareados têm **uma linha** de delta: o
+Em quinze dessas skills, os arquivos pareados têm **uma linha** de delta: o
 `name:` do frontmatter. O que conta à parte fica fora dessa linha — o
-`anvil-stack-payload` está entre as dezessete e carrega 2 arquivos `keep`.
+`anvil-stack-payload` está entre as quinze e carrega 2 arquivos `keep`.
 
 ---
 
@@ -206,7 +206,7 @@ merge` passa sem mensagem. Num projeto anvil, ela lê a spec do projeto e chama 
 
 | skill | para quê | origem |
 |---|---|---|
-| `anvil-architect` | esboça tipos, assinaturas e módulos **antes** do código, e fica no loop | pstack |
+| `anvil-architect` | antes do código, esboça duas formas — tipos, assinaturas, módulos — e fica com a de dono único e menos coisa para o chamador saber; design grande ou disputado vai para o `arena` | pstack |
 | `anvil-arena` | N candidatos em paralelo, um juiz independente, enxerta o melhor de cada | pstack |
 | `anvil-prototype` | protótipo descartável para responder uma pergunta de design que só se responde vendo rodar. A decisão volta para o documento; o protótipo morre fora da main | mattpocock |
 | `anvil-wayfinder` | trabalho grande demais para uma sessão: mapa de tickets de decisão | mattpocock |
@@ -220,15 +220,15 @@ merge` passa sem mensagem. Num projeto anvil, ela lê a spec do projeto e chama 
 ### Interface
 
 O `anvil-ui` é **roteador**: escolhe um método e só um, porque `hallmark` e
-`taste` são rivais — um entrega um tema como material, o outro parte de uma ideia
-tirada do assunto e mede a página num navegador real. Quem parte de uma
+`taste` são rivais — um entrega um tema como material, o outro parte do tipo de
+negócio e mede o site num navegador real. Tela de app fica com o hallmark. Quem parte de uma
 referência passa antes pelo `anvil-ui-study`, que entrega ao hallmark.
 
 | skill | para quê | origem |
 |---|---|---|
 | `anvil-ui` | decide qual método usar antes de qualquer código | autoral |
 | `anvil-ui-hallmark` | página nova a partir de um tema sorteado de um catálogo de 50 e de uma forma entre 21 macroestruturas; escopo próprio de componente, com os oito estados; `redesign` e `audit` só quando nomeado | hallmark |
-| `anvil-ui-taste` | página e tela de app, novas ou existentes: três de 20 direções contra um inventário do assunto, inspector em navegador real e crítica por screenshots. Pede Node 22+ e Chrome | taste |
+| `anvil-ui-taste` | site de empresa no padrão de figma.com e x.ai: o tipo de negócio decide tudo, fotografia e produto reais, um momento por página e um gate de acabamento que confere tudo num navegador real. Pede Node 22+ e Chrome | taste |
 | `anvil-ui-study` | extrai o DNA de design de uma URL ou screenshot de referência, recusa cópia e template pago, e grava um `design.md` que o hallmark lê como sistema travado | autoral |
 
 ### Escrita e comunicação
